@@ -16,9 +16,11 @@ import {
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useHeader } from '@/context/HeaderProvider';
 
 export function Header() {
   const { itemCount } = useCart();
+  const { headerTitle } = useHeader();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -26,8 +28,14 @@ export function Header() {
         <div className="flex items-center">
           <SidebarTrigger className="md:hidden" />
           <Link href="/" className="hidden md:flex items-center space-x-2">
-            <Flame className="h-8 w-8 text-red-500" />
-            <span className="text-2xl font-bold text-red-500">Eat Hub</span>
+            {headerTitle ? (
+              <span className="text-xl font-bold">{headerTitle}</span>
+            ) : (
+              <>
+                <Flame className="h-8 w-8 text-red-500" />
+                <span className="text-2xl font-bold text-red-500">Eat Hub</span>
+              </>
+            )}
           </Link>
         </div>
         

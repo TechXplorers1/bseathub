@@ -7,9 +7,9 @@ export default function TrackOrderPage() {
     const mapImage = getImageById('track-order-map');
 
     return (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="px-4 sm:px-6 lg:px-8 py-12">
             <h1 className="text-3xl font-bold text-center mb-8">Track Your Order</h1>
-            <Card className="mx-auto">
+            <Card className="mx-auto max-w-4xl">
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <div>
@@ -25,7 +25,7 @@ export default function TrackOrderPage() {
                             <Image
                                 src={mapImage.imageUrl}
                                 alt={mapImage.description}
-                                layout="fill"
+                                fill
                                 objectFit="cover"
                                 data-ai-hint={mapImage.imageHint}
                             />

@@ -25,42 +25,58 @@ export function MenuNav({ menuCategories, className }: MenuNavProps) {
 
   const handleScroll = React.useCallback(() => {
     let currentCategory = '';
-    const yOffset = -120;
+    const yOffset = 130; // A bit more than the sticky header height
     
-    for (const category of navItems) {
-      const element = document.getElementById(category);
+    const elements = navItems.map(item => document.getElementById(item)).filter(Boolean);
+
+    for (const element of elements) {
       if (element) {
-        const rect = element.getBoundingClientRect();
-        if (rect.top + yOffset <= 1) {
-          currentCategory = category;
-        }
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= yOffset && rect.bottom > yOffset) {
+              currentCategory = element.id;
+              break;
+          }
       }
     }
+
+    // If no category is in view, check if we've scrolled past the first one
+    if (!currentCategory && elements.length > 0 && elements[0]) {
+      if (elements[0].getBoundingClientRect().top > yOffset) {
+        currentCategory = elements[0].id;
+      }
+    }
+    
+    // If we've scrolled to the bottom, the last item should be active
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) { // 2px buffer
+        currentCategory = navItems[navItems.length - 1];
+    }
+
+
     if (currentCategory && currentCategory !== activeItem) {
         setActiveItem(currentCategory);
-    } else if (!currentCategory && navItems.length > 0) {
-        setActiveItem(navItems[0]);
     }
+
   }, [activeItem, navItems]);
 
 
   React.useEffect(() => {
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
 
   return (
-    <div className={cn('sticky top-28', className)}>
-        <ScrollArea className="h-[calc(100vh-200px)]">
+    <div className={cn('h-full', className)}>
+        <ScrollArea className="h-[calc(100vh-250px)]">
             <nav className="flex flex-col space-y-1 pr-4">
             {navItems.map((item) => (
                 <Button
                     key={item}
                     variant="ghost"
                     onClick={() => {
-                        setActiveItem(item);
+                        // setActiveItem(item); // This is handled by the scroll listener
                         scrollToCategory(item);
                     }}
                     className={cn(

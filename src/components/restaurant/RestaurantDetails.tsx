@@ -114,7 +114,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           
           {/* Left Column - Store Info & Menu Nav */}
           <div className="lg:col-span-3">
-            <div className='lg:sticky lg:top-28'>
+            <div className='lg:sticky lg:top-24 self-start'>
               <h1 className="text-4xl font-bold mt-8 text-center lg:text-left">{restaurant.name}</h1>
               <div className="mt-6 space-y-3 text-sm">
                 <h2 className="text-lg font-semibold sr-only lg:not-sr-only">Store Info</h2>

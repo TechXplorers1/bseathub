@@ -12,13 +12,13 @@ import {
   Home,
   ShoppingBag,
   Ticket,
-  Building,
   Heart,
-  Landmark,
   Search,
   Book,
   User,
   ShoppingBasket,
+  Gift,
+  Wallet,
 } from 'lucide-react';
 import { Header } from './Header';
 
@@ -28,17 +28,16 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Browse', icon: Search, href: '#' },
     { name: 'Orders', icon: Book, href: '/track-order' },
     { name: 'Favorites', icon: Heart, href: '#' },
-    { name: 'Wallet', icon: User, href: '#' },
+    { name: 'Wallet', icon: Wallet, href: '#' },
     { name: 'Promotions', icon: Ticket, href: '#' },
-    { name: 'Invite Friends', icon: Building, href: '#' },
+    { name: 'Invite Friends', icon: Gift, href: '#' },
   ];
 
   const categoriesNav = [
     { name: 'Grocery', icon: ShoppingBasket, href: '#' },
     { name: 'Convenience', icon: ShoppingBag, href: '#' },
-    { name: 'Alcohol', icon: Landmark, href: '#' },
-    { name: 'Retail', icon: Heart, href: '#' },
-    { name: 'Eat Hub', icon: Building, href: '#' },
+    { name: 'Best of Eat Hub', icon: Heart, href: '#' },
+    { name: 'Account', icon: User, href: '#' },
   ];
 
   return (

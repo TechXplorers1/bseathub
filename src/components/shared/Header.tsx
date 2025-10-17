@@ -39,7 +39,6 @@ export function Header() {
                   <Link href="/">Home</Link>
                   <Link href="/track-order">Track Order</Link>
                   <Button>Sign In</Button>
-                  <Button variant="secondary">Sign Up</Button>
                 </div>
             </SheetContent>
           </Sheet>
@@ -89,7 +88,6 @@ export function Header() {
             <User className="h-5 w-5 md:mr-2" />
             <span className="hidden md:block">Sign In</span>
           </Button>
-          <Button variant="secondary" className="hidden md:flex">Sign Up</Button>
         </nav>
       </div>
     </header>

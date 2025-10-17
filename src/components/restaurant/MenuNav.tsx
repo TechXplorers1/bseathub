@@ -11,7 +11,8 @@ interface MenuNavProps {
 }
 
 export function MenuNav({ menuCategories, className }: MenuNavProps) {
-  const [activeItem, setActiveItem] = React.useState(menuCategories[0] || 'Featured Items');
+  const navItems = ["Featured Items", "Reviews", "Most Ordered", ...menuCategories];
+  const [activeItem, setActiveItem] = React.useState(navItems[0] || 'Featured Items');
 
   const scrollToCategory = (id: string) => {
     const element = document.getElementById(id);
@@ -26,7 +27,7 @@ export function MenuNav({ menuCategories, className }: MenuNavProps) {
     let currentCategory = '';
     const yOffset = -120;
     
-    for (const category of menuCategories) {
+    for (const category of navItems) {
       const element = document.getElementById(category);
       if (element) {
         const rect = element.getBoundingClientRect();
@@ -37,10 +38,10 @@ export function MenuNav({ menuCategories, className }: MenuNavProps) {
     }
     if (currentCategory && currentCategory !== activeItem) {
         setActiveItem(currentCategory);
-    } else if (!currentCategory && menuCategories.length > 0) {
-        setActiveItem(menuCategories[0]);
+    } else if (!currentCategory && navItems.length > 0) {
+        setActiveItem(navItems[0]);
     }
-  }, [activeItem, menuCategories]);
+  }, [activeItem, navItems]);
 
 
   React.useEffect(() => {
@@ -49,8 +50,6 @@ export function MenuNav({ menuCategories, className }: MenuNavProps) {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
-
-  const navItems = ["Featured Items", "Reviews", "Most Ordered", ...menuCategories];
 
   return (
     <div className={cn('sticky top-28', className)}>

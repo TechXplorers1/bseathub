@@ -88,7 +88,7 @@ export function Cart() {
               })}
             </div>
           </ScrollArea>
-          <SheetFooter className="mt-auto flex flex-col space-y-4 pt-4">
+          <SheetFooter className="mt-auto flex flex-col space-y-4 pt-4 pr-4">
             <Separator />
             <div className="flex justify-between font-medium">
               <span>Subtotal</span>

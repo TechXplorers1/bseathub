@@ -171,7 +171,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
               <h2 className="text-2xl font-bold mb-4" id="Featured Items">Featured Items</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
-                  <Tag className="h-6 w-6 text-red-500" />
+                  <Tag className="h-6 w-6 text-primary" />
                   <div>
                     <h3 className="font-bold text-sm">50TREAT - 50% off your first order</h3>
                     <p className="text-xs text-muted-foreground">50TREAT - 50% off your first order of $15+, up to $15</p>
@@ -192,7 +192,10 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
             
             {/* Reviews Section */}
             <div id="Reviews">
-                <h2 className="text-2xl font-semibold mt-6 mb-4">Reviews</h2>
+                <div className="flex justify-between items-center mt-6 mb-4">
+                  <h2 className="text-2xl font-semibold">Reviews</h2>
+                  <Button variant="outline">Add Review</Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {reviews.map((review, index) => (
                         <ReviewCard key={index} review={review} />

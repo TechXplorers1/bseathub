@@ -25,6 +25,7 @@ import { MenuNav } from './MenuNav';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { cn } from '@/lib/utils';
 import { AddReviewDialog } from './AddReviewDialog';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -48,7 +49,7 @@ type Review = { author: string, text: string, rating: number, avatar: string };
 
 function ReviewCard({ review }: { review: Review }) {
     return (
-        <Card>
+        <Card className="w-[300px] flex-shrink-0">
             <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                     <Avatar>
@@ -60,7 +61,7 @@ function ReviewCard({ review }: { review: Review }) {
                         <ReviewStars rating={review.rating} />
                     </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-3">{review.text}</p>
+                <p className="text-sm text-muted-foreground mt-3 line-clamp-3">{review.text}</p>
             </CardContent>
         </Card>
     )
@@ -70,7 +71,10 @@ const initialReviews: Review[] = [
     { author: "Jane D.", text: "Absolutely delicious! The carbonara was to die for. Will be ordering again soon.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
     { author: "John S.", text: "Good food, but the delivery was a bit slow. The pizza was still warm though.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704e" },
     { author: "Mike L.", text: "The Calamari Fritti was a bit soggy, but the main course was great. Overall a good experience.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704f" },
-]
+    { author: "Sarah B.", text: "Wow! The sushi was incredibly fresh and beautifully presented. Best I've had in a long time.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026705d" },
+    { author: "Tom H.", text: "Burger was juicy and cooked perfectly. Fries were a little cold on arrival, but still good.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026706e" },
+    { author: "Emily R.", text: "The vegan options are amazing! So much flavor and creativity. Highly recommend the power bowl.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026707f" },
+];
 
 export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   const image = getImageById(restaurant.imageId);
@@ -206,11 +210,14 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                   <h2 className="text-2xl font-semibold">Reviews</h2>
                   <Button variant="outline" onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {reviews.map((review, index) => (
-                        <ReviewCard key={index} review={review} />
-                    ))}
-                </div>
+                <ScrollArea>
+                    <div className="flex space-x-4 pb-4">
+                        {reviews.map((review, index) => (
+                            <ReviewCard key={index} review={review} />
+                        ))}
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                </ScrollArea>
             </div>
 
             <Separator className="my-8" />

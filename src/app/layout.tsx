@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { SiteLayout } from '@/components/shared/SiteLayout';
 import { HeaderProvider } from '@/context/HeaderProvider';
+import { LocationProvider } from '@/context/LocationProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Eat Hub',
+  title: 'SwiftDash',
   description: 'Your favorite food, delivered fast.',
 };
 
@@ -31,14 +32,16 @@ export default function RootLayout({
           inter.variable
         )}
       >
-        <CartProvider>
-          <SidebarProvider>
-            <HeaderProvider>
-              <SiteLayout>{children}</SiteLayout>
-            </HeaderProvider>
-            <Toaster />
-          </SidebarProvider>
-        </CartProvider>
+        <LocationProvider>
+          <CartProvider>
+            <SidebarProvider>
+              <HeaderProvider>
+                <SiteLayout>{children}</SiteLayout>
+              </HeaderProvider>
+              <Toaster />
+            </SidebarProvider>
+          </CartProvider>
+        </LocationProvider>
       </body>
     </html>
   );

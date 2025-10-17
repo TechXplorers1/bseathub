@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartProvider';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -119,8 +119,4 @@ export function Cart() {
       )}
     </div>
   );
-}
-
-function buttonVariants(arg0?: undefined): string | undefined {
-    throw new Error('Function not implemented.');
 }

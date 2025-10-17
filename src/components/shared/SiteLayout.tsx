@@ -42,13 +42,13 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar
           variant="sidebar"
           collapsible="icon"
-          className="group hidden md:flex text-sidebar-foreground sticky top-16 h-[calc(100vh-4rem)]"
+          className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
         >
           <SidebarContent>
             <SidebarMenu>

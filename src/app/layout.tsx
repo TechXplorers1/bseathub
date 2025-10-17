@@ -30,12 +30,12 @@ export default function RootLayout({
           inter.variable
         )}
       >
-        <SidebarProvider>
-          <CartProvider>
+        <CartProvider>
+          <SidebarProvider>
             <SiteLayout>{children}</SiteLayout>
             <Toaster />
-          </CartProvider>
-        </SidebarProvider>
+          </SidebarProvider>
+        </CartProvider>
       </body>
     </html>
   );

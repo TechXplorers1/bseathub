@@ -148,8 +148,8 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           {/* Right Column - Menu & Other info */}
           <div className="lg:col-span-9">
             {/* Search and Delivery Options */}
-            <div className="sticky top-16 bg-background py-4 z-10 border-b -mx-4 px-4 mb-4">
-              <div className="container mx-auto px-0 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="sticky top-20 bg-background py-4 z-10 border-b">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="relative w-full sm:max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input

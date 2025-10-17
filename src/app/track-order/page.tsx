@@ -9,7 +9,7 @@ export default function TrackOrderPage() {
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h1 className="text-3xl font-bold text-center mb-8">Track Your Order</h1>
-            <Card className="max-w-4xl mx-auto">
+            <Card className="mx-auto">
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <div>

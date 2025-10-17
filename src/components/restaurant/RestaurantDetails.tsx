@@ -21,11 +21,58 @@ import {
   CardContent,
 } from '../ui/card';
 import { MenuNav } from './MenuNav';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+
+function ReviewStars({ rating, className }: { rating: number, className?: string }) {
+  return (
+    <div className={cn("flex items-center gap-0.5", className)}>
+      {Array.from({ length: 5 }, (_, i) => (
+        <Star
+          key={i}
+          className={cn(
+            "h-4 w-4",
+            i < Math.floor(rating)
+              ? "text-yellow-500 fill-yellow-500"
+              : "text-gray-300 fill-gray-300"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
+
+
+function ReviewCard({ review }: { review: { author: string, text: string, rating: number, avatar: string } }) {
+    return (
+        <Card>
+            <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                    <Avatar>
+                        <AvatarImage src={review.avatar} alt={review.author} />
+                        <AvatarFallback>{review.author.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="font-semibold">{review.author}</p>
+                        <ReviewStars rating={review.rating} />
+                    </div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3">{review.text}</p>
+            </CardContent>
+        </Card>
+    )
+}
 
 export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   const image = getImageById(restaurant.imageId);
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
   const menuCategories = restaurant.menu.map(cat => cat.title);
+  const mostOrderedItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
+  
+  const reviews = [
+    { author: "Jane D.", text: "Absolutely delicious! The carbonara was to die for. Will be ordering again soon.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
+    { author: "John S.", text: "Good food, but the delivery was a bit slow. The pizza was still warm though.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704e" },
+    { author: "Mike L.", text: "The Calamari Fritti was a bit soggy, but the main course was great. Overall a good experience.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704f" },
+  ]
 
   return (
     <div className="flex flex-col bg-background">
@@ -121,9 +168,9 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
               </div>
             </div>
 
-            {/* Deals */}
+            {/* Featured Items */}
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4" id="Featured Items">Deals & benefits</h2>
+              <h2 className="text-2xl font-bold mb-4" id="Featured Items">Featured Items</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
                   <Tag className="h-6 w-6 text-red-500" />
@@ -141,6 +188,30 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                    <Button size="sm" variant="secondary" className="ml-auto">Sign Up</Button>
                 </Card>
               </div>
+            </div>
+
+            <Separator className="my-8" />
+            
+            {/* Reviews Section */}
+            <div id="Reviews">
+                <h2 className="text-2xl font-semibold mt-6 mb-4">Reviews</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {reviews.map((review, index) => (
+                        <ReviewCard key={index} review={review} />
+                    ))}
+                </div>
+            </div>
+
+            <Separator className="my-8" />
+
+            {/* Most Ordered Section */}
+            <div id="Most Ordered">
+                <h2 className="text-2xl font-semibold mt-6 mb-4">Most Ordered</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {mostOrderedItems.map((item) => (
+                        <MenuItem key={item.id} item={item} />
+                    ))}
+                </div>
             </div>
 
             {/* Menu Sections */}

@@ -28,7 +28,7 @@ export function Cart() {
       {cartItems.length > 0 ? (
         <>
           <ScrollArea className="flex-1 pr-4">
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 space-y-6">
               {cartItems.map((item) => {
                 const image = getImageById(item.imageId);
                 return (
@@ -43,14 +43,14 @@ export function Cart() {
                         data-ai-hint={image.imageHint}
                       />
                     )}
-                    <div className="flex-1">
+                    <div className="flex-1 space-y-2">
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">
                           ${item.price.toFixed(2)}
                         </p>
                       </div>
-                      <div className="mt-2 flex items-center">
+                      <div className="flex items-center">
                         <Button
                           variant="outline"
                           size="icon"

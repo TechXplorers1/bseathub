@@ -89,9 +89,3 @@
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 }
-
-@layer utilities {
-  .bg-primary-red {
-    background-color: #FF4D4D;
-  }
-}

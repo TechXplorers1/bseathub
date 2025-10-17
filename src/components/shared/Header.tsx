@@ -122,7 +122,7 @@ export function Header() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="default" className="relative rounded-full bg-primary-red hover:bg-red-500">
+              <Button variant="default" className="relative rounded-full">
                 <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
                   <Badge

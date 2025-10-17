@@ -10,14 +10,14 @@ export function Banners() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
-      <Card className="overflow-hidden bg-red-500 text-white">
+      <Card className="overflow-hidden bg-primary text-primary-foreground">
         <CardContent className="flex items-center justify-between p-6">
           <div className="space-y-2">
             <h3 className="text-2xl font-bold">
               Enjoy 50% off your first order!
             </h3>
             <p>Use code 50TREAT on delivery orders of $15+</p>
-            <Button variant="secondary" className="mt-2 text-red-500">
+            <Button variant="secondary" className="mt-2 text-primary">
               Learn more
             </Button>
           </div>

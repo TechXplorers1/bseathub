@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Image from 'next/image';
 import type { Restaurant } from '@/lib/types';
 import { getImageById } from '@/lib/placeholder-images';
@@ -23,6 +24,7 @@ import {
 import { MenuNav } from './MenuNav';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { cn } from '@/lib/utils';
+import { AddReviewDialog } from './AddReviewDialog';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -42,8 +44,9 @@ function ReviewStars({ rating, className }: { rating: number, className?: string
   );
 }
 
+type Review = { author: string, text: string, rating: number, avatar: string };
 
-function ReviewCard({ review }: { review: { author: string, text: string, rating: number, avatar: string } }) {
+function ReviewCard({ review }: { review: Review }) {
     return (
         <Card>
             <CardContent className="p-4">
@@ -63,17 +66,24 @@ function ReviewCard({ review }: { review: { author: string, text: string, rating
     )
 }
 
+const initialReviews: Review[] = [
+    { author: "Jane D.", text: "Absolutely delicious! The carbonara was to die for. Will be ordering again soon.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
+    { author: "John S.", text: "Good food, but the delivery was a bit slow. The pizza was still warm though.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704e" },
+    { author: "Mike L.", text: "The Calamari Fritti was a bit soggy, but the main course was great. Overall a good experience.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704f" },
+]
+
 export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   const image = getImageById(restaurant.imageId);
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
   const menuCategories = restaurant.menu.map(cat => cat.title);
   const mostOrderedItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
   
-  const reviews = [
-    { author: "Jane D.", text: "Absolutely delicious! The carbonara was to die for. Will be ordering again soon.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
-    { author: "John S.", text: "Good food, but the delivery was a bit slow. The pizza was still warm though.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704e" },
-    { author: "Mike L.", text: "The Calamari Fritti was a bit soggy, but the main course was great. Overall a good experience.", rating: 4, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704f" },
-  ]
+  const [reviews, setReviews] = React.useState<Review[]>(initialReviews);
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
+
+  const handleAddReview = (newReview: Review) => {
+    setReviews([newReview, ...reviews]);
+  };
 
   return (
     <div className="flex flex-col bg-background">
@@ -194,7 +204,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
             <div id="Reviews">
                 <div className="flex justify-between items-center mt-6 mb-4">
                   <h2 className="text-2xl font-semibold">Reviews</h2>
-                  <Button variant="outline">Add Review</Button>
+                  <Button variant="outline" onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {reviews.map((review, index) => (
@@ -233,6 +243,11 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           </div>
         </div>
       </div>
+      <AddReviewDialog 
+        open={isReviewDialogOpen}
+        onOpenChange={setIsReviewDialogOpen}
+        onSubmit={handleAddReview}
+      />
     </div>
   );
 }

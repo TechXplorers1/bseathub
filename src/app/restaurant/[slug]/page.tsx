@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { allRestaurants } from '@/lib/data';
@@ -7,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Clock, Utensils, Zap } from 'lucide-react';
 import { MenuItem } from '@/components/restaurant/MenuItem';
 import { Separator } from '@/components/ui/separator';
+import { useEffect } from 'react';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function generateStaticParams() {
   return allRestaurants.map((restaurant) => ({
@@ -16,6 +20,11 @@ export function generateStaticParams() {
 
 export default function RestaurantPage({ params }: { params: { slug: string } }) {
   const restaurant = allRestaurants.find((r) => r.slug === params.slug);
+  const { setOpen } = useSidebar();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [setOpen]);
 
   if (!restaurant) {
     notFound();

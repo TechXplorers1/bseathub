@@ -38,7 +38,7 @@
     --sidebar-foreground: 224 71.4% 4.1%;
     --sidebar-border: 0 0% 89.8%;
     --sidebar-accent: 35 92% 95%;
-    --sidebar-accent-foreground: 25 95% 53%;
+    --sidebar-accent-foreground: 22.8 95.5% 53.3%;
     --sidebar-ring: 0 84.2% 60.2%;
   }
 
@@ -75,7 +75,7 @@
     --sidebar-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 25 95% 53%;
+    --sidebar-accent-foreground: 22.8 95.5% 53.3%;
     --sidebar-ring: 0 72.2% 50.6%;
   }
 }
@@ -87,5 +87,11 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+}
+
+@layer utilities {
+  .bg-primary-red {
+    background-color: #FF4D4D;
   }
 }

@@ -1,0 +1,122 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { personalizedMealRecommendations } from '@/ai/flows/personalized-meal-recommendations';
+import { RestaurantCard } from './RestaurantCard';
+import { allRestaurants } from '@/lib/data';
+import { Restaurant } from '@/lib/types';
+import { Button } from '../ui/button';
+import { ArrowRight } from 'lucide-react';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+
+export function Personalized() {
+  const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getRecommendations() {
+      try {
+        setLoading(true);
+        // Mock user data for demonstration
+        const mockInput = {
+          userId: 'user-123',
+          orderHistory: JSON.stringify([
+            {
+              orderId: 'order-1',
+              restaurant: 'The Golden Spoon',
+              items: ['Spaghetti Carbonara'],
+              date: '2024-07-20',
+            },
+            {
+              orderId: 'order-2',
+              restaurant: 'Sushi Palace',
+              items: ['California Roll', 'Spicy Tuna Roll'],
+              date: '2024-07-18',
+            },
+          ]),
+          preferences: JSON.stringify({
+            dietary: ['none'],
+            likes: ['Italian', 'Japanese'],
+            dislikes: ['spicy'],
+          }),
+        };
+
+        const result = await personalizedMealRecommendations(mockInput);
+
+        // This is a simplified logic. In a real app, you'd match meal names to restaurants.
+        // Here we just find restaurants whose cuisine matches the recommendations.
+        const recommendedRestaurants = allRestaurants.filter((restaurant) =>
+            result.recommendations.some(recommendation => restaurant.name.toLowerCase().includes(recommendation.toLowerCase()) || restaurant.cuisine.toLowerCase().includes(recommendation.toLowerCase()))
+        );
+        
+        // If not enough recommendations, fill with popular restaurants
+        if (recommendedRestaurants.length < 4) {
+            const popular = allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 4 - recommendedRestaurants.length);
+            recommendedRestaurants.push(...popular.filter(p => !recommendedRestaurants.find(r => r.id === p.id)));
+        }
+
+        setRecommendations(recommendedRestaurants.slice(0,4));
+
+      } catch (error) {
+        console.error('Failed to get personalized recommendations:', error);
+        // Fallback to popular restaurants on error
+        setRecommendations(allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 4));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    getRecommendations();
+  }, []);
+
+  if (loading) {
+    return (
+        <div className="py-8">
+            <h2 className="text-2xl font-bold mb-4">Picked for you</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                    <div key={i} className="border rounded-lg p-4">
+                        <div className="bg-gray-200 h-40 w-full rounded-md animate-pulse"></div>
+                        <div className="mt-4 bg-gray-200 h-6 w-3/4 rounded-md animate-pulse"></div>
+                        <div className="mt-2 bg-gray-200 h-4 w-1/2 rounded-md animate-pulse"></div>
+                    </div>
+                ))}
+            </div>
+      </div>
+    )
+  }
+
+  if (recommendations.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="py-8">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Picked for you</h2>
+        <Button variant="ghost">
+          See all <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+      <Carousel opts={{ align: 'start' }} className="w-full">
+        <CarouselContent>
+          {recommendations.map((restaurant, index) => (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
+              <div className="p-1">
+                <RestaurantCard restaurant={restaurant} />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="hidden sm:flex" />
+        <CarouselNext className="hidden sm:flex" />
+      </Carousel>
+    </div>
+  );
+}

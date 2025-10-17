@@ -4,8 +4,8 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { CartProvider } from '@/context/CartProvider';
 import { Toaster } from '@/components/ui/toaster';
-import { Header } from '@/components/shared/Header';
-import { Footer } from '@/components/shared/Footer';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { SiteLayout } from '@/components/shared/SiteLayout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -31,11 +31,9 @@ export default function RootLayout({
         )}
       >
         <CartProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <SidebarProvider>
+            <SiteLayout>{children}</SiteLayout>
+          </SidebarProvider>
           <Toaster />
         </CartProvider>
       </body>

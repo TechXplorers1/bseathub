@@ -34,22 +34,6 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">All Restaurants</h2>
-        <div className="flex items-center gap-2">
-            <Button variant="outline">
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                All Filters
-            </Button>
-            <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="picked">Our picks</SelectItem>
-                    <SelectItem value="rating">Rating</SelectItem>
-                    <SelectItem value="deliveryTime">Delivery time</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {sortedRestaurants.map((restaurant) => (

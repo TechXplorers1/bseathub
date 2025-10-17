@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { CartProvider } from '@/context/CartProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { SiteLayout } from '@/components/shared/SiteLayout';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,7 +31,7 @@ export default function RootLayout({
       >
         <CartProvider>
           <SidebarProvider>
-            <SiteLayout>{children}</SiteLayout>
+            {children}
           </SidebarProvider>
           <Toaster />
         </CartProvider>

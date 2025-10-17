@@ -113,7 +113,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
         <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
           
           {/* Left Column - Store Info & Menu Nav */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:border-r lg:pr-8">
             <div className='lg:sticky lg:top-24 self-start'>
               <h1 className="text-4xl font-bold mt-8 lg:mt-0">{restaurant.name}</h1>
               <div className="mt-6 space-y-3 text-sm">

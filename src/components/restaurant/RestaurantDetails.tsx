@@ -109,7 +109,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
       </div>
       
       {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
           
           {/* Left Column - Store Info & Menu Nav */}
@@ -233,5 +233,3 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
     </div>
   );
 }
-
-    

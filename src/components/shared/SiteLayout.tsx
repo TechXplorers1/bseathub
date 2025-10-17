@@ -3,10 +3,12 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarSeparator,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
   Home,
@@ -46,6 +48,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
         >
           <SidebarContent>
+            <SidebarHeader>
+                <SidebarTrigger />
+            </SidebarHeader>
             <SidebarMenu>
               {sidebarNav.map((item) => (
                 <SidebarMenuItem key={item.name}>

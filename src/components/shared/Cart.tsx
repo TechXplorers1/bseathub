@@ -86,8 +86,8 @@ export function Cart() {
               })}
             </div>
           </ScrollArea>
-          <Separator className="my-4" />
-          <SheetFooter className="mt-auto flex flex-col space-y-4">
+          <SheetFooter className="mt-auto flex flex-col space-y-4 pt-4">
+            <Separator />
             <div className="flex justify-between font-medium">
               <span>Subtotal</span>
               <span>${cartTotal.toFixed(2)}</span>

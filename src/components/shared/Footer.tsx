@@ -1,54 +1,45 @@
-import { Flame, Facebook, Twitter, Instagram } from 'lucide-react';
 import Link from 'next/link';
+import { Globe } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function Footer() {
-  const footerLinks = [
+  const footerSections = [
     {
-      title: 'Company',
-      links: [
-        { label: 'About Us', href: '#' },
-        { label: 'Careers', href: '#' },
-        { label: 'Blog', href: '#' },
-      ],
+      title: 'Top Cities',
+      links: ['New York City', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'],
     },
     {
-      title: 'Support',
-      links: [
-        { label: 'Contact Us', href: '#' },
-        { label: 'FAQ', href: '#' },
-        { label: 'Help Center', href: '#' },
-      ],
+      title: 'Get to Know Us',
+      links: ['About Us', 'Careers', 'Investors', 'Company Blog', 'Engineering Blog'],
     },
     {
-      title: 'Legal',
-      links: [
-        { label: 'Terms of Service', href: '#' },
-        { label: 'Privacy Policy', href: '#' },
-      ],
+      title: 'Let Us Help You',
+      links: ['Account Details', 'Order History', 'Help', 'Accessibility'],
+    },
+    {
+      title: 'Doing Business',
+      links: ['Become a Dasher', 'Be a Partner Restaurant', 'Get Dashers for Deliveries', 'Get SwiftDash for Work'],
     },
   ];
 
   return (
     <footer className="border-t bg-card">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center space-x-2">
-                <Flame className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold">SwiftDash</span>
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              Your favorite food, delivered fast.
-            </p>
-          </div>
-          {footerLinks.map((section) => (
+      <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          {footerSections.map((section) => (
             <div key={section.title}>
-              <h3 className="font-semibold">{section.title}</h3>
+              <h3 className="text-lg font-semibold">{section.title}</h3>
               <ul className="mt-4 space-y-2">
                 {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary">
-                        {link.label}
+                  <li key={link}>
+                    <Link href="#" className="text-sm text-muted-foreground hover:text-primary">
+                      {link}
                     </Link>
                   </li>
                 ))}
@@ -56,21 +47,23 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-8 flex flex-col items-center justify-between border-t pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} SwiftDash. All rights reserved.
-          </p>
-          <div className="mt-4 flex space-x-4 sm:mt-0">
-            <Link href="#" className="text-muted-foreground hover:text-primary">
-              <Facebook className="h-5 w-5" />
-            </Link>
-            <Link href="#" className="text-muted-foreground hover:text-primary">
-              <Twitter className="h-5 w-5" />
-            </Link>
-            <Link href="#" className="text-muted-foreground hover:text-primary">
-              <Instagram className="h-5 w-5" />
-            </Link>
-          </div>
+        <div className="mt-16 flex flex-col items-center justify-between border-t pt-8 sm:flex-row">
+            <div className="flex items-center space-x-4">
+                <Globe className="h-5 w-5 text-muted-foreground" />
+                <Select defaultValue="en">
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="es">Español</SelectItem>
+                        <SelectItem value="fr">Français</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground sm:mt-0">
+                &copy; {new Date().getFullYear()} SwiftDash
+            </p>
         </div>
       </div>
     </footer>

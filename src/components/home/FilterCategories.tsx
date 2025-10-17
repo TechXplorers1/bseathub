@@ -1,26 +1,48 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import {
+  Pizza,
+  Fish,
+  Beef,
+  Beer,
+  Sandwich,
+  Soup,
+  Vegan,
+  Zap,
+  Utensils,
+  Sprout,
+  Star,
+} from 'lucide-react';
 
 const categories = [
-  'All', 'Pizza', 'Sushi', 'Burgers', 'Mexican', 'Italian', 'Indian', 'Chinese', 'Healthy', 'Vegan'
+  { name: 'Deals', icon: Zap },
+  { name: 'Restaurants', icon: Utensils },
+  { name: 'Grocery', icon: Sprout },
+  { name: 'Pizza', icon: Pizza },
+  { name: 'Sushi', icon: Fish },
+  { name: 'Burgers', icon: Beef },
+  { name: 'Alcohol', icon: Beer },
+  { name: 'Best overall', icon: Star },
 ];
 
 export function FilterCategories() {
   return (
     <div className="py-8">
-        <h2 className="text-2xl font-bold mb-4">Categories</h2>
-        <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex w-max space-x-4 pb-4">
-                {categories.map((category) => (
-                <Button key={category} variant={category === 'All' ? 'default' : 'outline'} className="rounded-full px-6 py-3 text-base">
-                    {category}
-                </Button>
-                ))}
+      <div className="flex justify-start space-x-6 overflow-x-auto pb-4">
+        {categories.map((category) => (
+          <div
+            key={category.name}
+            className="flex flex-col items-center space-y-2 cursor-pointer group flex-shrink-0"
+          >
+            <div className="p-4 bg-gray-100 rounded-full group-hover:bg-primary/10 transition-colors">
+              <category.icon className="h-8 w-8 text-gray-700 group-hover:text-primary" />
             </div>
-            <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+            <p className="text-sm font-medium text-gray-700 group-hover:text-primary">
+              {category.name}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

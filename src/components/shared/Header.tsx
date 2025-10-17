@@ -57,7 +57,7 @@ export function Header() {
             ) : (
               <>
                 <Flame className="h-8 w-8 text-primary" />
-                <span className="text-2xl font-bold text-primary">SwiftDash</span>
+                <span className="text-2xl font-bold text-primary">Eat Hub</span>
               </>
             )}
           </Link>
@@ -67,7 +67,7 @@ export function Header() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search SwiftDash"
+            placeholder="Search Eat Hub"
             className="pl-9 rounded-full bg-gray-100 border-none focus-visible:ring-primary"
           />
         </div>

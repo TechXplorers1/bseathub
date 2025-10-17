@@ -45,14 +45,14 @@ export function Banners() {
           </div>
         </CardContent>
       </Card>
-      <Card className="overflow-hidden bg-teal-50">
+      <Card className="overflow-hidden bg-accent text-accent-foreground">
         <CardContent className="flex items-center justify-between p-6">
           <div className="space-y-2">
             <h3 className="text-xl font-bold">
               Get unlimited $0 delivery fees on eligible Eat Hub orders*
             </h3>
             <p className="text-sm">Plus exclusive offers and savings</p>
-            <Button className="mt-2 bg-teal-600 hover:bg-teal-700">
+            <Button variant="secondary" className="mt-2 bg-white text-accent">
               Try it Free for 30 Days
             </Button>
           </div>

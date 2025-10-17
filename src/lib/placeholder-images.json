@@ -1,3 +1,214 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-background",
+      "description": "A vibrant assortment of different foods on a table.",
+      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2080&auto=format&fit=crop",
+      "imageHint": "food variety"
+    },
+    {
+      "id": "restaurant-1",
+      "description": "Interior of a cozy Italian restaurant",
+      "imageUrl": "https://picsum.photos/seed/r1/600/400",
+      "imageHint": "italian restaurant"
+    },
+    {
+      "id": "restaurant-2",
+      "description": "Modern and clean sushi bar",
+      "imageUrl": "https://picsum.photos/seed/r2/600/400",
+      "imageHint": "sushi bar"
+    },
+    {
+      "id": "restaurant-3",
+      "description": "A classic American diner setup for burgers",
+      "imageUrl": "https://picsum.photos/seed/r3/600/400",
+      "imageHint": "burger diner"
+    },
+    {
+      "id": "restaurant-4",
+      "description": "A colorful and vibrant Mexican taqueria",
+      "imageUrl": "https://picsum.photos/seed/r4/600/400",
+      "imageHint": "mexican restaurant"
+    },
+    {
+      "id": "restaurant-5",
+      "description": "An elegant Indian restaurant with warm lighting",
+      "imageUrl": "https://picsum.photos/seed/r5/600/400",
+      "imageHint": "indian restaurant"
+    },
+    {
+      "id": "restaurant-6",
+      "description": "A bright and airy cafe specializing in salads",
+      "imageUrl": "https://picsum.photos/seed/r6/600/400",
+      "imageHint": "salad cafe"
+    },
+    {
+      "id": "food-1",
+      "description": "Close-up of bruschetta appetizers",
+      "imageUrl": "https://picsum.photos/seed/f1/400/300",
+      "imageHint": "bruschetta appetizer"
+    },
+    {
+      "id": "food-2",
+      "description": "A plate of crispy fried calamari",
+      "imageUrl": "https://picsum.photos/seed/f2/400/300",
+      "imageHint": "fried calamari"
+    },
+    {
+      "id": "food-3",
+      "description": "A bowl of spaghetti carbonara",
+      "imageUrl": "https://picsum.photos/seed/f3/400/300",
+      "imageHint": "spaghetti carbonara"
+    },
+    {
+      "id": "food-4",
+      "description": "A whole margherita pizza",
+      "imageUrl": "https://picsum.photos/seed/f4/400/300",
+      "imageHint": "margherita pizza"
+    },
+    {
+      "id": "food-5",
+      "description": "A plate of California sushi rolls",
+      "imageUrl": "https://picsum.photos/seed/f5/400/300",
+      "imageHint": "sushi roll"
+    },
+    {
+      "id": "food-6",
+      "description": "Spicy tuna rolls arranged on a plate",
+      "imageUrl": "https://picsum.photos/seed/f6/400/300",
+      "imageHint": "tuna roll"
+    },
+    {
+      "id": "food-7",
+      "description": "Two pieces of salmon nigiri",
+      "imageUrl": "https://picsum.photos/seed/f7/400/300",
+      "imageHint": "salmon nigiri"
+    },
+    {
+      "id": "food-8",
+      "description": "Two pieces of tuna nigiri",
+      "imageUrl": "https://picsum.photos/seed/f8/400/300",
+      "imageHint": "tuna nigiri"
+    },
+    {
+      "id": "food-9",
+      "description": "A juicy classic cheeseburger",
+      "imageUrl": "https://picsum.photos/seed/f9/400/300",
+      "imageHint": "cheeseburger"
+    },
+    {
+      "id": "food-10",
+      "description": "A tall bacon avocado burger",
+      "imageUrl": "https://picsum.photos/seed/f10/400/300",
+      "imageHint": "bacon burger"
+    },
+    {
+      "id": "food-11",
+      "description": "A basket of french fries",
+      "imageUrl": "https://picsum.photos/seed/f11/400/300",
+      "imageHint": "french fries"
+    },
+    {
+      "id": "food-12",
+      "description": "A stack of onion rings",
+      "imageUrl": "https://picsum.photos/seed/f12/400/300",
+      "imageHint": "onion rings"
+    },
+    {
+      "id": "food-13",
+      "description": "Two carne asada street tacos",
+      "imageUrl": "https://picsum.photos/seed/f13/400/300",
+      "imageHint": "street tacos"
+    },
+    {
+      "id": "food-14",
+      "description": "Al pastor tacos with pineapple",
+      "imageUrl": "https://picsum.photos/seed/f14/400/300",
+      "imageHint": "al pastor"
+    },
+    {
+      "id": "food-15",
+      "description": "A simple bean and cheese burrito",
+      "imageUrl": "https://picsum.photos/seed/f15/400/300",
+      "imageHint": "bean burrito"
+    },
+    {
+      "id": "food-16",
+      "description": "A large California burrito cut in half",
+      "imageUrl": "https://picsum.photos/seed/f16/400/300",
+      "imageHint": "california burrito"
+    },
+    {
+      "id": "food-17",
+      "description": "A bowl of chicken tikka masala",
+      "imageUrl": "https://picsum.photos/seed/f17/400/300",
+      "imageHint": "tikka masala"
+    },
+    {
+      "id": "food-18",
+      "description": "A bowl of paneer butter masala",
+      "imageUrl": "https://picsum.photos/seed/f18/400/300",
+      "imageHint": "paneer curry"
+    },
+    {
+      "id": "food-19",
+      "description": "A piece of garlic naan bread",
+      "imageUrl": "https://picsum.photos/seed/f19/400/300",
+      "imageHint": "naan bread"
+    },
+    {
+      "id": "food-20",
+      "description": "A stack of roti bread",
+      "imageUrl": "https://picsum.photos/seed/f20/400/300",
+      "imageHint": "roti bread"
+    },
+    {
+      "id": "food-21",
+      "description": "A large cobb salad in a white bowl",
+      "imageUrl": "https://picsum.photos/seed/f21/400/300",
+      "imageHint": "cobb salad"
+    },
+    {
+      "id": "food-22",
+      "description": "A healthy quinoa power bowl",
+      "imageUrl": "https://picsum.photos/seed/f22/400/300",
+      "imageHint": "quinoa bowl"
+    },
+    {
+      "id": "food-23",
+      "description": "A bowl of colorful mixed greens for a custom salad",
+      "imageUrl": "https://picsum.photos/seed/f23/400/300",
+      "imageHint": "mixed greens"
+    },
+    {
+      "id": "food-24",
+      "description": "A generic noodle dish in a bowl",
+      "imageUrl": "https://picsum.photos/seed/f24/400/300",
+      "imageHint": "noodle dish"
+    },
+    {
+      "id": "food-25",
+      "description": "A healthy-looking grain bowl",
+      "imageUrl": "https://picsum.photos/seed/f25/400/300",
+      "imageHint": "grain bowl"
+    },
+    {
+      "id": "food-26",
+      "description": "A vibrant and fresh spring roll",
+      "imageUrl": "https://picsum.photos/seed/f26/400/300",
+      "imageHint": "spring roll"
+    },
+    {
+      "id": "food-27",
+      "description": "A slice of decadent chocolate cake",
+      "imageUrl": "https://picsum.photos/seed/f27/400/300",
+      "imageHint": "chocolate cake"
+    },
+    {
+      "id": "track-order-map",
+      "description": "A map showing a delivery route",
+      "imageUrl": "https://picsum.photos/seed/map1/1200/400",
+      "imageHint": "delivery map"
+    }
+  ]
 }

@@ -10,13 +10,11 @@ import {
 } from '@/components/ui/sidebar';
 import {
   Home,
-  ShoppingBag,
   Ticket,
   Heart,
   Search,
   Book,
   User,
-  ShoppingBasket,
   Gift,
   Wallet,
 } from 'lucide-react';
@@ -34,8 +32,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   ];
 
   const categoriesNav = [
-    { name: 'Grocery', icon: ShoppingBasket, href: '#' },
-    { name: 'Convenience', icon: ShoppingBag, href: '#' },
     { name: 'Best of Eat Hub', icon: Heart, href: '#' },
     { name: 'Account', icon: User, href: '#' },
   ];

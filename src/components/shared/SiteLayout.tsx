@@ -44,13 +44,13 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar
           variant="sidebar"
           collapsible="icon"
-          className="group hidden md:flex text-sidebar-foreground sticky top-16 h-[calc(100vh-4rem)]"
+          className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
         >
           <SidebarContent>
             <SidebarMenu>
@@ -76,8 +76,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </SidebarContent>
         </Sidebar>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-    </>
+    </div>
   );
 }

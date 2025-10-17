@@ -124,7 +124,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
               <div className="mt-6 space-y-3 text-sm">
                 <h2 className="text-lg font-semibold sr-only lg:not-sr-only">Store Info</h2>
                 <div className="flex items-center justify-center lg:justify-start gap-2">
-                  <Badge variant="outline">DashPass</Badge>
+                  <Badge variant="outline">Eat Hub</Badge>
                 </div>
                 <div className="flex items-center justify-center lg:justify-start gap-2 text-muted-foreground">
                   <Star className="h-4 w-4 fill-foreground text-foreground" />
@@ -181,9 +181,9 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                   </div>
                 </Card>
                 <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
-                  <Badge variant="outline">DashPass</Badge>
+                  <Badge variant="outline">Eat Hub</Badge>
                   <div>
-                    <h3 className="font-bold text-sm">Get $0 delivery fees with DashPass</h3>
+                    <h3 className="font-bold text-sm">Get $0 delivery fees with Eat Hub</h3>
                     <p className="text-xs text-muted-foreground">Plus, low service fees. Sign up now.</p>
                   </div>
                    <Button size="sm" variant="secondary" className="ml-auto">Sign Up</Button>

@@ -38,7 +38,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Convenience', icon: ShoppingBag, href: '#' },
     { name: 'Alcohol', icon: Landmark, href: '#' },
     { name: 'Retail', icon: Heart, href: '#' },
-    { name: 'DashMart', icon: Building, href: '#' },
+    { name: 'Eat Hub', icon: Building, href: '#' },
   ];
 
   return (

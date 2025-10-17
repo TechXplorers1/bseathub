@@ -42,7 +42,7 @@ const filterButtons = [
   { name: 'Over 4.5', icon: Star, hasDropdown: true },
   { name: 'Under 30 min', icon: null },
   { name: 'Price', icon: null, hasDropdown: true },
-  { name: 'DashPass', icon: Check },
+  { name: 'Eat Hub', icon: Check },
 ];
 
 export function FilterCategories() {

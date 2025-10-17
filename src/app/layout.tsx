@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'SwiftDash',
+  title: 'Eat Hub',
   description: 'Your favorite food, delivered fast.',
 };
 

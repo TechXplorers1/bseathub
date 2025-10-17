@@ -24,76 +24,65 @@ export default function RestaurantPage({ params }: { params: { slug: string } })
   const image = getImageById(restaurant.imageId);
 
   return (
-    <div>
-      <div className="relative h-64 w-full">
+    <div className="flex flex-col">
+      <div className="relative h-48 w-full">
         {image && (
           <Image
             src={image.imageUrl}
             alt={restaurant.name}
             fill
             objectFit="cover"
-            className="brightness-75"
+            className="brightness-50"
             data-ai-hint={image.imageHint}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 p-8 text-white">
-          <h1 className="text-4xl font-bold">{restaurant.name}</h1>
-          <p className="text-lg">{restaurant.cuisine}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 p-4 sm:p-6 lg:p-8 text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold">{restaurant.name}</h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm">
+            <div className="flex items-center">
+              <Star className="h-4 w-4 mr-1.5 text-yellow-400 fill-yellow-400" />
+              <span>{restaurant.rating} ({restaurant.reviews} reviews)</span>
+            </div>
+            <div className="flex items-center">
+              <Clock className="h-4 w-4 mr-1.5" />
+              <span>{restaurant.deliveryTime} min</span>
+            </div>
+            <div className="flex items-center">
+              <Zap className="h-4 w-4 mr-1.5" />
+              <span>${restaurant.deliveryFee.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Menu</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {restaurant.menu.map((category, index) => (
-                  <div key={category.title}>
-                    <h2 className="text-2xl font-semibold mt-6 mb-4">{category.title}</h2>
-                    <div className="space-y-4">
-                      {category.items.map((item) => (
-                        <MenuItem key={item.id} item={item} />
-                      ))}
-                    </div>
-                    {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+        <div className="max-w-4xl mx-auto">
+           <div className="flex flex-wrap gap-2 mb-6">
+              <Badge variant="outline">{restaurant.cuisine}</Badge>
+              {restaurant.categories.map(cat => (
+                  <Badge key={cat} variant="secondary">{cat}</Badge>
+              ))}
           </div>
-          <div className="md:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Restaurant Info</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center">
-                  <Star className="h-5 w-5 mr-3 text-yellow-500 fill-yellow-500" />
-                  <span>{restaurant.rating} ({restaurant.reviews} reviews)</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-5 w-5 mr-3 text-primary" />
-                  <span>{restaurant.deliveryTime} min delivery</span>
-                </div>
-                <div className="flex items-center">
-                  <Zap className="h-5 w-5 mr-3 text-primary" />
-                  <span>${restaurant.deliveryFee.toFixed(2)} delivery fee</span>
-                </div>
-                <div className="flex items-center">
-                  <Utensils className="h-5 w-5 mr-3 text-primary" />
-                  <span>{restaurant.cuisine}</span>
-                </div>
-                <div className="flex flex-wrap gap-2 pt-2">
-                    {restaurant.categories.map(cat => (
-                        <Badge key={cat} variant="secondary">{cat}</Badge>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Menu</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {restaurant.menu.map((category, index) => (
+                <div key={category.title}>
+                  <h2 className="text-2xl font-semibold mt-6 mb-4">{category.title}</h2>
+                  <div className="space-y-4">
+                    {category.items.map((item) => (
+                      <MenuItem key={item.id} item={item} />
                     ))}
+                  </div>
+                  {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

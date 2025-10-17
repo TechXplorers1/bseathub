@@ -108,11 +108,6 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
         </div>
       </div>
       
-      {/* Yellow Banner */}
-      <div className="bg-yellow-100/50 p-3 text-center text-sm font-medium">
-        Closed. Order now, get it later
-      </div>
-
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

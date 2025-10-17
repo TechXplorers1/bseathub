@@ -37,22 +37,24 @@ export default function RestaurantPage({ params }: { params: { slug: string } })
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        <div className="absolute bottom-0 left-0 p-4 sm:p-6 lg:p-8 text-white">
-          <h1 className="text-3xl sm:text-4xl font-bold">{restaurant.name}</h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm">
-            <div className="flex items-center">
-              <Star className="h-4 w-4 mr-1.5 text-yellow-400 fill-yellow-400" />
-              <span>{restaurant.rating} ({restaurant.reviews} reviews)</span>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="absolute bottom-0 p-4 sm:p-6 lg:p-8 text-white">
+              <h1 className="text-3xl sm:text-4xl font-bold">{restaurant.name}</h1>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm">
+                <div className="flex items-center">
+                  <Star className="h-4 w-4 mr-1.5 text-yellow-400 fill-yellow-400" />
+                  <span>{restaurant.rating} ({restaurant.reviews} reviews)</span>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-1.5" />
+                  <span>{restaurant.deliveryTime} min</span>
+                </div>
+                <div className="flex items-center">
+                  <Zap className="h-4 w-4 mr-1.5" />
+                  <span>${restaurant.deliveryFee.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1.5" />
-              <span>{restaurant.deliveryTime} min</span>
-            </div>
-            <div className="flex items-center">
-              <Zap className="h-4 w-4 mr-1.5" />
-              <span>${restaurant.deliveryFee.toFixed(2)}</span>
-            </div>
-          </div>
         </div>
       </div>
 

@@ -22,6 +22,7 @@ import {
 } from '../ui/card';
 import { MenuNav } from './MenuNav';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { cn } from '@/lib/utils';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (

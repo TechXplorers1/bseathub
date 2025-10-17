@@ -110,18 +110,18 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
       
       {/* Main Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
           
           {/* Left Column - Store Info & Menu Nav */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-1">
             <div className='lg:sticky lg:top-24 self-start'>
-              <h1 className="text-4xl font-bold mt-8 text-center lg:text-left">{restaurant.name}</h1>
+              <h1 className="text-4xl font-bold mt-8 lg:mt-0">{restaurant.name}</h1>
               <div className="mt-6 space-y-3 text-sm">
                 <h2 className="text-lg font-semibold sr-only lg:not-sr-only">Store Info</h2>
-                <div className="flex items-center justify-center lg:justify-start gap-2">
+                <div className="flex items-center gap-2">
                   <Badge variant="outline">Eat Hub</Badge>
                 </div>
-                <div className="flex items-center justify-center lg:justify-start gap-2 text-muted-foreground">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Star className="h-4 w-4 fill-foreground text-foreground" />
                   <span>
                     {restaurant.rating} ({restaurant.reviews > 1000 ? '1k+' : restaurant.reviews})
@@ -129,12 +129,12 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                   <span>•</span>
                   <span>2 mi</span>
                 </div>
-                <p className="text-muted-foreground text-center lg:text-left">$ • Canadian</p>
-                <div className="flex items-center justify-center lg:justify-start gap-1 text-xs text-muted-foreground">
+                <p className="text-muted-foreground">$ • Canadian</p>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <span>Service fees apply</span>
                   <Info className="h-3 w-3" />
                 </div>
-                <Button variant="outline" className="w-full rounded-full max-w-xs mx-auto lg:max-w-full">
+                <Button variant="outline" className="w-full rounded-full">
                   See More
                 </Button>
               </div>
@@ -146,7 +146,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           </div>
 
           {/* Right Column - Menu & Other info */}
-          <div className="lg:col-span-9">
+          <div className="lg:col-span-3">
             {/* Search and Delivery Options */}
             <div className="sticky top-[88px] bg-background py-4 z-10 border-b -mt-2">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -233,3 +233,5 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
     </div>
   );
 }
+
+    

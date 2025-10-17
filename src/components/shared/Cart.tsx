@@ -44,10 +44,12 @@ export function Cart() {
                       />
                     )}
                     <div className="flex-1">
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        ${item.price.toFixed(2)}
-                      </p>
+                      <div>
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          ${item.price.toFixed(2)}
+                        </p>
+                      </div>
                       <div className="mt-2 flex items-center">
                         <Button
                           variant="outline"

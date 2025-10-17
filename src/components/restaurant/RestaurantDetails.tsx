@@ -110,7 +110,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
       
       {/* Main Content */}
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 lg:gap-8">
           
           {/* Left Column - Store Info & Menu Nav */}
           <div className="lg:col-span-3">
@@ -148,7 +148,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           {/* Right Column - Menu & Other info */}
           <div className="lg:col-span-9">
             {/* Search and Delivery Options */}
-            <div className="sticky top-20 bg-background py-4 z-10 border-b">
+            <div className="sticky top-[88px] bg-background py-4 z-10 border-b -mt-2">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="relative w-full sm:max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

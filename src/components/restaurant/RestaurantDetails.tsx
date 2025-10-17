@@ -148,19 +148,21 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           {/* Right Column - Menu & Other info */}
           <div className="lg:col-span-9">
             {/* Search and Delivery Options */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-16 bg-background py-4 z-10">
-              <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={`Search ${restaurant.name}`}
-                  className="pl-9 rounded-full bg-gray-100 border-none"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <Button variant="outline" className="rounded-full">
-                  <span>Opens 6:30 AM</span>
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
+            <div className="sticky top-16 bg-background py-4 z-10 border-b -mx-4 px-4 mb-4">
+              <div className="container mx-auto px-0 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder={`Search ${restaurant.name}`}
+                    className="pl-9 rounded-full bg-gray-100 border-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Button variant="outline" className="rounded-full">
+                    <span>Opens 6:30 AM</span>
+                    <ChevronDown className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
               </div>
             </div>
 

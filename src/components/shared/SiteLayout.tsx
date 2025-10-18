@@ -30,7 +30,7 @@ import { Header } from './Header';
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const sidebarNav = [
     { name: 'Home', icon: Home, href: '/' },
-    { name: 'Home Food', icon: Utensils, href: '#' },
+    { name: 'Home Food', icon: Utensils, href: '/home-food' },
     { name: 'Restaurant', icon: Building2, href: '/restaurants' },
     { name: 'Chefs', icon: ChefHat, href: '#' },
     { name: 'Browse', icon: Search, href: '#' },

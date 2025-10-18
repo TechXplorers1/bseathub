@@ -11,7 +11,7 @@ interface MenuNavProps {
 }
 
 export function MenuNav({ menuCategories, className }: MenuNavProps) {
-  const navItems = ["Deals & Discounts", "Reviews", "Most Ordered", ...menuCategories];
+  const navItems = ["Deals & Discounts", "Featured Items", "Reviews", "Most Ordered", ...menuCategories];
   const [activeItem, setActiveItem] = React.useState(navItems[0] || 'Deals & Discounts');
 
   const scrollToCategory = (id: string) => {

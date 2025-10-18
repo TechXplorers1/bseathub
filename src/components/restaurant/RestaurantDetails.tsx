@@ -81,6 +81,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
   const menuCategories = restaurant.menu.map(cat => cat.title);
   const mostOrderedItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const featuredItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
   
   const [reviews, setReviews] = React.useState<Review[]>(initialReviews);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
@@ -200,6 +201,18 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                    <Button size="sm" variant="secondary" className="ml-auto">Sign Up</Button>
                 </Card>
               </div>
+            </div>
+
+            <Separator className="my-8" />
+            
+            {/* Featured Items Section */}
+            <div id="Featured Items">
+                <h2 className="text-2xl font-semibold mt-6 mb-4">Featured Items</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {featuredItems.map((item) => (
+                        <MenuItem key={item.id} item={item} />
+                    ))}
+                </div>
             </div>
 
             <Separator className="my-8" />

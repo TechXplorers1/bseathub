@@ -19,8 +19,11 @@ interface HomeFeedProps {
 
 type SortOption = 'picked' | 'rating' | 'deliveryTime';
 
+const INITIAL_VISIBLE_COUNT = 4;
+
 export function HomeFeed({ restaurants }: HomeFeedProps) {
   const [sortOption, setSortOption] = useState<SortOption>('picked');
+  const [showAll, setShowAll] = useState(false);
 
   const sortFunctions: Record<SortOption, (a: Restaurant, b: Restaurant) => number> = {
     picked: (a, b) => a.id.localeCompare(b.id),
@@ -29,17 +32,21 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
   };
 
   const sortedRestaurants = [...restaurants].sort(sortFunctions[sortOption]);
+  const visibleRestaurants = showAll ? sortedRestaurants : sortedRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
+
 
   return (
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">All Restaurants</h2>
-        <Button variant="ghost">
-          See all <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        {!showAll && restaurants.length > INITIAL_VISIBLE_COUNT && (
+            <Button variant="ghost" onClick={() => setShowAll(true)}>
+                See all <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {sortedRestaurants.map((restaurant) => (
+        {visibleRestaurants.map((restaurant) => (
           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
         ))}
       </div>

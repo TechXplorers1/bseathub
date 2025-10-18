@@ -5,7 +5,7 @@ import { personalizedMealRecommendations } from '@/ai/flows/personalized-meal-re
 import { RestaurantCard } from './RestaurantCard';
 import { allRestaurants } from '@/lib/data';
 import { Restaurant } from '@/lib/types';
-import { Button } from '../ui/button';
+import { Button, buttonVariants } from '../ui/button';
 import { ArrowRight, ArrowUp } from 'lucide-react';
 import {
   Carousel,
@@ -14,13 +14,14 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const INITIAL_VISIBLE_COUNT = 4;
 
 export function Personalized() {
   const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     async function getRecommendations() {
@@ -78,7 +79,7 @@ export function Personalized() {
     getRecommendations();
   }, []);
   
-  const visibleRestaurants = showAll ? recommendations : recommendations.slice(0, INITIAL_VISIBLE_COUNT);
+  const visibleRestaurants = recommendations.slice(0, INITIAL_VISIBLE_COUNT);
 
 
   if (loading) {
@@ -107,17 +108,9 @@ export function Personalized() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Picked for you</h2>
         {recommendations.length > INITIAL_VISIBLE_COUNT && (
-          <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
-            {showAll ? (
-              <>
-                See less <ArrowUp className="ml-2 h-4 w-4" />
-              </>
-            ) : (
-              <>
-                See all <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
+          <Link href="/restaurants" className={cn(buttonVariants({ variant: 'ghost' }))}>
+              See all <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

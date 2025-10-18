@@ -10,8 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, ArrowUp } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface HomeFeedProps {
   restaurants: Restaurant[];
@@ -23,7 +25,6 @@ const INITIAL_VISIBLE_COUNT = 4;
 
 export function HomeFeed({ restaurants }: HomeFeedProps) {
   const [sortOption, setSortOption] = useState<SortOption>('picked');
-  const [showAll, setShowAll] = useState(false);
 
   const sortFunctions: Record<SortOption, (a: Restaurant, b: Restaurant) => number> = {
     picked: (a, b) => a.id.localeCompare(b.id),
@@ -32,7 +33,7 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
   };
 
   const sortedRestaurants = [...restaurants].sort(sortFunctions[sortOption]);
-  const visibleRestaurants = showAll ? sortedRestaurants : sortedRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
+  const visibleRestaurants = sortedRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 
 
   return (
@@ -40,17 +41,9 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">All Restaurants</h2>
         {restaurants.length > INITIAL_VISIBLE_COUNT && (
-            <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
-                {showAll ? (
-                    <>
-                        See less <ArrowUp className="ml-2 h-4 w-4" />
-                    </>
-                ) : (
-                    <>
-                        See all <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                )}
-            </Button>
+            <Link href="/restaurants" className={cn(buttonVariants({ variant: 'ghost' }))}>
+                See all <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

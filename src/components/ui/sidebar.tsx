@@ -566,12 +566,12 @@ const SidebarMenuButton = React.forwardRef<
     },
     ref
   ) => {
-    const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
-    
-    const buttonContent = (
+    const Comp = asChild ? Slot : "button"
+
+    const button = (
       <Comp
-        ref={ref as any}
+        ref={ref}
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
@@ -582,48 +582,22 @@ const SidebarMenuButton = React.forwardRef<
       </Comp>
     )
 
-    const renderButton = () => {
-      if (href) {
-        // If there's an href, we need a Link. If asChild is true, the Link will pass its props to the button.
-        // If not, the Link will be the button itself.
-        if (asChild) {
-          return <Link href={href} asChild>{buttonContent}</Link>;
-        }
-        // When not using asChild with Link, we need to make the button an `a` tag or have the Link wrap it without asChild.
-        // To avoid complexity, we'll make the Comp an 'a' if href is present and not asChild.
-        // But the original `Comp` is already a button or Slot. Let's rethink.
-        
-        const { asChild: _asChild, ...restProps } = props;
-
-        const InnerComp = _asChild ? Slot : 'button';
-
-        return (
-          <Link href={href} passHref legacyBehavior>
-             <InnerComp
-                ref={ref as any}
-                data-sidebar="menu-button"
-                data-size={size}
-                data-active={isActive}
-                className={cn(sidebarMenuButtonVariants({ variant, size, className }))}
-                {...restProps}
-              >
-                {children}
-              </InnerComp>
-          </Link>
-        )
-      }
-      return buttonContent;
-    }
-
-
+    const content = href ? (
+      <Link href={href} asChild>
+        {button}
+      </Link>
+    ) : (
+      button
+    )
+    
     if (!tooltip) {
-      return renderButton();
+      return content;
     }
     
-    const content = (
+    const tooltipContent = (
       <Tooltip>
         <TooltipTrigger asChild>
-          {renderButton()}
+          {content}
         </TooltipTrigger>
         <TooltipContent
           side="right"
@@ -634,7 +608,7 @@ const SidebarMenuButton = React.forwardRef<
       </Tooltip>
     )
     
-    return content;
+    return tooltipContent;
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"
@@ -808,3 +782,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    

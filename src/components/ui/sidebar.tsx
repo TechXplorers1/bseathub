@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeftClose } from "lucide-react"
@@ -548,6 +549,7 @@ const SidebarMenuButton = React.forwardRef<
     asChild?: boolean
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    href?: string
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
@@ -558,10 +560,13 @@ const SidebarMenuButton = React.forwardRef<
       size = "default",
       tooltip,
       className,
+      href,
       ...props
     },
     ref
   ) => {
+    // The component logic is correct, but we need to conditionally wrap it in a Link component.
+    // The `asChild` prop in the `Link` component will pass down the `href` to the button.
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
 
@@ -576,27 +581,27 @@ const SidebarMenuButton = React.forwardRef<
       />
     )
 
-    if (!tooltip) {
-      return button
-    }
-
-    if (typeof tooltip === "string") {
-      tooltip = {
-        children: tooltip,
-      }
-    }
-
-    return (
+    const content = (
       <Tooltip>
         <TooltipTrigger asChild>{button}</TooltipTrigger>
         <TooltipContent
           side="right"
           align="center"
           hidden={state !== "collapsed" || isMobile}
-          {...tooltip}
+          {...(typeof tooltip === 'string' ? { children: tooltip } : tooltip)}
         />
       </Tooltip>
-    )
+    );
+
+    if (href) {
+      return (
+        <Link href={href} passHref legacyBehavior>
+          {tooltip ? content : button}
+        </Link>
+      )
+    }
+
+    return tooltip ? content : button;
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"

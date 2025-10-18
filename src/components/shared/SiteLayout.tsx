@@ -3,6 +3,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -22,6 +23,7 @@ import {
   Utensils,
   Building2,
   ChefHat,
+  LogOut,
 } from 'lucide-react';
 import { Header } from './Header';
 
@@ -29,7 +31,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const sidebarNav = [
     { name: 'Home', icon: Home, href: '/' },
     { name: 'Home Food', icon: Utensils, href: '#' },
-    { name: 'Restaurant', icon: Building2, href: '#' },
+    { name: 'Restaurant', icon: Building2, href: '/restaurants' },
     { name: 'Chefs', icon: ChefHat, href: '#' },
     { name: 'Browse', icon: Search, href: '#' },
     { name: 'Orders', icon: Book, href: '/track-order' },
@@ -79,6 +81,16 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarMenu>
           </SidebarContent>
+           <SidebarFooter>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton href="#" tooltip="Logout">
+                  <LogOut />
+                  <span>Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
         </Sidebar>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

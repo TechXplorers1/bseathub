@@ -602,7 +602,91 @@ export const allRestaurants: Restaurant[] = [
         ],
       },
     ],
-  }
+  },
+  {
+    id: '26',
+    name: 'Waffle House',
+    slug: 'waffle-house',
+    imageId: 'restaurant-23',
+    cuisine: 'Breakfast',
+    rating: 4.4,
+    reviews: 2500,
+    deliveryTime: 20,
+    deliveryFee: 3.50,
+    categories: ['Breakfast', 'Waffles', 'American'],
+    menu: [
+      {
+        title: 'Waffles',
+        items: [
+          { id: '2601', name: 'Classic Belgian Waffle', description: 'With whipped cream and strawberries.', price: 10.99, imageId: 'food-51' },
+          { id: '2602', name: 'Chocolate Chip Waffle', description: 'Loaded with chocolate chips and syrup.', price: 11.99, imageId: 'food-52' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '27',
+    name: 'Pancake Palace',
+    slug: 'pancake-palace',
+    imageId: 'restaurant-24',
+    cuisine: 'Breakfast',
+    rating: 4.5,
+    reviews: 1900,
+    deliveryTime: 22,
+    deliveryFee: 3.00,
+    categories: ['Breakfast', 'Pancakes', 'American'],
+    menu: [
+      {
+        title: 'Pancakes',
+        items: [
+          { id: '2701', name: 'Buttermilk Pancake Stack', description: 'A tall stack of fluffy pancakes.', price: 11.99, imageId: 'food-53' },
+          { id: '2702', name: 'Blueberry Pancakes', description: 'Filled with fresh blueberries.', price: 12.99, imageId: 'food-54' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '28',
+    name: 'The Muffin Man',
+    slug: 'the-muffin-man',
+    imageId: 'restaurant-25',
+    cuisine: 'Bakery',
+    rating: 4.7,
+    reviews: 800,
+    deliveryTime: 15,
+    deliveryFee: 2.00,
+    categories: ['Bakery', 'Breakfast', 'Coffee'],
+    menu: [
+      {
+        title: 'Muffins',
+        items: [
+          { id: '2801', name: 'Blueberry Muffin', description: 'A classic muffin bursting with blueberries.', price: 3.99, imageId: 'food-55' },
+          { id: '2802', name: 'Chocolate Chip Muffin', description: 'A sweet treat for any time of day.', price: 3.99, imageId: 'food-56' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '29',
+    name: 'Sunrise Eats',
+    slug: 'sunrise-eats',
+    imageId: 'restaurant-26',
+    cuisine: 'Breakfast',
+    rating: 4.6,
+    reviews: 950,
+    deliveryTime: 18,
+    deliveryFee: 2.50,
+    categories: ['Breakfast', 'Brunch', 'American'],
+    menu: [
+      {
+        title: 'Breakfast Plates',
+        items: [
+          { id: '2901', name: 'The Grand Slam', description: 'Pancakes, eggs, bacon, and sausage.', price: 16.99, imageId: 'food-57' },
+          { id: '2902', name: 'Avocado Toast', description: 'Smashed avocado on sourdough with a poached egg.', price: 13.99, imageId: 'food-58' },
+        ],
+      },
+    ],
+  },
 ];
 
 

@@ -330,4 +330,386 @@ export const allRestaurants: Restaurant[] = [
       },
     ],
   },
+  {
+    id: '13',
+    name: 'Mediterranean Bites',
+    slug: 'mediterranean-bites',
+    imageId: 'restaurant-1', // Placeholder
+    cuisine: 'Mediterranean',
+    rating: 4.7,
+    reviews: 850,
+    deliveryTime: 28,
+    deliveryFee: 3.20,
+    categories: ['Mediterranean', 'Greek', 'Healthy'],
+    menu: [
+      {
+        title: 'Plates',
+        items: [
+          { id: '1301', name: 'Chicken Shawarma Plate', description: 'Marinated chicken, rice, and salad.', price: 17.99, imageId: 'food-1' },
+          { id: '1302', name: 'Falafel Plate', description: 'Crispy falafel with tahini sauce.', price: 14.99, imageId: 'food-2' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '14',
+    name: 'Breakfast Club',
+    slug: 'breakfast-club',
+    imageId: 'restaurant-2', // Placeholder
+    cuisine: 'Breakfast',
+    rating: 4.6,
+    reviews: 1100,
+    deliveryTime: 22,
+    deliveryFee: 2.50,
+    categories: ['Breakfast', 'American', 'Cafe'],
+    menu: [
+      {
+        title: 'Classics',
+        items: [
+          { id: '1401', name: 'Pancakes Stack', description: 'Fluffy pancakes with syrup and butter.', price: 12.99, imageId: 'food-3' },
+          { id: '1402', name: 'Eggs Benedict', description: 'Poached eggs, ham, on an English muffin with hollandaise.', price: 15.99, imageId: 'food-4' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '15',
+    name: 'The Ramen Shop',
+    slug: 'the-ramen-shop',
+    imageId: 'restaurant-3', // Placeholder
+    cuisine: 'Japanese',
+    rating: 4.8,
+    reviews: 1300,
+    deliveryTime: 33,
+    deliveryFee: 3.80,
+    categories: ['Japanese', 'Ramen', 'Noodles'],
+    menu: [
+      {
+        title: 'Ramen',
+        items: [
+          { id: '1501', name: 'Tonkotsu Ramen', description: 'Rich pork broth with chashu pork.', price: 16.99, imageId: 'food-5' },
+          { id: '1502', name: 'Miso Ramen', description: 'Soybean paste broth with vegetables.', price: 15.99, imageId: 'food-6' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '16',
+    name: 'BBQ Central',
+    slug: 'bbq-central',
+    imageId: 'restaurant-4', // Placeholder
+    cuisine: 'BBQ',
+    rating: 4.5,
+    reviews: 950,
+    deliveryTime: 45,
+    deliveryFee: 4.50,
+    categories: ['BBQ', 'American', 'Grill'],
+    menu: [
+      {
+        title: 'Meats',
+        items: [
+          { id: '1601', name: 'Pulled Pork Sandwich', description: 'Slow-smoked pulled pork on a brioche bun.', price: 14.99, imageId: 'food-7' },
+          { id: '1602', name: 'Beef Brisket', description: 'Tender beef brisket, sold by the pound.', price: 28.99, imageId: 'food-8' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '17',
+    name: 'The Sweet Spot',
+    slug: 'the-sweet-spot',
+    imageId: 'restaurant-5', // Placeholder
+    cuisine: 'Desserts',
+    rating: 4.9,
+    reviews: 2100,
+    deliveryTime: 18,
+    deliveryFee: 2.00,
+    categories: ['Desserts', 'Bakery', 'Sweets'],
+    menu: [
+      {
+        title: 'Cakes',
+        items: [
+          { id: '1701', name: 'Chocolate Lava Cake', description: 'Warm chocolate cake with a gooey center.', price: 8.99, imageId: 'food-9' },
+          { id: '1702', name: 'New York Cheesecake', description: 'Classic creamy cheesecake.', price: 7.99, imageId: 'food-10' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '18',
+    name: 'Healthy Habits',
+    slug: 'healthy-habits',
+    imageId: 'restaurant-6', // Placeholder
+    cuisine: 'Healthy',
+    rating: 4.7,
+    reviews: 780,
+    deliveryTime: 20,
+    deliveryFee: 3.00,
+    categories: ['Healthy', 'Smoothies', 'Bowls'],
+    menu: [
+      {
+        title: 'Smoothies',
+        items: [
+          { id: '1801', name: 'Green Detox Smoothie', description: 'Spinach, kale, apple, and banana.', price: 9.99, imageId: 'food-11' },
+          { id: '1802', name: 'Berry Blast Smoothie', description: 'Mixed berries, yogurt, and honey.', price: 9.99, imageId: 'food-12' },
+        ],
+      },
+    ],
+  },
+];
+
+
+export const allHomeFoods: Restaurant[] = [
+  {
+    id: 'hf1',
+    name: "Maria's Kitchen",
+    slug: 'marias-kitchen',
+    imageId: 'food-1',
+    cuisine: 'Homestyle Italian',
+    rating: 4.9,
+    reviews: 150,
+    deliveryTime: 30,
+    deliveryFee: 3.50,
+    categories: ['Italian', 'Homemade', 'Pasta'],
+    menu: [
+      {
+        title: 'Family Recipes',
+        items: [
+          { id: 'hf101', name: 'Grandma\'s Lasagna', description: 'Layers of pasta, ricotta, and bolognese sauce.', price: 18.00, imageId: 'food-3' },
+          { id: 'hf102', name: 'Chicken Parmesan', description: 'Breaded chicken with marinara and mozzarella.', price: 17.50, imageId: 'food-4' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf2',
+    name: 'Chen\'s Dumplings',
+    slug: 'chens-dumplings',
+    imageId: 'food-2',
+    cuisine: 'Chinese',
+    rating: 4.8,
+    reviews: 210,
+    deliveryTime: 25,
+    deliveryFee: 2.99,
+    categories: ['Chinese', 'Dumplings', 'Homemade'],
+    menu: [
+      {
+        title: 'Dumplings',
+        items: [
+          { id: 'hf201', name: 'Pork & Chive Dumplings (12pcs)', description: 'Hand-wrapped and pan-fried.', price: 15.00, imageId: 'food-5' },
+          { id: 'hf202', name: 'Veggie Dumplings (12pcs)', description: 'Filled with mushrooms, cabbage, and carrots.', price: 14.00, imageId: 'food-6' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf3',
+    name: "Javier's Tacos",
+    slug: 'javiers-tacos',
+    imageId: 'food-13',
+    cuisine: 'Authentic Mexican',
+    rating: 4.9,
+    reviews: 300,
+    deliveryTime: 20,
+    deliveryFee: 2.50,
+    categories: ['Mexican', 'Tacos', 'Homemade'],
+    menu: [
+      {
+        title: 'Street Tacos',
+        items: [
+          { id: 'hf301', name: 'Carne Asada Tacos (3)', description: 'Marinated grilled steak on corn tortillas.', price: 12.00, imageId: 'food-13' },
+          { id: 'hf302', name: 'Cochinita Pibil Tacos (3)', description: 'Slow-roasted pork with pickled onions.', price: 12.00, imageId: 'food-14' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf4',
+    name: 'Healthy Home Bowls',
+    slug: 'healthy-home-bowls',
+    imageId: 'food-22',
+    cuisine: 'Healthy Bowls',
+    rating: 4.7,
+    reviews: 95,
+    deliveryTime: 15,
+    deliveryFee: 4.00,
+    categories: ['Healthy', 'Vegan', 'Bowls'],
+    menu: [
+      {
+        title: 'Nourish Bowls',
+        items: [
+          { id: 'hf401', name: 'Quinoa & Roasted Veggie Bowl', description: 'With lemon-tahini dressing.', price: 16.00, imageId: 'food-22' },
+          { id: 'hf402', name: 'Mediterranean Chicken Bowl', description: 'Grilled chicken, feta, olives, and couscous.', price: 17.00, imageId: 'food-23' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf5',
+    name: "Priya's Indian Feast",
+    slug: 'priyas-indian-feast',
+    imageId: 'food-17',
+    cuisine: 'Homestyle Indian',
+    rating: 4.8,
+    reviews: 180,
+    deliveryTime: 35,
+    deliveryFee: 3.75,
+    categories: ['Indian', 'Curry', 'Homemade'],
+    menu: [
+      {
+        title: 'Curries',
+        items: [
+          { id: 'hf501', name: 'Homestyle Chicken Curry', description: 'Aromatic and medium spicy.', price: 17.00, imageId: 'food-17' },
+          { id: 'hf502', name: 'Dal Makhani', description: 'Creamy black lentils.', price: 15.00, imageId: 'food-18' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf6',
+    name: 'Brenda\'s BBQ',
+    slug: 'brendas-bbq',
+    imageId: 'food-7',
+    cuisine: 'Southern BBQ',
+    rating: 4.9,
+    reviews: 250,
+    deliveryTime: 45,
+    deliveryFee: 5.00,
+    categories: ['BBQ', 'American', 'Homemade'],
+    menu: [
+      {
+        title: 'BBQ Plates',
+        items: [
+          { id: 'hf601', name: 'Pulled Pork Plate', description: 'With coleslaw and cornbread.', price: 19.00, imageId: 'food-7' },
+          { id: 'hf602', name: 'Smoked Ribs (Half Rack)', description: 'Fall-off-the-bone tender.', price: 22.00, imageId: 'food-8' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf7',
+    name: 'Mama Kim\'s Korean',
+    slug: 'mama-kims-korean',
+    imageId: 'food-24', // Placeholder
+    cuisine: 'Korean',
+    rating: 4.8,
+    reviews: 190,
+    deliveryTime: 30,
+    deliveryFee: 3.50,
+    categories: ['Korean', 'Homemade', 'Spicy'],
+    menu: [
+      {
+        title: 'Main Dishes',
+        items: [
+          { id: 'hf701', name: 'Bibimbap', description: 'Mixed rice with vegetables, beef, and a fried egg.', price: 18.00, imageId: 'food-24' },
+          { id: 'hf702', name: 'Kimchi Jjigae', description: 'Spicy kimchi stew with pork and tofu.', price: 17.00, imageId: 'food-25' },
+        ],
+      },
+    ],
+  },
+    {
+    id: 'hf8',
+    name: 'Sophie\'s Soups',
+    slug: 'sophies-soups',
+    imageId: 'food-38',
+    cuisine: 'Soups & Stews',
+    rating: 4.9,
+    reviews: 120,
+    deliveryTime: 20,
+    deliveryFee: 3.00,
+    categories: ['Soup', 'Comfort Food', 'Homemade'],
+    menu: [
+      {
+        title: 'Hearty Soups',
+        items: [
+          { id: 'hf801', name: 'Tomato Basil Soup', description: 'Creamy and rich, served with a side of bread.', price: 12.00, imageId: 'food-38' },
+          { id: 'hf802', name: 'Chicken Noodle Soup', description: 'Classic comfort in a bowl.', price: 13.00, imageId: 'food-29' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf9',
+    name: 'Baker Ben\'s Breads',
+    slug: 'baker-bens-breads',
+    imageId: 'food-19',
+    cuisine: 'Artisan Bakery',
+    rating: 4.9,
+    reviews: 280,
+    deliveryTime: 15,
+    deliveryFee: 4.00,
+    categories: ['Bakery', 'Bread', 'Homemade'],
+    menu: [
+      {
+        title: 'Freshly Baked',
+        items: [
+          { id: 'hf901', name: 'Sourdough Loaf', description: 'Naturally leavened and crusty.', price: 9.00, imageId: 'food-19' },
+          { id: 'hf902', name: 'Chocolate Babka', description: 'Sweet braided bread with chocolate filling.', price: 14.00, imageId: 'food-27' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf10',
+    name: 'Thai by Ton',
+    slug: 'thai-by-ton',
+    imageId: 'food-36',
+    cuisine: 'Authentic Thai',
+    rating: 4.8,
+    reviews: 165,
+    deliveryTime: 30,
+    deliveryFee: 3.25,
+    categories: ['Thai', 'Homemade', 'Spicy'],
+    menu: [
+      {
+        title: 'Thai Favorites',
+        items: [
+          { id: 'hf1001', name: 'Green Curry with Chicken', description: 'Homemade green curry paste, coconut milk, and chicken.', price: 17.50, imageId: 'food-37' },
+          { id: 'hf1002', name: 'Drunken Noodles (Pad Kee Mao)', description: 'Spicy stir-fried flat noodles with basil.', price: 16.50, imageId: 'food-36' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf11',
+    name: 'Elena\'s Greek Kitchen',
+    slug: 'elenas-greek-kitchen',
+    imageId: 'food-21',
+    cuisine: 'Greek',
+    rating: 4.9,
+    reviews: 195,
+    deliveryTime: 30,
+    deliveryFee: 3.50,
+    categories: ['Greek', 'Mediterranean', 'Homemade'],
+    menu: [
+      {
+        title: 'Greek Specialties',
+        items: [
+          { id: 'hf1101', name: 'Moussaka', description: 'Layered eggplant, minced meat, and béchamel sauce.', price: 19.00, imageId: 'food-21' },
+          { id: 'hf1102', name: 'Spanakopita (Spinach Pie)', description: 'Flaky phyllo pastry with spinach and feta.', price: 10.00, imageId: 'food-22' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf12',
+    name: 'Frank\'s Famous Chili',
+    slug: 'franks-famous-chili',
+    imageId: 'food-24', // Placeholder
+    cuisine: 'American Comfort',
+    rating: 4.7,
+    reviews: 88,
+    deliveryTime: 25,
+    deliveryFee: 3.00,
+    categories: ['Comfort Food', 'American', 'Homemade'],
+    menu: [
+      {
+        title: 'Chili Bowls',
+        items: [
+          { id: 'hf1201', name: 'Classic Beef Chili', description: 'Hearty and spicy, served with sour cream and cheese.', price: 15.00, imageId: 'food-24' },
+          { id: 'hf1202', name: 'Vegetarian Three-Bean Chili', description: 'A flavorful mix of beans and spices.', price: 14.00, imageId: 'food-25' },
+        ],
+      },
+    ],
+  },
 ];

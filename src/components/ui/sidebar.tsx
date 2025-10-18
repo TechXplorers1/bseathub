@@ -561,29 +561,38 @@ const SidebarMenuButton = React.forwardRef<
       tooltip,
       className,
       href,
+      children,
       ...props
     },
     ref
   ) => {
-    // The component logic is correct, but we need to conditionally wrap it in a Link component.
-    // The `asChild` prop in the `Link` component will pass down the `href` to the button.
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
 
     const button = (
       <Comp
-        ref={ref}
+        ref={ref as any}
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
-      />
+      >
+        {children}
+      </Comp>
     )
 
     const content = (
       <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipTrigger asChild>
+          {href ? (
+            <Link href={href} className={cn(sidebarMenuButtonVariants({ variant, size }), className)} {...props}>
+              {children}
+            </Link>
+          ) : (
+            button
+          )}
+        </TooltipTrigger>
         <TooltipContent
           side="right"
           align="center"
@@ -593,15 +602,14 @@ const SidebarMenuButton = React.forwardRef<
       </Tooltip>
     );
 
-    if (href) {
-      return (
-        <Link href={href} passHref legacyBehavior>
-          {tooltip ? content : button}
-        </Link>
-      )
+    if (!tooltip) {
+      if (href) {
+        return <Link href={href} className={cn(sidebarMenuButtonVariants({ variant, size }), className)} {...props}>{children}</Link>
+      }
+      return button;
     }
-
-    return tooltip ? content : button;
+    
+    return content;
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"

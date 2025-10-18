@@ -568,8 +568,8 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
-
-    const button = (
+    
+    const buttonContent = (
       <Comp
         ref={ref as any}
         data-sidebar="menu-button"
@@ -582,10 +582,48 @@ const SidebarMenuButton = React.forwardRef<
       </Comp>
     )
 
+    const renderButton = () => {
+      if (href) {
+        // If there's an href, we need a Link. If asChild is true, the Link will pass its props to the button.
+        // If not, the Link will be the button itself.
+        if (asChild) {
+          return <Link href={href} asChild>{buttonContent}</Link>;
+        }
+        // When not using asChild with Link, we need to make the button an `a` tag or have the Link wrap it without asChild.
+        // To avoid complexity, we'll make the Comp an 'a' if href is present and not asChild.
+        // But the original `Comp` is already a button or Slot. Let's rethink.
+        
+        const { asChild: _asChild, ...restProps } = props;
+
+        const InnerComp = _asChild ? Slot : 'button';
+
+        return (
+          <Link href={href} passHref legacyBehavior>
+             <InnerComp
+                ref={ref as any}
+                data-sidebar="menu-button"
+                data-size={size}
+                data-active={isActive}
+                className={cn(sidebarMenuButtonVariants({ variant, size, className }))}
+                {...restProps}
+              >
+                {children}
+              </InnerComp>
+          </Link>
+        )
+      }
+      return buttonContent;
+    }
+
+
+    if (!tooltip) {
+      return renderButton();
+    }
+    
     const content = (
       <Tooltip>
         <TooltipTrigger asChild>
-          {href ? <Link href={href}>{button}</Link> : button}
+          {renderButton()}
         </TooltipTrigger>
         <TooltipContent
           side="right"
@@ -595,15 +633,8 @@ const SidebarMenuButton = React.forwardRef<
         />
       </Tooltip>
     )
-
-    if (!tooltip) {
-      if (href) {
-        return <Link href={href}>{button}</Link>
-      }
-      return button
-    }
     
-    return content
+    return content;
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"

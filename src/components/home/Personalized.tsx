@@ -6,7 +6,7 @@ import { RestaurantCard } from './RestaurantCard';
 import { allRestaurants } from '@/lib/data';
 import { Restaurant } from '@/lib/types';
 import { Button } from '../ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUp } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -15,9 +15,12 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 
+const INITIAL_VISIBLE_COUNT = 4;
+
 export function Personalized() {
   const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     async function getRecommendations() {
@@ -56,17 +59,17 @@ export function Personalized() {
         );
         
         // If not enough recommendations, fill with popular restaurants
-        if (recommendedRestaurants.length < 4) {
-            const popular = allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 4 - recommendedRestaurants.length);
+        if (recommendedRestaurants.length < 8) {
+            const popular = allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 8 - recommendedRestaurants.length);
             recommendedRestaurants.push(...popular.filter(p => !recommendedRestaurants.find(r => r.id === p.id)));
         }
 
-        setRecommendations(recommendedRestaurants.slice(0,4));
+        setRecommendations(recommendedRestaurants);
 
       } catch (error) {
         console.error('Failed to get personalized recommendations:', error);
         // Fallback to popular restaurants on error
-        setRecommendations(allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 4));
+        setRecommendations(allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 8));
       } finally {
         setLoading(false);
       }
@@ -74,6 +77,9 @@ export function Personalized() {
 
     getRecommendations();
   }, []);
+  
+  const visibleRestaurants = showAll ? recommendations : recommendations.slice(0, INITIAL_VISIBLE_COUNT);
+
 
   if (loading) {
     return (
@@ -100,23 +106,25 @@ export function Personalized() {
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Picked for you</h2>
-        <Button variant="ghost">
-          See all <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
+        {recommendations.length > INITIAL_VISIBLE_COUNT && (
+          <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
+            {showAll ? (
+              <>
+                See less <ArrowUp className="ml-2 h-4 w-4" />
+              </>
+            ) : (
+              <>
+                See all <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        )}
       </div>
-      <Carousel opts={{ align: 'start' }} className="w-full">
-        <CarouselContent>
-          {recommendations.map((restaurant, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
-              <div className="p-1">
-                <RestaurantCard restaurant={restaurant} />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="hidden sm:flex" />
-        <CarouselNext className="hidden sm:flex" />
-      </Carousel>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {visibleRestaurants.map((restaurant) => (
+          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+        ))}
+      </div>
     </div>
   );
 }

@@ -12,10 +12,6 @@ export default function Home() {
         <FilterCategories />
         <Banners />
         <Personalized />
-        <RestaurantCarousel
-          title="Under $1 delivery fee"
-          restaurants={allRestaurants.filter((r) => r.deliveryFee < 1)}
-        />
         <HomeFeed restaurants={allRestaurants} />
       </div>
     </div>

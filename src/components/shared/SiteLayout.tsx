@@ -19,12 +19,18 @@ import {
   User,
   Gift,
   Wallet,
+  Utensils,
+  Building2,
+  ChefHat,
 } from 'lucide-react';
 import { Header } from './Header';
 
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const sidebarNav = [
     { name: 'Home', icon: Home, href: '/' },
+    { name: 'Home Food', icon: Utensils, href: '#' },
+    { name: 'Restaurant', icon: Building2, href: '#' },
+    { name: 'Chefs', icon: ChefHat, href: '#' },
     { name: 'Browse', icon: Search, href: '#' },
     { name: 'Orders', icon: Book, href: '/track-order' },
     { name: 'Favorites', icon: Heart, href: '#' },

@@ -180,9 +180,9 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
               </div>
             </div>
 
-            {/* Featured Items */}
+            {/* Deals & Discounts */}
             <div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4" id="Featured Items">Featured Items</h2>
+              <h2 className="text-2xl font-bold mb-4" id="Deals & Discounts">Deals & Discounts</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
                   <Tag className="h-6 w-6 text-primary" />

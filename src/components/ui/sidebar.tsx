@@ -586,7 +586,7 @@ const SidebarMenuButton = React.forwardRef<
       </Comp>
     );
 
-    const content = href ? <Link href={href} passHref legacyBehavior asChild>{buttonContent}</Link> : buttonContent;
+    const content = href ? <Link href={href} passHref legacyBehavior>{buttonContent}</Link> : buttonContent;
     
     if (!tooltip) {
       return content
@@ -778,3 +778,5 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
+    

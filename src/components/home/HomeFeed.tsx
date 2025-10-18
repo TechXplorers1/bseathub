@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, ArrowUp } from 'lucide-react';
 
 interface HomeFeedProps {
   restaurants: Restaurant[];
@@ -39,9 +39,17 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">All Restaurants</h2>
-        {!showAll && restaurants.length > INITIAL_VISIBLE_COUNT && (
-            <Button variant="ghost" onClick={() => setShowAll(true)}>
-                See all <ArrowRight className="ml-2 h-4 w-4" />
+        {restaurants.length > INITIAL_VISIBLE_COUNT && (
+            <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
+                {showAll ? (
+                    <>
+                        See less <ArrowUp className="ml-2 h-4 w-4" />
+                    </>
+                ) : (
+                    <>
+                        See all <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                )}
             </Button>
         )}
       </div>

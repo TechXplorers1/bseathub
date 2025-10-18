@@ -334,7 +334,7 @@ export const allRestaurants: Restaurant[] = [
     id: '13',
     name: 'Mediterranean Bites',
     slug: 'mediterranean-bites',
-    imageId: 'restaurant-1', // Placeholder
+    imageId: 'restaurant-13',
     cuisine: 'Mediterranean',
     rating: 4.7,
     reviews: 850,
@@ -355,7 +355,7 @@ export const allRestaurants: Restaurant[] = [
     id: '14',
     name: 'Breakfast Club',
     slug: 'breakfast-club',
-    imageId: 'restaurant-2', // Placeholder
+    imageId: 'restaurant-14',
     cuisine: 'Breakfast',
     rating: 4.6,
     reviews: 1100,
@@ -376,7 +376,7 @@ export const allRestaurants: Restaurant[] = [
     id: '15',
     name: 'The Ramen Shop',
     slug: 'the-ramen-shop',
-    imageId: 'restaurant-3', // Placeholder
+    imageId: 'restaurant-15',
     cuisine: 'Japanese',
     rating: 4.8,
     reviews: 1300,
@@ -397,7 +397,7 @@ export const allRestaurants: Restaurant[] = [
     id: '16',
     name: 'BBQ Central',
     slug: 'bbq-central',
-    imageId: 'restaurant-4', // Placeholder
+    imageId: 'restaurant-16',
     cuisine: 'BBQ',
     rating: 4.5,
     reviews: 950,
@@ -418,7 +418,7 @@ export const allRestaurants: Restaurant[] = [
     id: '17',
     name: 'The Sweet Spot',
     slug: 'the-sweet-spot',
-    imageId: 'restaurant-5', // Placeholder
+    imageId: 'restaurant-17',
     cuisine: 'Desserts',
     rating: 4.9,
     reviews: 2100,
@@ -439,7 +439,7 @@ export const allRestaurants: Restaurant[] = [
     id: '18',
     name: 'Healthy Habits',
     slug: 'healthy-habits',
-    imageId: 'restaurant-6', // Placeholder
+    imageId: 'restaurant-18',
     cuisine: 'Healthy',
     rating: 4.7,
     reviews: 780,
@@ -456,6 +456,153 @@ export const allRestaurants: Restaurant[] = [
       },
     ],
   },
+   {
+    id: '19',
+    name: 'Cluck-a-Doodle',
+    slug: 'cluck-a-doodle',
+    imageId: 'restaurant-19',
+    cuisine: 'Chicken',
+    rating: 4.6,
+    reviews: 1300,
+    deliveryTime: 25,
+    deliveryFee: 3.50,
+    categories: ['Chicken', 'Fast Food', 'American'],
+    menu: [
+      {
+        title: 'Fried Chicken',
+        items: [
+          { id: '1901', name: '3-Piece Fried Chicken', description: 'Crispy and juicy fried chicken.', price: 12.99, imageId: 'food-44' },
+          { id: '1902', name: 'Spicy Chicken Sandwich', description: 'A fiery chicken sandwich with pickles.', price: 9.99, imageId: 'food-45' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '20',
+    name: 'Boba Bliss',
+    slug: 'boba-bliss',
+    imageId: 'restaurant-20',
+    cuisine: 'Bubble Tea',
+    rating: 4.9,
+    reviews: 2500,
+    deliveryTime: 15,
+    deliveryFee: 2.00,
+    categories: ['Bubble Tea', 'Drinks', 'Desserts'],
+    menu: [
+      {
+        title: 'Milk Teas',
+        items: [
+          { id: '2001', name: 'Classic Milk Tea', description: 'Black tea with milk and tapioca pearls.', price: 5.50, imageId: 'food-46' },
+          { id: '2002', name: 'Taro Milk Tea', description: 'Creamy taro flavor with boba.', price: 6.00, imageId: 'food-47' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '21',
+    name: 'The Halal Guys',
+    slug: 'the-halal-guys',
+    imageId: 'restaurant-21',
+    cuisine: 'Halal',
+    rating: 4.7,
+    reviews: 5000,
+    deliveryTime: 20,
+    deliveryFee: 3.00,
+    categories: ['Halal', 'Mediterranean', 'Street Food'],
+    menu: [
+      {
+        title: 'Platters',
+        items: [
+          { id: '2101', name: 'Chicken & Gyro Combo', description: 'A mix of chicken and gyro meat over rice.', price: 14.99, imageId: 'food-48' },
+          { id: '2102', name: 'Falafel Platter', description: 'Crispy falafel over rice with white sauce.', price: 12.99, imageId: 'food-2' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '22',
+    name: 'Sublime Sandwiches',
+    slug: 'sublime-sandwiches',
+    imageId: 'restaurant-22',
+    cuisine: 'Sandwiches',
+    rating: 4.5,
+    reviews: 600,
+    deliveryTime: 18,
+    deliveryFee: 2.50,
+    categories: ['Sandwiches', 'Deli', 'Lunch'],
+    menu: [
+      {
+        title: 'Hot Sandwiches',
+        items: [
+          { id: '2201', name: 'Philly Cheesesteak', description: 'Thinly-sliced beef with melted cheese and onions.', price: 13.99, imageId: 'food-49' },
+          { id: '2202', name: 'Italian Meatball Sub', description: 'Meatballs in marinara with provolone.', price: 12.99, imageId: 'food-50' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '23',
+    name: 'Athens Grill',
+    slug: 'athens-grill',
+    imageId: 'restaurant-13',
+    cuisine: 'Greek',
+    rating: 4.8,
+    reviews: 950,
+    deliveryTime: 30,
+    deliveryFee: 3.00,
+    categories: ['Greek', 'Mediterranean', 'Healthy'],
+    menu: [
+      {
+        title: 'Gyros',
+        items: [
+          { id: '2301', name: 'Lamb Gyro', description: 'Sliced lamb in a warm pita with tzatziki.', price: 11.99, imageId: 'food-1' },
+          { id: '2302', name: 'Chicken Souvlaki Pita', description: 'Grilled chicken skewers in a pita.', price: 10.99, imageId: 'food-2' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '24',
+    name: 'Perfectly Pasta',
+    slug: 'perfectly-pasta',
+    imageId: 'restaurant-1',
+    cuisine: 'Italian',
+    rating: 4.6,
+    reviews: 800,
+    deliveryTime: 28,
+    deliveryFee: 3.50,
+    categories: ['Italian', 'Pasta', 'Noodle'],
+    menu: [
+      {
+        title: 'Pasta',
+        items: [
+          { id: '2401', name: 'Fettuccine Alfredo', description: 'Creamy parmesan sauce over fettuccine.', price: 17.99, imageId: 'food-3' },
+          { id: '2402', name: 'Pesto Gnocchi', description: 'Soft potato dumplings in a basil pesto sauce.', price: 18.99, imageId: 'food-4' },
+        ],
+      },
+    ],
+  },
+  {
+    id: '25',
+    name: 'The Cake Box',
+    slug: 'the-cake-box',
+    imageId: 'restaurant-17',
+    cuisine: 'Bakery',
+    rating: 4.9,
+    reviews: 1200,
+    deliveryTime: 20,
+    deliveryFee: 2.50,
+    categories: ['Bakery', 'Desserts', 'Sweets'],
+    menu: [
+      {
+        title: 'Cupcakes',
+        items: [
+          { id: '2501', name: 'Red Velvet Cupcake', description: 'Classic red velvet with cream cheese frosting.', price: 4.50, imageId: 'food-9' },
+          { id: '2502', name: 'Chocolate Fudge Cupcake', description: 'Rich chocolate cupcake with fudge icing.', price: 4.50, imageId: 'food-10' },
+        ],
+      },
+    ],
+  }
 ];
 
 
@@ -713,3 +860,5 @@ export const allHomeFoods: Restaurant[] = [
     ],
   },
 ];
+
+    

@@ -79,6 +79,66 @@
       "imageHint": "steakhouse"
     },
     {
+      "id": "restaurant-13",
+      "description": "A bright mediterranean restaurant",
+      "imageUrl": "https://images.unsplash.com/photo-1724023878298-78ff392030a8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtZWRpdGVycmFuZWFuJTIwcmVzdGF1cmFudHxlbnwwfHx8fDE3NjA3ODY1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mediterranean restaurant"
+    },
+    {
+      "id": "restaurant-14",
+      "description": "A cozy breakfast cafe",
+      "imageUrl": "https://images.unsplash.com/photo-1620280614936-fbd4339f9446?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxicmVha2Zhc3QlMjBjYWZlfGVufDB8fHx8MTc2MDc4NjUzMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "breakfast cafe"
+    },
+    {
+      "id": "restaurant-15",
+      "description": "A modern ramen shop",
+      "imageUrl": "https://images.unsplash.com/photo-1676340923416-56adfe1490b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxyYW1lbiUyMHNob3B8ZW58MHx8fHwxNzYwNzY3NDkzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ramen shop"
+    },
+    {
+      "id": "restaurant-16",
+      "description": "A rustic BBQ joint",
+      "imageUrl": "https://images.unsplash.com/photo-1601568656096-bde429d5d386?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxCQlElMjBqb2ludHxlbnwwfHx8fDE3NjA3ODY1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "BBQ joint"
+    },
+    {
+      "id": "restaurant-17",
+      "description": "A cute dessert and bakery shop",
+      "imageUrl": "https://images.unsplash.com/photo-1640631700502-b029475bbce0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkZXNzZXJ0JTIwc2hvcHxlbnwwfHx8fDE3NjA3ODY1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dessert shop"
+    },
+    {
+      "id": "restaurant-18",
+      "description": "A clean and green healthy food cafe",
+      "imageUrl": "https://images.unsplash.com/photo-1543137158-a486e853560c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxoZWFsdGh5JTIwY2FmZXxlbnwwfHx8fDE3NjA3Njc0OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthy cafe"
+    },
+    {
+      "id": "restaurant-19",
+      "description": "A fun and bright fried chicken restaurant",
+      "imageUrl": "https://images.unsplash.com/photo-1702705497146-bbde3336a801?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjaGlja2VuJTIwcmVzdGF1cmFudHxlbnwwfHx8fDE3NjA3ODY1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chicken restaurant"
+    },
+    {
+      "id": "restaurant-20",
+      "description": "A colorful bubble tea shop",
+      "imageUrl": "https://images.unsplash.com/photo-1637273484093-3e205aed2c59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxidWJibGUlMjB0ZWF8ZW58MHx8fHwxNzYwNzg2NTMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bubble tea"
+    },
+    {
+      "id": "restaurant-21",
+      "description": "A street food cart for halal food",
+      "imageUrl": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoYWxhbCUyMGZvb2R8ZW58MHx8fHwxNzYwNzg2NTMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "halal food"
+    },
+    {
+      "id": "restaurant-22",
+      "description": "A classic sandwich deli",
+      "imageUrl": "https://images.unsplash.com/photo-1725155229371-05cea3610205?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2FuZHdpY2glMjBkZWxpfGVufDB8fHx8MTc2MDc4NjUzMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sandwich deli"
+    },
+    {
       "id": "food-1",
       "description": "Close-up of bruschetta appetizers",
       "imageUrl": "https://images.unsplash.com/photo-1574862612718-adc4a21d2204?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxicnVzY2hldHRhJTIwYXBwZXRpemVyfGVufDB8fHx8MTc2MDczNzA2NXww&ixlib=rb-4.1.0&q=80&w=1080",
@@ -341,6 +401,48 @@
       "description": "A side dish of creamed spinach",
       "imageUrl": "https://images.unsplash.com/photo-1601528013634-59ab3bc83d0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjcmVhbWVkJTIwc3BpbmFjaHxlbnwwfHx8fDE3NjA3Nzk3OTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "creamed spinach"
+    },
+    {
+      "id": "food-44",
+      "description": "A plate of crispy fried chicken",
+      "imageUrl": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmcmllZCUyMGNoaWNrZW58ZW58MHx8fHwxNzYwNzU3MzI1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fried chicken"
+    },
+    {
+      "id": "food-45",
+      "description": "A spicy chicken sandwich",
+      "imageUrl": "https://images.unsplash.com/photo-1613985216255-a26ecf1df4a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjaGlja2VuJTIwc2FuZHdpY2h8ZW58MHx8fHwxNzYwNzYxNjQ1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chicken sandwich"
+    },
+    {
+      "id": "food-46",
+      "description": "A glass of classic milk tea with boba",
+      "imageUrl": "https://images.unsplash.com/photo-1622480914747-d26cd0555a45?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtaWxrJTIwdGVhfGVufDB8fHx8MTc2MDc1OTYxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "milk tea"
+    },
+    {
+      "id": "food-47",
+      "description": "A glass of taro milk tea",
+      "imageUrl": "https://images.unsplash.com/photo-1626759292870-5813c8c647c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHx0YXJvJTIwdGVhfGVufDB8fHx8MTc2MDc4NjUzMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "taro tea"
+    },
+    {
+      "id": "food-48",
+      "description": "A halal platter with chicken and gyro",
+      "imageUrl": "https://images.unsplash.com/photo-1584031745084-223095abdb0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoYWxhbCUyMHBsYXR0ZXJ8ZW58MHx8fHwxNzYwNzg2NTMwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "halal platter"
+    },
+    {
+      "id": "food-49",
+      "description": "A philly cheesesteak sandwich",
+      "imageUrl": "https://images.unsplash.com/photo-1734769853702-c7444c039c8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjaGVlc2VzdGVhayUyMHNhbmR3aWNofGVufDB8fHx8MTc2MDc4NjUzMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cheesesteak sandwich"
+    },
+    {
+      "id": "food-50",
+      "description": "An Italian meatball sub",
+      "imageUrl": "https://images.unsplash.com/photo-1584701830110-c2ecf0a5f2a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtZWF0YmFsbCUyMHN1YnxlbnwwfHx8fDE3NjA3ODY1MzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "meatball sub"
     }
   ]
 }

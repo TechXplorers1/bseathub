@@ -14,34 +14,37 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   const image = getImageById(restaurant.imageId);
 
   return (
-    <Link href={`/restaurant/${restaurant.slug}`}>
-      <Card className="overflow-hidden transition-all hover:shadow-lg">
+    <Link href={`/restaurant/${restaurant.slug}`} className="flex">
+      <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col">
         {image && (
-          <Image
-            src={image.imageUrl}
-            alt={restaurant.name}
-            width={600}
-            height={400}
-            className="h-48 w-full object-cover"
-            data-ai-hint={image.imageHint}
-          />
-        )}
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start">
-            <h3 className="font-bold text-lg">{restaurant.name}</h3>
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-              <span>{restaurant.rating.toFixed(1)}</span>
-            </Badge>
+          <div className="relative h-48 w-full">
+            <Image
+              src={image.imageUrl}
+              alt={restaurant.name}
+              fill
+              className="object-cover"
+              data-ai-hint={image.imageHint}
+            />
           </div>
-          <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
+        )}
+        <CardContent className="p-4 flex flex-col flex-1">
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <h3 className="font-bold text-lg">{restaurant.name}</h3>
+              <Badge variant="secondary" className="flex items-center gap-1 flex-shrink-0">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span>{restaurant.rating.toFixed(1)}</span>
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
+          </div>
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
               <span>{restaurant.deliveryTime} min</span>
             </div>
             <span>
-              ${restaurant.deliveryFee.toFixed(2)}
+              ${restaurant.deliveryFee > 0 ? restaurant.deliveryFee.toFixed(2) : 'Free'}
             </span>
           </div>
         </CardContent>

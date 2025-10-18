@@ -545,7 +545,7 @@ const sidebarMenuButtonVariants = cva(
 
 const SidebarMenuButton = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<"button"> & {
+  React.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
@@ -568,21 +568,25 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const { isMobile, state } = useSidebar()
     const Comp = asChild ? Slot : "button"
-
+    
+    const commonProps = {
+      "data-sidebar": "menu-button",
+      "data-size": size,
+      "data-active": isActive,
+      className: cn(sidebarMenuButtonVariants({ variant, size, className })),
+      ...props,
+    };
+    
     const buttonContent = (
       <Comp
-        ref={ref}
-        data-sidebar="menu-button"
-        data-size={size}
-        data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size, className }))}
-        {...props}
+        ref={ref as any}
+        {...commonProps}
       >
         {children}
       </Comp>
-    )
+    );
 
-    const content = href ? <Link href={href} legacyBehavior={false} passHref asChild>{buttonContent}</Link> : buttonContent;
+    const content = href ? <Link href={href} passHref legacyBehavior asChild>{buttonContent}</Link> : buttonContent;
     
     if (!tooltip) {
       return content

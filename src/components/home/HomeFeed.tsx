@@ -21,7 +21,7 @@ interface HomeFeedProps {
 
 type SortOption = 'picked' | 'rating' | 'deliveryTime';
 
-const INITIAL_VISIBLE_COUNT = 4;
+const INITIAL_VISIBLE_COUNT = 8;
 
 export function HomeFeed({ restaurants }: HomeFeedProps) {
   const [sortOption, setSortOption] = useState<SortOption>('picked');

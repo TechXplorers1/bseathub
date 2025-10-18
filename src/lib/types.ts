@@ -1,6 +1,6 @@
-import type { placeholderImages } from './placeholder-images.json';
+import placeholderData from './placeholder-images.json';
 
-type PlaceholderImageIds = (typeof placeholderImages)[number]['id'];
+type PlaceholderImageIds = (typeof placeholderData.placeholderImages)[number]['id'];
 
 export interface Restaurant {
   id: string;

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, SlidersHorizontal } from 'lucide-react';
 
 interface HomeFeedProps {
   restaurants: Restaurant[];
@@ -34,6 +34,9 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">All Restaurants</h2>
+        <Button variant="ghost">
+          See all <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {sortedRestaurants.map((restaurant) => (

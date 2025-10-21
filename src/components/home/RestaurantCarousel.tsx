@@ -14,7 +14,7 @@ interface RestaurantCarouselProps {
   href?: string;
 }
 
-const INITIAL_VISIBLE_COUNT = 4;
+const INITIAL_VISIBLE_COUNT = 8;
 
 export function RestaurantCarousel({ title, restaurants, href = "/restaurants" }: RestaurantCarouselProps) {
   const visibleRestaurants = restaurants.slice(0, INITIAL_VISIBLE_COUNT);

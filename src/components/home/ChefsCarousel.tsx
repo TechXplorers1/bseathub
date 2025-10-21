@@ -24,7 +24,7 @@ const uniqueChefs = chefs.reduce((acc, current) => {
 }, [] as typeof chefs);
 
 
-const INITIAL_VISIBLE_COUNT = 4;
+const INITIAL_VISIBLE_COUNT = 8;
 
 export function ChefsCarousel() {
   const visibleChefs = uniqueChefs.slice(0, INITIAL_VISIBLE_COUNT);

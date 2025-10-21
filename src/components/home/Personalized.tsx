@@ -17,7 +17,7 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
-const INITIAL_VISIBLE_COUNT = 4;
+const INITIAL_VISIBLE_COUNT = 8;
 
 export function Personalized() {
   const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
@@ -87,7 +87,7 @@ export function Personalized() {
         <div className="py-8">
             <h2 className="text-2xl font-bold mb-4">Picked for you</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
+                {[...Array(8)].map((_, i) => (
                     <div key={i} className="border rounded-lg p-4">
                         <div className="bg-gray-200 h-40 w-full rounded-md animate-pulse"></div>
                         <div className="mt-4 bg-gray-200 h-6 w-3/4 rounded-md animate-pulse"></div>

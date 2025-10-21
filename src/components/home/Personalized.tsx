@@ -48,7 +48,7 @@ export function Personalized() {
           ]),
           preferences: JSON.stringify({
             dietary: ['none'],
-            likes: ['Italian', 'Japanese'],
+            likes: ['Italian', 'Japanese', 'Homemade'],
             dislikes: ['spicy'],
           }),
         };
@@ -59,23 +59,53 @@ export function Personalized() {
 
         // This is a simplified logic. In a real app, you'd match meal names to restaurants.
         // Here we just find restaurants whose cuisine matches the recommendations.
-        const recommendedRestaurants = allItems.filter((restaurant) =>
-            result.recommendations.some(recommendation => restaurant.name.toLowerCase().includes(recommendation.toLowerCase()) || restaurant.cuisine.toLowerCase().includes(recommendation.toLowerCase()))
+        let recommendedItems = allItems.filter((restaurant) =>
+            result.recommendations.some(recommendation => 
+                restaurant.name.toLowerCase().includes(recommendation.toLowerCase()) || 
+                restaurant.cuisine.toLowerCase().includes(recommendation.toLowerCase()) ||
+                restaurant.categories.some(cat => cat.toLowerCase().includes(recommendation.toLowerCase()))
+            )
         );
         
-        // If not enough recommendations, fill with popular restaurants
-        if (recommendedRestaurants.length < 8) {
-            const popular = allItems.sort((a,b) => b.rating - a.rating).slice(0, 8 - recommendedRestaurants.length);
-            recommendedRestaurants.push(...popular.filter(p => !recommendedRestaurants.find(r => r.id === p.id)));
+        // Ensure a mix of home food and restaurants
+        const hasHomeFood = recommendedItems.some(item => item.type === 'home-food');
+        const hasRestaurant = recommendedItems.some(item => item.type === 'restaurant');
+
+        // If not enough recommendations, fill with popular items, ensuring a mix
+        if (recommendedItems.length < INITIAL_VISIBLE_COUNT) {
+            const needed = INITIAL_VISIBLE_COUNT - recommendedItems.length;
+            
+            let fillItems: Restaurant[] = [];
+            if (!hasHomeFood) {
+                const homeFoodToAdd = allHomeFoods
+                    .filter(hf => !recommendedItems.find(r => r.id === hf.id))
+                    .slice(0, 2);
+                fillItems.push(...homeFoodToAdd);
+            }
+
+            const popular = allItems
+                .sort((a,b) => b.rating - a.rating)
+                .filter(p => !recommendedItems.find(r => r.id === p.id) && !fillItems.find(f => f.id === p.id))
+                .slice(0, needed - fillItems.length);
+            
+            fillItems.push(...popular);
+            recommendedItems.push(...fillItems);
         }
 
-        setRecommendations(recommendedRestaurants);
+        // Shuffle to make it look more organic
+        recommendedItems.sort(() => Math.random() - 0.5);
+
+        setRecommendations(recommendedItems.slice(0, INITIAL_VISIBLE_COUNT));
 
       } catch (error) {
         console.error('Failed to get personalized recommendations:', error);
         // Fallback to popular restaurants on error
-        const allItems = [...allRestaurants, ...allHomeFoods];
-        setRecommendations(allItems.sort((a,b) => b.rating - a.rating).slice(0, 8));
+        const mixedItems = [
+            ...allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 4),
+            ...allHomeFoods.sort((a,b) => b.rating - a.rating).slice(0, 4)
+        ].sort(() => Math.random() - 0.5);
+
+        setRecommendations(mixedItems);
       } finally {
         setLoading(false);
       }

@@ -1260,13 +1260,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 150,
     deliveryTime: 30,
     deliveryFee: 3.50,
-    categories: ['Italian', 'Homemade', 'Pasta'],
+    categories: ['Italian', 'Homemade', 'Pasta', 'Comfort Food'],
     menu: [
       {
         title: 'Family Recipes',
         items: [
-          { id: 'hf101', name: 'Grandma\'s Lasagna', description: 'Layers of pasta, ricotta, and a rich, slow-simmered bolognese sauce. Just like nonna used to make.', price: 18.00, imageId: 'food-3' },
-          { id: 'hf102', name: 'Chicken Parmesan', description: 'Tender chicken breast, breaded and fried, then smothered in marinara sauce and melted mozzarella. Served with a side of spaghetti.', price: 17.50, imageId: 'food-4' },
+          { id: 'hf101', name: 'Grandma\'s Lasagna', description: 'Layers of pasta, ricotta, and a rich, slow-simmered bolognese sauce. A comforting dish made with love, just like nonna used to make.', price: 18.00, imageId: 'food-3' },
+          { id: 'hf102', name: 'Chicken Parmesan', description: 'Tender chicken breast, breaded and fried until golden, then smothered in homemade marinara sauce and melted mozzarella. Served with a side of spaghetti.', price: 17.50, imageId: 'food-4' },
         ],
       },
     ],
@@ -1286,8 +1286,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Dumplings',
         items: [
-          { id: 'hf201', name: 'Pork & Chive Dumplings (12pcs)', description: 'Juicy, hand-wrapped dumplings filled with ground pork and fresh chives, pan-fried to a crispy perfection.', price: 15.00, imageId: 'food-5' },
-          { id: 'hf202', name: 'Veggie Dumplings (12pcs)', description: 'A delightful mix of mushrooms, cabbage, and carrots, wrapped in a delicate dough and steamed or pan-fried.', price: 14.00, imageId: 'food-6' },
+          { id: 'hf201', name: 'Pork & Chive Dumplings (12pcs)', description: 'Juicy, hand-wrapped dumplings filled with ground pork and fresh chives, pan-fried to a crispy perfection on the bottom and steamed on top.', price: 15.00, imageId: 'food-5' },
+          { id: 'hf202', name: 'Veggie Dumplings (12pcs)', description: 'A delightful mix of shiitake mushrooms, crisp cabbage, and sweet carrots, wrapped in a delicate dough and steamed or pan-fried to your liking.', price: 14.00, imageId: 'food-6' },
         ],
       },
     ],
@@ -1302,13 +1302,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 300,
     deliveryTime: 20,
     deliveryFee: 2.50,
-    categories: ['Mexican', 'Tacos', 'Homemade'],
+    categories: ['Mexican', 'Tacos', 'Homemade', 'Spicy'],
     menu: [
       {
         title: 'Street Tacos',
         items: [
-          { id: 'hf301', name: 'Carne Asada Tacos (3)', description: 'Tender, marinated grilled steak chopped and served on warm corn tortillas with cilantro, onion, and a side of salsa.', price: 12.00, imageId: 'food-13' },
-          { id: 'hf302', name: 'Cochinita Pibil Tacos (3)', description: 'A Yucatan specialty. Slow-roasted pork marinated in citrus and achiote, topped with pickled red onions.', price: 12.00, imageId: 'food-14' },
+          { id: 'hf301', name: 'Carne Asada Tacos (3)', description: 'Tender, marinated grilled steak chopped and served on warm corn tortillas with cilantro, onion, and a side of Javier\'s famous smoky salsa.', price: 12.00, imageId: 'food-13' },
+          { id: 'hf302', name: 'Cochinita Pibil Tacos (3)', description: 'A Yucatan specialty. Slow-roasted pork marinated in citrus and achiote, creating a tender, flavorful filling, topped with pickled red onions.', price: 12.00, imageId: 'food-14' },
         ],
       },
     ],
@@ -1323,13 +1323,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 95,
     deliveryTime: 15,
     deliveryFee: 4.00,
-    categories: ['Healthy', 'Vegan', 'Bowls'],
+    categories: ['Healthy', 'Vegan', 'Bowls', 'Homemade'],
     menu: [
       {
         title: 'Nourish Bowls',
         items: [
-          { id: 'hf401', name: 'Quinoa & Roasted Veggie Bowl', description: 'A vibrant bowl of fluffy quinoa, roasted seasonal vegetables, and a creamy lemon-tahini dressing.', price: 16.00, imageId: 'food-22' },
-          { id: 'hf402', name: 'Mediterranean Chicken Bowl', description: 'Grilled chicken breast, crumbled feta cheese, kalamata olives, cucumbers, and tomatoes over a bed of couscous.', price: 17.00, imageId: 'food-23' },
+          { id: 'hf401', name: 'Quinoa & Roasted Veggie Bowl', description: 'A vibrant bowl of fluffy quinoa, roasted seasonal vegetables like broccoli and sweet potatoes, and a creamy lemon-tahini dressing.', price: 16.00, imageId: 'food-22' },
+          { id: 'hf402', name: 'Mediterranean Chicken Bowl', description: 'Grilled chicken breast, crumbled feta cheese, kalamata olives, cucumbers, and tomatoes over a bed of fluffy couscous with a light vinaigrette.', price: 17.00, imageId: 'food-23' },
         ],
       },
     ],
@@ -1344,13 +1344,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 180,
     deliveryTime: 35,
     deliveryFee: 3.75,
-    categories: ['Indian', 'Curry', 'Homemade'],
+    categories: ['Indian', 'Curry', 'Homemade', 'Spicy'],
     menu: [
       {
         title: 'Curries',
         items: [
-          { id: 'hf501', name: 'Homestyle Chicken Curry', description: 'A comforting and aromatic chicken curry with a medium spice level, just like Priya\'s family makes it. Served with basmati rice.', price: 17.00, imageId: 'food-17' },
-          { id: 'hf502', name: 'Dal Makhani', description: 'A rich and creamy dish of black lentils and kidney beans, slow-cooked with butter and spices.', price: 15.00, imageId: 'food-18' },
+          { id: 'hf501', name: 'Homestyle Chicken Curry', description: 'A comforting and aromatic chicken curry with a medium spice level, made from a secret family recipe. Served with fluffy basmati rice.', price: 17.00, imageId: 'food-17' },
+          { id: 'hf502', name: 'Dal Makhani', description: 'A rich and creamy dish of black lentils and kidney beans, slow-cooked for hours with butter, cream, and a blend of traditional spices.', price: 15.00, imageId: 'food-18' },
         ],
       },
     ],
@@ -1365,13 +1365,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 250,
     deliveryTime: 45,
     deliveryFee: 5.00,
-    categories: ['BBQ', 'American', 'Homemade'],
+    categories: ['BBQ', 'American', 'Homemade', 'Comfort Food'],
     menu: [
       {
         title: 'BBQ Plates',
         items: [
-          { id: 'hf601', name: 'Pulled Pork Plate', description: 'Slow-smoked for 10 hours until perfectly tender, served with a side of tangy coleslaw and sweet cornbread.', price: 19.00, imageId: 'food-7' },
-          { id: 'hf602', name: 'Smoked Ribs (Half Rack)', description: 'A half rack of our fall-off-the-bone tender pork ribs, glazed with our secret family BBQ sauce.', price: 22.00, imageId: 'food-8' },
+          { id: 'hf601', name: 'Pulled Pork Plate', description: 'Slow-smoked for 10 hours until perfectly tender, served with a side of tangy homemade coleslaw and a slice of sweet cornbread.', price: 19.00, imageId: 'food-7' },
+          { id: 'hf602', name: 'Smoked Ribs (Half Rack)', description: 'A half rack of our fall-off-the-bone tender pork ribs, glazed with our secret family recipe BBQ sauce. A true taste of the South.', price: 22.00, imageId: 'food-8' },
         ],
       },
     ],
@@ -1380,7 +1380,7 @@ export const allHomeFoods: Restaurant[] = [
     id: 'hf7',
     name: 'Mama Kim\'s Korean',
     slug: 'mama-kims-korean',
-    imageId: 'food-24', // Placeholder
+    imageId: 'food-24',
     cuisine: 'Korean',
     rating: 4.8,
     reviews: 190,
@@ -1391,8 +1391,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Main Dishes',
         items: [
-          { id: 'hf701', name: 'Bibimbap', description: 'A classic Korean mixed rice bowl topped with seasoned vegetables, savory beef, a sunny-side-up fried egg, and gochujang sauce.', price: 18.00, imageId: 'food-24' },
-          { id: 'hf702', name: 'Kimchi Jjigae', description: 'A fiery and comforting kimchi stew with tender pork belly and soft tofu. A staple in every Korean home.', price: 17.00, imageId: 'food-25' },
+          { id: 'hf701', name: 'Bibimbap', description: 'A classic Korean mixed rice bowl topped with an array of seasoned vegetables, savory beef, a sunny-side-up fried egg, and gochujang sauce.', price: 18.00, imageId: 'food-24' },
+          { id: 'hf702', name: 'Kimchi Jjigae', description: 'A fiery and comforting kimchi stew with tender pork belly and soft tofu. A staple in every Korean home, perfect for a cold day.', price: 17.00, imageId: 'food-25' },
         ],
       },
     ],
@@ -1407,13 +1407,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 120,
     deliveryTime: 20,
     deliveryFee: 3.00,
-    categories: ['Soup', 'Comfort Food', 'Homemade'],
+    categories: ['Soup', 'Comfort Food', 'Homemade', 'Healthy'],
     menu: [
       {
         title: 'Hearty Soups',
         items: [
-          { id: 'hf801', name: 'Tomato Basil Soup', description: 'A creamy and rich tomato soup made with fresh basil and a touch of cream. Served with a side of crusty bread for dipping.', price: 12.00, imageId: 'food-38' },
-          { id: 'hf802', name: 'Chicken Noodle Soup', description: 'The ultimate comfort food. Made with a flavorful chicken broth, tender chicken pieces, vegetables, and egg noodles.', price: 13.00, imageId: 'food-29' },
+          { id: 'hf801', name: 'Tomato Basil Soup', description: 'A creamy and rich tomato soup made from vine-ripened tomatoes and fresh basil, with a touch of cream. Served with a side of crusty bread for dipping.', price: 12.00, imageId: 'food-38' },
+          { id: 'hf802', name: 'Chicken Noodle Soup', description: 'The ultimate comfort food. Made with a flavorful homemade chicken broth, tender chicken pieces, celery, carrots, and egg noodles.', price: 13.00, imageId: 'food-29' },
         ],
       },
     ],
@@ -1433,8 +1433,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Freshly Baked',
         items: [
-          { id: 'hf901', name: 'Sourdough Loaf', description: 'A beautiful, naturally leavened sourdough loaf with a tangy flavor and a satisfyingly crusty exterior.', price: 9.00, imageId: 'food-19' },
-          { id: 'hf902', name: 'Chocolate Babka', description: 'A sweet braided bread with a rich, gooey chocolate and cinnamon filling. Perfect for dessert or a special breakfast.', price: 14.00, imageId: 'food-27' },
+          { id: 'hf901', name: 'Sourdough Loaf', description: 'A beautiful, naturally leavened sourdough loaf with a tangy flavor, a chewy crumb, and a satisfyingly crusty exterior. Baked fresh daily.', price: 9.00, imageId: 'food-19' },
+          { id: 'hf902', name: 'Chocolate Babka', description: 'A sweet braided bread with a rich, gooey chocolate and cinnamon filling. Perfect for dessert or a special breakfast treat.', price: 14.00, imageId: 'food-27' },
         ],
       },
     ],
@@ -1449,13 +1449,13 @@ export const allHomeFoods: Restaurant[] = [
     reviews: 165,
     deliveryTime: 30,
     deliveryFee: 3.25,
-    categories: ['Thai', 'Homemade', 'Spicy'],
+    categories: ['Thai', 'Homemade', 'Spicy', 'Curry'],
     menu: [
       {
         title: 'Thai Favorites',
         items: [
-          { id: 'hf1001', name: 'Green Curry with Chicken', description: 'An authentic and aromatic green curry made from Ton\'s homemade paste, with coconut milk, chicken, and Thai basil.', price: 17.50, imageId: 'food-37' },
-          { id: 'hf1002', name: 'Drunken Noodles (Pad Kee Mao)', description: 'Spicy, stir-fried wide rice noodles with chicken, fresh basil, and a mix of vegetables. A flavorful and fiery dish.', price: 16.50, imageId: 'food-36' },
+          { id: 'hf1001', name: 'Green Curry with Chicken', description: 'An authentic and aromatic green curry made from Ton\'s homemade paste, with coconut milk, tender chicken, bamboo shoots, and Thai basil.', price: 17.50, imageId: 'food-37' },
+          { id: 'hf1002', name: 'Drunken Noodles (Pad Kee Mao)', description: 'Spicy, stir-fried wide rice noodles with chicken, fresh basil, bell peppers, and onions in a savory sauce. A flavorful and fiery dish.', price: 16.50, imageId: 'food-36' },
         ],
       },
     ],
@@ -1475,8 +1475,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Greek Specialties',
         items: [
-          { id: 'hf1101', name: 'Moussaka', description: 'A classic Greek casserole with layers of eggplant, seasoned ground meat, and a creamy béchamel sauce.', price: 19.00, imageId: 'food-21' },
-          { id: 'hf1102', name: 'Spanakopita (Spinach Pie)', description: 'A savory pie made with flaky phyllo pastry, filled with spinach, feta cheese, and herbs. Sold by the slice.', price: 10.00, imageId: 'food-22' },
+          { id: 'hf1101', name: 'Moussaka', description: 'A classic Greek casserole with layers of tender eggplant, seasoned ground meat, and a rich, creamy béchamel sauce, baked to perfection.', price: 19.00, imageId: 'food-21' },
+          { id: 'hf1102', name: 'Spanakopita (Spinach Pie)', description: 'A savory pie made with flaky phyllo pastry, generously filled with spinach, feta cheese, onions, and fresh herbs. Sold by the slice.', price: 10.00, imageId: 'food-22' },
         ],
       },
     ],
@@ -1485,23 +1485,234 @@ export const allHomeFoods: Restaurant[] = [
     id: 'hf12',
     name: 'Frank\'s Famous Chili',
     slug: 'franks-famous-chili',
-    imageId: 'food-24', // Placeholder
+    imageId: 'food-24',
     cuisine: 'American Comfort',
     rating: 4.7,
     reviews: 88,
     deliveryTime: 25,
     deliveryFee: 3.00,
-    categories: ['Comfort Food', 'American', 'Homemade'],
+    categories: ['Comfort Food', 'American', 'Homemade', 'Soup'],
     menu: [
       {
         title: 'Chili Bowls',
         items: [
-          { id: 'hf1201', name: 'Classic Beef Chili', description: 'Frank\'s award-winning recipe! A hearty and perfectly spiced beef chili, served with a side of sour cream and shredded cheddar.', price: 15.00, imageId: 'food-24' },
-          { id: 'hf1202', name: 'Vegetarian Three-Bean Chili', description: 'A flavorful and satisfying chili made with a mix of kidney, pinto, and black beans in a spiced tomato base.', price: 14.00, imageId: 'food-25' },
+          { id: 'hf1201', name: 'Classic Beef Chili', description: 'Frank\'s award-winning recipe! A hearty and perfectly spiced beef chili with beans, served with a side of sour cream and shredded cheddar.', price: 15.00, imageId: 'food-24' },
+          { id: 'hf1202', name: 'Vegetarian Three-Bean Chili', description: 'A flavorful and satisfying chili made with a mix of kidney, pinto, and black beans in a spiced tomato base, topped with green onions.', price: 14.00, imageId: 'food-25' },
         ],
       },
     ],
   },
+   {
+    id: 'hf13',
+    name: 'Morning Sunshine Breakfast',
+    slug: 'morning-sunshine-breakfast',
+    imageId: 'food-57',
+    cuisine: 'Breakfast',
+    rating: 4.8,
+    reviews: 110,
+    deliveryTime: 20,
+    deliveryFee: 3.00,
+    categories: ['Breakfast', 'Homemade', 'American'],
+    menu: [
+      {
+        title: 'Breakfast Classics',
+        items: [
+          { id: 'hf1301', name: 'Breakfast Burrito', description: 'A hearty burrito stuffed with scrambled eggs, savory sausage, potatoes, and cheese, wrapped in a warm flour tortilla.', price: 12.00, imageId: 'food-15' },
+          { id: 'hf1302', name: 'French Toast', description: 'Thick slices of brioche bread soaked in a sweet custard batter, grilled to golden brown, and topped with powdered sugar and berries.', price: 14.00, imageId: 'food-54' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf14',
+    name: 'Quick Bite Burgers',
+    slug: 'quick-bite-burgers',
+    imageId: 'food-9',
+    cuisine: 'Burgers',
+    rating: 4.6,
+    reviews: 90,
+    deliveryTime: 25,
+    deliveryFee: 3.50,
+    categories: ['Burgers', 'Fast Food', 'American', 'Homemade'],
+    menu: [
+      {
+        title: 'Homemade Burgers',
+        items: [
+          { id: 'hf1401', name: 'The Backyard Burger', description: 'A simple, delicious beef patty, seasoned and grilled, served on a toasted bun with lettuce, tomato, and onion.', price: 13.00, imageId: 'food-9' },
+          { id: 'hf1402', name: 'Mushroom Swiss Burger', description: 'A juicy beef patty topped with sautéed mushrooms and melted Swiss cheese on a brioche bun.', price: 14.50, imageId: 'food-10' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf15',
+    name: 'Java at Home',
+    slug: 'java-at-home',
+    imageId: 'food-34',
+    cuisine: 'Coffee',
+    rating: 4.9,
+    reviews: 150,
+    deliveryTime: 10,
+    deliveryFee: 2.00,
+    categories: ['Coffee', 'Drinks', 'Homemade'],
+    menu: [
+      {
+        title: 'Artisan Coffee',
+        items: [
+          { id: 'hf1501', name: 'Homemade Cold Brew', description: 'Small-batch cold brew coffee, steeped for 24 hours for a smooth, rich flavor. Served over ice.', price: 5.00, imageId: 'food-34' },
+          { id: 'hf1502', name: 'Spiced Chai Latte', description: 'A warm and aromatic chai latte made with a blend of black tea, spices, and steamed milk.', price: 5.50, imageId: 'food-33' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf16',
+    name: 'Pizza by the Pie',
+    slug: 'pizza-by-the-pie',
+    imageId: 'food-4',
+    cuisine: 'Pizza',
+    rating: 4.7,
+    reviews: 120,
+    deliveryTime: 35,
+    deliveryFee: 4.00,
+    categories: ['Pizza', 'Italian', 'Homemade'],
+    menu: [
+      {
+        title: 'Handmade Pizzas',
+        items: [
+          { id: 'hf1601', name: 'Classic Pepperoni Pizza', description: 'A 12-inch pizza with a hand-tossed crust, zesty tomato sauce, mozzarella cheese, and plenty of pepperoni.', price: 16.00, imageId: 'food-30' },
+          { id: 'hf1602', name: 'Four Cheese White Pizza', description: 'A creamy garlic sauce base topped with a blend of mozzarella, ricotta, parmesan, and provolone cheese.', price: 17.00, imageId: 'food-31' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf17',
+    name: 'Halal Home Cooking',
+    slug: 'halal-home-cooking',
+    imageId: 'food-48',
+    cuisine: 'Halal',
+    rating: 4.8,
+    reviews: 180,
+    deliveryTime: 30,
+    deliveryFee: 3.50,
+    categories: ['Halal', 'Middle Eastern', 'Homemade'],
+    menu: [
+      {
+        title: 'Halal Dishes',
+        items: [
+          { id: 'hf1701', name: 'Chicken Kabsa', description: 'A fragrant rice dish popular in the Gulf states, cooked with chicken, spices, and raisins.', price: 18.00, imageId: 'food-48' },
+          { id: 'hf1702', name: 'Lamb Tagine', description: 'A slow-cooked Moroccan stew with tender lamb, apricots, and almonds in a savory, aromatic sauce.', price: 20.00, imageId: 'food-1' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf18',
+    name: 'Crispy Cluckers',
+    slug: 'crispy-cluckers',
+    imageId: 'food-44',
+    cuisine: 'Chicken',
+    rating: 4.7,
+    reviews: 130,
+    deliveryTime: 30,
+    deliveryFee: 3.25,
+    categories: ['Chicken', 'American', 'Fast Food', 'Homemade'],
+    menu: [
+      {
+        title: 'Fried Chicken',
+        items: [
+          { id: 'hf1801', name: 'Buttermilk Fried Chicken (4pcs)', description: 'Chicken pieces marinated in buttermilk, then double-dredged for an extra crispy coating.', price: 16.00, imageId: 'food-44' },
+          { id: 'hf1802', name: 'Honey BBQ Wings (8pcs)', description: 'Crispy fried wings tossed in a sweet and tangy honey BBQ sauce.', price: 14.00, imageId: 'food-45' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf19',
+    name: 'Boba Creations',
+    slug: 'boba-creations',
+    imageId: 'food-47',
+    cuisine: 'Bubble Tea',
+    rating: 4.9,
+    reviews: 200,
+    deliveryTime: 15,
+    deliveryFee: 2.50,
+    categories: ['Bubble Tea', 'Drinks', 'Desserts', 'Homemade'],
+    menu: [
+      {
+        title: 'Handcrafted Boba',
+        items: [
+          { id: 'hf1901', name: 'Strawberry Matcha Latte', description: 'A beautiful and delicious layered drink with strawberry puree, creamy milk, and earthy matcha.', price: 6.50, imageId: 'food-46' },
+          { id: 'hf1902', name: 'Passion Fruit Green Tea', description: 'A refreshing and tropical green tea with real passion fruit pulp and seeds, with your choice of popping boba or jelly.', price: 6.00, imageId: 'food-47' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf20',
+    name: 'Sweet Endings',
+    slug: 'sweet-endings',
+    imageId: 'food-10',
+    cuisine: 'Desserts',
+    rating: 4.9,
+    reviews: 170,
+    deliveryTime: 20,
+    deliveryFee: 2.75,
+    categories: ['Desserts', 'Bakery', 'Homemade', 'Sweets'],
+    menu: [
+      {
+        title: 'Homemade Sweets',
+        items: [
+          { id: 'hf2001', name: 'Fudgy Brownies', description: 'Rich, dense, and chewy chocolate brownies made with premium cocoa. Sold individually.', price: 4.00, imageId: 'food-9' },
+          { id: 'hf2002', name: 'Apple Crumble', description: 'Warm baked apples with a cinnamon-spiced oat crumble topping. Served with a side of vanilla bean ice cream.', price: 8.00, imageId: 'food-10' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf21',
+    name: 'The Sandwich Shop at Home',
+    slug: 'the-sandwich-shop-at-home',
+    imageId: 'food-50',
+    cuisine: 'Sandwiches',
+    rating: 4.7,
+    reviews: 100,
+    deliveryTime: 15,
+    deliveryFee: 2.50,
+    categories: ['Sandwiches', 'Deli', 'Lunch', 'Homemade'],
+    menu: [
+      {
+        title: 'Artisan Sandwiches',
+        items: [
+          { id: 'hf2101', name: 'Roast Beef & Caramelized Onion', description: 'Thinly sliced roast beef, sweet caramelized onions, and sharp provolone on a toasted ciabatta roll with horseradish aioli.', price: 14.00, imageId: 'food-50' },
+          { id: 'hf2102', name: 'Caprese Sandwich', description: 'Fresh mozzarella, ripe tomatoes, and basil pesto on a crusty baguette, drizzled with balsamic glaze.', price: 12.00, imageId: 'food-49' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf22',
+    name: 'Noodle Nirvana',
+    slug: 'noodle-nirvana',
+    imageId: 'food-28',
+    cuisine: 'Noodle Dishes',
+    rating: 4.8,
+    reviews: 140,
+    deliveryTime: 30,
+    deliveryFee: 3.00,
+    categories: ['Noodle', 'Asian', 'Homemade', 'Comfort Food'],
+    menu: [
+      {
+        title: 'Noodle Bowls',
+        items: [
+          { id: 'hf2201', name: 'Spicy Peanut Noodles', description: 'Chewy noodles tossed in a creamy, spicy peanut sauce with shredded chicken, carrots, and cilantro.', price: 16.00, imageId: 'food-28' },
+          { id: 'hf2202', name: 'Garlic Shrimp Scampi', description: 'Linguine pasta with succulent shrimp in a garlic, white wine, and butter sauce with a hint of red pepper flakes.', price: 18.00, imageId: 'food-29' },
+        ],
+      },
+    ],
+  }
 ];
 
     
+

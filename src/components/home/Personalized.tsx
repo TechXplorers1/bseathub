@@ -87,7 +87,7 @@ export function Personalized() {
   if (loading) {
     return (
         <div className="py-8">
-            <h2 className="text-2xl font-bold mb-4">Picked for you at {location}</h2>
+            <h2 className="text-2xl font-bold mb-4">Picked from your location</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(8)].map((_, i) => (
                     <div key={i} className="border rounded-lg p-4">
@@ -108,7 +108,7 @@ export function Personalized() {
   return (
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Picked for you at {location}</h2>
+        <h2 className="text-2xl font-bold">Picked from your location</h2>
         {recommendations.length > INITIAL_VISIBLE_COUNT && (
           <Link href="/restaurants" className={cn(buttonVariants({ variant: 'ghost' }))}>
               See all <ArrowRight className="ml-2 h-4 w-4" />

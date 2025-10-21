@@ -8,6 +8,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { SiteLayout } from '@/components/shared/SiteLayout';
 import { HeaderProvider } from '@/context/HeaderProvider';
 import { LocationProvider } from '@/context/LocationProvider';
+import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,14 +34,16 @@ export default function RootLayout({
         )}
       >
         <LocationProvider>
-          <CartProvider>
-            <SidebarProvider>
-              <HeaderProvider>
-                <SiteLayout>{children}</SiteLayout>
-              </HeaderProvider>
-              <Toaster />
-            </SidebarProvider>
-          </CartProvider>
+          <DeliveryModeProvider>
+            <CartProvider>
+              <SidebarProvider>
+                <HeaderProvider>
+                  <SiteLayout>{children}</SiteLayout>
+                </HeaderProvider>
+                <Toaster />
+              </SidebarProvider>
+            </CartProvider>
+          </DeliveryModeProvider>
         </LocationProvider>
       </body>
     </html>

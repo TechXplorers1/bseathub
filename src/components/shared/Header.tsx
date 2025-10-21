@@ -33,6 +33,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
 import { useState } from 'react';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 export function Header() {
   const { itemCount } = useCart();
@@ -40,6 +41,7 @@ export function Header() {
   const { location, setLocation } = useLocation();
   const [newLocation, setNewLocation] = useState(location);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { deliveryMode, setDeliveryMode } = useDeliveryMode();
 
   const handleLocationSave = () => {
     setLocation(newLocation);
@@ -107,11 +109,19 @@ export function Header() {
             </DialogContent>
           </Dialog>
 
-          <div className="hidden md:flex">
-            <Button variant="secondary" className="rounded-full">
+          <div className="hidden md:flex bg-gray-100 rounded-full p-1">
+            <Button 
+              variant={deliveryMode === 'delivery' ? 'secondary' : 'ghost'} 
+              className="rounded-full"
+              onClick={() => setDeliveryMode('delivery')}
+            >
               Delivery
             </Button>
-            <Button variant="ghost" className="rounded-full">
+            <Button 
+              variant={deliveryMode === 'pickup' ? 'secondary' : 'ghost'} 
+              className="rounded-full"
+              onClick={() => setDeliveryMode('pickup')}
+            >
               Pickup
             </Button>
           </div>

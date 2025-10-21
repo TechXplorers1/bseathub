@@ -569,20 +569,20 @@ const SidebarMenuButton = React.forwardRef<
     const { isMobile, state } = useSidebar()
     const Comp = asChild ? Slot : "button"
 
-    const buttonContent = React.createElement(
-      Comp,
-      {
-        ref: ref,
-        "data-sidebar": "menu-button",
-        "data-size": size,
-        "data-active": isActive,
-        className: cn(sidebarMenuButtonVariants({ variant, size, className })),
-        ...props,
-      },
-      children
+    const buttonContent = (
+      <Comp
+        ref={ref}
+        data-sidebar="menu-button"
+        data-size={size}
+        data-active={isActive}
+        className={cn(sidebarMenuButtonVariants({ variant, size, className }))}
+        {...props}
+      >
+        {children}
+      </Comp>
     );
 
-    const content = href ? <Link href={href} passHref legacyBehavior>{buttonContent}</Link> : buttonContent;
+    const content = href ? <Link href={href} passHref legacyBehavior={false}>{buttonContent}</Link> : buttonContent;
     
     if (!tooltip) {
       return content

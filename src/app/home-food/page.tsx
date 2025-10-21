@@ -1,19 +1,31 @@
+
 import { RestaurantCard } from '@/components/home/RestaurantCard';
 import { allHomeFoods } from '@/lib/data';
 import type { Restaurant } from '@/lib/types';
 
 const categories = [
+  "Breakfast",
+  "Fast Food",
+  "Burgers",
+  "Coffee",
+  "Pizza",
+  "Halal",
+  "Chicken",
+  "Bubble Tea",
+  "Indian",
+  "Desserts",
+  "Mexican",
+  "Greek",
+  "Healthy",
+  "Sandwiches",
+  "Noodle",
   "Italian",
   "Chinese",
-  "Mexican",
-  "Healthy",
-  "Indian",
   "BBQ",
   "Korean",
   "Soup",
   "Bakery",
   "Thai",
-  "Greek",
   "Comfort Food",
   "Pasta",
   "Dumplings",
@@ -64,3 +76,5 @@ export default function HomeFoodPage() {
     </div>
   );
 }
+
+    

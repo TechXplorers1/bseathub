@@ -1,3 +1,4 @@
+
 import type { Restaurant } from './types';
 
 export const allRestaurants: Restaurant[] = [
@@ -1711,8 +1712,284 @@ export const allHomeFoods: Restaurant[] = [
         ],
       },
     ],
+  },
+  {
+    id: 'hf23',
+    name: 'Granny\'s Breakfast Nook',
+    slug: 'grannys-breakfast-nook',
+    imageId: 'food-53',
+    cuisine: 'Breakfast',
+    rating: 4.9,
+    reviews: 95,
+    deliveryTime: 22,
+    deliveryFee: 2.80,
+    categories: ['Breakfast', 'Homemade', 'American'],
+    menu: [
+      {
+        title: 'Homestyle Breakfast',
+        items: [
+          { id: 'hf2301', name: 'Fluffy Buttermilk Pancakes', description: 'A stack of three light and fluffy pancakes made from scratch, served with real maple syrup and butter.', price: 13.00, imageId: 'food-53' },
+          { id: 'hf2302', name: 'Country Scramble', description: 'Three eggs scrambled with diced ham, bell peppers, and onions, topped with cheddar cheese. Served with a side of toast.', price: 14.00, imageId: 'food-57' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf24',
+    name: 'The Burger Joint',
+    slug: 'the-burger-joint',
+    imageId: 'food-10',
+    cuisine: 'Burgers',
+    rating: 4.7,
+    reviews: 115,
+    deliveryTime: 28,
+    deliveryFee: 3.20,
+    categories: ['Burgers', 'American', 'Homemade', 'Fast Food'],
+    menu: [
+      {
+        title: 'Gourmet Burgers',
+        items: [
+          { id: 'hf2401', name: 'The Classic', description: 'A 1/3 lb hand-pressed beef patty, American cheese, lettuce, tomato, onion, and pickles on a toasted brioche bun.', price: 14.00, imageId: 'food-9' },
+          { id: 'hf2402', name: 'The Western', description: 'Our classic patty topped with cheddar cheese, crispy onion rings, bacon, and a tangy BBQ sauce.', price: 16.00, imageId: 'food-10' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf25',
+    name: 'Perky Pots Coffee',
+    slug: 'perky-pots-coffee',
+    imageId: 'food-33',
+    cuisine: 'Coffee',
+    rating: 4.9,
+    reviews: 210,
+    deliveryTime: 12,
+    deliveryFee: 1.90,
+    categories: ['Coffee', 'Drinks', 'Homemade'],
+    menu: [
+      {
+        title: 'Specialty Coffee',
+        items: [
+          { id: 'hf2501', name: 'Vanilla Bean Latte', description: 'Espresso with steamed milk and a sweet hint of real vanilla bean, creating a smooth and comforting latte.', price: 6.00, imageId: 'food-33' },
+          { id: 'hf2502', name: 'Caramel Cold Foam Cold Brew', description: 'Our signature cold brew topped with a sweet and salty caramel cold foam for a delightful contrast.', price: 6.50, imageId: 'food-34' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf26',
+    name: 'Home Slice Pizza',
+    slug: 'home-slice-pizza',
+    imageId: 'food-31',
+    cuisine: 'Pizza',
+    rating: 4.8,
+    reviews: 180,
+    deliveryTime: 38,
+    deliveryFee: 4.50,
+    categories: ['Pizza', 'Italian', 'Homemade'],
+    menu: [
+      {
+        title: '14-inch Pizzas',
+        items: [
+          { id: 'hf2601', name: 'Supreme Pizza', description: 'The works! Pepperoni, sausage, bell peppers, onions, and black olives on our homemade crust.', price: 22.00, imageId: 'food-31' },
+          { id: 'hf2602', name: 'Margherita Pizza', description: 'A classic with fresh mozzarella, basil, and a simple San Marzano tomato sauce.', price: 18.00, imageId: 'food-4' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf27',
+    name: 'Adam\'s Halal Kitchen',
+    slug: 'adams-halal-kitchen',
+    imageId: 'food-48',
+    cuisine: 'Halal',
+    rating: 4.9,
+    reviews: 250,
+    deliveryTime: 32,
+    deliveryFee: 3.80,
+    categories: ['Halal', 'Middle Eastern', 'Homemade'],
+    menu: [
+      {
+        title: 'Platters',
+        items: [
+          { id: 'hf2701', name: 'Chicken Shawarma Platter', description: 'Tender marinated chicken, slow-roasted and served over basmati rice with a side of garlic sauce and pita bread.', price: 19.00, imageId: 'food-48' },
+          { id: 'hf2702', name: 'Beef Kofta Platter', description: 'Two skewers of seasoned ground beef, grilled to perfection and served with rice, salad, and hummus.', price: 20.00, imageId: 'food-1' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf28',
+    name: 'The Chicken Coop',
+    slug: 'the-chicken-coop',
+    imageId: 'food-45',
+    cuisine: 'Chicken',
+    rating: 4.7,
+    reviews: 155,
+    deliveryTime: 28,
+    deliveryFee: 3.40,
+    categories: ['Chicken', 'American', 'Homemade'],
+    menu: [
+      {
+        title: 'Chicken Dinners',
+        items: [
+          { id: 'hf2801', name: 'Lemon Herb Roasted Chicken', description: 'A whole chicken, roasted with lemon, garlic, and herbs until the skin is crispy and the meat is juicy. Serves 2-3.', price: 25.00, imageId: 'food-44' },
+          { id: 'hf2802', name: 'Nashville Hot Chicken Tenders', description: 'Crispy fried chicken tenders tossed in a spicy, flavorful Nashville hot sauce. Served with pickles.', price: 15.00, imageId: 'food-45' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf29',
+    name: 'Boba Time at Home',
+    slug: 'boba-time-at-home',
+    imageId: 'food-46',
+    cuisine: 'Bubble Tea',
+    rating: 4.8,
+    reviews: 220,
+    deliveryTime: 18,
+    deliveryFee: 2.60,
+    categories: ['Bubble Tea', 'Drinks', 'Homemade'],
+    menu: [
+      {
+        title: 'Signature Drinks',
+        items: [
+          { id: 'hf2901', name: 'Honeydew Milk Tea', description: 'A refreshing and creamy milk tea with the sweet, distinct flavor of honeydew melon.', price: 6.00, imageId: 'food-46' },
+          { id: 'hf2902', name: 'Classic Thai Tea with Boba', description: 'A sweet and creamy Thai tea, brewed fresh and served with chewy tapioca pearls.', price: 6.25, imageId: 'food-47' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf30',
+    name: 'The Dessert Drawer',
+    slug: 'the-dessert-drawer',
+    imageId: 'food-9',
+    cuisine: 'Desserts',
+    rating: 4.9,
+    reviews: 310,
+    deliveryTime: 20,
+    deliveryFee: 3.00,
+    categories: ['Desserts', 'Bakery', 'Sweets', 'Homemade'],
+    menu: [
+      {
+        title: 'Baked Goods',
+        items: [
+          { id: 'hf3001', name: 'Tiramisu for Two', description: 'A classic Italian dessert with layers of coffee-soaked ladyfingers and a rich mascarpone cream.', price: 12.00, imageId: 'food-9' },
+          { id: 'hf3002', name: 'Oatmeal Chocolate Chip Cookies (6)', description: 'A half dozen chewy oatmeal cookies packed with semi-sweet chocolate chips.', price: 14.00, imageId: 'food-10' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf31',
+    name: 'Sabor de Mexico',
+    slug: 'sabor-de-mexico',
+    imageId: 'food-14',
+    cuisine: 'Mexican',
+    rating: 4.8,
+    reviews: 270,
+    deliveryTime: 30,
+    deliveryFee: 3.50,
+    categories: ['Mexican', 'Homemade', 'Spicy'],
+    menu: [
+      {
+        title: 'Platillos',
+        items: [
+          { id: 'hf3101', name: 'Chicken Mole Enchiladas', description: 'Two corn tortillas filled with shredded chicken, covered in a rich, complex mole sauce made from scratch.', price: 19.00, imageId: 'food-14' },
+          { id: 'hf3102', name: 'Pork Tamales (2)', description: 'Tender masa filled with seasoned pork, wrapped in a corn husk and steamed to perfection.', price: 10.00, imageId: 'food-16' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf32',
+    name: 'Yia Yia\'s Kitchen',
+    slug: 'yia-yias-kitchen',
+    imageId: 'food-1',
+    cuisine: 'Greek',
+    rating: 4.9,
+    reviews: 220,
+    deliveryTime: 33,
+    deliveryFee: 3.90,
+    categories: ['Greek', 'Mediterranean', 'Homemade'],
+    menu: [
+      {
+        title: 'Traditional Greek',
+        items: [
+          { id: 'hf3201', name: 'Pastitsio', description: 'A Greek baked pasta dish with layers of pasta, seasoned ground beef, and a creamy béchamel sauce.', price: 18.50, imageId: 'food-1' },
+          { id: 'hf3202', name: 'Lemon Chicken and Potatoes', description: 'Tender chicken and potatoes roasted with lemon, garlic, and oregano until golden and delicious.', price: 17.00, imageId: 'food-2' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf33',
+    name: 'The Lean Green',
+    slug: 'the-lean-green',
+    imageId: 'food-23',
+    cuisine: 'Healthy',
+    rating: 4.8,
+    reviews: 180,
+    deliveryTime: 18,
+    deliveryFee: 3.00,
+    categories: ['Healthy', 'Vegan', 'Homemade', 'Salads'],
+    menu: [
+      {
+        title: 'Healthy Entrees',
+        items: [
+          { id: 'hf3301', name: 'Lentil Shepherd\'s Pie', description: 'A hearty and healthy vegan version of a classic, with a savory lentil filling topped with fluffy sweet potato mash.', price: 16.00, imageId: 'food-23' },
+          { id: 'hf3302', name: 'Black Bean Burgers (2)', description: 'Two homemade black bean patties, seasoned to perfection, served on whole wheat buns with avocado.', price: 15.00, imageId: 'food-40' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf34',
+    name: 'Sammy\'s Sandwiches',
+    slug: 'sammys-sandwiches',
+    imageId: 'food-49',
+    cuisine: 'Sandwiches',
+    rating: 4.7,
+    reviews: 140,
+    deliveryTime: 15,
+    deliveryFee: 2.20,
+    categories: ['Sandwiches', 'Homemade', 'Lunch'],
+    menu: [
+      {
+        title: 'Classic Sandwiches',
+        items: [
+          { id: 'hf3401', name: 'Classic Tuna Melt', description: 'Our homemade tuna salad with melted cheddar cheese on grilled rye bread.', price: 12.00, imageId: 'food-49' },
+          { id: 'hf3402', name: 'BLT on Sourdough', description: 'Crispy bacon, fresh lettuce, and ripe tomatoes on toasted sourdough with a touch of mayo.', price: 11.00, imageId: 'food-50' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'hf35',
+    name: 'The Noodle Bowl',
+    slug: 'the-noodle-bowl',
+    imageId: 'food-29',
+    cuisine: 'Noodle',
+    rating: 4.8,
+    reviews: 160,
+    deliveryTime: 28,
+    deliveryFee: 3.10,
+    categories: ['Noodle', 'Asian', 'Homemade'],
+    menu: [
+      {
+        title: 'Noodle Soups',
+        items: [
+          { id: 'hf3501', name: 'Wonton Noodle Soup', description: 'A comforting soup with handmade pork wontons, egg noodles, and leafy greens in a clear, flavorful broth.', price: 15.00, imageId: 'food-29' },
+          { id: 'hf3502', name: 'Dan Dan Noodles', description: 'A Sichuan classic. Noodles topped with a spicy sauce, preserved vegetables, chili oil, and minced pork.', price: 16.00, imageId: 'food-28' },
+        ],
+      },
+    ],
   }
 ];
 
     
 
+
+
+    

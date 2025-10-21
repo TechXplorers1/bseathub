@@ -568,22 +568,18 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const { isMobile, state } = useSidebar()
     const Comp = asChild ? Slot : "button"
-    
-    const commonProps = {
-      "data-sidebar": "menu-button",
-      "data-size": size,
-      "data-active": isActive,
-      className: cn(sidebarMenuButtonVariants({ variant, size, className })),
-      ...props,
-    };
-    
-    const buttonContent = (
-      <Comp
-        ref={ref as any}
-        {...commonProps}
-      >
-        {children}
-      </Comp>
+
+    const buttonContent = React.createElement(
+      Comp,
+      {
+        ref: ref,
+        "data-sidebar": "menu-button",
+        "data-size": size,
+        "data-active": isActive,
+        className: cn(sidebarMenuButtonVariants({ variant, size, className })),
+        ...props,
+      },
+      children
     );
 
     const content = href ? <Link href={href} passHref legacyBehavior>{buttonContent}</Link> : buttonContent;
@@ -778,5 +774,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
-    

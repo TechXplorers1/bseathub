@@ -14,8 +14,8 @@ export default function Home() {
         <Banners />
         <Personalized />
         <HomeFoodCarousel />
-        <ChefsCarousel />
         <HomeFeed restaurants={allRestaurants} />
+        <ChefsCarousel />
       </div>
     </div>
   );

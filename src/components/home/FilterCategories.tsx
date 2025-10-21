@@ -1,6 +1,8 @@
+
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import {
   Pizza,
   Fish,
@@ -88,9 +90,10 @@ export function FilterCategories() {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {mainCategories.map((category) => (
-            <div
-              key={category.name}
-              className="flex flex-col items-center space-y-2 cursor-pointer group/item flex-shrink-0"
+            <Link
+                href={`/category/${encodeURIComponent(category.name)}`}
+                key={category.name}
+                className="flex flex-col items-center space-y-2 cursor-pointer group/item flex-shrink-0"
             >
               <div className="p-3 bg-gray-100 rounded-full group-hover/item:bg-primary/10 transition-colors">
                 <category.icon className="h-7 w-7 text-gray-700 group-hover/item:text-primary" />
@@ -98,7 +101,7 @@ export function FilterCategories() {
               <p className="text-sm font-medium text-gray-700 group-hover/item:text-primary">
                 {category.name}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
 

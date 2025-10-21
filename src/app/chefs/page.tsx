@@ -32,8 +32,9 @@ export default function ChefsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {uniqueChefs.map((chef) => {
           const restaurantImage = getImageById(chef.restaurantImageId);
+          const chefName = chef.name.split(' ')[0];
           return (
-            <Link href={`/restaurant/${chef.slug}`} key={chef.name} className="flex">
+            <Link href={`/restaurant/${chef.slug}?chef=${encodeURIComponent(chef.name)}`} key={chef.name} className="flex">
                 <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 w-full">
                     {restaurantImage && (
                         <div className="relative h-40 w-full">

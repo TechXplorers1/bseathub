@@ -8,20 +8,26 @@ import { useEffect } from 'react';
 
 export function RestaurantClientPage({
   restaurant,
+  chefName,
 }: {
   restaurant: Restaurant;
+  chefName?: string;
 }) {
   const { setOpen } = useSidebar();
   const { setHeaderTitle } = useHeader();
 
   useEffect(() => {
     setOpen(false);
-    setHeaderTitle(restaurant.name);
+    if (chefName) {
+      setHeaderTitle(`Chef's ${chefName}`);
+    } else {
+      setHeaderTitle(restaurant.name);
+    }
 
     return () => {
       setHeaderTitle(null);
     };
-  }, [setOpen, setHeaderTitle, restaurant.name]);
+  }, [setOpen, setHeaderTitle, restaurant.name, chefName]);
 
-  return <RestaurantDetails restaurant={restaurant} />;
+  return <RestaurantDetails restaurant={restaurant} chefName={chefName} />;
 }

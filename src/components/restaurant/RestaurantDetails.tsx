@@ -77,7 +77,7 @@ const initialReviews: Review[] = [
     { author: "Emily R.", text: "The vegan options are amazing! So much flavor and creativity. Highly recommend the power bowl.", rating: 5, avatar: "https://i.pravatar.cc/150?u=a042581f4e29026707f" },
 ];
 
-export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
+export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restaurant, chefName?: string }) {
   const image = getImageById(restaurant.imageId);
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
   const menuCategories = restaurant.menu.map(cat => cat.title);
@@ -95,6 +95,8 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   const handleItemClick = (item: MenuItemType) => {
     setSelectedItem(item);
   };
+
+  const displayName = chefName ? `Chef's ${chefName}` : restaurant.name;
 
   return (
     <div className="flex flex-col bg-background">
@@ -136,7 +138,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
           {/* Left Column - Store Info & Menu Nav */}
           <div className="lg:col-span-1 lg:border-r lg:pr-8">
             <div className='lg:sticky lg:top-24 self-start'>
-              <h1 className="text-4xl font-bold mt-8 lg:mt-0">{restaurant.name}</h1>
+              <h1 className="text-4xl font-bold mt-8 lg:mt-0">{displayName}</h1>
               <div className="mt-6 space-y-3 text-sm">
                 <h2 className="text-lg font-semibold sr-only lg:not-sr-only">Store Info</h2>
                 <div className="flex items-center gap-2">

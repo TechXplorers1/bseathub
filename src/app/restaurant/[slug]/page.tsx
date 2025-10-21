@@ -12,7 +12,13 @@ export function generateStaticParams() {
   return [...restaurantSlugs, ...homeFoodSlugs];
 }
 
-export default function RestaurantPage({ params }: { params: { slug: string } }) {
+export default function RestaurantPage({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams?: { chef?: string };
+}) {
   const allItems = [...allRestaurants, ...allHomeFoods];
   const restaurant = allItems.find((r) => r.slug === params.slug);
 
@@ -20,5 +26,7 @@ export default function RestaurantPage({ params }: { params: { slug: string } })
     notFound();
   }
 
-  return <RestaurantClientPage restaurant={restaurant} />;
+  return (
+    <RestaurantClientPage restaurant={restaurant} chefName={searchParams?.chef} />
+  );
 }

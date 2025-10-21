@@ -16,15 +16,15 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Appetizers',
         items: [
-          { id: '101', name: 'Bruschetta', description: 'Grilled bread with tomatoes, garlic, and basil.', price: 8.99, imageId: 'food-1' },
-          { id: '102', name: 'Calamari Fritti', description: 'Fried squid with a zesty marinara sauce.', price: 12.99, imageId: 'food-2' },
+          { id: '101', name: 'Bruschetta', description: 'Toasted ciabatta bread topped with fresh diced tomatoes, garlic, basil, and a drizzle of balsamic glaze.', price: 8.99, imageId: 'food-1' },
+          { id: '102', name: 'Calamari Fritti', description: 'Tender squid, lightly battered and fried to a golden brown. Served with a zesty marinara sauce and a lemon wedge.', price: 12.99, imageId: 'food-2' },
         ],
       },
       {
         title: 'Main Courses',
         items: [
-          { id: '103', name: 'Spaghetti Carbonara', description: 'Pasta with eggs, cheese, pancetta, and pepper.', price: 18.99, imageId: 'food-3' },
-          { id: '104', name: 'Margherita Pizza', description: 'Classic pizza with tomatoes, mozzarella, and basil.', price: 15.99, imageId: 'food-4' },
+          { id: '103', name: 'Spaghetti Carbonara', description: 'Classic spaghetti tossed in a creamy sauce made with fresh eggs, Pecorino Romano cheese, crispy pancetta, and freshly ground black pepper.', price: 18.99, imageId: 'food-3' },
+          { id: '104', name: 'Margherita Pizza', description: 'A timeless classic featuring a thin crust, San Marzano tomato sauce, fresh mozzarella, basil leaves, and a drizzle of extra virgin olive oil.', price: 15.99, imageId: 'food-4' },
         ],
       },
     ],
@@ -44,15 +44,15 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Sushi Rolls',
         items: [
-          { id: '201', name: 'California Roll', description: 'Crab, avocado, and cucumber.', price: 10.99, imageId: 'food-5' },
-          { id: '202', name: 'Spicy Tuna Roll', description: 'Tuna, spicy mayo, and cucumber.', price: 12.99, imageId: 'food-6' },
+          { id: '201', name: 'California Roll', description: 'A favorite for a reason. Made with imitation crab, creamy avocado, and crisp cucumber, all rolled in seaweed and seasoned rice.', price: 10.99, imageId: 'food-5' },
+          { id: '202', name: 'Spicy Tuna Roll', description: 'A flavorful roll with chopped fresh tuna, spicy mayo, and cucumber, finished with a sprinkle of sesame seeds.', price: 12.99, imageId: 'food-6' },
         ],
       },
       {
         title: 'Nigiri',
         items: [
-          { id: '203', name: 'Salmon Nigiri', description: 'Fresh salmon over vinegared rice.', price: 6.99, imageId: 'food-7' },
-          { id: '204', name: 'Tuna Nigiri', description: 'Premium tuna over vinegared rice.', price: 7.99, imageId: 'food-8' },
+          { id: '203', name: 'Salmon Nigiri', description: 'A slice of buttery, fresh salmon served over a hand-pressed bed of seasoned sushi rice.', price: 6.99, imageId: 'food-7' },
+          { id: '204', name: 'Tuna Nigiri', description: 'Premium, melt-in-your-mouth tuna delicately placed atop a small mound of vinegared rice.', price: 7.99, imageId: 'food-8' },
         ],
       },
     ],
@@ -72,15 +72,15 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Burgers',
         items: [
-          { id: '301', name: 'Classic Cheeseburger', description: 'Beef patty, cheese, lettuce, tomato, and onion.', price: 11.99, imageId: 'food-9' },
-          { id: '302', name: 'Bacon Avocado Burger', description: 'Beef patty, bacon, avocado, and swiss cheese.', price: 14.99, imageId: 'food-10' },
+          { id: '301', name: 'Classic Cheeseburger', description: 'A juicy, all-beef patty grilled to perfection, topped with melted American cheese, crisp lettuce, fresh tomato, and sliced onion on a toasted sesame seed bun.', price: 11.99, imageId: 'food-9' },
+          { id: '302', name: 'Bacon Avocado Burger', description: 'A juicy beef patty topped with crispy bacon, creamy avocado, and melted swiss cheese, served on a toasted brioche bun with lettuce and tomato. A truly satisfying burger experience.', price: 14.99, imageId: 'food-10' },
         ],
       },
       {
         title: 'Sides',
         items: [
-          { id: '303', name: 'French Fries', description: 'Crispy golden fries.', price: 4.99, imageId: 'food-11' },
-          { id: '304', name: 'Onion Rings', description: 'Battered and fried onion rings.', price: 5.99, imageId: 'food-12' },
+          { id: '303', name: 'French Fries', description: 'Golden, crispy fries salted to perfection. The perfect companion to any burger.', price: 4.99, imageId: 'food-11' },
+          { id: '304', name: 'Onion Rings', description: 'Thick-cut onion rings, battered and fried until golden and crispy. Served with a side of house dipping sauce.', price: 5.99, imageId: 'food-12' },
         ],
       },
     ],
@@ -100,15 +100,15 @@ export const allRestaurants: Restaurant[] = [
        {
         title: 'Tacos',
         items: [
-          { id: '401', name: 'Carne Asada Taco', description: 'Grilled steak in a corn tortilla.', price: 3.99, imageId: 'food-13' },
-          { id: '402', name: 'Al Pastor Taco', description: 'Marinated pork with pineapple.', price: 3.99, imageId: 'food-14' },
+          { id: '401', name: 'Carne Asada Taco', description: 'Tender, marinated grilled steak served in a warm corn tortilla with fresh cilantro and onions.', price: 3.99, imageId: 'food-13' },
+          { id: '402', name: 'Al Pastor Taco', description: 'Savory marinated pork, slow-cooked on a vertical spit, and served with a slice of pineapple, cilantro, and onions.', price: 3.99, imageId: 'food-14' },
         ],
       },
       {
         title: 'Burritos',
         items: [
-          { id: '403', name: 'Bean & Cheese Burrito', description: 'A classic simple burrito.', price: 8.99, imageId: 'food-15' },
-          { id: '404', name: 'California Burrito', description: 'Carne asada, fries, cheese, and guacamole.', price: 12.99, imageId: 'food-16' },
+          { id: '403', name: 'Bean & Cheese Burrito', description: 'A simple yet satisfying classic. Creamy refried beans and melted cheese wrapped in a warm flour tortilla.', price: 8.99, imageId: 'food-15' },
+          { id: '404', name: 'California Burrito', description: 'A Southern California icon. Packed with juicy carne asada, crispy french fries, shredded cheese, and creamy guacamole.', price: 12.99, imageId: 'food-16' },
         ],
       },
     ],
@@ -128,15 +128,15 @@ export const allRestaurants: Restaurant[] = [
        {
         title: 'Curries',
         items: [
-          { id: '501', name: 'Chicken Tikka Masala', description: 'Creamy tomato-based curry with chicken.', price: 16.99, imageId: 'food-17' },
-          { id: '502', name: 'Paneer Butter Masala', description: 'Indian cheese in a rich, creamy sauce.', price: 15.99, imageId: 'food-18' },
+          { id: '501', name: 'Chicken Tikka Masala', description: 'Tender chunks of grilled chicken simmered in a rich, creamy tomato-based sauce with a blend of aromatic spices.', price: 16.99, imageId: 'food-17' },
+          { id: '502', name: 'Paneer Butter Masala', description: 'Soft cubes of Indian cottage cheese (paneer) cooked in a luscious, buttery tomato sauce with cream and spices.', price: 15.99, imageId: 'food-18' },
         ],
       },
       {
         title: 'Breads',
         items: [
-          { id: '503', name: 'Garlic Naan', description: 'Soft flatbread with garlic and butter.', price: 3.99, imageId: 'food-19' },
-          { id: '504', name: 'Roti', description: 'Whole wheat flatbread.', price: 2.99, imageId: 'food-20' },
+          { id: '503', name: 'Garlic Naan', description: 'Soft, leavened flatbread freshly baked in a tandoor oven, brushed with garlic-infused butter.', price: 3.99, imageId: 'food-19' },
+          { id: '504', name: 'Roti', description: 'A simple, healthy whole wheat flatbread, cooked on a griddle. The perfect partner for any curry.', price: 2.99, imageId: 'food-20' },
         ],
       },
     ],
@@ -156,14 +156,14 @@ export const allRestaurants: Restaurant[] = [
        {
         title: 'Signature Salads',
         items: [
-          { id: '601', name: 'Cobb Salad', description: 'Greens, chicken, bacon, egg, avocado, and blue cheese.', price: 14.99, imageId: 'food-21' },
-          { id: '602', name: 'Quinoa & Avocado Power Bowl', description: 'Quinoa, avocado, chickpeas, and mixed greens.', price: 13.99, imageId: 'food-22' },
+          { id: '601', name: 'Cobb Salad', description: 'A hearty salad with mixed greens, grilled chicken, crispy bacon, hard-boiled egg, avocado, tomatoes, and blue cheese crumbles.', price: 14.99, imageId: 'food-21' },
+          { id: '602', name: 'Quinoa & Avocado Power Bowl', description: 'A nutrient-packed bowl of quinoa, creamy avocado, protein-rich chickpeas, and mixed greens with a zesty lemon vinaigrette.', price: 13.99, imageId: 'food-22' },
         ],
       },
       {
         title: 'Create Your Own',
         items: [
-          { id: '603', name: 'Custom Salad', description: 'Choose your base, toppings, and dressing.', price: 15.99, imageId: 'food-23' },
+          { id: '603', name: 'Custom Salad', description: 'Your salad, your way. Choose your base, select up to five fresh toppings, and finish with your favorite dressing.', price: 15.99, imageId: 'food-23' },
         ],
       },
     ],
@@ -183,14 +183,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Pho',
         items: [
-          { id: '701', name: 'Classic Beef Pho', description: 'Rich beef broth with rice noodles and sliced beef.', price: 13.99, imageId: 'food-28' },
-          { id: '702', name: 'Chicken Pho', description: 'Savory chicken broth with shredded chicken.', price: 12.99, imageId: 'food-29' },
+          { id: '701', name: 'Classic Beef Pho', description: 'A comforting bowl of rich beef broth, slow-simmered for hours, served with rice noodles, thin slices of beef, and fresh herbs.', price: 13.99, imageId: 'food-28' },
+          { id: '702', name: 'Chicken Pho', description: 'A lighter yet deeply savory chicken broth with tender shredded chicken, rice noodles, and a garnish of cilantro and onion.', price: 12.99, imageId: 'food-29' },
         ],
       },
       {
         title: 'Appetizers',
         items: [
-          { id: '703', name: 'Fresh Spring Rolls', description: 'Shrimp, pork, and herbs wrapped in rice paper.', price: 7.99, imageId: 'food-26' },
+          { id: '703', name: 'Fresh Spring Rolls', description: 'Delicate rice paper rolls filled with shrimp, pork, vermicelli noodles, and fresh herbs. Served with a peanut dipping sauce.', price: 7.99, imageId: 'food-26' },
         ],
       },
     ],
@@ -210,14 +210,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Specialty Pizzas',
         items: [
-          { id: '801', name: 'Pepperoni Overload', description: 'Covered in classic pepperoni slices.', price: 17.99, imageId: 'food-30' },
-          { id: '802', name: 'Veggie Supreme', description: 'Onions, peppers, olives, and mushrooms.', price: 16.99, imageId: 'food-31' },
+          { id: '801', name: 'Pepperoni Overload', description: 'A pepperoni lover\'s dream. Edge-to-edge coverage of classic spicy pepperoni slices over mozzarella and our signature tomato sauce.', price: 17.99, imageId: 'food-30' },
+          { id: '802', name: 'Veggie Supreme', description: 'A garden on a pizza! Loaded with fresh bell peppers, red onions, black olives, and mushrooms on a bed of mozzarella.', price: 16.99, imageId: 'food-31' },
         ],
       },
       {
         title: 'Sides',
         items: [
-          { id: '803', name: 'Garlic Knots', description: 'Buttery garlic knots with marinara.', price: 6.99, imageId: 'food-32' },
+          { id: '803', name: 'Garlic Knots', description: 'Soft, warm dough knots tossed in garlic butter and parmesan cheese. Served with a side of classic marinara sauce.', price: 6.99, imageId: 'food-32' },
         ],
       },
     ],
@@ -237,14 +237,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Coffee & Tea',
         items: [
-          { id: '901', name: 'Iced Latte', description: 'Espresso with chilled milk over ice.', price: 4.99, imageId: 'food-33' },
-          { id: '902', name: 'Matcha Green Tea', description: 'Ceremonial grade matcha with steamed milk.', price: 5.49, imageId: 'food-34' },
+          { id: '901', name: 'Iced Latte', description: 'Rich, smooth espresso combined with chilled milk and served over ice. A refreshing classic.', price: 4.99, imageId: 'food-33' },
+          { id: '902', name: 'Matcha Green Tea', description: 'Vibrant, ceremonial grade matcha powder whisked with steamed milk for a creamy, earthy, and energizing beverage.', price: 5.49, imageId: 'food-34' },
         ],
       },
       {
         title: 'Pastries',
         items: [
-          { id: '903', name: 'Croissant', description: 'Flaky, buttery, and freshly baked.', price: 3.50, imageId: 'food-35' },
+          { id: '903', name: 'Croissant', description: 'A perfectly baked, buttery, and flaky croissant with a soft, airy interior. Pairs perfectly with any coffee.', price: 3.50, imageId: 'food-35' },
         ],
       },
     ],
@@ -264,14 +264,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Main Dishes',
         items: [
-          { id: '1001', name: 'Pad Thai', description: 'Stir-fried rice noodles with shrimp, tofu, and peanuts.', price: 15.99, imageId: 'food-36' },
-          { id: '1002', name: 'Green Curry', description: 'Spicy green curry with chicken and bamboo shoots.', price: 16.99, imageId: 'food-37' },
+          { id: '1001', name: 'Pad Thai', description: 'Thailand\'s most famous noodle dish! Stir-fried rice noodles with shrimp, tofu, bean sprouts, and crushed peanuts in a tangy tamarind sauce.', price: 15.99, imageId: 'food-36' },
+          { id: '1002', name: 'Green Curry', description: 'A fiery and aromatic green curry made with coconut milk, chicken, bamboo shoots, bell peppers, and fresh basil.', price: 16.99, imageId: 'food-37' },
         ],
       },
       {
         title: 'Appetizers',
         items: [
-          { id: '1003', name: 'Tom Yum Soup', description: 'Hot and sour soup with shrimp and mushrooms.', price: 8.99, imageId: 'food-38' },
+          { id: '1003', name: 'Tom Yum Soup', description: 'A classic hot and sour soup with shrimp, mushrooms, lemongrass, galangal, and kaffir lime leaves.', price: 8.99, imageId: 'food-38' },
         ],
       },
     ],
@@ -291,14 +291,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Bowls',
         items: [
-          { id: '1101', name: 'Buddha Bowl', description: 'Roasted veggies, quinoa, and a tahini dressing.', price: 14.99, imageId: 'food-25' },
-          { id: '1102', name: 'Spicy "Tuna" Bowl', description: 'Plant-based tuna with avocado and brown rice.', price: 15.99, imageId: 'food-39' },
+          { id: '1101', name: 'Buddha Bowl', description: 'A colorful and nourishing bowl filled with roasted sweet potatoes, broccoli, quinoa, and chickpeas, all drizzled with a creamy tahini dressing.', price: 14.99, imageId: 'food-25' },
+          { id: '1102', name: 'Spicy "Tuna" Bowl', description: 'Our signature plant-based "tuna" made from seasoned tomatoes, served over brown rice with avocado, cucumber, and a spicy sriracha aioli.', price: 15.99, imageId: 'food-39' },
         ],
       },
       {
         title: 'Burgers',
         items: [
-          { id: '1103', name: 'Impossible Burger', description: 'A delicious plant-based patty with all the fixings.', price: 16.99, imageId: 'food-40' },
+          { id: '1103', name: 'Impossible Burger', description: 'A juicy, plant-based Impossible patty that tastes just like the real thing. Served with vegan cheese, lettuce, tomato, and our special sauce.', price: 16.99, imageId: 'food-40' },
         ],
       },
     ],
@@ -318,14 +318,14 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Steaks',
         items: [
-          { id: '1201', name: 'Filet Mignon (8oz)', description: 'The most tender cut, cooked to perfection.', price: 45.99, imageId: 'food-41' },
-          { id: '1202', name: 'Ribeye (12oz)', description: 'Well-marbled for peak flavor.', price: 39.99, imageId: 'food-42' },
+          { id: '1201', name: 'Filet Mignon (8oz)', description: 'Our most tender cut of beef, aged for 28 days and cooked to your desired temperature. Served with a red wine reduction sauce.', price: 45.99, imageId: 'food-41' },
+          { id: '1202', name: 'Ribeye (12oz)', description: 'A well-marbled and incredibly flavorful cut, known for its rich taste. Grilled over an open flame for a perfect char.', price: 39.99, imageId: 'food-42' },
         ],
       },
       {
         title: 'Sides',
         items: [
-          { id: '1203', name: 'Creamed Spinach', description: 'A classic steakhouse side.', price: 9.99, imageId: 'food-43' },
+          { id: '1203', name: 'Creamed Spinach', description: 'A rich and creamy steakhouse classic. Fresh spinach cooked with garlic, cream, and a hint of nutmeg.', price: 9.99, imageId: 'food-43' },
         ],
       },
     ],
@@ -345,8 +345,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Plates',
         items: [
-          { id: '1301', name: 'Chicken Shawarma Plate', description: 'Marinated chicken, rice, and salad.', price: 17.99, imageId: 'food-1' },
-          { id: '1302', name: 'Falafel Plate', description: 'Crispy falafel with tahini sauce.', price: 14.99, imageId: 'food-2' },
+          { id: '1301', name: 'Chicken Shawarma Plate', description: 'Tender, marinated chicken, slow-roasted on a vertical spit, served with fluffy basmati rice, a side salad, and garlic sauce.', price: 17.99, imageId: 'food-1' },
+          { id: '1302', name: 'Falafel Plate', description: 'Five crispy, golden-brown falafel balls made from ground chickpeas and herbs. Served with hummus, salad, and warm pita bread.', price: 14.99, imageId: 'food-2' },
         ],
       },
     ],
@@ -366,8 +366,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Classics',
         items: [
-          { id: '1401', name: 'Pancakes Stack', description: 'Fluffy pancakes with syrup and butter.', price: 12.99, imageId: 'food-3' },
-          { id: '1402', name: 'Eggs Benedict', description: 'Poached eggs, ham, on an English muffin with hollandaise.', price: 15.99, imageId: 'food-4' },
+          { id: '1401', name: 'Pancakes Stack', description: 'A fluffy stack of three buttermilk pancakes, served with a pad of butter and warm maple syrup.', price: 12.99, imageId: 'food-3' },
+          { id: '1402', name: 'Eggs Benedict', description: 'Two perfectly poached eggs and Canadian bacon on a toasted English muffin, all smothered in a rich, creamy hollandaise sauce.', price: 15.99, imageId: 'food-4' },
         ],
       },
     ],
@@ -387,8 +387,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Ramen',
         items: [
-          { id: '1501', name: 'Tonkotsu Ramen', description: 'Rich pork broth with chashu pork.', price: 16.99, imageId: 'food-5' },
-          { id: '1502', name: 'Miso Ramen', description: 'Soybean paste broth with vegetables.', price: 15.99, imageId: 'food-6' },
+          { id: '1501', name: 'Tonkotsu Ramen', description: 'A rich, creamy pork broth ramen, topped with tender chashu pork, a soft-boiled egg, bamboo shoots, and scallions.', price: 16.99, imageId: 'food-5' },
+          { id: '1502', name: 'Miso Ramen', description: 'A savory soybean paste broth with wavy noodles, topped with corn, seaweed, bean sprouts, and your choice of chicken or tofu.', price: 15.99, imageId: 'food-6' },
         ],
       },
     ],
@@ -408,8 +408,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Meats',
         items: [
-          { id: '1601', name: 'Pulled Pork Sandwich', description: 'Slow-smoked pulled pork on a brioche bun.', price: 14.99, imageId: 'food-7' },
-          { id: '1602', name: 'Beef Brisket', description: 'Tender beef brisket, sold by the pound.', price: 28.99, imageId: 'food-8' },
+          { id: '1601', name: 'Pulled Pork Sandwich', description: 'Our signature slow-smoked pulled pork, piled high on a toasted brioche bun and drizzled with our tangy BBQ sauce.', price: 14.99, imageId: 'food-7' },
+          { id: '1602', name: 'Beef Brisket', description: 'Incredibly tender, melt-in-your-mouth beef brisket, smoked for 12 hours. Sold by the pound, perfect for sharing.', price: 28.99, imageId: 'food-8' },
         ],
       },
     ],
@@ -429,8 +429,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Cakes',
         items: [
-          { id: '1701', name: 'Chocolate Lava Cake', description: 'Warm chocolate cake with a gooey center.', price: 8.99, imageId: 'food-9' },
-          { id: '1702', name: 'New York Cheesecake', description: 'Classic creamy cheesecake.', price: 7.99, imageId: 'food-10' },
+          { id: '1701', name: 'Chocolate Lava Cake', description: 'A decadent, individual-sized warm chocolate cake with a gooey, molten chocolate center. Served with a dusting of powdered sugar.', price: 8.99, imageId: 'food-9' },
+          { id: '1702', name: 'New York Cheesecake', description: 'A classic, rich, and creamy New York-style cheesecake with a graham cracker crust. A timeless dessert.', price: 7.99, imageId: 'food-10' },
         ],
       },
     ],
@@ -450,8 +450,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Smoothies',
         items: [
-          { id: '1801', name: 'Green Detox Smoothie', description: 'Spinach, kale, apple, and banana.', price: 9.99, imageId: 'food-11' },
-          { id: '1802', name: 'Berry Blast Smoothie', description: 'Mixed berries, yogurt, and honey.', price: 9.99, imageId: 'food-12' },
+          { id: '1801', name: 'Green Detox Smoothie', description: 'A refreshing blend of fresh spinach, kale, crisp apple, banana, and a splash of coconut water.', price: 9.99, imageId: 'food-11' },
+          { id: '1802', name: 'Berry Blast Smoothie', description: 'A delicious mix of strawberries, blueberries, raspberries, and Greek yogurt, with a touch of honey for sweetness.', price: 9.99, imageId: 'food-12' },
         ],
       },
     ],
@@ -471,8 +471,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Fried Chicken',
         items: [
-          { id: '1901', name: '3-Piece Fried Chicken', description: 'Crispy and juicy fried chicken.', price: 12.99, imageId: 'food-44' },
-          { id: '1902', name: 'Spicy Chicken Sandwich', description: 'A fiery chicken sandwich with pickles.', price: 9.99, imageId: 'food-45' },
+          { id: '1901', name: '3-Piece Fried Chicken', description: 'Three pieces of our signature crispy and juicy fried chicken, hand-breaded and cooked to golden perfection.', price: 12.99, imageId: 'food-44' },
+          { id: '1902', name: 'Spicy Chicken Sandwich', description: 'A fiery, crispy chicken breast fillet on a toasted brioche bun with crunchy pickles and our secret spicy sauce.', price: 9.99, imageId: 'food-45' },
         ],
       },
     ],
@@ -492,8 +492,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Milk Teas',
         items: [
-          { id: '2001', name: 'Classic Milk Tea', description: 'Black tea with milk and tapioca pearls.', price: 5.50, imageId: 'food-46' },
-          { id: '2002', name: 'Taro Milk Tea', description: 'Creamy taro flavor with boba.', price: 6.00, imageId: 'food-47' },
+          { id: '2001', name: 'Classic Milk Tea', description: 'Our signature rich black tea blend, shaken with creamy milk and served with chewy tapioca pearls.', price: 5.50, imageId: 'food-46' },
+          { id: '2002', name: 'Taro Milk Tea', description: 'A sweet and creamy milk tea with the distinct flavor of taro root, complete with delicious boba.', price: 6.00, imageId: 'food-47' },
         ],
       },
     ],
@@ -513,8 +513,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Platters',
         items: [
-          { id: '2101', name: 'Chicken & Gyro Combo', description: 'A mix of chicken and gyro meat over rice.', price: 14.99, imageId: 'food-48' },
-          { id: '2102', name: 'Falafel Platter', description: 'Crispy falafel over rice with white sauce.', price: 12.99, imageId: 'food-2' },
+          { id: '2101', name: 'Chicken & Gyro Combo', description: 'The best of both worlds. A generous platter of our famous chicken and gyro meat served over seasoned rice with our legendary white sauce.', price: 14.99, imageId: 'food-48' },
+          { id: '2102', name: 'Falafel Platter', description: 'Deliciously crispy falafel served over a bed of rice, with lettuce, tomato, and a drizzle of our famous white sauce.', price: 12.99, imageId: 'food-2' },
         ],
       },
     ],
@@ -534,8 +534,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Hot Sandwiches',
         items: [
-          { id: '2201', name: 'Philly Cheesesteak', description: 'Thinly-sliced beef with melted cheese and onions.', price: 13.99, imageId: 'food-49' },
-          { id: '2202', name: 'Italian Meatball Sub', description: 'Meatballs in marinara with provolone.', price: 12.99, imageId: 'food-50' },
+          { id: '2201', name: 'Philly Cheesesteak', description: 'A hearty sandwich with thinly-sliced beef, melted provolone cheese, and grilled onions on a soft hoagie roll.', price: 13.99, imageId: 'food-49' },
+          { id: '2202', name: 'Italian Meatball Sub', description: 'Hearty meatballs simmered in our house marinara sauce, topped with melted provolone cheese and served on a toasted sub roll.', price: 12.99, imageId: 'food-50' },
         ],
       },
     ],
@@ -555,8 +555,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Gyros',
         items: [
-          { id: '2301', name: 'Lamb Gyro', description: 'Sliced lamb in a warm pita with tzatziki.', price: 11.99, imageId: 'food-1' },
-          { id: '2302', name: 'Chicken Souvlaki Pita', description: 'Grilled chicken skewers in a pita.', price: 10.99, imageId: 'food-2' },
+          { id: '2301', name: 'Lamb Gyro', description: 'Thinly sliced, seasoned lamb wrapped in a warm pita with fresh tomatoes, onions, and our creamy tzatziki sauce.', price: 11.99, imageId: 'food-1' },
+          { id: '2302', name: 'Chicken Souvlaki Pita', description: 'Tender, marinated grilled chicken skewers wrapped in a fluffy pita with lettuce, tomatoes, and a dollop of tzatziki.', price: 10.99, imageId: 'food-2' },
         ],
       },
     ],
@@ -576,8 +576,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Pasta',
         items: [
-          { id: '2401', name: 'Fettuccine Alfredo', description: 'Creamy parmesan sauce over fettuccine.', price: 17.99, imageId: 'food-3' },
-          { id: '2402', name: 'Pesto Gnocchi', description: 'Soft potato dumplings in a basil pesto sauce.', price: 18.99, imageId: 'food-4' },
+          { id: '2401', name: 'Fettuccine Alfredo', description: 'Classic fettuccine noodles tossed in a rich and creamy parmesan sauce, finished with a touch of black pepper.', price: 17.99, imageId: 'food-3' },
+          { id: '2402', name: 'Pesto Gnocchi', description: 'Soft, pillowy potato gnocchi tossed in a vibrant basil pesto sauce and topped with shaved parmesan cheese.', price: 18.99, imageId: 'food-4' },
         ],
       },
     ],
@@ -597,8 +597,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Cupcakes',
         items: [
-          { id: '2501', name: 'Red Velvet Cupcake', description: 'Classic red velvet with cream cheese frosting.', price: 4.50, imageId: 'food-9' },
-          { id: '2502', name: 'Chocolate Fudge Cupcake', description: 'Rich chocolate cupcake with fudge icing.', price: 4.50, imageId: 'food-10' },
+          { id: '2501', name: 'Red Velvet Cupcake', description: 'A southern classic. Moist red velvet cake topped with a generous swirl of our signature cream cheese frosting.', price: 4.50, imageId: 'food-9' },
+          { id: '2502', name: 'Chocolate Fudge Cupcake', description: 'A chocoholic\'s delight! A rich chocolate cupcake with a gooey fudge center, topped with chocolate buttercream.', price: 4.50, imageId: 'food-10' },
         ],
       },
     ],
@@ -618,8 +618,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Waffles',
         items: [
-          { id: '2601', name: 'Classic Belgian Waffle', description: 'With whipped cream and strawberries.', price: 10.99, imageId: 'food-51' },
-          { id: '2602', name: 'Chocolate Chip Waffle', description: 'Loaded with chocolate chips and syrup.', price: 11.99, imageId: 'food-52' },
+          { id: '2601', name: 'Classic Belgian Waffle', description: 'A large, golden-brown Belgian waffle, light and crispy on the outside, fluffy on the inside. Served with whipped cream and fresh strawberries.', price: 10.99, imageId: 'food-51' },
+          { id: '2602', name: 'Chocolate Chip Waffle', description: 'Our classic waffle loaded with melted chocolate chips and drizzled with chocolate syrup. A sweet start to your day.', price: 11.99, imageId: 'food-52' },
         ],
       },
     ],
@@ -639,8 +639,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Pancakes',
         items: [
-          { id: '2701', name: 'Buttermilk Pancake Stack', description: 'A tall stack of fluffy pancakes.', price: 11.99, imageId: 'food-53' },
-          { id: '2702', name: 'Blueberry Pancakes', description: 'Filled with fresh blueberries.', price: 12.99, imageId: 'food-54' },
+          { id: '2701', name: 'Buttermilk Pancake Stack', description: 'A tall stack of five of our famous, fluffy buttermilk pancakes. Served with butter and maple syrup.', price: 11.99, imageId: 'food-53' },
+          { id: '2702', name: 'Blueberry Pancakes', description: 'Our classic pancakes filled with juicy, wild blueberries and dusted with powdered sugar.', price: 12.99, imageId: 'food-54' },
         ],
       },
     ],
@@ -660,8 +660,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Muffins',
         items: [
-          { id: '2801', name: 'Blueberry Muffin', description: 'A classic muffin bursting with blueberries.', price: 3.99, imageId: 'food-55' },
-          { id: '2802', name: 'Chocolate Chip Muffin', description: 'A sweet treat for any time of day.', price: 3.99, imageId: 'food-56' },
+          { id: '2801', name: 'Blueberry Muffin', description: 'A bakery classic. A moist and fluffy muffin bursting with sweet, juicy blueberries and a crumbly sugar topping.', price: 3.99, imageId: 'food-55' },
+          { id: '2802', name: 'Chocolate Chip Muffin', description: 'A rich and decadent muffin packed with semi-sweet chocolate chips. Perfect for a morning treat or an afternoon snack.', price: 3.99, imageId: 'food-56' },
         ],
       },
     ],
@@ -681,8 +681,8 @@ export const allRestaurants: Restaurant[] = [
       {
         title: 'Breakfast Plates',
         items: [
-          { id: '2901', name: 'The Grand Slam', description: 'Pancakes, eggs, bacon, and sausage.', price: 16.99, imageId: 'food-57' },
-          { id: '2902', name: 'Avocado Toast', description: 'Smashed avocado on sourdough with a poached egg.', price: 13.99, imageId: 'food-58' },
+          { id: '2901', name: 'The Grand Slam', description: 'The ultimate breakfast feast! Two fluffy pancakes, two eggs your way, two strips of bacon, and two sausage links.', price: 16.99, imageId: 'food-57' },
+          { id: '2902', name: 'Avocado Toast', description: 'Thick-cut sourdough toast topped with fresh, smashed avocado, a perfectly poached egg, and a sprinkle of red pepper flakes.', price: 13.99, imageId: 'food-58' },
         ],
       },
     ],
@@ -698,7 +698,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Burgers', 'American', 'Fast Food'],
-    menu: [{ title: 'Burgers', items: [{ id: '3001', name: 'The Farmhand Burger', description: 'Double patty, cheddar, bacon, and a fried egg.', price: 15.99, imageId: 'food-9' }] }],
+    menu: [{ title: 'Burgers', items: [{ id: '3001', name: 'The Farmhand Burger', description: 'A hearty burger with two all-beef patties, sharp cheddar cheese, crispy bacon, and a sunny-side-up fried egg on a brioche bun.', price: 15.99, imageId: 'food-9' }] }],
   },
   {
     id: '31',
@@ -711,7 +711,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Burgers', 'American', 'Fast Food'],
-    menu: [{ title: 'Burgers', items: [{ id: '3101', name: 'Shack Special', description: 'Single patty with secret sauce, lettuce, and tomato.', price: 10.99, imageId: 'food-10' }] }],
+    menu: [{ title: 'Burgers', items: [{ id: '3101', name: 'Shack Special', description: 'Our signature single patty burger with our secret shack sauce, crisp lettuce, tomato, and pickles on a toasted potato bun.', price: 10.99, imageId: 'food-10' }] }],
   },
   {
     id: '32',
@@ -724,7 +724,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Burgers', 'American', 'Grill'],
-    menu: [{ title: 'Burgers', items: [{ id: '3201', name: 'The Griller', description: 'Flame-grilled patty, smoked gouda, and onion jam.', price: 13.99, imageId: 'food-9' }] }],
+    menu: [{ title: 'Burgers', items: [{ id: '3201', name: 'The Griller', description: 'A perfectly flame-grilled patty topped with smoked gouda cheese, sweet and savory onion jam, and arugula on a pretzel bun.', price: 13.99, imageId: 'food-9' }] }],
   },
   {
     id: '33',
@@ -737,7 +737,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Burgers', 'American', 'Gourmet'],
-    menu: [{ title: 'Burgers', items: [{ id: '3301', name: 'The Einstein', description: 'Wagyu patty, truffle aioli, and arugula.', price: 18.99, imageId: 'food-10' }] }],
+    menu: [{ title: 'Burgers', items: [{ id: '3301', name: 'The Einstein', description: 'A burger of pure genius. A premium Wagyu beef patty, black truffle aioli, crispy shallots, and fresh arugula on a brioche bun.', price: 18.99, imageId: 'food-10' }] }],
   },
   {
     id: '34',
@@ -750,7 +750,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.80,
     categories: ['Coffee', 'Cafe', 'Bakery'],
-    menu: [{ title: 'Coffee', items: [{ id: '3401', name: 'Caramel Macchiato', description: 'Espresso, steamed milk, and caramel drizzle.', price: 5.25, imageId: 'food-33' }] }],
+    menu: [{ title: 'Coffee', items: [{ id: '3401', name: 'Caramel Macchiato', description: 'Freshly steamed milk with vanilla-flavored syrup marked with espresso and topped with a caramel drizzle for an oh-so-sweet finish.', price: 5.25, imageId: 'food-33' }] }],
   },
   {
     id: '35',
@@ -763,7 +763,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 10,
     deliveryFee: 1.50,
     categories: ['Coffee', 'Cafe'],
-    menu: [{ title: 'Coffee', items: [{ id: '3501', name: 'Cold Brew', description: 'Slow-steeped, smooth, and strong.', price: 4.75, imageId: 'food-34' }] }],
+    menu: [{ title: 'Coffee', items: [{ id: '3501', name: 'Cold Brew', description: 'Our signature coffee beans, slow-steeped in cool water for 20 hours for a smooth, less acidic, and highly caffeinated coffee experience.', price: 4.75, imageId: 'food-34' }] }],
   },
   {
     id: '36',
@@ -776,7 +776,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Coffee', 'Cafe', 'Desserts'],
-    menu: [{ title: 'Coffee', items: [{ id: '3601', name: 'Iced Mocha', description: 'Espresso, chocolate, milk, and ice.', price: 5.50, imageId: 'food-33' }] }],
+    menu: [{ title: 'Coffee', items: [{ id: '3601', name: 'Iced Mocha', description: 'A delightful combination of rich espresso, bittersweet mocha sauce, and milk served over ice. Topped with whipped cream.', price: 5.50, imageId: 'food-33' }] }],
   },
   {
     id: '37',
@@ -789,7 +789,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.00,
     categories: ['Pizza', 'Italian'],
-    menu: [{ title: 'Pizzas', items: [{ id: '3701', name: 'Meat Lover\'s Pizza', description: 'Pepperoni, sausage, bacon, and ham.', price: 19.99, imageId: 'food-30' }] }],
+    menu: [{ title: 'Pizzas', items: [{ id: '3701', name: 'Meat Lover\'s Pizza', description: 'A carnivore\'s dream. Loaded with pepperoni, Italian sausage, crispy bacon, and savory ham on our classic crust.', price: 19.99, imageId: 'food-30' }] }],
   },
   {
     id: '38',
@@ -802,7 +802,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 2.90,
     categories: ['Pizza', 'Italian', 'Gourmet'],
-    menu: [{ title: 'Pizzas', items: [{ id: '3801', name: 'Prosciutto & Arugula Pizza', description: 'With shaved parmesan and a balsamic glaze.', price: 21.99, imageId: 'food-31' }] }],
+    menu: [{ title: 'Pizzas', items: [{ id: '3801', name: 'Prosciutto & Arugula Pizza', description: 'A sophisticated white pizza with fresh mozzarella, topped with salty prosciutto, peppery arugula, shaved parmesan, and a sweet balsamic glaze.', price: 21.99, imageId: 'food-31' }] }],
   },
   {
     id: '39',
@@ -815,7 +815,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 2.50,
     categories: ['Pizza', 'Fast Food'],
-    menu: [{ title: 'Pizzas', items: [{ id: '3901', name: 'BBQ Chicken Pizza', description: 'Chicken, red onions, cilantro, and BBQ sauce.', price: 18.99, imageId: 'food-30' }] }],
+    menu: [{ title: 'Pizzas', items: [{ id: '3901', name: 'BBQ Chicken Pizza', description: 'A tangy and sweet pizza with a BBQ sauce base, grilled chicken, red onions, and fresh cilantro.', price: 18.99, imageId: 'food-30' }] }],
   },
   {
     id: '40',
@@ -828,7 +828,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Halal', 'Indian', 'Pakistani'],
-    menu: [{ title: 'Grill', items: [{ id: '4001', name: 'Chicken Biryani', description: 'Flavorful rice dish with chicken.', price: 15.99, imageId: 'food-17' }] }],
+    menu: [{ title: 'Grill', items: [{ id: '4001', name: 'Chicken Biryani', description: 'A classic South Asian dish. Long-grain basmati rice cooked with tender chicken, exotic spices, and fragrant saffron.', price: 15.99, imageId: 'food-17' }] }],
   },
   {
     id: '41',
@@ -841,7 +841,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.00,
     categories: ['Halal', 'Middle Eastern', 'Grill'],
-    menu: [{ title: 'Grill', items: [{ id: '4101', name: 'Beef Kabab Platter', description: 'Grilled beef skewers with rice and salad.', price: 18.99, imageId: 'food-48' }] }],
+    menu: [{ title: 'Grill', items: [{ id: '4101', name: 'Beef Kabab Platter', description: 'Two skewers of seasoned and grilled ground beef kababs, served with basmati rice, grilled vegetables, and a side of yogurt sauce.', price: 18.99, imageId: 'food-48' }] }],
   },
   {
     id: '42',
@@ -854,7 +854,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 32,
     deliveryFee: 3.80,
     categories: ['Halal', 'Indian'],
-    menu: [{ title: 'Curries', items: [{ id: '4201', name: 'Lamb Karahi', description: 'Spicy lamb curry cooked in a wok.', price: 17.99, imageId: 'food-18' }] }],
+    menu: [{ title: 'Curries', items: [{ id: '4201', name: 'Lamb Karahi', description: 'Tender pieces of lamb cooked in a traditional karahi (wok) with tomatoes, ginger, garlic, and a blend of spices.', price: 17.99, imageId: 'food-18' }] }],
   },
   {
     id: '43',
@@ -867,7 +867,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Halal', 'Street Food', 'Fast Food'],
-    menu: [{ title: 'Platters', items: [{ id: '4301', name: 'Lamb over Rice', description: 'Classic street food platter with white sauce.', price: 13.99, imageId: 'food-48' }] }],
+    menu: [{ title: 'Platters', items: [{ id: '4301', name: 'Lamb over Rice', description: 'The iconic New York street food. Tender lamb served over seasoned rice with lettuce, tomato, and our legendary white sauce.', price: 13.99, imageId: 'food-48' }] }],
   },
   {
     id: '44',
@@ -880,7 +880,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.80,
     categories: ['Chicken', 'Fast Food'],
-    menu: [{ title: 'Chicken', items: [{ id: '4401', name: 'Chicken Tenders Basket', description: 'Crispy chicken tenders with fries.', price: 11.99, imageId: 'food-44' }] }],
+    menu: [{ title: 'Chicken', items: [{ id: '4401', name: 'Chicken Tenders Basket', description: 'Crispy, all-white meat chicken tenders served with a generous portion of our signature fries and your choice of dipping sauce.', price: 11.99, imageId: 'food-44' }] }],
   },
   {
     id: '45',
@@ -893,7 +893,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Chicken', 'Wings', 'American'],
-    menu: [{ title: 'Wings', items: [{ id: '4501', name: '10pc Buffalo Wings', description: 'Classic spicy buffalo wings with ranch.', price: 14.99, imageId: 'food-45' }] }],
+    menu: [{ title: 'Wings', items: [{ id: '4501', name: '10pc Buffalo Wings', description: 'Ten crispy chicken wings tossed in our classic, spicy buffalo sauce. Served with a side of creamy ranch or blue cheese dressing.', price: 14.99, imageId: 'food-45' }] }],
   },
   {
     id: '46',
@@ -906,7 +906,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Chicken', 'Sandwiches', 'American'],
-    menu: [{ title: 'Sandwiches', items: [{ id: '4601', name: 'Grilled Chicken Club', description: 'Grilled chicken, bacon, lettuce, and tomato.', price: 13.99, imageId: 'food-49' }] }],
+    menu: [{ title: 'Sandwiches', items: [{ id: '4601', name: 'Grilled Chicken Club', description: 'A triple-decker sandwich with a tender grilled chicken breast, crispy bacon, lettuce, tomato, and mayo on toasted bread.', price: 13.99, imageId: 'food-49' }] }],
   },
   {
     id: '47',
@@ -919,7 +919,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Chicken', 'Gourmet', 'American'],
-    menu: [{ title: 'Mains', items: [{ id: '4701', name: 'Roasted Half Chicken', description: 'Herb-roasted chicken with root vegetables.', price: 19.99, imageId: 'food-44' }] }],
+    menu: [{ title: 'Mains', items: [{ id: '4701', name: 'Roasted Half Chicken', description: 'A juicy, herb-roasted half chicken, cooked to perfection with crispy skin. Served with a side of roasted root vegetables.', price: 19.99, imageId: 'food-44' }] }],
   },
   {
     id: '48',
@@ -932,7 +932,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.90,
     categories: ['Bubble Tea', 'Drinks'],
-    menu: [{ title: 'Fruit Teas', items: [{ id: '4801', name: 'Mango Green Tea', description: 'Fresh mango with green tea and popping boba.', price: 6.25, imageId: 'food-46' }] }],
+    menu: [{ title: 'Fruit Teas', items: [{ id: '4801', name: 'Mango Green Tea', description: 'A refreshing and fruity green tea infused with sweet mango puree and served with chewy popping boba.', price: 6.25, imageId: 'food-46' }] }],
   },
   {
     id: '49',
@@ -945,7 +945,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Bubble Tea', 'Drinks'],
-    menu: [{ title: 'Specials', items: [{ id: '4901', name: 'Brown Sugar Boba', description: 'Rich brown sugar syrup with fresh milk and tapioca.', price: 6.50, imageId: 'food-47' }] }],
+    menu: [{ title: 'Specials', items: [{ id: '4901', name: 'Brown Sugar Boba', description: 'A decadent treat. Chewy tapioca pearls simmered in a rich brown sugar syrup, served with fresh, creamy milk.', price: 6.50, imageId: 'food-47' }] }],
   },
   {
     id: '50',
@@ -958,7 +958,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.20,
     categories: ['Bubble Tea', 'Drinks'],
-    menu: [{ title: 'Milk Teas', items: [{ id: '5001', name: 'Oolong Milk Tea', description: 'Roasted oolong tea with creamy milk.', price: 5.75, imageId: 'food-46' }] }],
+    menu: [{ title: 'Milk Teas', items: [{ id: '5001', name: 'Oolong Milk Tea', description: 'A deeply aromatic and roasted oolong tea, balanced with creamy milk for a smooth and sophisticated flavor.', price: 5.75, imageId: 'food-46' }] }],
   },
    {
     id: '51',
@@ -971,7 +971,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.90,
     categories: ['Bubble Tea', 'Coffee', 'Desserts'],
-    menu: [{ title: 'Fruit Teas', items: [{ id: '5101', name: 'Peach Oolong Tea', description: 'Fruity and refreshing with fruit bits.', price: 6.00, imageId: 'food-47' }] }],
+    menu: [{ title: 'Fruit Teas', items: [{ id: '5101', name: 'Peach Oolong Tea', description: 'A light and refreshing oolong tea infused with sweet peach flavor and containing real fruit bits.', price: 6.00, imageId: 'food-47' }] }],
   },
   {
     id: '52',
@@ -984,7 +984,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 38,
     deliveryFee: 4.20,
     categories: ['Indian', 'Curry'],
-    menu: [{ title: 'Vegetarian', items: [{ id: '5201', name: 'Aloo Gobi', description: 'Cauliflower and potatoes in Indian spices.', price: 14.99, imageId: 'food-18' }] }],
+    menu: [{ title: 'Vegetarian', items: [{ id: '5201', name: 'Aloo Gobi', description: 'A classic vegetarian dish from North India. Tender cauliflower and potatoes cooked with onions, tomatoes, and a blend of Indian spices.', price: 14.99, imageId: 'food-18' }] }],
   },
   {
     id: '53',
@@ -997,7 +997,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Indian', 'Fine Dining'],
-    menu: [{ title: 'Mains', items: [{ id: '5301', name: 'Rogan Josh', description: 'Aromatic lamb curry.', price: 19.99, imageId: 'food-17' }] }],
+    menu: [{ title: 'Mains', items: [{ id: '5301', name: 'Rogan Josh', description: 'A fragrant and aromatic lamb curry from the Kashmir region. Tender lamb pieces are braised in a gravy flavored with aromatic spices.', price: 19.99, imageId: 'food-17' }] }],
   },
   {
     id: '54',
@@ -1010,7 +1010,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Indian', 'Street Food'],
-    menu: [{ title: 'Snacks', items: [{ id: '5401', name: 'Pav Bhaji', description: 'Spiced vegetable mash with soft bread rolls.', price: 12.99, imageId: 'food-18' }] }],
+    menu: [{ title: 'Snacks', items: [{ id: '5401', name: 'Pav Bhaji', description: 'A popular Mumbai street food. A spicy mash of mixed vegetables, served with soft, buttered bread rolls (pav).', price: 12.99, imageId: 'food-18' }] }],
   },
    {
     id: '55',
@@ -1023,7 +1023,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 40,
     deliveryFee: 4.50,
     categories: ['Indian', 'Mughlai', 'Fine Dining'],
-    menu: [{ title: 'Tandoor', items: [{ id: '5501', name: 'Tandoori Chicken', description: 'Chicken marinated in yogurt and spices, cooked in a tandoor.', price: 18.99, imageId: 'food-17' }] }],
+    menu: [{ title: 'Tandoor', items: [{ id: '5501', name: 'Tandoori Chicken', description: 'A world-famous dish. Chicken marinated in yogurt and a special blend of spices, then cooked to smoky perfection in a traditional tandoor oven.', price: 18.99, imageId: 'food-17' }] }],
   },
   {
     id: '56',
@@ -1036,7 +1036,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.20,
     categories: ['Desserts', 'Sweets'],
-    menu: [{ title: 'Ice Cream', items: [{ id: '5601', name: 'Double Scoop Sundae', description: 'Your choice of two ice cream flavors with toppings.', price: 9.99, imageId: 'food-9' }] }],
+    menu: [{ title: 'Ice Cream', items: [{ id: '5601', name: 'Double Scoop Sundae', description: 'Build your own dream sundae! Choose any two of our premium ice cream flavors, and we\'ll top it with whipped cream, chocolate sauce, and a cherry.', price: 9.99, imageId: 'food-9' }] }],
   },
   {
     id: '57',
@@ -1049,7 +1049,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.80,
     categories: ['Desserts', 'Cookies', 'Bakery'],
-    menu: [{ title: 'Cookies', items: [{ id: '5701', name: 'Half Dozen Assorted Cookies', description: 'A mix of our best sellers.', price: 15.00, imageId: 'food-10' }] }],
+    menu: [{ title: 'Cookies', items: [{ id: '5701', name: 'Half Dozen Assorted Cookies', description: 'Can\'t decide? Get a mix of our six best-selling, freshly baked cookies, including Chocolate Chip, Oatmeal Raisin, and Snickerdoodle.', price: 15.00, imageId: 'food-10' }] }],
   },
   {
     id: '58',
@@ -1062,7 +1062,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Mexican', 'Tacos'],
-    menu: [{ title: 'Tacos', items: [{ id: '5801', name: 'Baja Fish Tacos', description: 'Crispy fish tacos with cabbage slaw and chipotle aioli.', price: 13.99, imageId: 'food-13' }] }],
+    menu: [{ title: 'Tacos', items: [{ id: '5801', name: 'Baja Fish Tacos', description: 'A taste of Baja California. Crispy, beer-battered fish fillets in warm tortillas, topped with a crunchy cabbage slaw and a smoky chipotle aioli.', price: 13.99, imageId: 'food-13' }] }],
   },
   {
     id: '59',
@@ -1075,7 +1075,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Mexican', 'Enchiladas', 'Margaritas'],
-    menu: [{ title: 'Entrees', items: [{ id: '5901', name: 'Chicken Enchiladas', description: 'Corn tortillas filled with chicken, covered in green sauce.', price: 17.99, imageId: 'food-14' }] }],
+    menu: [{ title: 'Entrees', items: [{ id: '5901', name: 'Chicken Enchiladas', description: 'Tender shredded chicken wrapped in corn tortillas, covered in a tangy green tomatillo sauce and melted cheese. Served with rice and beans.', price: 17.99, imageId: 'food-14' }] }],
   },
   {
     id: '60',
@@ -1088,7 +1088,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Mexican', 'Burritos', 'Bowls'],
-    menu: [{ title: 'Bowls', items: [{ id: '6001', name: 'Burrito Bowl', description: 'Your choice of protein, rice, beans, and toppings.', price: 14.99, imageId: 'food-15' }] }],
+    menu: [{ title: 'Bowls', items: [{ id: '6001', name: 'Burrito Bowl', description: 'All the goodness of a burrito, without the tortilla. Your choice of protein, rice, beans, and toppings served in a convenient bowl.', price: 14.99, imageId: 'food-15' }] }],
   },
   {
     id: '61',
@@ -1101,7 +1101,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Mexican', 'Fajitas', 'Tex-Mex'],
-    menu: [{ title: 'Fajitas', items: [{ id: '6101', name: 'Sizzling Steak Fajitas', description: 'Served with peppers, onions, tortillas, and sides.', price: 22.99, imageId: 'food-16' }] }],
+    menu: [{ title: 'Fajitas', items: [{ id: '6101', name: 'Sizzling Steak Fajitas', description: 'A show-stopping dish. Marinated steak, grilled with onions and peppers, served sizzling with warm tortillas and all the classic sides.', price: 22.99, imageId: 'food-16' }] }],
   },
   {
     id: '62',
@@ -1114,7 +1114,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 32,
     deliveryFee: 3.80,
     categories: ['Greek', 'Mediterranean'],
-    menu: [{ title: 'Appetizers', items: [{ id: '6201', name: 'Saganaki (Flaming Cheese)', description: 'Pan-fried cheese, flambéed tableside.', price: 12.99, imageId: 'food-1' }] }],
+    menu: [{ title: 'Appetizers', items: [{ id: '6201', name: 'Saganaki (Flaming Cheese)', description: 'A theatrical and delicious appetizer. Pan-fried Greek cheese, flambéed at your table with brandy and extinguished with a squeeze of lemon.', price: 12.99, imageId: 'food-1' }] }],
   },
   {
     id: '63',
@@ -1127,7 +1127,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Greek', 'Mediterranean', 'Healthy'],
-    menu: [{ title: 'Mains', items: [{ id: '6301', name: 'Lamb Chops', description: 'Grilled lamb chops with lemon potatoes.', price: 25.99, imageId: 'food-2' }] }],
+    menu: [{ title: 'Mains', items: [{ id: '6301', name: 'Lamb Chops', description: 'Four perfectly grilled and seasoned lamb chops, served with roasted lemon potatoes and a side of tzatziki sauce.', price: 25.99, imageId: 'food-2' }] }],
   },
   {
     id: '64',
@@ -1140,7 +1140,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Greek', 'Mediterranean', 'Seafood'],
-    menu: [{ title: 'Seafood', items: [{ id: '6401', name: 'Grilled Octopus', description: 'Tender octopus grilled with olive oil and lemon.', price: 21.99, imageId: 'food-1' }] }],
+    menu: [{ title: 'Seafood', items: [{ id: '6401', name: 'Grilled Octopus', description: 'Tender, chargrilled octopus marinated in olive oil, lemon, and Greek oregano. A true taste of the Aegean.', price: 21.99, imageId: 'food-1' }] }],
   },
   {
     id: '65',
@@ -1153,7 +1153,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Sandwiches', 'Deli', 'Fast Food'],
-    menu: [{ title: 'Cold Subs', items: [{ id: '6501', name: 'Turkey Club', description: 'Turkey, bacon, lettuce, tomato on wheat.', price: 11.99, imageId: 'food-49' }] }],
+    menu: [{ title: 'Cold Subs', items: [{ id: '6501', name: 'Turkey Club', description: 'A classic triple-decker sandwich with sliced turkey breast, crispy bacon, lettuce, tomato, and mayo on your choice of bread.', price: 11.99, imageId: 'food-49' }] }],
   },
   {
     id: '66',
@@ -1166,7 +1166,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Sandwiches', 'Deli'],
-    menu: [{ title: 'Specialty', items: [{ id: '6601', name: 'The Reuben', description: 'Corned beef, swiss cheese, sauerkraut on rye.', price: 14.99, imageId: 'food-50' }] }],
+    menu: [{ title: 'Specialty', items: [{ id: '6601', name: 'The Reuben', description: 'A deli icon. Corned beef, Swiss cheese, sauerkraut, and Russian dressing grilled between slices of rye bread.', price: 14.99, imageId: 'food-50' }] }],
   },
   {
     id: '67',
@@ -1179,7 +1179,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Sandwiches', 'Grilled Cheese', 'Comfort Food'],
-    menu: [{ title: 'Grilled Cheese', items: [{ id: '6701', name: 'The Classic Melt', description: 'Cheddar and provolone on sourdough.', price: 9.99, imageId: 'food-49' }] }],
+    menu: [{ title: 'Grilled Cheese', items: [{ id: '6701', name: 'The Classic Melt', description: 'The ultimate comfort food. A perfect blend of sharp cheddar and provolone cheeses melted between two thick slices of buttery sourdough.', price: 9.99, imageId: 'food-49' }] }],
   },
   {
     id: '68',
@@ -1192,7 +1192,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.60,
     categories: ['Sandwiches', 'Italian', 'Cafe'],
-    menu: [{ title: 'Paninis', items: [{ id: '6801', name: 'Caprese Panini', description: 'Mozzarella, tomato, basil, and balsamic.', price: 12.99, imageId: 'food-50' }] }],
+    menu: [{ title: 'Paninis', items: [{ id: '6801', name: 'Caprese Panini', description: 'A taste of Italy. Fresh mozzarella, ripe tomatoes, basil, and a drizzle of balsamic glaze, all pressed and grilled to perfection.', price: 12.99, imageId: 'food-50' }] }],
   },
   {
     id: '69',
@@ -1205,7 +1205,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Vietnamese', 'Noodles', 'Pho'],
-    menu: [{ title: 'Pho', items: [{ id: '6901', name: 'Spicy Beef Pho', description: 'Beef broth with a kick of chili oil.', price: 14.99, imageId: 'food-28' }] }],
+    menu: [{ title: 'Pho', items: [{ id: '6901', name: 'Spicy Beef Pho', description: 'Our classic beef pho with a fiery kick of house-made chili oil. Not for the faint of heart!', price: 14.99, imageId: 'food-28' }] }],
   },
   {
     id: '70',
@@ -1218,7 +1218,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Vietnamese', 'Banh Mi', 'Sandwiches'],
-    menu: [{ title: 'Banh Mi', items: [{ id: '7001', name: 'Classic Banh Mi', description: 'Pork, pâté, pickled vegetables, and cilantro on a baguette.', price: 10.99, imageId: 'food-49' }] }],
+    menu: [{ title: 'Banh Mi', items: [{ id: '7001', name: 'Classic Banh Mi', description: 'A crispy baguette filled with savory grilled pork, rich pâté, pickled carrots and daikon, fresh cilantro, and jalapeños.', price: 10.99, imageId: 'food-49' }] }],
   },
   {
     id: '71',
@@ -1231,7 +1231,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Vietnamese', 'Fine Dining'],
-    menu: [{ title: 'Mains', items: [{ id: '7101', name: 'Cha Ca La Vong', description: 'Grilled fish with dill and turmeric.', price: 24.99, imageId: 'food-29' }] }],
+    menu: [{ title: 'Mains', items: [{ id: '7101', name: 'Cha Ca La Vong', description: 'A famous Hanoi specialty. Grilled fish seasoned with dill and turmeric, served with vermicelli noodles, peanuts, and herbs.', price: 24.99, imageId: 'food-29' }] }],
   },
   {
     id: '72',
@@ -1244,7 +1244,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.20,
     categories: ['Vietnamese', 'Noodles'],
-    menu: [{ title: 'Noodle Bowls', items: [{ id: '7201', name: 'Bun Thit Nuong', description: 'Grilled pork over vermicelli noodles with fresh herbs.', price: 15.99, imageId: 'food-28' }] }],
+    menu: [{ title: 'Noodle Bowls', items: [{ id: '7201', name: 'Bun Thit Nuong', description: 'A refreshing and flavorful bowl of cool vermicelli noodles, topped with chargrilled pork, fresh herbs, and a savory-sweet dipping sauce.', price: 15.99, imageId: 'food-28' }] }],
   }
 ];
 
@@ -1265,8 +1265,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Family Recipes',
         items: [
-          { id: 'hf101', name: 'Grandma\'s Lasagna', description: 'Layers of pasta, ricotta, and bolognese sauce.', price: 18.00, imageId: 'food-3' },
-          { id: 'hf102', name: 'Chicken Parmesan', description: 'Breaded chicken with marinara and mozzarella.', price: 17.50, imageId: 'food-4' },
+          { id: 'hf101', name: 'Grandma\'s Lasagna', description: 'Layers of pasta, ricotta, and a rich, slow-simmered bolognese sauce. Just like nonna used to make.', price: 18.00, imageId: 'food-3' },
+          { id: 'hf102', name: 'Chicken Parmesan', description: 'Tender chicken breast, breaded and fried, then smothered in marinara sauce and melted mozzarella. Served with a side of spaghetti.', price: 17.50, imageId: 'food-4' },
         ],
       },
     ],
@@ -1286,8 +1286,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Dumplings',
         items: [
-          { id: 'hf201', name: 'Pork & Chive Dumplings (12pcs)', description: 'Hand-wrapped and pan-fried.', price: 15.00, imageId: 'food-5' },
-          { id: 'hf202', name: 'Veggie Dumplings (12pcs)', description: 'Filled with mushrooms, cabbage, and carrots.', price: 14.00, imageId: 'food-6' },
+          { id: 'hf201', name: 'Pork & Chive Dumplings (12pcs)', description: 'Juicy, hand-wrapped dumplings filled with ground pork and fresh chives, pan-fried to a crispy perfection.', price: 15.00, imageId: 'food-5' },
+          { id: 'hf202', name: 'Veggie Dumplings (12pcs)', description: 'A delightful mix of mushrooms, cabbage, and carrots, wrapped in a delicate dough and steamed or pan-fried.', price: 14.00, imageId: 'food-6' },
         ],
       },
     ],
@@ -1307,8 +1307,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Street Tacos',
         items: [
-          { id: 'hf301', name: 'Carne Asada Tacos (3)', description: 'Marinated grilled steak on corn tortillas.', price: 12.00, imageId: 'food-13' },
-          { id: 'hf302', name: 'Cochinita Pibil Tacos (3)', description: 'Slow-roasted pork with pickled onions.', price: 12.00, imageId: 'food-14' },
+          { id: 'hf301', name: 'Carne Asada Tacos (3)', description: 'Tender, marinated grilled steak chopped and served on warm corn tortillas with cilantro, onion, and a side of salsa.', price: 12.00, imageId: 'food-13' },
+          { id: 'hf302', name: 'Cochinita Pibil Tacos (3)', description: 'A Yucatan specialty. Slow-roasted pork marinated in citrus and achiote, topped with pickled red onions.', price: 12.00, imageId: 'food-14' },
         ],
       },
     ],
@@ -1328,8 +1328,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Nourish Bowls',
         items: [
-          { id: 'hf401', name: 'Quinoa & Roasted Veggie Bowl', description: 'With lemon-tahini dressing.', price: 16.00, imageId: 'food-22' },
-          { id: 'hf402', name: 'Mediterranean Chicken Bowl', description: 'Grilled chicken, feta, olives, and couscous.', price: 17.00, imageId: 'food-23' },
+          { id: 'hf401', name: 'Quinoa & Roasted Veggie Bowl', description: 'A vibrant bowl of fluffy quinoa, roasted seasonal vegetables, and a creamy lemon-tahini dressing.', price: 16.00, imageId: 'food-22' },
+          { id: 'hf402', name: 'Mediterranean Chicken Bowl', description: 'Grilled chicken breast, crumbled feta cheese, kalamata olives, cucumbers, and tomatoes over a bed of couscous.', price: 17.00, imageId: 'food-23' },
         ],
       },
     ],
@@ -1349,8 +1349,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Curries',
         items: [
-          { id: 'hf501', name: 'Homestyle Chicken Curry', description: 'Aromatic and medium spicy.', price: 17.00, imageId: 'food-17' },
-          { id: 'hf502', name: 'Dal Makhani', description: 'Creamy black lentils.', price: 15.00, imageId: 'food-18' },
+          { id: 'hf501', name: 'Homestyle Chicken Curry', description: 'A comforting and aromatic chicken curry with a medium spice level, just like Priya\'s family makes it. Served with basmati rice.', price: 17.00, imageId: 'food-17' },
+          { id: 'hf502', name: 'Dal Makhani', description: 'A rich and creamy dish of black lentils and kidney beans, slow-cooked with butter and spices.', price: 15.00, imageId: 'food-18' },
         ],
       },
     ],
@@ -1370,8 +1370,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'BBQ Plates',
         items: [
-          { id: 'hf601', name: 'Pulled Pork Plate', description: 'With coleslaw and cornbread.', price: 19.00, imageId: 'food-7' },
-          { id: 'hf602', name: 'Smoked Ribs (Half Rack)', description: 'Fall-off-the-bone tender.', price: 22.00, imageId: 'food-8' },
+          { id: 'hf601', name: 'Pulled Pork Plate', description: 'Slow-smoked for 10 hours until perfectly tender, served with a side of tangy coleslaw and sweet cornbread.', price: 19.00, imageId: 'food-7' },
+          { id: 'hf602', name: 'Smoked Ribs (Half Rack)', description: 'A half rack of our fall-off-the-bone tender pork ribs, glazed with our secret family BBQ sauce.', price: 22.00, imageId: 'food-8' },
         ],
       },
     ],
@@ -1391,8 +1391,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Main Dishes',
         items: [
-          { id: 'hf701', name: 'Bibimbap', description: 'Mixed rice with vegetables, beef, and a fried egg.', price: 18.00, imageId: 'food-24' },
-          { id: 'hf702', name: 'Kimchi Jjigae', description: 'Spicy kimchi stew with pork and tofu.', price: 17.00, imageId: 'food-25' },
+          { id: 'hf701', name: 'Bibimbap', description: 'A classic Korean mixed rice bowl topped with seasoned vegetables, savory beef, a sunny-side-up fried egg, and gochujang sauce.', price: 18.00, imageId: 'food-24' },
+          { id: 'hf702', name: 'Kimchi Jjigae', description: 'A fiery and comforting kimchi stew with tender pork belly and soft tofu. A staple in every Korean home.', price: 17.00, imageId: 'food-25' },
         ],
       },
     ],
@@ -1412,8 +1412,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Hearty Soups',
         items: [
-          { id: 'hf801', name: 'Tomato Basil Soup', description: 'Creamy and rich, served with a side of bread.', price: 12.00, imageId: 'food-38' },
-          { id: 'hf802', name: 'Chicken Noodle Soup', description: 'Classic comfort in a bowl.', price: 13.00, imageId: 'food-29' },
+          { id: 'hf801', name: 'Tomato Basil Soup', description: 'A creamy and rich tomato soup made with fresh basil and a touch of cream. Served with a side of crusty bread for dipping.', price: 12.00, imageId: 'food-38' },
+          { id: 'hf802', name: 'Chicken Noodle Soup', description: 'The ultimate comfort food. Made with a flavorful chicken broth, tender chicken pieces, vegetables, and egg noodles.', price: 13.00, imageId: 'food-29' },
         ],
       },
     ],
@@ -1433,8 +1433,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Freshly Baked',
         items: [
-          { id: 'hf901', name: 'Sourdough Loaf', description: 'Naturally leavened and crusty.', price: 9.00, imageId: 'food-19' },
-          { id: 'hf902', name: 'Chocolate Babka', description: 'Sweet braided bread with chocolate filling.', price: 14.00, imageId: 'food-27' },
+          { id: 'hf901', name: 'Sourdough Loaf', description: 'A beautiful, naturally leavened sourdough loaf with a tangy flavor and a satisfyingly crusty exterior.', price: 9.00, imageId: 'food-19' },
+          { id: 'hf902', name: 'Chocolate Babka', description: 'A sweet braided bread with a rich, gooey chocolate and cinnamon filling. Perfect for dessert or a special breakfast.', price: 14.00, imageId: 'food-27' },
         ],
       },
     ],
@@ -1454,8 +1454,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Thai Favorites',
         items: [
-          { id: 'hf1001', name: 'Green Curry with Chicken', description: 'Homemade green curry paste, coconut milk, and chicken.', price: 17.50, imageId: 'food-37' },
-          { id: 'hf1002', name: 'Drunken Noodles (Pad Kee Mao)', description: 'Spicy stir-fried flat noodles with basil.', price: 16.50, imageId: 'food-36' },
+          { id: 'hf1001', name: 'Green Curry with Chicken', description: 'An authentic and aromatic green curry made from Ton\'s homemade paste, with coconut milk, chicken, and Thai basil.', price: 17.50, imageId: 'food-37' },
+          { id: 'hf1002', name: 'Drunken Noodles (Pad Kee Mao)', description: 'Spicy, stir-fried wide rice noodles with chicken, fresh basil, and a mix of vegetables. A flavorful and fiery dish.', price: 16.50, imageId: 'food-36' },
         ],
       },
     ],
@@ -1475,8 +1475,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Greek Specialties',
         items: [
-          { id: 'hf1101', name: 'Moussaka', description: 'Layered eggplant, minced meat, and béchamel sauce.', price: 19.00, imageId: 'food-21' },
-          { id: 'hf1102', name: 'Spanakopita (Spinach Pie)', description: 'Flaky phyllo pastry with spinach and feta.', price: 10.00, imageId: 'food-22' },
+          { id: 'hf1101', name: 'Moussaka', description: 'A classic Greek casserole with layers of eggplant, seasoned ground meat, and a creamy béchamel sauce.', price: 19.00, imageId: 'food-21' },
+          { id: 'hf1102', name: 'Spanakopita (Spinach Pie)', description: 'A savory pie made with flaky phyllo pastry, filled with spinach, feta cheese, and herbs. Sold by the slice.', price: 10.00, imageId: 'food-22' },
         ],
       },
     ],
@@ -1496,8 +1496,8 @@ export const allHomeFoods: Restaurant[] = [
       {
         title: 'Chili Bowls',
         items: [
-          { id: 'hf1201', name: 'Classic Beef Chili', description: 'Hearty and spicy, served with sour cream and cheese.', price: 15.00, imageId: 'food-24' },
-          { id: 'hf1202', name: 'Vegetarian Three-Bean Chili', description: 'A flavorful mix of beans and spices.', price: 14.00, imageId: 'food-25' },
+          { id: 'hf1201', name: 'Classic Beef Chili', description: 'Frank\'s award-winning recipe! A hearty and perfectly spiced beef chili, served with a side of sour cream and shredded cheddar.', price: 15.00, imageId: 'food-24' },
+          { id: 'hf1202', name: 'Vegetarian Three-Bean Chili', description: 'A flavorful and satisfying chili made with a mix of kidney, pinto, and black beans in a spiced tomato base.', price: 14.00, imageId: 'food-25' },
         ],
       },
     ],

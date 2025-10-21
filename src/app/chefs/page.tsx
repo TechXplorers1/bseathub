@@ -31,7 +31,7 @@ export default function ChefsPage() {
         {uniqueChefs.map((chef) => {
           const restaurantImage = getImageById(chef.restaurantImageId);
           return (
-            <Card key={chef.name} className="flex flex-col overflow-hidden">
+            <Card key={chef.name} className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 {restaurantImage && (
                     <div className="relative h-40 w-full">
                         <Image

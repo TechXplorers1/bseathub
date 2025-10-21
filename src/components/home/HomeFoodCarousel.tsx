@@ -3,6 +3,6 @@ import { RestaurantCarousel } from './RestaurantCarousel';
 
 export function HomeFoodCarousel() {
   return (
-    <RestaurantCarousel title="Home Food" restaurants={allHomeFoods} />
+    <RestaurantCarousel title="Home Food" restaurants={allHomeFoods} href="/home-food" />
   );
 }

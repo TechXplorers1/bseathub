@@ -13,6 +13,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 2.99,
     categories: ['Italian', 'Pasta', 'Pizza'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Appetizers',
@@ -41,6 +42,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 4.50,
     categories: ['Japanese', 'Sushi', 'Asian'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Sushi Rolls',
@@ -69,6 +71,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 1.99,
     categories: ['American', 'Burgers', 'Fast Food'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Burgers',
@@ -97,6 +100,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Mexican', 'Tacos', 'Burritos'],
+    type: 'restaurant',
     menu: [
        {
         title: 'Tacos',
@@ -125,6 +129,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Indian', 'Curry', 'Vegetarian'],
+    type: 'restaurant',
     menu: [
        {
         title: 'Curries',
@@ -153,6 +158,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.50,
     categories: ['Salads', 'Healthy', 'Vegan'],
+    type: 'restaurant',
     menu: [
        {
         title: 'Signature Salads',
@@ -180,6 +186,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Vietnamese', 'Noodles', 'Pho'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Pho',
@@ -207,6 +214,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 2.99,
     categories: ['Pizza', 'Italian', 'Fast Food'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Specialty Pizzas',
@@ -234,6 +242,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 10,
     deliveryFee: 1.50,
     categories: ['Coffee', 'Cafe', 'Breakfast'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Coffee & Tea',
@@ -261,6 +270,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.00,
     categories: ['Thai', 'Curry', 'Asian'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Main Dishes',
@@ -288,6 +298,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.99,
     categories: ['Vegan', 'Healthy', 'Salads'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Bowls',
@@ -315,6 +326,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 40,
     deliveryFee: 5.00,
     categories: ['Steak', 'American', 'Fine Dining'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Steaks',
@@ -342,6 +354,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Mediterranean', 'Greek', 'Healthy'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Plates',
@@ -363,6 +376,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.50,
     categories: ['Breakfast', 'American', 'Cafe'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Classics',
@@ -384,6 +398,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 33,
     deliveryFee: 3.80,
     categories: ['Japanese', 'Ramen', 'Noodles'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Ramen',
@@ -405,6 +420,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 45,
     deliveryFee: 4.50,
     categories: ['BBQ', 'American', 'Grill'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Meats',
@@ -426,6 +442,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.00,
     categories: ['Desserts', 'Bakery', 'Sweets'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Cakes',
@@ -447,6 +464,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.00,
     categories: ['Healthy', 'Smoothies', 'Bowls'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Smoothies',
@@ -468,6 +486,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.50,
     categories: ['Chicken', 'Fast Food', 'American'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Fried Chicken',
@@ -489,6 +508,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Bubble Tea', 'Drinks', 'Desserts'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Milk Teas',
@@ -510,6 +530,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.00,
     categories: ['Halal', 'Mediterranean', 'Street Food', 'Fast Food'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Platters',
@@ -531,6 +552,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Sandwiches', 'Deli', 'Lunch'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Hot Sandwiches',
@@ -552,6 +574,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.00,
     categories: ['Greek', 'Mediterranean', 'Healthy'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Gyros',
@@ -573,6 +596,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.50,
     categories: ['Italian', 'Pasta', 'Noodle'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Pasta',
@@ -594,6 +618,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Bakery', 'Desserts', 'Sweets'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Cupcakes',
@@ -615,6 +640,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.50,
     categories: ['Breakfast', 'Waffles', 'American'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Waffles',
@@ -636,6 +662,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 3.00,
     categories: ['Breakfast', 'Pancakes', 'American'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Pancakes',
@@ -657,6 +684,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Bakery', 'Breakfast', 'Coffee'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Muffins',
@@ -678,6 +706,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Breakfast', 'Brunch', 'American'],
+    type: 'restaurant',
     menu: [
       {
         title: 'Breakfast Plates',
@@ -699,6 +728,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Burgers', 'American', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Burgers', items: [{ id: '3001', name: 'The Farmhand Burger', description: 'A hearty burger with two all-beef patties, sharp cheddar cheese, crispy bacon, and a sunny-side-up fried egg on a brioche bun.', price: 15.99, imageId: 'food-9' }] }],
   },
   {
@@ -712,6 +742,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Burgers', 'American', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Burgers', items: [{ id: '3101', name: 'Shack Special', description: 'Our signature single patty burger with our secret shack sauce, crisp lettuce, tomato, and pickles on a toasted potato bun.', price: 10.99, imageId: 'food-10' }] }],
   },
   {
@@ -725,6 +756,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Burgers', 'American', 'Grill'],
+    type: 'restaurant',
     menu: [{ title: 'Burgers', items: [{ id: '3201', name: 'The Griller', description: 'A perfectly flame-grilled patty topped with smoked gouda cheese, sweet and savory onion jam, and arugula on a pretzel bun.', price: 13.99, imageId: 'food-9' }] }],
   },
   {
@@ -738,6 +770,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Burgers', 'American', 'Gourmet'],
+    type: 'restaurant',
     menu: [{ title: 'Burgers', items: [{ id: '3301', name: 'The Einstein', description: 'A burger of pure genius. A premium Wagyu beef patty, black truffle aioli, crispy shallots, and fresh arugula on a brioche bun.', price: 18.99, imageId: 'food-10' }] }],
   },
   {
@@ -751,6 +784,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.80,
     categories: ['Coffee', 'Cafe', 'Bakery'],
+    type: 'restaurant',
     menu: [{ title: 'Coffee', items: [{ id: '3401', name: 'Caramel Macchiato', description: 'Freshly steamed milk with vanilla-flavored syrup marked with espresso and topped with a caramel drizzle for an oh-so-sweet finish.', price: 5.25, imageId: 'food-33' }] }],
   },
   {
@@ -764,6 +798,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 10,
     deliveryFee: 1.50,
     categories: ['Coffee', 'Cafe'],
+    type: 'restaurant',
     menu: [{ title: 'Coffee', items: [{ id: '3501', name: 'Cold Brew', description: 'Our signature coffee beans, slow-steeped in cool water for 20 hours for a smooth, less acidic, and highly caffeinated coffee experience.', price: 4.75, imageId: 'food-34' }] }],
   },
   {
@@ -777,6 +812,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Coffee', 'Cafe', 'Desserts'],
+    type: 'restaurant',
     menu: [{ title: 'Coffee', items: [{ id: '3601', name: 'Iced Mocha', description: 'A delightful combination of rich espresso, bittersweet mocha sauce, and milk served over ice. Topped with whipped cream.', price: 5.50, imageId: 'food-33' }] }],
   },
   {
@@ -790,6 +826,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.00,
     categories: ['Pizza', 'Italian'],
+    type: 'restaurant',
     menu: [{ title: 'Pizzas', items: [{ id: '3701', name: 'Meat Lover\'s Pizza', description: 'A carnivore\'s dream. Loaded with pepperoni, Italian sausage, crispy bacon, and savory ham on our classic crust.', price: 19.99, imageId: 'food-30' }] }],
   },
   {
@@ -803,6 +840,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 2.90,
     categories: ['Pizza', 'Italian', 'Gourmet'],
+    type: 'restaurant',
     menu: [{ title: 'Pizzas', items: [{ id: '3801', name: 'Prosciutto & Arugula Pizza', description: 'A sophisticated white pizza with fresh mozzarella, topped with salty prosciutto, peppery arugula, shaved parmesan, and a sweet balsamic glaze.', price: 21.99, imageId: 'food-31' }] }],
   },
   {
@@ -816,6 +854,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 2.50,
     categories: ['Pizza', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Pizzas', items: [{ id: '3901', name: 'BBQ Chicken Pizza', description: 'A tangy and sweet pizza with a BBQ sauce base, grilled chicken, red onions, and fresh cilantro.', price: 18.99, imageId: 'food-30' }] }],
   },
   {
@@ -829,6 +868,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Halal', 'Indian', 'Pakistani'],
+    type: 'restaurant',
     menu: [{ title: 'Grill', items: [{ id: '4001', name: 'Chicken Biryani', description: 'A classic South Asian dish. Long-grain basmati rice cooked with tender chicken, exotic spices, and fragrant saffron.', price: 15.99, imageId: 'food-17' }] }],
   },
   {
@@ -842,6 +882,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.00,
     categories: ['Halal', 'Middle Eastern', 'Grill'],
+    type: 'restaurant',
     menu: [{ title: 'Grill', items: [{ id: '4101', name: 'Beef Kabab Platter', description: 'Two skewers of seasoned and grilled ground beef kababs, served with basmati rice, grilled vegetables, and a side of yogurt sauce.', price: 18.99, imageId: 'food-48' }] }],
   },
   {
@@ -855,6 +896,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 32,
     deliveryFee: 3.80,
     categories: ['Halal', 'Indian'],
+    type: 'restaurant',
     menu: [{ title: 'Curries', items: [{ id: '4201', name: 'Lamb Karahi', description: 'Tender pieces of lamb cooked in a traditional karahi (wok) with tomatoes, ginger, garlic, and a blend of spices.', price: 17.99, imageId: 'food-18' }] }],
   },
   {
@@ -868,6 +910,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.50,
     categories: ['Halal', 'Street Food', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Platters', items: [{ id: '4301', name: 'Lamb over Rice', description: 'The iconic New York street food. Tender lamb served over seasoned rice with lettuce, tomato, and our legendary white sauce.', price: 13.99, imageId: 'food-48' }] }],
   },
   {
@@ -881,6 +924,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.80,
     categories: ['Chicken', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Chicken', items: [{ id: '4401', name: 'Chicken Tenders Basket', description: 'Crispy, all-white meat chicken tenders served with a generous portion of our signature fries and your choice of dipping sauce.', price: 11.99, imageId: 'food-44' }] }],
   },
   {
@@ -894,6 +938,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Chicken', 'Wings', 'American'],
+    type: 'restaurant',
     menu: [{ title: 'Wings', items: [{ id: '4501', name: '10pc Buffalo Wings', description: 'Ten crispy chicken wings tossed in our classic, spicy buffalo sauce. Served with a side of creamy ranch or blue cheese dressing.', price: 14.99, imageId: 'food-45' }] }],
   },
   {
@@ -907,6 +952,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Chicken', 'Sandwiches', 'American'],
+    type: 'restaurant',
     menu: [{ title: 'Sandwiches', items: [{ id: '4601', name: 'Grilled Chicken Club', description: 'A triple-decker sandwich with a tender grilled chicken breast, crispy bacon, lettuce, tomato, and mayo on toasted bread.', price: 13.99, imageId: 'food-49' }] }],
   },
   {
@@ -920,6 +966,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Chicken', 'Gourmet', 'American'],
+    type: 'restaurant',
     menu: [{ title: 'Mains', items: [{ id: '4701', name: 'Roasted Half Chicken', description: 'A juicy, herb-roasted half chicken, cooked to perfection with crispy skin. Served with a side of roasted root vegetables.', price: 19.99, imageId: 'food-44' }] }],
   },
   {
@@ -933,6 +980,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.90,
     categories: ['Bubble Tea', 'Drinks'],
+    type: 'restaurant',
     menu: [{ title: 'Fruit Teas', items: [{ id: '4801', name: 'Mango Green Tea', description: 'A refreshing and fruity green tea infused with sweet mango puree and served with chewy popping boba.', price: 6.25, imageId: 'food-46' }] }],
   },
   {
@@ -946,6 +994,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Bubble Tea', 'Drinks'],
+    type: 'restaurant',
     menu: [{ title: 'Specials', items: [{ id: '4901', name: 'Brown Sugar Boba', description: 'A decadent treat. Chewy tapioca pearls simmered in a rich brown sugar syrup, served with fresh, creamy milk.', price: 6.50, imageId: 'food-47' }] }],
   },
   {
@@ -959,6 +1008,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.20,
     categories: ['Bubble Tea', 'Drinks'],
+    type: 'restaurant',
     menu: [{ title: 'Milk Teas', items: [{ id: '5001', name: 'Oolong Milk Tea', description: 'A deeply aromatic and roasted oolong tea, balanced with creamy milk for a smooth and sophisticated flavor.', price: 5.75, imageId: 'food-46' }] }],
   },
    {
@@ -972,6 +1022,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.90,
     categories: ['Bubble Tea', 'Coffee', 'Desserts'],
+    type: 'restaurant',
     menu: [{ title: 'Fruit Teas', items: [{ id: '5101', name: 'Peach Oolong Tea', description: 'A light and refreshing oolong tea infused with sweet peach flavor and containing real fruit bits.', price: 6.00, imageId: 'food-47' }] }],
   },
   {
@@ -985,6 +1036,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 38,
     deliveryFee: 4.20,
     categories: ['Indian', 'Curry'],
+    type: 'restaurant',
     menu: [{ title: 'Vegetarian', items: [{ id: '5201', name: 'Aloo Gobi', description: 'A classic vegetarian dish from North India. Tender cauliflower and potatoes cooked with onions, tomatoes, and a blend of Indian spices.', price: 14.99, imageId: 'food-18' }] }],
   },
   {
@@ -998,6 +1050,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Indian', 'Fine Dining'],
+    type: 'restaurant',
     menu: [{ title: 'Mains', items: [{ id: '5301', name: 'Rogan Josh', description: 'A fragrant and aromatic lamb curry from the Kashmir region. Tender lamb pieces are braised in a gravy flavored with aromatic spices.', price: 19.99, imageId: 'food-17' }] }],
   },
   {
@@ -1011,6 +1064,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Indian', 'Street Food'],
+    type: 'restaurant',
     menu: [{ title: 'Snacks', items: [{ id: '5401', name: 'Pav Bhaji', description: 'A popular Mumbai street food. A spicy mash of mixed vegetables, served with soft, buttered bread rolls (pav).', price: 12.99, imageId: 'food-18' }] }],
   },
    {
@@ -1024,6 +1078,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 40,
     deliveryFee: 4.50,
     categories: ['Indian', 'Mughlai', 'Fine Dining'],
+    type: 'restaurant',
     menu: [{ title: 'Tandoor', items: [{ id: '5501', name: 'Tandoori Chicken', description: 'A world-famous dish. Chicken marinated in yogurt and a special blend of spices, then cooked to smoky perfection in a traditional tandoor oven.', price: 18.99, imageId: 'food-17' }] }],
   },
   {
@@ -1037,6 +1092,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.20,
     categories: ['Desserts', 'Sweets'],
+    type: 'restaurant',
     menu: [{ title: 'Ice Cream', items: [{ id: '5601', name: 'Double Scoop Sundae', description: 'Build your own dream sundae! Choose any two of our premium ice cream flavors, and we\'ll top it with whipped cream, chocolate sauce, and a cherry.', price: 9.99, imageId: 'food-9' }] }],
   },
   {
@@ -1050,6 +1106,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.80,
     categories: ['Desserts', 'Cookies', 'Bakery'],
+    type: 'restaurant',
     menu: [{ title: 'Cookies', items: [{ id: '5701', name: 'Half Dozen Assorted Cookies', description: 'Can\'t decide? Get a mix of our six best-selling, freshly baked cookies, including Chocolate Chip, Oatmeal Raisin, and Snickerdoodle.', price: 15.00, imageId: 'food-10' }] }],
   },
   {
@@ -1063,6 +1120,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Mexican', 'Tacos'],
+    type: 'restaurant',
     menu: [{ title: 'Tacos', items: [{ id: '5801', name: 'Baja Fish Tacos', description: 'A taste of Baja California. Crispy, beer-battered fish fillets in warm tortillas, topped with a crunchy cabbage slaw and a smoky chipotle aioli.', price: 13.99, imageId: 'food-13' }] }],
   },
   {
@@ -1076,6 +1134,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Mexican', 'Enchiladas', 'Margaritas'],
+    type: 'restaurant',
     menu: [{ title: 'Entrees', items: [{ id: '5901', name: 'Chicken Enchiladas', description: 'Tender shredded chicken wrapped in corn tortillas, covered in a tangy green tomatillo sauce and melted cheese. Served with rice and beans.', price: 17.99, imageId: 'food-14' }] }],
   },
   {
@@ -1089,6 +1148,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Mexican', 'Burritos', 'Bowls'],
+    type: 'restaurant',
     menu: [{ title: 'Bowls', items: [{ id: '6001', name: 'Burrito Bowl', description: 'All the goodness of a burrito, without the tortilla. Your choice of protein, rice, beans, and toppings served in a convenient bowl.', price: 14.99, imageId: 'food-15' }] }],
   },
   {
@@ -1102,6 +1162,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Mexican', 'Fajitas', 'Tex-Mex'],
+    type: 'restaurant',
     menu: [{ title: 'Fajitas', items: [{ id: '6101', name: 'Sizzling Steak Fajitas', description: 'A show-stopping dish. Marinated steak, grilled with onions and peppers, served sizzling with warm tortillas and all the classic sides.', price: 22.99, imageId: 'food-16' }] }],
   },
   {
@@ -1115,6 +1176,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 32,
     deliveryFee: 3.80,
     categories: ['Greek', 'Mediterranean'],
+    type: 'restaurant',
     menu: [{ title: 'Appetizers', items: [{ id: '6201', name: 'Saganaki (Flaming Cheese)', description: 'A theatrical and delicious appetizer. Pan-fried Greek cheese, flambéed at your table with brandy and extinguished with a squeeze of lemon.', price: 12.99, imageId: 'food-1' }] }],
   },
   {
@@ -1128,6 +1190,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Greek', 'Mediterranean', 'Healthy'],
+    type: 'restaurant',
     menu: [{ title: 'Mains', items: [{ id: '6301', name: 'Lamb Chops', description: 'Four perfectly grilled and seasoned lamb chops, served with roasted lemon potatoes and a side of tzatziki sauce.', price: 25.99, imageId: 'food-2' }] }],
   },
   {
@@ -1141,6 +1204,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Greek', 'Mediterranean', 'Seafood'],
+    type: 'restaurant',
     menu: [{ title: 'Seafood', items: [{ id: '6401', name: 'Grilled Octopus', description: 'Tender, chargrilled octopus marinated in olive oil, lemon, and Greek oregano. A true taste of the Aegean.', price: 21.99, imageId: 'food-1' }] }],
   },
   {
@@ -1154,6 +1218,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.00,
     categories: ['Sandwiches', 'Deli', 'Fast Food'],
+    type: 'restaurant',
     menu: [{ title: 'Cold Subs', items: [{ id: '6501', name: 'Turkey Club', description: 'A classic triple-decker sandwich with sliced turkey breast, crispy bacon, lettuce, tomato, and mayo on your choice of bread.', price: 11.99, imageId: 'food-49' }] }],
   },
   {
@@ -1167,6 +1232,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Sandwiches', 'Deli'],
+    type: 'restaurant',
     menu: [{ title: 'Specialty', items: [{ id: '6601', name: 'The Reuben', description: 'A deli icon. Corned beef, Swiss cheese, sauerkraut, and Russian dressing grilled between slices of rye bread.', price: 14.99, imageId: 'food-50' }] }],
   },
   {
@@ -1180,6 +1246,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Sandwiches', 'Grilled Cheese', 'Comfort Food'],
+    type: 'restaurant',
     menu: [{ title: 'Grilled Cheese', items: [{ id: '6701', name: 'The Classic Melt', description: 'The ultimate comfort food. A perfect blend of sharp cheddar and provolone cheeses melted between two thick slices of buttery sourdough.', price: 9.99, imageId: 'food-49' }] }],
   },
   {
@@ -1193,6 +1260,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.60,
     categories: ['Sandwiches', 'Italian', 'Cafe'],
+    type: 'restaurant',
     menu: [{ title: 'Paninis', items: [{ id: '6801', name: 'Caprese Panini', description: 'A taste of Italy. Fresh mozzarella, ripe tomatoes, basil, and a drizzle of balsamic glaze, all pressed and grilled to perfection.', price: 12.99, imageId: 'food-50' }] }],
   },
   {
@@ -1206,6 +1274,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Vietnamese', 'Noodles', 'Pho'],
+    type: 'restaurant',
     menu: [{ title: 'Pho', items: [{ id: '6901', name: 'Spicy Beef Pho', description: 'Our classic beef pho with a fiery kick of house-made chili oil. Not for the faint of heart!', price: 14.99, imageId: 'food-28' }] }],
   },
   {
@@ -1219,6 +1288,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Vietnamese', 'Banh Mi', 'Sandwiches'],
+    type: 'restaurant',
     menu: [{ title: 'Banh Mi', items: [{ id: '7001', name: 'Classic Banh Mi', description: 'A crispy baguette filled with savory grilled pork, rich pâté, pickled carrots and daikon, fresh cilantro, and jalapeños.', price: 10.99, imageId: 'food-49' }] }],
   },
   {
@@ -1232,6 +1302,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Vietnamese', 'Fine Dining'],
+    type: 'restaurant',
     menu: [{ title: 'Mains', items: [{ id: '7101', name: 'Cha Ca La Vong', description: 'A famous Hanoi specialty. Grilled fish seasoned with dill and turmeric, served with vermicelli noodles, peanuts, and herbs.', price: 24.99, imageId: 'food-29' }] }],
   },
   {
@@ -1245,6 +1316,7 @@ export const allRestaurants: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.20,
     categories: ['Vietnamese', 'Noodles'],
+    type: 'restaurant',
     menu: [{ title: 'Noodle Bowls', items: [{ id: '7201', name: 'Bun Thit Nuong', description: 'A refreshing and flavorful bowl of cool vermicelli noodles, topped with chargrilled pork, fresh herbs, and a savory-sweet dipping sauce.', price: 15.99, imageId: 'food-28' }] }],
   }
 ];
@@ -1262,6 +1334,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Italian', 'Homemade', 'Pasta', 'Comfort Food'],
+    type: 'home-food',
     menu: [
       {
         title: 'Family Recipes',
@@ -1283,6 +1356,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 2.99,
     categories: ['Chinese', 'Dumplings', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Dumplings',
@@ -1304,6 +1378,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.50,
     categories: ['Mexican', 'Tacos', 'Homemade', 'Spicy'],
+    type: 'home-food',
     menu: [
       {
         title: 'Street Tacos',
@@ -1325,6 +1400,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 4.00,
     categories: ['Healthy', 'Vegan', 'Bowls', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Nourish Bowls',
@@ -1346,6 +1422,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 3.75,
     categories: ['Indian', 'Curry', 'Homemade', 'Spicy'],
+    type: 'home-food',
     menu: [
       {
         title: 'Curries',
@@ -1367,6 +1444,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 45,
     deliveryFee: 5.00,
     categories: ['BBQ', 'American', 'Homemade', 'Comfort Food'],
+    type: 'home-food',
     menu: [
       {
         title: 'BBQ Plates',
@@ -1388,6 +1466,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Korean', 'Homemade', 'Spicy'],
+    type: 'home-food',
     menu: [
       {
         title: 'Main Dishes',
@@ -1409,6 +1488,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.00,
     categories: ['Soup', 'Comfort Food', 'Homemade', 'Healthy'],
+    type: 'home-food',
     menu: [
       {
         title: 'Hearty Soups',
@@ -1430,6 +1510,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 4.00,
     categories: ['Bakery', 'Bread', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Freshly Baked',
@@ -1451,6 +1532,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.25,
     categories: ['Thai', 'Homemade', 'Spicy', 'Curry'],
+    type: 'home-food',
     menu: [
       {
         title: 'Thai Favorites',
@@ -1472,6 +1554,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Greek', 'Mediterranean', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Greek Specialties',
@@ -1493,6 +1576,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.00,
     categories: ['Comfort Food', 'American', 'Homemade', 'Soup'],
+    type: 'home-food',
     menu: [
       {
         title: 'Chili Bowls',
@@ -1514,6 +1598,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.00,
     categories: ['Breakfast', 'Homemade', 'American'],
+    type: 'home-food',
     menu: [
       {
         title: 'Breakfast Classics',
@@ -1535,6 +1620,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 25,
     deliveryFee: 3.50,
     categories: ['Burgers', 'Fast Food', 'American', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Homemade Burgers',
@@ -1556,6 +1642,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 10,
     deliveryFee: 2.00,
     categories: ['Coffee', 'Drinks', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Artisan Coffee',
@@ -1577,6 +1664,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 35,
     deliveryFee: 4.00,
     categories: ['Pizza', 'Italian', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Handmade Pizzas',
@@ -1598,6 +1686,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Halal', 'Middle Eastern', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Halal Dishes',
@@ -1619,6 +1708,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.25,
     categories: ['Chicken', 'American', 'Fast Food', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Fried Chicken',
@@ -1640,6 +1730,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.50,
     categories: ['Bubble Tea', 'Drinks', 'Desserts', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Handcrafted Boba',
@@ -1661,6 +1752,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 2.75,
     categories: ['Desserts', 'Bakery', 'Homemade', 'Sweets'],
+    type: 'home-food',
     menu: [
       {
         title: 'Homemade Sweets',
@@ -1682,6 +1774,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.50,
     categories: ['Sandwiches', 'Deli', 'Lunch', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Artisan Sandwiches',
@@ -1703,6 +1796,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.00,
     categories: ['Noodle', 'Asian', 'Homemade', 'Comfort Food'],
+    type: 'home-food',
     menu: [
       {
         title: 'Noodle Bowls',
@@ -1724,6 +1818,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 22,
     deliveryFee: 2.80,
     categories: ['Breakfast', 'Homemade', 'American'],
+    type: 'home-food',
     menu: [
       {
         title: 'Homestyle Breakfast',
@@ -1745,6 +1840,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.20,
     categories: ['Burgers', 'American', 'Homemade', 'Fast Food'],
+    type: 'home-food',
     menu: [
       {
         title: 'Gourmet Burgers',
@@ -1766,6 +1862,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 12,
     deliveryFee: 1.90,
     categories: ['Coffee', 'Drinks', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Specialty Coffee',
@@ -1787,6 +1884,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 38,
     deliveryFee: 4.50,
     categories: ['Pizza', 'Italian', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: '14-inch Pizzas',
@@ -1808,6 +1906,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 32,
     deliveryFee: 3.80,
     categories: ['Halal', 'Middle Eastern', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Platters',
@@ -1829,6 +1928,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.40,
     categories: ['Chicken', 'American', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Chicken Dinners',
@@ -1850,6 +1950,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 2.60,
     categories: ['Bubble Tea', 'Drinks', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Signature Drinks',
@@ -1871,6 +1972,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 20,
     deliveryFee: 3.00,
     categories: ['Desserts', 'Bakery', 'Sweets', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Baked Goods',
@@ -1892,6 +1994,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 30,
     deliveryFee: 3.50,
     categories: ['Mexican', 'Homemade', 'Spicy'],
+    type: 'home-food',
     menu: [
       {
         title: 'Platillos',
@@ -1913,6 +2016,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 33,
     deliveryFee: 3.90,
     categories: ['Greek', 'Mediterranean', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Traditional Greek',
@@ -1934,6 +2038,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 18,
     deliveryFee: 3.00,
     categories: ['Healthy', 'Vegan', 'Homemade', 'Salads'],
+    type: 'home-food',
     menu: [
       {
         title: 'Healthy Entrees',
@@ -1955,6 +2060,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 15,
     deliveryFee: 2.20,
     categories: ['Sandwiches', 'Homemade', 'Lunch'],
+    type: 'home-food',
     menu: [
       {
         title: 'Classic Sandwiches',
@@ -1976,6 +2082,7 @@ export const allHomeFoods: Restaurant[] = [
     deliveryTime: 28,
     deliveryFee: 3.10,
     categories: ['Noodle', 'Asian', 'Homemade'],
+    type: 'home-food',
     menu: [
       {
         title: 'Noodle Soups',

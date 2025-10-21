@@ -14,6 +14,7 @@ export interface Restaurant {
   deliveryFee: number;
   categories: string[];
   menu: MenuCategory[];
+  type: 'restaurant' | 'home-food';
 }
 
 export interface MenuCategory {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { personalizedMealRecommendations } from '@/ai/flows/personalized-meal-recommendations';
 import { RestaurantCard } from './RestaurantCard';
-import { allRestaurants } from '@/lib/data';
+import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { Restaurant } from '@/lib/types';
 import { Button, buttonVariants } from '../ui/button';
 import { ArrowRight, ArrowUp } from 'lucide-react';
@@ -54,16 +54,18 @@ export function Personalized() {
         };
 
         const result = await personalizedMealRecommendations(mockInput);
+        
+        const allItems = [...allRestaurants, ...allHomeFoods];
 
         // This is a simplified logic. In a real app, you'd match meal names to restaurants.
         // Here we just find restaurants whose cuisine matches the recommendations.
-        const recommendedRestaurants = allRestaurants.filter((restaurant) =>
+        const recommendedRestaurants = allItems.filter((restaurant) =>
             result.recommendations.some(recommendation => restaurant.name.toLowerCase().includes(recommendation.toLowerCase()) || restaurant.cuisine.toLowerCase().includes(recommendation.toLowerCase()))
         );
         
         // If not enough recommendations, fill with popular restaurants
         if (recommendedRestaurants.length < 8) {
-            const popular = allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 8 - recommendedRestaurants.length);
+            const popular = allItems.sort((a,b) => b.rating - a.rating).slice(0, 8 - recommendedRestaurants.length);
             recommendedRestaurants.push(...popular.filter(p => !recommendedRestaurants.find(r => r.id === p.id)));
         }
 
@@ -72,7 +74,8 @@ export function Personalized() {
       } catch (error) {
         console.error('Failed to get personalized recommendations:', error);
         // Fallback to popular restaurants on error
-        setRecommendations(allRestaurants.sort((a,b) => b.rating - a.rating).slice(0, 8));
+        const allItems = [...allRestaurants, ...allHomeFoods];
+        setRecommendations(allItems.sort((a,b) => b.rating - a.rating).slice(0, 8));
       } finally {
         setLoading(false);
       }

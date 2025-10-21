@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import type { Restaurant } from '@/lib/types';
+import type { MenuItem as MenuItemType, Restaurant } from '@/lib/types';
 import { getImageById } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { cn } from '@/lib/utils';
 import { AddReviewDialog } from './AddReviewDialog';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { MenuItemDialog } from './MenuItemDialog';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -85,9 +86,14 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
   
   const [reviews, setReviews] = React.useState<Review[]>(initialReviews);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
+  const [selectedItem, setSelectedItem] = React.useState<MenuItemType | null>(null);
 
   const handleAddReview = (newReview: Review) => {
     setReviews([newReview, ...reviews]);
+  };
+  
+  const handleItemClick = (item: MenuItemType) => {
+    setSelectedItem(item);
   };
 
   return (
@@ -210,7 +216,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                 <h2 className="text-2xl font-semibold mt-6 mb-4">Featured Items</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {featuredItems.map((item) => (
-                        <MenuItem key={item.id} item={item} />
+                        <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
                     ))}
                 </div>
             </div>
@@ -240,7 +246,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                 <h2 className="text-2xl font-semibold mt-6 mb-4">Most Ordered</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {mostOrderedItems.map((item) => (
-                        <MenuItem key={item.id} item={item} />
+                        <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
                     ))}
                 </div>
             </div>
@@ -253,7 +259,7 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
                       <h2 className="text-2xl font-semibold mt-6 mb-4">{category.title}</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {category.items.map((item) => (
-                          <MenuItem key={item.id} item={item} />
+                           <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
                           ))}
                       </div>
                       {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
@@ -268,6 +274,17 @@ export function RestaurantDetails({ restaurant }: { restaurant: Restaurant }) {
         onOpenChange={setIsReviewDialogOpen}
         onSubmit={handleAddReview}
       />
+       {selectedItem && (
+        <MenuItemDialog
+          item={selectedItem}
+          open={!!selectedItem}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedItem(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

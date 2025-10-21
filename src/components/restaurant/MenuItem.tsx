@@ -3,21 +3,19 @@
 import Image from 'next/image';
 import type { MenuItem as MenuItemType } from '@/lib/types';
 import { getImageById } from '@/lib/placeholder-images';
-import { useCart } from '@/context/CartProvider';
-import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 
 interface MenuItemProps {
   item: MenuItemType;
+  onClick: () => void;
 }
 
-export function MenuItem({ item }: MenuItemProps) {
+export function MenuItem({ item, onClick }: MenuItemProps) {
   const image = getImageById(item.imageId);
-  const { addToCart } = useCart();
 
   return (
-    <Card className="overflow-hidden cursor-pointer group flex flex-col" onClick={() => addToCart(item)}>
+    <Card className="overflow-hidden cursor-pointer group flex flex-col" onClick={onClick}>
         <CardContent className="p-0 flex flex-col flex-1">
             <div className="flex justify-between items-start p-4 flex-1">
                 <div className="flex-1 pr-4">
@@ -38,11 +36,11 @@ export function MenuItem({ item }: MenuItemProps) {
                 </div>
                 )}
             </div>
-            <div className="p-4 pt-0 mt-auto">
-                <Button size="sm" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
+             <div className="p-4 pt-0 mt-auto">
+                <div className="w-full h-9 rounded-md px-3 bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium">
+                    <Plus className="h-4 w-4" />
                     Add
-                </Button>
+                </div>
             </div>
         </CardContent>
     </Card>

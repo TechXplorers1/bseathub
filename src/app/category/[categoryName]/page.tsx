@@ -48,7 +48,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredRestaurants.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Restaurants</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredRestaurants.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                 ))}
@@ -59,7 +59,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredHomeFoods.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Home Food</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredHomeFoods.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                 ))}
@@ -70,7 +70,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredChefs.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Chefs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredChefs.map((chef) => (
                     <ChefCard key={chef.name} chef={chef} />
                 ))}

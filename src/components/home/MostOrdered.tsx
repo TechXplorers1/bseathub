@@ -1,13 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import type { MenuItem as MenuItemType } from '@/lib/types';
-import { allRestaurants } from '@/lib/data';
+import type { MenuItem as MenuItemType, Restaurant } from '@/lib/types';
+import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { MenuItem } from '@/components/restaurant/MenuItem';
 import { MenuItemDialog } from '@/components/restaurant/MenuItemDialog';
 import { Separator } from '../ui/separator';
 
-const mostOrderedItems = [...allRestaurants.flatMap(r => r.menu.flatMap(c => c.items))].sort(() => 0.5 - Math.random()).slice(0, 9);
+const allItems = [...allRestaurants, ...allHomeFoods];
+const mostOrderedItems = allItems
+    .flatMap(restaurant => restaurant.menu.flatMap(category => category.items.map(item => ({ ...item, type: restaurant.type, restaurantName: restaurant.name }))))
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 9);
+
 
 export function MostOrdered() {
     const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);

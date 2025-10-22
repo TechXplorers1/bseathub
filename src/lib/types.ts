@@ -1,6 +1,8 @@
 import placeholderData from './placeholder-images.json';
 
 type PlaceholderImageIds = (typeof placeholderData.placeholderImages)[number]['id'];
+type RestaurantType = 'restaurant' | 'home-food';
+
 
 export interface Restaurant {
   id: string;
@@ -14,7 +16,7 @@ export interface Restaurant {
   deliveryFee: number;
   categories: string[];
   menu: MenuCategory[];
-  type: 'restaurant' | 'home-food';
+  type: RestaurantType;
 }
 
 export interface MenuCategory {
@@ -28,6 +30,8 @@ export interface MenuItem {
   description: string;
   price: number;
   imageId: PlaceholderImageIds;
+  type?: RestaurantType;
+  restaurantName?: string;
 }
 
 export interface CartItem extends MenuItem {

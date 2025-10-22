@@ -5,6 +5,7 @@ import type { MenuItem as MenuItemType } from '@/lib/types';
 import { getImageById } from '@/lib/placeholder-images';
 import { Plus } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -20,6 +21,11 @@ export function MenuItem({ item, onClick }: MenuItemProps) {
             <div className="flex justify-between items-start p-4 flex-1">
                 <div className="flex-1 pr-4">
                     <h3 className="font-semibold text-base group-hover:text-primary">{item.name}</h3>
+                     {item.type && (
+                      <Badge variant="outline" className="mt-1">
+                        {item.type === 'home-food' ? 'Home Food' : 'Restaurant'}
+                      </Badge>
+                    )}
                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
                     <p className="font-medium mt-2">${item.price.toFixed(2)}</p>
                 </div>

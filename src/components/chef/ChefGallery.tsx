@@ -5,6 +5,7 @@ import { allRestaurants, allHomeFoods } from '@/lib/data';
 import type { MenuItem } from '@/lib/types';
 import { Card } from '../ui/card';
 import { getImageById } from '@/lib/placeholder-images';
+import { cn } from '@/lib/utils';
 
 const galleryImageIds = [
     'food-3',
@@ -27,12 +28,12 @@ export function ChefGallery() {
 
     const [dish1, dish2, dish3, dish4, dish5, dish6] = dishes;
 
-    const renderImageWithOverlay = (dish: MenuItem) => {
+    const renderImageWithOverlay = (dish: MenuItem, className?: string) => {
         const image = getImageById(dish.imageId);
         if (!image) return null;
         
         return (
-            <Card key={dish.id} className="overflow-hidden relative group">
+            <div key={dish.id} className={cn("overflow-hidden relative group rounded-lg", className)}>
                 <Image
                     src={image.imageUrl}
                     alt={dish.name}
@@ -44,7 +45,7 @@ export function ChefGallery() {
                     <h3 className="font-bold text-white text-lg">{dish.name}</h3>
                     <p className="text-white/90 text-sm line-clamp-2">{dish.description}</p>
                 </div>
-            </Card>
+            </div>
         );
     }
 
@@ -52,9 +53,7 @@ export function ChefGallery() {
         <div className="py-8">
             <h2 className="text-2xl font-bold mb-4">Signature Dishes</h2>
             <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[500px]">
-                <div className="col-span-2 row-span-2">
-                    {renderImageWithOverlay(dish1)}
-                </div>
+                {renderImageWithOverlay(dish1, "col-span-2 row-span-2")}
                 {renderImageWithOverlay(dish2)}
                 {renderImageWithOverlay(dish3)}
                 {renderImageWithOverlay(dish4)}

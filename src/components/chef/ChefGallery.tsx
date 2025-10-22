@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { allRestaurants, allHomeFoods } from '@/lib/data';
 import type { MenuItem } from '@/lib/types';
 import { Card } from '../ui/card';
+import { getImageById } from '@/lib/placeholder-images';
 
 const galleryImageIds = [
     'food-3',
@@ -26,21 +27,26 @@ export function ChefGallery() {
 
     const [dish1, dish2, dish3, dish4, dish5, dish6] = dishes;
 
-    const renderImageWithOverlay = (dish: MenuItem) => (
-        <Card key={dish.id} className="overflow-hidden relative group">
-            <Image
-                src={`https://picsum.photos/seed/${dish.imageId.split('-')[1]}/600/400`}
-                alt={dish.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                data-ai-hint={dish.name}
-            />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/60 transition-colors flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100">
-                <h3 className="font-bold text-white text-lg">{dish.name}</h3>
-                <p className="text-white/90 text-sm line-clamp-2">{dish.description}</p>
-            </div>
-        </Card>
-    );
+    const renderImageWithOverlay = (dish: MenuItem) => {
+        const image = getImageById(dish.imageId);
+        if (!image) return null;
+        
+        return (
+            <Card key={dish.id} className="overflow-hidden relative group">
+                <Image
+                    src={image.imageUrl}
+                    alt={dish.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    data-ai-hint={image.imageHint}
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/60 transition-colors flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100">
+                    <h3 className="font-bold text-white text-lg">{dish.name}</h3>
+                    <p className="text-white/90 text-sm line-clamp-2">{dish.description}</p>
+                </div>
+            </Card>
+        );
+    }
 
     return (
         <div className="py-8">

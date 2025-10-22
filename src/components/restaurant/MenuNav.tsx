@@ -12,9 +12,9 @@ interface MenuNavProps {
 }
 
 export function MenuNav({ menuCategories, hasChef, className }: MenuNavProps) {
-  const baseNavItems = ["Deals & Discounts", "Featured Items", "Reviews", "Most Ordered"];
+  const baseNavItems = ["Deals & Discounts", "Featured Items", "Reviews"];
   const chefNavItems = ["About", "Signature Dishes", "Book a Chef"];
-  const navItems = hasChef ? [...baseNavItems.slice(0,1), ...chefNavItems, ...baseNavItems.slice(1), ...menuCategories] : [...baseNavItems, ...menuCategories];
+  const navItems = hasChef ? chefNavItems : [...baseNavItems, ...menuCategories];
   const [activeItem, setActiveItem] = React.useState(navItems[0]);
 
   const scrollToCategory = (id: string) => {

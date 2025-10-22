@@ -83,8 +83,6 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
   const image = getImageById(restaurant.imageId);
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
   const menuCategories = restaurant.menu.map(cat => cat.title);
-  const mostOrderedItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
-  const featuredItems = [...restaurant.menu.flatMap(c => c.items)].sort(() => 0.5 - Math.random()).slice(0, 3);
   
   const [reviews, setReviews] = React.useState<Review[]>(initialReviews);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = React.useState(false);
@@ -98,8 +96,90 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
     setSelectedItem(item);
   };
 
-  const displayName = chefName ? `Chef's ${chefName}` : restaurant.name;
+  const displayName = chefName ? chefName : restaurant.name;
 
+  if (chefName) {
+    const chefAvatar = `https://i.pravatar.cc/150?u=${restaurant.id}`;
+    return (
+    <div className="flex flex-col bg-background">
+      {/* Hero Section */}
+      <div className="relative h-48 w-full">
+        {image && (
+          <Image
+            src={image.imageUrl}
+            alt={restaurant.name}
+            fill
+            objectFit="cover"
+            data-ai-hint={image.imageHint}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 transform lg:left-8 lg:translate-x-0 h-20 w-20 rounded-full border-4 border-white bg-white overflow-hidden">
+          <Avatar className="h-full w-full">
+            <AvatarImage src={chefAvatar} alt={chefName} />
+            <AvatarFallback>{chefName.charAt(0)}</AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="absolute top-4 right-4">
+          <Button variant="secondary" size="icon" className="rounded-full">
+            <Heart className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
+          
+          {/* Left Column - Store Info & Menu Nav */}
+          <div className="lg:col-span-1 lg:border-r lg:pr-8">
+            <div className='lg:sticky lg:top-24 self-start'>
+              <h1 className="text-4xl font-bold mt-8 lg:mt-0">{displayName}</h1>
+              <div className="mt-6 space-y-3 text-sm">
+                <h2 className="text-lg font-semibold sr-only lg:not-sr-only">Chef Info</h2>
+                 <p className="text-muted-foreground">{restaurant.cuisine}</p>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Star className="h-4 w-4 fill-foreground text-foreground" />
+                  <span>
+                    {restaurant.rating} ({restaurant.reviews > 1000 ? '1k+' : restaurant.reviews})
+                  </span>
+                </div>
+              </div>
+              <Separator className="my-6" />
+              <div className="hidden lg:block">
+                 <MenuNav menuCategories={[]} hasChef={true} />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Chef Portfolio */}
+          <div className="lg:col-span-3">
+            <div className="mt-8" id="About">
+              <h2 className="text-2xl font-bold mb-4">About {chefName}</h2>
+              <p className="text-muted-foreground">
+                Chef {chefName} is the heart and soul behind {restaurant.name}, bringing authentic {restaurant.cuisine} flavors to your table. With over 15 years of experience in kitchens around the world, {chefName.split(' ')[0]} has a passion for using fresh, local ingredients to create memorable dining experiences. This home kitchen is a culmination of that passion, offering a menu that is both innovative and deeply rooted in tradition.
+              </p>
+            </div>
+            
+            <Separator className="my-8" />
+
+            <div id="Signature Dishes">
+                <ChefGallery />
+            </div>
+
+            <Separator className="my-8" />
+            
+            <div id="Book a Chef">
+                <BookingForm chefName={chefName} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    )
+  }
+
+  // Original Restaurant Details Page
   return (
     <div className="flex flex-col bg-background">
       {/* Hero Section */}
@@ -154,7 +234,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                   <span>•</span>
                   <span>2 mi</span>
                 </div>
-                <p className="text-muted-foreground">$ • Canadian</p>
+                <p className="text-muted-foreground">$ • {restaurant.cuisine}</p>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <span>Service fees apply</span>
                   <Info className="h-3 w-3" />
@@ -190,19 +270,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                 </div>
               </div>
             </div>
-
-            {chefName && (
-              <>
-                <div className="mt-8" id="About">
-                  <h2 className="text-2xl font-bold mb-4">About {chefName}</h2>
-                  <p className="text-muted-foreground">
-                    Chef {chefName} is the heart and soul behind {restaurant.name}, bringing authentic {restaurant.cuisine} flavors to your table. With over 15 years of experience in kitchens around the world, {chefName.split(' ')[0]} has a passion for using fresh, local ingredients to create memorable dining experiences. This home kitchen is a culmination of that passion, offering a menu that is both innovative and deeply rooted in tradition.
-                  </p>
-                </div>
-                <Separator className="my-8" />
-              </>
-            )}
-
+            
             {/* Deals & Discounts */}
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-4" id="Deals & Discounts">Deals & Discounts</h2>
@@ -231,7 +299,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
             <div id="Featured Items">
                 <h2 className="text-2xl font-semibold mt-6 mb-4">Featured Items</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {featuredItems.map((item) => (
+                    {restaurant.menu.flatMap(c => c.items).slice(0,3).map((item) => (
                         <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
                     ))}
                 </div>
@@ -257,16 +325,6 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
 
             <Separator className="my-8" />
 
-            {/* Most Ordered Section */}
-            <div id="Most Ordered">
-                <h2 className="text-2xl font-semibold mt-6 mb-4">Most Ordered</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {mostOrderedItems.map((item) => (
-                        <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
-                    ))}
-                </div>
-            </div>
-
             {/* Menu Sections */}
             <div className="mt-8">
                <Separator className="my-8" />
@@ -284,18 +342,6 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                     </React.Fragment>
                 ))}
             </div>
-
-            {chefName && (
-              <>
-                <div id="Signature Dishes">
-                    <ChefGallery />
-                </div>
-                <div id="Book a Chef" className="my-8">
-                    <BookingForm chefName={chefName} />
-                </div>
-              </>
-            )}
-
           </div>
         </div>
       </div>

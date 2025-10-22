@@ -283,8 +283,10 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
 
                         {chefName && category.title.toLowerCase() === 'dumplings' && (
                             <>
-                                <ChefGallery />
-                                <div className="my-8">
+                                <div id="Signature Dishes">
+                                    <ChefGallery />
+                                </div>
+                                <div id="Book a Chef" className="my-8">
                                     <BookingForm chefName={chefName} />
                                 </div>
                             </>

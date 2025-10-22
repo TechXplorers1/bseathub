@@ -280,22 +280,22 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                               ))}
                           </div>
                         </div>
-
-                        {chefName && category.title.toLowerCase() === 'dumplings' && (
-                            <>
-                                <div id="Signature Dishes">
-                                    <ChefGallery />
-                                </div>
-                                <div id="Book a Chef" className="my-8">
-                                    <BookingForm chefName={chefName} />
-                                </div>
-                            </>
-                        )}
-
                         {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
                     </React.Fragment>
                 ))}
             </div>
+
+            {chefName && (
+              <>
+                <div id="Signature Dishes">
+                    <ChefGallery />
+                </div>
+                <div id="Book a Chef" className="my-8">
+                    <BookingForm chefName={chefName} />
+                </div>
+              </>
+            )}
+
           </div>
         </div>
       </div>

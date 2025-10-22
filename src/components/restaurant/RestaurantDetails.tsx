@@ -189,6 +189,18 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
               </div>
             </div>
 
+            {chefName && (
+              <>
+                <div className="mt-8" id="About">
+                  <h2 className="text-2xl font-bold mb-4">About {chefName}</h2>
+                  <p className="text-muted-foreground">
+                    Chef {chefName} is the heart and soul behind {restaurant.name}, bringing authentic {restaurant.cuisine} flavors to your table. With over 15 years of experience in kitchens around the world, {chefName.split(' ')[0]} has a passion for using fresh, local ingredients to create memorable dining experiences. This home kitchen is a culmination of that passion, offering a menu that is both innovative and deeply rooted in tradition.
+                  </p>
+                </div>
+                <Separator className="my-8" />
+              </>
+            )}
+
             {/* Deals & Discounts */}
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-4" id="Deals & Discounts">Deals & Discounts</h2>

@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button';
 
 interface MenuNavProps {
   menuCategories: string[];
+  hasChef: boolean;
   className?: string;
 }
 
-export function MenuNav({ menuCategories, className }: MenuNavProps) {
-  const navItems = ["Deals & Discounts", "Featured Items", "Reviews", "Most Ordered", ...menuCategories];
-  const [activeItem, setActiveItem] = React.useState(navItems[0] || 'Deals & Discounts');
+export function MenuNav({ menuCategories, hasChef, className }: MenuNavProps) {
+  const baseNavItems = ["Deals & Discounts", "Featured Items", "Reviews", "Most Ordered"];
+  const navItems = hasChef ? ["About", ...baseNavItems, ...menuCategories] : [...baseNavItems, ...menuCategories];
+  const [activeItem, setActiveItem] = React.useState(navItems[0]);
 
   const scrollToCategory = (id: string) => {
     const element = document.getElementById(id);

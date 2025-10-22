@@ -43,9 +43,6 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
               <Clock className="h-4 w-4" />
               <span>{restaurant.deliveryTime} min</span>
             </div>
-            <span>
-              ${restaurant.deliveryFee > 0 ? restaurant.deliveryFee.toFixed(2) : 'Free'}
-            </span>
           </div>
         </CardContent>
       </Card>

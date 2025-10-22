@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -20,7 +19,7 @@ export function MostOrdered() {
     return (
         <div className="py-8">
             <div className="mb-4">
-                <h2 className="text-2xl font-bold">Most Ordered</h2>
+                <h2 className="text-2xl font-bold">What's on your mind today!</h2>
                 <p className="text-muted-foreground">The most commonly ordered items and dishes from this store</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -43,4 +42,3 @@ export function MostOrdered() {
         </div>
     );
 }
-

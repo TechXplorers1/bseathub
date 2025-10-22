@@ -4,6 +4,7 @@ import { ChefsCarousel } from '@/components/home/ChefsCarousel';
 import { FilterCategories } from '@/components/home/FilterCategories';
 import { HomeFeed } from '@/components/home/HomeFeed';
 import { HomeFoodCarousel } from '@/components/home/HomeFoodCarousel';
+import { MostOrdered } from '@/components/home/MostOrdered';
 import { Personalized } from '@/components/home/Personalized';
 import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { allRestaurants, allHomeFoods } from '@/lib/data';
@@ -15,6 +16,7 @@ export default function Home() {
         <FilterCategories />
         <Banners />
         <Personalized />
+        <MostOrdered />
         <RestaurantCarousel title="Home Food" restaurants={allHomeFoods} href="/home-food" />
         <HomeFeed restaurants={allRestaurants} />
         <ChefsCarousel />

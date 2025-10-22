@@ -12,6 +12,7 @@ import { Calendar } from '@/components/ui/calendar';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,6 +24,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
@@ -32,6 +40,7 @@ const bookingFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   phone: z.string().optional(),
   eventDate: z.date({ required_error: 'An event date is required.' }),
+  eventType: z.string({ required_error: 'Please select an event type.' }),
   guests: z.coerce.number().min(1, { message: 'Must have at least 1 guest.' }),
   message: z.string().optional(),
 });
@@ -140,6 +149,29 @@ export function BookingForm({ chefName }: { chefName: string }) {
                                 />
                             </PopoverContent>
                             </Popover>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="eventType"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Type of Event</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder="Select an event type" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="personal">Personal Party</SelectItem>
+                                <SelectItem value="corporate">Corporate Event</SelectItem>
+                                <SelectItem value="wedding">Wedding</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                         )}

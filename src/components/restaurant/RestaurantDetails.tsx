@@ -270,26 +270,29 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
             <div className="mt-8">
                <Separator className="my-8" />
                 {restaurant.menu.map((category, index) => (
-                    <div key={category.title} id={category.title}>
-                      <h2 className="text-2xl font-semibold mt-6 mb-4">{category.title}</h2>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {category.items.map((item) => (
-                           <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
-                          ))}
-                      </div>
-                      {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
-                    </div>
+                    <React.Fragment key={category.title}>
+                        <div id={category.title}>
+                          <h2 className="text-2xl font-semibold mt-6 mb-4">{category.title}</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {category.items.map((item) => (
+                               <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />
+                              ))}
+                          </div>
+                        </div>
+
+                        {chefName && category.title.toLowerCase() === 'dumplings' && (
+                            <div className="my-8">
+                                <BookingForm chefName={chefName} />
+                            </div>
+                        )}
+
+                        {index < restaurant.menu.length - 1 && <Separator className="my-8" />}
+                    </React.Fragment>
                 ))}
             </div>
           </div>
         </div>
       </div>
-
-      {chefName && (
-        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-            <BookingForm chefName={chefName} />
-        </div>
-      )}
 
       <AddReviewDialog 
         open={isReviewDialogOpen}

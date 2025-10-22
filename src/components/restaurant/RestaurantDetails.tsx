@@ -28,6 +28,7 @@ import { AddReviewDialog } from './AddReviewDialog';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { MenuItemDialog } from './MenuItemDialog';
 import { BookingForm } from '../chef/BookingForm';
+import { ChefGallery } from '../chef/ChefGallery';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -281,9 +282,12 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                         </div>
 
                         {chefName && category.title.toLowerCase() === 'dumplings' && (
-                            <div className="my-8">
-                                <BookingForm chefName={chefName} />
-                            </div>
+                            <>
+                                <ChefGallery />
+                                <div className="my-8">
+                                    <BookingForm chefName={chefName} />
+                                </div>
+                            </>
                         )}
 
                         {index < restaurant.menu.length - 1 && <Separator className="my-8" />}

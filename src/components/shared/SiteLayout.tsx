@@ -19,7 +19,7 @@ import {
   Book,
   User,
   Gift,
-  Wallet,
+  LayoutDashboard,
   Utensils,
   Building2,
   ChefHat,
@@ -37,7 +37,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Browse', icon: Search, href: '#' },
     { name: 'Orders', icon: Book, href: '/track-order' },
     { name: 'Favorites', icon: Heart, href: '#' },
-    { name: 'Wallet', icon: Wallet, href: '#' },
+    { name: 'Dashboards', icon: LayoutDashboard, href: '/dashboard' },
     { name: 'Promotions', icon: Ticket, href: '#' },
     { name: 'Invite Friends', icon: Gift, href: '#' },
   ];

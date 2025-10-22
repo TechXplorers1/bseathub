@@ -97,7 +97,7 @@ export function BookingForm({ chefName }: { chefName: string }) {
                         name="phone"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Phone Number (Optional)</FormLabel>
+                            <FormLabel>Phone Number</FormLabel>
                             <FormControl>
                             <Input placeholder="(123) 456-7890" {...field} />
                             </FormControl>

@@ -27,6 +27,7 @@ import { cn } from '@/lib/utils';
 import { AddReviewDialog } from './AddReviewDialog';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { MenuItemDialog } from './MenuItemDialog';
+import { BookingForm } from '../chef/BookingForm';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -163,7 +164,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
               </div>
               <Separator className="my-6" />
               <div className="hidden lg:block">
-                 <MenuNav menuCategories={menuCategories} />
+                 <MenuNav menuCategories={menuCategories} hasChef={!!chefName} />
               </div>
             </div>
           </div>
@@ -283,6 +284,13 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
           </div>
         </div>
       </div>
+
+      {chefName && (
+        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+            <BookingForm chefName={chefName} />
+        </div>
+      )}
+
       <AddReviewDialog 
         open={isReviewDialogOpen}
         onOpenChange={setIsReviewDialogOpen}

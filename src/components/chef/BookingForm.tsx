@@ -52,7 +52,12 @@ export function BookingForm({ chefName }: { chefName: string }) {
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
       guests: 1,
+      message: '',
+      eventType: '',
     },
   });
 

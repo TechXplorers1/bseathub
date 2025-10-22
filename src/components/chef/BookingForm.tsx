@@ -73,8 +73,8 @@ export function BookingForm({ chefName }: { chefName: string }) {
   return (
     <Card>
         <CardHeader>
-            <CardTitle className="text-3xl font-bold">Book Chef {chefName}</CardTitle>
-            <CardDescription>Interested in a private event? Fill out the form below to get in touch.</CardDescription>
+            <CardTitle className="text-2xl font-bold tracking-tight">Booking Inquiry for Chef {chefName}</CardTitle>
+            <CardDescription>Fill out the form below to inquire about a private event.</CardDescription>
         </CardHeader>
         <CardContent>
             <Form {...form}>
@@ -200,7 +200,7 @@ export function BookingForm({ chefName }: { chefName: string }) {
                     name="message"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Message (Optional)</FormLabel>
+                        <FormLabel>Message <span className="text-muted-foreground">(Optional)</span></FormLabel>
                         <FormControl>
                         <Textarea
                             placeholder="Tell us a little bit about your event, any dietary restrictions, or special requests."
@@ -212,7 +212,7 @@ export function BookingForm({ chefName }: { chefName: string }) {
                     </FormItem>
                     )}
                 />
-                <Button type="submit" size="lg">Send Booking Request</Button>
+                <Button type="submit" size="lg" className="w-full">Send Booking Request</Button>
             </form>
             </Form>
         </CardContent>

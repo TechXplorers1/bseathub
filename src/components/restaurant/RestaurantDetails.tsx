@@ -170,7 +170,15 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
             <Separator className="my-8" />
             
             <div id="Book a Chef">
+              <div className="text-center">
+                  <h2 className="text-3xl font-bold tracking-tight">Book This Chef</h2>
+                  <p className="mt-2 text-lg text-muted-foreground">
+                      Elevate your next event with a private culinary experience curated by Chef {chefName}.
+                  </p>
+              </div>
+              <div className="mt-8">
                 <BookingForm chefName={chefName} />
+              </div>
             </div>
           </div>
         </div>
@@ -282,7 +290,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                     <p className="text-xs text-muted-foreground">50TREAT - 50% off your first order of $15+, up to $15</p>
                   </div>
                 </Card>
-                <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
+                <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray.50">
                   <Badge variant="outline">Eat Hub</Badge>
                   <div>
                     <h3 className="font-bold text-sm">Get $0 delivery fees with Eat Hub</h3>

@@ -173,6 +173,7 @@ export default function DashboardPage() {
                                         <TableHeader>
                                             <TableRow>
                                             <TableHead>Restaurant</TableHead>
+                                            <TableHead>Order Name</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead>Date</TableHead>
                                             <TableHead className="text-right">Amount</TableHead>
@@ -192,6 +193,9 @@ export default function DashboardPage() {
                                                                     </Avatar>
                                                                     <div className="font-medium">{order.restaurant}</div>
                                                                 </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div className="font-medium">{order.id}</div>
                                                             </TableCell>
                                                             <TableCell>
                                                                 <Badge 
@@ -227,7 +231,7 @@ export default function DashboardPage() {
                                                         </TableRow>
                                                         <CollapsibleContent asChild>
                                                             <TableRow>
-                                                                <TableCell colSpan={5} className="p-0">
+                                                                <TableCell colSpan={6} className="p-0">
                                                                     <div className="p-4 bg-muted/50">
                                                                         <h4 className="font-semibold mb-2">Order Items:</h4>
                                                                         <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">

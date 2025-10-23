@@ -173,7 +173,7 @@ export default function DashboardPage() {
                                         <TableHeader>
                                             <TableRow>
                                             <TableHead>Restaurant</TableHead>
-                                            <TableHead>Order Name</TableHead>
+                                            <TableHead>Order ID</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead>Date</TableHead>
                                             <TableHead className="text-right">Amount</TableHead>

@@ -35,13 +35,10 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
   };
   
   const filteredRestaurants = restaurants.filter(restaurant => {
-    if (deliveryMode === 'delivery') {
-      return true; // Assume all restaurants deliver
+    if (deliveryMode === 'all') {
+      return true;
     }
-    if (deliveryMode === 'pickup') {
-      return true; // Assume all restaurants offer pickup
-    }
-    return true; // 'all'
+    return restaurant.services.includes(deliveryMode);
   });
 
   const sortedRestaurants = [...filteredRestaurants].sort(sortFunctions[sortOption]);

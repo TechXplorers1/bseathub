@@ -15,6 +15,7 @@ export interface Restaurant {
   deliveryTime: number;
   deliveryFee: number;
   categories: string[];
+  services: ('delivery' | 'pickup')[];
   menu: MenuCategory[];
   type: RestaurantType;
 }

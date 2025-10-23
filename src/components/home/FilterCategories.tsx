@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -46,7 +45,6 @@ const filterButtons = [
   { name: 'Deals', icon: Tag },
   { name: 'Pickup', icon: null },
   { name: 'Over 4.5', icon: Star, hasDropdown: true },
-  { name: 'Under 30 min', icon: null },
   { name: 'Price', icon: null, hasDropdown: true },
   { name: 'Eat Hub', icon: Check },
 ];

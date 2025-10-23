@@ -34,15 +34,7 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
     deliveryTime: (a, b) => a.deliveryTime - b.deliveryTime,
   };
   
-  const filteredRestaurants = restaurants.filter(restaurant => {
-    if (deliveryMode === 'pickup') {
-        // For pickup, we can assume all restaurants are available for simplicity
-        // In a real app, you'd filter by distance or if they offer pickup
-        return true;
-    }
-    // For delivery, filter based on delivery fee (assuming fee implies delivery)
-    return restaurant.deliveryFee > 0;
-  });
+  const filteredRestaurants = restaurants;
 
   const sortedRestaurants = [...filteredRestaurants].sort(sortFunctions[sortOption]);
   const visibleRestaurants = sortedRestaurants.slice(0, INITIAL_VISIBLE_COUNT);

@@ -116,12 +116,7 @@ export function Personalized() {
     getRecommendations();
   }, []);
   
-  const filteredRestaurants = recommendations.filter(restaurant => {
-    if (deliveryMode === 'pickup') {
-      return true;
-    }
-    return restaurant.deliveryFee > 0;
-  });
+  const filteredRestaurants = recommendations;
 
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 

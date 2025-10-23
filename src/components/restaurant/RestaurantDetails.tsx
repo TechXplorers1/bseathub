@@ -29,6 +29,7 @@ import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { MenuItemDialog } from './MenuItemDialog';
 import { BookingForm } from '../chef/BookingForm';
 import { ChefGallery } from '../chef/ChefGallery';
+import { ChefCuisineSpecialties } from '../chef/ChefCuisineSpecialties';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
   return (
@@ -160,6 +161,10 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
                 Chef {chefName} is the heart and soul behind {restaurant.name}, bringing authentic {restaurant.cuisine} flavors to your table. With over 15 years of experience in kitchens around the world, {chefName.split(' ')[0]} has a passion for using fresh, local ingredients to create memorable dining experiences. This home kitchen is a culmination of that passion, offering a menu that is both innovative and deeply rooted in tradition.
               </p>
             </div>
+            
+            <Separator className="my-8" />
+            
+            <ChefCuisineSpecialties cuisines={[restaurant.cuisine, ...restaurant.categories]} />
             
             <Separator className="my-8" />
 

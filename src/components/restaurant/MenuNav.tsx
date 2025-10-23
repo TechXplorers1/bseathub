@@ -13,7 +13,7 @@ interface MenuNavProps {
 
 export function MenuNav({ menuCategories, hasChef, className }: MenuNavProps) {
   const baseNavItems = ["Deals & Discounts", "Featured Items", "Reviews"];
-  const chefNavItems = ["About", "Signature Dishes", "Reviews", "Book a Chef"];
+  const chefNavItems = ["About", "Specialties", "Signature Dishes", "Reviews", "Book a Chef"];
   const navItems = hasChef ? chefNavItems : [...baseNavItems, ...menuCategories];
   const [activeItem, setActiveItem] = React.useState(navItems[0]);
 

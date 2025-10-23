@@ -38,3 +38,13 @@ export interface MenuItem {
 export interface CartItem extends MenuItem {
   quantity: number;
 }
+
+export interface Order {
+  id: string;
+  restaurant: string;
+  restaurantId: string;
+  items: string[];
+  amount: number;
+  status: 'Delivered' | 'Preparing' | 'Confirmed' | 'Cancelled';
+  date: string;
+}

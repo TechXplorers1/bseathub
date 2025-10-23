@@ -10,8 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { allRestaurants, allHomeFoods } from "@/lib/data"
 import { MoreHorizontal } from "lucide-react"
+import { OrderDetailsDialog } from '@/components/dashboard/OrderDetailsDialog';
+import type { Order } from '@/lib/types';
 
-const recentOrders = [
+const recentOrders: Order[] = [
     {
         id: "ORD001",
         restaurant: "The Golden Spoon",
@@ -87,10 +89,16 @@ type OrderStatus = 'All' | 'Completed' | 'Pending' | 'Confirmed' | 'Cancelled';
 
 export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<OrderStatus>('All');
-    const [openOrderId, setOpenOrderId] = useState<string | null>(null);
+    const [orders, setOrders] = useState<Order[]>(recentOrders);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+    const handleCancelOrder = (orderId: string) => {
+        setOrders(prevOrders => prevOrders.map(o => o.id === orderId ? { ...o, status: 'Cancelled' } : o));
+        setSelectedOrder(null);
+    };
 
 
-    const filteredOrders = recentOrders.filter(order => {
+    const filteredOrders = orders.filter(order => {
         if (activeTab === 'All') return true;
         if (activeTab === 'Completed') return order.status === 'Delivered';
         if (activeTab === 'Pending') return order.status === 'Preparing';
@@ -99,6 +107,7 @@ export default function DashboardPage() {
         return false;
     });
   return (
+    <>
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -210,18 +219,16 @@ export default function DashboardPage() {
                                                     <TableCell>{order.date}</TableCell>
                                                     <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
                                                     <TableCell className="text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                    <MoreHorizontal className="h-4 w-4" />
-                                                                </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                    <DropdownMenuItem>View Order</DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        </div>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem onSelect={() => setSelectedOrder(order)}>View Order</DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -319,6 +326,15 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
+    {selectedOrder && (
+        <OrderDetailsDialog
+            order={selectedOrder}
+            isOpen={!!selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+            onCancelOrder={handleCancelOrder}
+        />
+    )}
+    </>
   )
 }
     

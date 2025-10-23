@@ -115,35 +115,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Your Spending</CardTitle>
-                        <CardDescription>January - June 2024</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                        <BarChart accessibilityLayer data={chartData}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis
-                                dataKey="month"
-                                tickLine={false}
-                                tickMargin={10}
-                                axisLine={false}
-                                tickFormatter={(value) => value.slice(0, 3)}
-                            />
-                             <YAxis
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={10}
-                                tickFormatter={(value) => `$${value}`}
-                                />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                        </BarChart>
-                        </ChartContainer>
-                    </CardContent>
-                </Card>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
                 <Card>
                     <CardHeader className="px-7">
                         <CardTitle>Recent Orders</CardTitle>

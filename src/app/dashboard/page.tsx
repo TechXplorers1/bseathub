@@ -4,38 +4,32 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { allRestaurants, allHomeFoods } from "@/lib/data"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
-
-const chartConfig = {
-  desktop: {
-    label: "Spending",
-    color: "hsl(var(--primary))",
-  },
-}
+import { MoreHorizontal } from "lucide-react"
 
 const recentOrders = [
     {
         id: "ORD001",
         restaurant: "The Golden Spoon",
+        restaurantId: '1',
         amount: 32.50,
         status: "Delivered",
         date: "2024-07-22",
     },
     {
+        id: "ORD006",
+        restaurant: "The Noodle Bar",
+        restaurantId: '7',
+        amount: 28.50,
+        status: "Preparing",
+        date: "2024-07-23",
+    },
+    {
         id: "ORD002",
         restaurant: "Sushi Palace",
+        restaurantId: '2',
         amount: 55.10,
         status: "Delivered",
         date: "2024-07-20",
@@ -43,6 +37,7 @@ const recentOrders = [
     {
         id: "ORD003",
         restaurant: "Burger Bonanza",
+        restaurantId: '3',
         amount: 25.00,
         status: "Cancelled",
         date: "2024-07-19",
@@ -50,6 +45,7 @@ const recentOrders = [
     {
         id: "ORD004",
         restaurant: "The Green Bowl",
+        restaurantId: '6',
         amount: 18.75,
         status: "Delivered",
         date: "2024-07-18",
@@ -57,6 +53,7 @@ const recentOrders = [
     {
         id: "ORD005",
         restaurant: "Curry House",
+        restaurantId: '5',
         amount: 45.20,
         status: "Delivered",
         date: "2024-07-15",
@@ -122,7 +119,7 @@ export default function DashboardPage() {
               </Card>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                <div className="grid auto-rows-max items-start gap-4">
+                <div className="grid auto-rows-max items-start gap-4 lg:col-span-2">
                     <Card>
                         <CardHeader className="px-7">
                             <CardTitle>Recent Orders</CardTitle>
@@ -134,19 +131,24 @@ export default function DashboardPage() {
                             <Table>
                             <TableHeader>
                                 <TableRow>
-                                <TableHead>Order</TableHead>
                                 <TableHead>Restaurant</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Date</TableHead>
                                 <TableHead className="text-right">Amount</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {recentOrders.map(order => (
                                     <TableRow key={order.id}>
-                                        <TableCell>{order.id}</TableCell>
                                         <TableCell>
-                                            <div className="font-medium">{order.restaurant}</div>
+                                            <div className="flex items-center gap-4">
+                                                <Avatar className="hidden h-10 w-10 sm:flex">
+                                                    <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
+                                                    <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                                <div className="font-medium">{order.restaurant}</div>
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <Badge 
@@ -158,6 +160,20 @@ export default function DashboardPage() {
                                         </TableCell>
                                         <TableCell>{order.date}</TableCell>
                                         <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                        <TableCell className="text-right">
+                                            {order.status === 'Preparing' && (
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            )}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

@@ -150,7 +150,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1">
                 <div className="grid auto-rows-max items-start gap-4 lg:col-span-2">
                     <Card>
                         <CardHeader className="px-7">
@@ -247,61 +247,59 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
                 </div>
-                <div className="grid auto-rows-max items-start gap-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Your Favorite Home Food</CardTitle>
-                                <CardDescription>
-                                    Your go-to home kitchens.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {allHomeFoods.slice(0,4).map(restaurant => (
-                                <div key={restaurant.id} className="flex items-center gap-4">
-                                    <Avatar className="hidden h-12 w-12 sm:flex">
-                                    <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
-                                    <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        {restaurant.name}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {restaurant.cuisine}
-                                    </p>
-                                    </div>
+                <div className="grid auto-rows-max items-start gap-4 md:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Favorite Home Food</CardTitle>
+                            <CardDescription>
+                                Your go-to home kitchens.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allHomeFoods.slice(0,4).map(restaurant => (
+                            <div key={restaurant.id} className="flex items-center gap-4">
+                                <Avatar className="hidden h-12 w-12 sm:flex">
+                                <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
+                                <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="grid gap-1">
+                                <p className="text-sm font-medium leading-none">
+                                    {restaurant.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {restaurant.cuisine}
+                                </p>
                                 </div>
-                            ))}
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Your Favorite Restaurants</CardTitle>
-                                <CardDescription>
-                                    Your most-ordered from spots.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {allRestaurants.slice(0,4).map(restaurant => (
-                                <div key={restaurant.id} className="flex items-center gap-4">
-                                    <Avatar className="hidden h-12 w-12 sm:flex">
-                                    <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
-                                    <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">
-                                        {restaurant.name}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {restaurant.cuisine}
-                                    </p>
-                                    </div>
+                            </div>
+                        ))}
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Favorite Restaurants</CardTitle>
+                            <CardDescription>
+                                Your most-ordered from spots.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allRestaurants.slice(0,4).map(restaurant => (
+                            <div key={restaurant.id} className="flex items-center gap-4">
+                                <Avatar className="hidden h-12 w-12 sm:flex">
+                                <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
+                                <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="grid gap-1">
+                                <p className="text-sm font-medium leading-none">
+                                    {restaurant.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {restaurant.cuisine}
+                                </p>
                                 </div>
-                            ))}
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
+                        ))}
+                        </CardContent>
+                    </Card>
                     <Card>
                         <CardHeader>
                             <CardTitle>Your Favorite Chefs</CardTitle>

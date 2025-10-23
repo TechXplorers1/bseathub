@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { allRestaurants } from "@/lib/data"
+import { allRestaurants, allHomeFoods } from "@/lib/data"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 const chartData = [
@@ -63,6 +63,12 @@ const recentOrders = [
     },
 ]
 
+const favoriteChefs = allHomeFoods.slice(0,4).map(food => ({
+    name: food.name.split("'s")[0],
+    specialty: food.cuisine,
+    avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
+}));
+
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -115,75 +121,131 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-                <Card>
-                    <CardHeader className="px-7">
-                        <CardTitle>Recent Orders</CardTitle>
-                        <CardDescription>
-                        A summary of your most recent orders.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                        <TableHeader>
-                            <TableRow>
-                            <TableHead>Order</TableHead>
-                            <TableHead>Restaurant</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recentOrders.map(order => (
-                                <TableRow key={order.id}>
-                                    <TableCell>{order.id}</TableCell>
-                                    <TableCell>
-                                        <div className="font-medium">{order.restaurant}</div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge 
-                                            className="text-xs"
-                                            variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
-                                        >
-                                            {order.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{order.date}</TableCell>
-                                    <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div className="grid auto-rows-max items-start gap-4">
+                    <Card>
+                        <CardHeader className="px-7">
+                            <CardTitle>Recent Orders</CardTitle>
+                            <CardDescription>
+                            A summary of your most recent orders.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Order</TableHead>
+                                <TableHead>Restaurant</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead className="text-right">Amount</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                            </TableHeader>
+                            <TableBody>
+                                {recentOrders.map(order => (
+                                    <TableRow key={order.id}>
+                                        <TableCell>{order.id}</TableCell>
+                                        <TableCell>
+                                            <div className="font-medium">{order.restaurant}</div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge 
+                                                className="text-xs"
+                                                variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
+                                            >
+                                                {order.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{order.date}</TableCell>
+                                        <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Favorite Restaurants</CardTitle>
+                            <CardDescription>
+                                Your most-ordered from spots.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allRestaurants.slice(0,4).map(restaurant => (
+                            <div key={restaurant.id} className="flex items-center gap-4">
+                                <Avatar className="hidden h-12 w-12 sm:flex">
+                                <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
+                                <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="grid gap-1">
+                                <p className="text-sm font-medium leading-none">
+                                    {restaurant.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {restaurant.cuisine}
+                                </p>
+                                </div>
+                            </div>
+                        ))}
+                        </CardContent>
+                    </Card>
+                </div>
+                 <div className="grid auto-rows-max items-start gap-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Favorite Home Food</CardTitle>
+                            <CardDescription>
+                                Your go-to home kitchens.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {allHomeFoods.slice(0,4).map(restaurant => (
+                            <div key={restaurant.id} className="flex items-center gap-4">
+                                <Avatar className="hidden h-12 w-12 sm:flex">
+                                <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
+                                <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="grid gap-1">
+                                <p className="text-sm font-medium leading-none">
+                                    {restaurant.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {restaurant.cuisine}
+                                </p>
+                                </div>
+                            </div>
+                        ))}
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Favorite Chefs</CardTitle>
+                            <CardDescription>
+                                The culinary artists you love.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {favoriteChefs.map(chef => (
+                            <div key={chef.name} className="flex items-center gap-4">
+                                <Avatar className="hidden h-12 w-12 sm:flex">
+                                <AvatarImage src={chef.avatarUrl} alt={chef.name} />
+                                <AvatarFallback>{chef.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="grid gap-1">
+                                <p className="text-sm font-medium leading-none">
+                                    {chef.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    {chef.specialty}
+                                </p>
+                                </div>
+                            </div>
+                        ))}
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Your Favorite Restaurants</CardTitle>
-                    <CardDescription>
-                        Your most-ordered from spots.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {allRestaurants.slice(0,4).map(restaurant => (
-                    <div key={restaurant.id} className="flex items-center gap-4">
-                        <Avatar className="hidden h-12 w-12 sm:flex">
-                        <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
-                        <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="grid gap-1">
-                        <p className="text-sm font-medium leading-none">
-                            {restaurant.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            {restaurant.cuisine}
-                        </p>
-                        </div>
-                    </div>
-                ))}
-                </CardContent>
-            </Card>
           </div>
         </main>
       </div>

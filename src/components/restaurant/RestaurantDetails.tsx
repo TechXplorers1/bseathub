@@ -166,6 +166,24 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
             <div id="Signature Dishes">
                 <ChefGallery />
             </div>
+            
+            <Separator className="my-8" />
+
+            {/* Reviews Section */}
+            <div id="Reviews">
+                <div className="flex justify-between items-center mt-6 mb-4">
+                  <h2 className="text-2xl font-semibold">Reviews</h2>
+                  <Button variant="outline" onClick={() => setIsReviewDialogOpen(true)}>Add Review</Button>
+                </div>
+                <ScrollArea>
+                    <div className="flex space-x-4 pb-4">
+                        {reviews.map((review, index) => (
+                            <ReviewCard key={index} review={review} />
+                        ))}
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+            </div>
 
             <Separator className="my-8" />
             
@@ -183,6 +201,11 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
           </div>
         </div>
       </div>
+       <AddReviewDialog 
+        open={isReviewDialogOpen}
+        onOpenChange={setIsReviewDialogOpen}
+        onSubmit={handleAddReview}
+      />
     </div>
     )
   }

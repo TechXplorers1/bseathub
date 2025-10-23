@@ -215,18 +215,16 @@ export default function DashboardPage() {
                                                                 <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
                                                                 <TableCell className="text-right">
                                                                     <div className="flex items-center justify-end gap-2">
-                                                                        {(order.status === 'Preparing' || order.status === 'Confirmed') && (
-                                                                            <DropdownMenu>
-                                                                                <DropdownMenuTrigger asChild>
-                                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                                    <MoreHorizontal className="h-4 w-4" />
-                                                                                </Button>
-                                                                                </DropdownMenuTrigger>
-                                                                                <DropdownMenuContent align="end">
-                                                                                <DropdownMenuItem>Cancel Order</DropdownMenuItem>
-                                                                                </DropdownMenuContent>
-                                                                            </DropdownMenu>
-                                                                        )}
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                                <MoreHorizontal className="h-4 w-4" />
+                                                                            </Button>
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent align="end">
+                                                                            <DropdownMenuItem>View Order</DropdownMenuItem>
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
                                                                     </div>
                                                                 </TableCell>
                                                             </TableRow>

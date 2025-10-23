@@ -3,7 +3,7 @@ import Link from 'next/link';
 import type { Restaurant } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Star } from 'lucide-react';
+import { Clock, Star, Bike, ShoppingBag } from 'lucide-react';
 import { getImageById } from '@/lib/placeholder-images';
 
 interface RestaurantCardProps {
@@ -25,6 +25,20 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
               className="object-cover"
               data-ai-hint={image.imageHint}
             />
+             <div className="absolute bottom-2 right-2 flex gap-2">
+                {restaurant.services.includes('delivery') && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                        <Bike className="h-3 w-3" />
+                        <span>Delivery</span>
+                    </Badge>
+                )}
+                {restaurant.services.includes('pickup') && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                        <ShoppingBag className="h-3 w-3" />
+                        <span>Pickup</span>
+                    </Badge>
+                )}
+            </div>
           </div>
         )}
         <CardContent className="p-4 flex flex-col flex-1">

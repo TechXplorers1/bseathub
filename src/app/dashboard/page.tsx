@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { allRestaurants, allHomeFoods } from "@/lib/data"
 import { MoreHorizontal } from "lucide-react"
 
@@ -24,6 +26,14 @@ const recentOrders = [
         restaurantId: '7',
         amount: 28.50,
         status: "Preparing",
+        date: "2024-07-23",
+    },
+    {
+        id: "ORD007",
+        restaurant: "Pizza Planet",
+        restaurantId: '8',
+        amount: 22.00,
+        status: "Confirmed",
         date: "2024-07-23",
     },
     {
@@ -66,7 +76,19 @@ const favoriteChefs = allHomeFoods.slice(0,4).map(food => ({
     avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
 }));
 
+type OrderStatus = 'All' | 'Completed' | 'Pending' | 'Confirmed' | 'Cancelled';
+
 export default function DashboardPage() {
+    const [activeTab, setActiveTab] = useState<OrderStatus>('All');
+
+    const filteredOrders = recentOrders.filter(order => {
+        if (activeTab === 'All') return true;
+        if (activeTab === 'Completed') return order.status === 'Delivered';
+        if (activeTab === 'Pending') return order.status === 'Preparing';
+        if (activeTab === 'Confirmed') return order.status === 'Confirmed';
+        if (activeTab === 'Cancelled') return order.status === 'Cancelled';
+        return false;
+    });
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
@@ -128,56 +150,67 @@ export default function DashboardPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Table>
-                            <TableHeader>
-                                <TableRow>
-                                <TableHead>Restaurant</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead className="text-right">Amount</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {recentOrders.map(order => (
-                                    <TableRow key={order.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-4">
-                                                <Avatar className="hidden h-10 w-10 sm:flex">
-                                                    <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
-                                                    <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
-                                                </Avatar>
-                                                <div className="font-medium">{order.restaurant}</div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge 
-                                                className="text-xs"
-                                                variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
-                                            >
-                                                {order.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>{order.date}</TableCell>
-                                        <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
-                                        <TableCell className="text-right">
-                                            {order.status === 'Preparing' && (
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>Cancel Order</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                            </Table>
+                            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as OrderStatus)}>
+                                <TabsList>
+                                    <TabsTrigger value="All">All</TabsTrigger>
+                                    <TabsTrigger value="Completed">Completed</TabsTrigger>
+                                    <TabsTrigger value="Pending">Pending</TabsTrigger>
+                                    <TabsTrigger value="Confirmed">Confirmed</TabsTrigger>
+                                    <TabsTrigger value="Cancelled">Cancelled</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value={activeTab}>
+                                     <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                            <TableHead>Restaurant</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead className="text-right">Amount</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {filteredOrders.map(order => (
+                                                <TableRow key={order.id}>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-4">
+                                                            <Avatar className="hidden h-10 w-10 sm:flex">
+                                                                <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
+                                                                <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="font-medium">{order.restaurant}</div>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge 
+                                                            className="text-xs"
+                                                            variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
+                                                        >
+                                                            {order.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>{order.date}</TableCell>
+                                                    <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        {(order.status === 'Preparing' || order.status === 'Confirmed') && (
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                        </Table>
+                                </TabsContent>
+                            </Tabs>
                         </CardContent>
                     </Card>
                 </div>

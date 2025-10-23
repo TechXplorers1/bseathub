@@ -45,6 +45,6 @@ export interface Order {
   restaurantId: string;
   items: string[];
   amount: number;
-  status: 'Delivered' | 'Preparing' | 'Confirmed' | 'Cancelled';
+  status: 'Delivered' | 'Preparing' | 'Confirmed' | 'Cancelled' | 'Pickup';
   date: string;
 }

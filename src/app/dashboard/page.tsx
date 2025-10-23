@@ -12,6 +12,8 @@ import { allRestaurants, allHomeFoods } from "@/lib/data"
 import { MoreHorizontal } from "lucide-react"
 import { OrderDetailsDialog } from '@/components/dashboard/OrderDetailsDialog';
 import type { Order } from '@/lib/types';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ChevronDown } from 'lucide-react';
 
 const recentOrders: Order[] = [
     {
@@ -77,6 +79,15 @@ const recentOrders: Order[] = [
         status: "Delivered",
         date: "2024-07-15",
     },
+    {
+        id: "ORD008",
+        restaurant: "Taco Town",
+        restaurantId: '4',
+        items: ['Carne Asada Taco', 'Al Pastor Taco'],
+        amount: 15.96,
+        status: "Pickup",
+        date: "2024-07-24",
+    },
 ]
 
 const favoriteChefs = allHomeFoods.slice(0,4).map(food => ({
@@ -85,7 +96,7 @@ const favoriteChefs = allHomeFoods.slice(0,4).map(food => ({
     avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
 }));
 
-type OrderStatus = 'All' | 'Completed' | 'Pending' | 'Confirmed' | 'Cancelled';
+type OrderStatus = 'All' | 'Completed' | 'Pending' | 'Confirmed' | 'Cancelled' | 'Pickup';
 
 export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<OrderStatus>('All');
@@ -104,6 +115,7 @@ export default function DashboardPage() {
         if (activeTab === 'Pending') return order.status === 'Preparing';
         if (activeTab === 'Confirmed') return order.status === 'Confirmed';
         if (activeTab === 'Cancelled') return order.status === 'Cancelled';
+        if (activeTab === 'Pickup') return order.status === 'Pickup';
         return false;
     });
   return (
@@ -175,6 +187,7 @@ export default function DashboardPage() {
                                     <TabsTrigger value="Pending">Pending</TabsTrigger>
                                     <TabsTrigger value="Confirmed">Confirmed</TabsTrigger>
                                     <TabsTrigger value="Cancelled">Cancelled</TabsTrigger>
+                                    <TabsTrigger value="Pickup">Pickup</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value={activeTab}>
                                      <Table>

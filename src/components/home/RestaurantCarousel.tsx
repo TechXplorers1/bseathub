@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUp } from 'lucide-react';
 import { Button, buttonVariants } from '../ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 interface RestaurantCarouselProps {
   title: string;
@@ -17,7 +18,16 @@ interface RestaurantCarouselProps {
 const INITIAL_VISIBLE_COUNT = 8;
 
 export function RestaurantCarousel({ title, restaurants, href = "/restaurants" }: RestaurantCarouselProps) {
-  const visibleRestaurants = restaurants.slice(0, INITIAL_VISIBLE_COUNT);
+  const { deliveryMode } = useDeliveryMode();
+  
+  const filteredRestaurants = restaurants.filter(restaurant => {
+    if (deliveryMode === 'pickup') {
+      return true;
+    }
+    return restaurant.deliveryFee > 0;
+  });
+  
+  const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 
   return (
     <div className="py-8">

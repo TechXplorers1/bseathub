@@ -14,6 +14,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 interface HomeFeedProps {
   restaurants: Restaurant[];
@@ -25,14 +26,25 @@ const INITIAL_VISIBLE_COUNT = 8;
 
 export function HomeFeed({ restaurants }: HomeFeedProps) {
   const [sortOption, setSortOption] = useState<SortOption>('picked');
+  const { deliveryMode } = useDeliveryMode();
 
   const sortFunctions: Record<SortOption, (a: Restaurant, b: Restaurant) => number> = {
     picked: (a, b) => a.id.localeCompare(b.id),
     rating: (a, b) => b.rating - a.rating,
     deliveryTime: (a, b) => a.deliveryTime - b.deliveryTime,
   };
+  
+  const filteredRestaurants = restaurants.filter(restaurant => {
+    if (deliveryMode === 'pickup') {
+        // For pickup, we can assume all restaurants are available for simplicity
+        // In a real app, you'd filter by distance or if they offer pickup
+        return true;
+    }
+    // For delivery, filter based on delivery fee (assuming fee implies delivery)
+    return restaurant.deliveryFee > 0;
+  });
 
-  const sortedRestaurants = [...restaurants].sort(sortFunctions[sortOption]);
+  const sortedRestaurants = [...filteredRestaurants].sort(sortFunctions[sortOption]);
   const visibleRestaurants = sortedRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 
 

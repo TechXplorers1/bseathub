@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLocation } from '@/context/LocationProvider';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 const INITIAL_VISIBLE_COUNT = 8;
 
@@ -24,6 +25,7 @@ export function Personalized() {
   const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const { location } = useLocation();
+  const { deliveryMode } = useDeliveryMode();
 
   useEffect(() => {
     async function getRecommendations() {
@@ -95,7 +97,7 @@ export function Personalized() {
         // Shuffle to make it look more organic
         recommendedItems.sort(() => Math.random() - 0.5);
 
-        setRecommendations(recommendedItems.slice(0, INITIAL_VISIBLE_COUNT));
+        setRecommendations(recommendedItems);
 
       } catch (error) {
         console.error('Failed to get personalized recommendations:', error);
@@ -114,7 +116,14 @@ export function Personalized() {
     getRecommendations();
   }, []);
   
-  const visibleRestaurants = recommendations.slice(0, INITIAL_VISIBLE_COUNT);
+  const filteredRestaurants = recommendations.filter(restaurant => {
+    if (deliveryMode === 'pickup') {
+      return true;
+    }
+    return restaurant.deliveryFee > 0;
+  });
+
+  const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 
 
   if (loading) {

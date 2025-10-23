@@ -34,6 +34,7 @@ import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
 import { useState } from 'react';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
+import { Notifications } from './Notifications';
 
 export function Header() {
   const { itemCount } = useCart();
@@ -47,6 +48,8 @@ export function Header() {
     setLocation(newLocation);
     setIsDialogOpen(false);
   };
+
+  const hasNotifications = true; // Placeholder for notification state
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
@@ -133,9 +136,17 @@ export function Header() {
             </Button>
           </div>
 
-          <Button variant="ghost" size="icon" className="hidden md:flex">
-            <Bell />
-          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="hidden md:flex relative">
+                <Bell />
+                {hasNotifications && <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-primary" />}
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <Notifications />
+            </SheetContent>
+          </Sheet>
 
           <Sheet>
             <SheetTrigger asChild>

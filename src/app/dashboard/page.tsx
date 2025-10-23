@@ -9,13 +9,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { allRestaurants, allHomeFoods } from "@/lib/data"
-import { MoreHorizontal } from "lucide-react"
+import { ChevronDown, MoreHorizontal } from "lucide-react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const recentOrders = [
     {
         id: "ORD001",
         restaurant: "The Golden Spoon",
         restaurantId: '1',
+        items: ['Spaghetti Carbonara', 'Bruschetta'],
         amount: 32.50,
         status: "Delivered",
         date: "2024-07-22",
@@ -24,6 +26,7 @@ const recentOrders = [
         id: "ORD006",
         restaurant: "The Noodle Bar",
         restaurantId: '7',
+        items: ['Classic Beef Pho'],
         amount: 28.50,
         status: "Preparing",
         date: "2024-07-23",
@@ -32,6 +35,7 @@ const recentOrders = [
         id: "ORD007",
         restaurant: "Pizza Planet",
         restaurantId: '8',
+        items: ['Pepperoni Overload'],
         amount: 22.00,
         status: "Confirmed",
         date: "2024-07-23",
@@ -40,6 +44,7 @@ const recentOrders = [
         id: "ORD002",
         restaurant: "Sushi Palace",
         restaurantId: '2',
+        items: ['California Roll', 'Spicy Tuna Roll', 'Salmon Nigiri'],
         amount: 55.10,
         status: "Delivered",
         date: "2024-07-20",
@@ -48,6 +53,7 @@ const recentOrders = [
         id: "ORD003",
         restaurant: "Burger Bonanza",
         restaurantId: '3',
+        items: ['Classic Cheeseburger', 'French Fries'],
         amount: 25.00,
         status: "Cancelled",
         date: "2024-07-19",
@@ -56,6 +62,7 @@ const recentOrders = [
         id: "ORD004",
         restaurant: "The Green Bowl",
         restaurantId: '6',
+        items: ['Cobb Salad'],
         amount: 18.75,
         status: "Delivered",
         date: "2024-07-18",
@@ -64,6 +71,7 @@ const recentOrders = [
         id: "ORD005",
         restaurant: "Curry House",
         restaurantId: '5',
+        items: ['Chicken Tikka Masala', 'Garlic Naan'],
         amount: 45.20,
         status: "Delivered",
         date: "2024-07-15",
@@ -80,6 +88,8 @@ type OrderStatus = 'All' | 'Completed' | 'Pending' | 'Confirmed' | 'Cancelled';
 
 export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<OrderStatus>('All');
+    const [openOrderId, setOpenOrderId] = useState<string | null>(null);
+
 
     const filteredOrders = recentOrders.filter(order => {
         if (activeTab === 'All') return true;
@@ -171,41 +181,64 @@ export default function DashboardPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {filteredOrders.map(order => (
-                                                <TableRow key={order.id}>
-                                                    <TableCell>
-                                                        <div className="flex items-center gap-4">
-                                                            <Avatar className="hidden h-10 w-10 sm:flex">
-                                                                <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
-                                                                <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
-                                                            </Avatar>
-                                                            <div className="font-medium">{order.restaurant}</div>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge 
-                                                            className="text-xs"
-                                                            variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
-                                                        >
-                                                            {order.status}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>{order.date}</TableCell>
-                                                    <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        {(order.status === 'Preparing' || order.status === 'Confirmed') && (
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon">
-                                                                    <MoreHorizontal className="h-4 w-4" />
-                                                                </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                <DropdownMenuItem>Cancel Order</DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                        )}
-                                                    </TableCell>
-                                                </TableRow>
+                                                <Collapsible asChild key={order.id} open={openOrderId === order.id} onOpenChange={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}>
+                                                    <>
+                                                        <TableRow className="bg-background">
+                                                            <TableCell>
+                                                                <div className="flex items-center gap-4">
+                                                                    <Avatar className="hidden h-10 w-10 sm:flex">
+                                                                        <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
+                                                                        <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
+                                                                    </Avatar>
+                                                                    <div className="font-medium">{order.restaurant}</div>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge 
+                                                                    className="text-xs"
+                                                                    variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
+                                                                >
+                                                                    {order.status}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell>{order.date}</TableCell>
+                                                            <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                                            <TableCell className="text-right">
+                                                                <div className="flex items-center justify-end gap-2">
+                                                                    <CollapsibleTrigger asChild>
+                                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                            <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                                                                        </Button>
+                                                                    </CollapsibleTrigger>
+                                                                    {(order.status === 'Preparing' || order.status === 'Confirmed') && (
+                                                                        <DropdownMenu>
+                                                                            <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                                <MoreHorizontal className="h-4 w-4" />
+                                                                            </Button>
+                                                                            </DropdownMenuTrigger>
+                                                                            <DropdownMenuContent align="end">
+                                                                            <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                                                                            </DropdownMenuContent>
+                                                                        </DropdownMenu>
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                        <CollapsibleContent asChild>
+                                                            <TableRow>
+                                                                <TableCell colSpan={5} className="p-0">
+                                                                    <div className="p-4 bg-muted/50">
+                                                                        <h4 className="font-semibold mb-2">Order Items:</h4>
+                                                                        <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                                                                            {order.items.map(item => <li key={item}>{item}</li>)}
+                                                                        </ul>
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </CollapsibleContent>
+                                                    </>
+                                                </Collapsible>
                                             ))}
                                         </TableBody>
                                         </Table>

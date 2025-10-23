@@ -182,7 +182,7 @@ export default function DashboardPage() {
                                         <TableBody>
                                             {filteredOrders.map(order => (
                                                 <Collapsible asChild key={order.id} open={openOrderId === order.id} onOpenChange={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}>
-                                                    <>
+                                                    <tbody>
                                                         <TableRow className="bg-background">
                                                             <TableCell>
                                                                 <div className="flex items-center gap-4">
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                                                                 </TableCell>
                                                             </TableRow>
                                                         </CollapsibleContent>
-                                                    </>
+                                                    </tbody>
                                                 </Collapsible>
                                             ))}
                                         </TableBody>
@@ -334,3 +334,5 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+    

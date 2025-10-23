@@ -114,21 +114,21 @@ export function Header() {
 
           <div className="hidden md:flex bg-gray-100 rounded-full p-1">
              <Button 
-              variant={deliveryMode === 'all' ? 'secondary' : 'ghost'} 
+              variant={deliveryMode === 'all' ? 'default' : 'ghost'} 
               className="rounded-full"
               onClick={() => setDeliveryMode('all')}
             >
               All
             </Button>
             <Button 
-              variant={deliveryMode === 'delivery' ? 'secondary' : 'ghost'} 
+              variant={deliveryMode === 'delivery' ? 'default' : 'ghost'} 
               className="rounded-full"
               onClick={() => setDeliveryMode('delivery')}
             >
               Delivery
             </Button>
             <Button 
-              variant={deliveryMode === 'pickup' ? 'secondary' : 'ghost'} 
+              variant={deliveryMode === 'pickup' ? 'default' : 'ghost'} 
               className="rounded-full"
               onClick={() => setDeliveryMode('pickup')}
             >

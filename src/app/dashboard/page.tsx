@@ -1,8 +1,219 @@
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { allRestaurants } from "@/lib/data"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
+
+const chartData = [
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+]
+
+const chartConfig = {
+  desktop: {
+    label: "Spending",
+    color: "hsl(var(--primary))",
+  },
+}
+
+const recentOrders = [
+    {
+        id: "ORD001",
+        restaurant: "The Golden Spoon",
+        amount: 32.50,
+        status: "Delivered",
+        date: "2024-07-22",
+    },
+    {
+        id: "ORD002",
+        restaurant: "Sushi Palace",
+        amount: 55.10,
+        status: "Delivered",
+        date: "2024-07-20",
+    },
+    {
+        id: "ORD003",
+        restaurant: "Burger Bonanza",
+        amount: 25.00,
+        status: "Cancelled",
+        date: "2024-07-19",
+    },
+    {
+        id: "ORD004",
+        restaurant: "The Green Bowl",
+        amount: 18.75,
+        status: "Delivered",
+        date: "2024-07-18",
+    },
+    {
+        id: "ORD005",
+        restaurant: "Curry House",
+        amount: 45.20,
+        status: "Delivered",
+        date: "2024-07-15",
+    },
+]
+
 export default function DashboardPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
-      <p>Welcome to your dashboard!</p>
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+          <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Orders</CardDescription>
+                  <CardTitle className="text-4xl">125</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    +10% from last month
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Total Spent</CardDescription>
+                  <CardTitle className="text-4xl">$2,389</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    +25% from last month
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Favorites</CardDescription>
+                  <CardTitle className="text-4xl">12</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    You discovered 2 new restaurants this month
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Eat Hub Pro</CardDescription>
+                  <CardTitle className="text-4xl">Active</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">
+                    Your membership is saving you money!
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Your Spending</CardTitle>
+                        <CardDescription>January - June 2024</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                        <BarChart accessibilityLayer data={chartData}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                                dataKey="month"
+                                tickLine={false}
+                                tickMargin={10}
+                                axisLine={false}
+                                tickFormatter={(value) => value.slice(0, 3)}
+                            />
+                             <YAxis
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={10}
+                                tickFormatter={(value) => `$${value}`}
+                                />
+                            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                        </BarChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="px-7">
+                        <CardTitle>Recent Orders</CardTitle>
+                        <CardDescription>
+                        A summary of your most recent orders.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead>Order</TableHead>
+                            <TableHead>Restaurant</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead className="text-right">Amount</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {recentOrders.map(order => (
+                                <TableRow key={order.id}>
+                                    <TableCell>{order.id}</TableCell>
+                                    <TableCell>
+                                        <div className="font-medium">{order.restaurant}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge 
+                                            className="text-xs"
+                                            variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
+                                        >
+                                            {order.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>{order.date}</TableCell>
+                                    <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Your Favorite Restaurants</CardTitle>
+                    <CardDescription>
+                        Your most-ordered from spots.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {allRestaurants.slice(0,4).map(restaurant => (
+                    <div key={restaurant.id} className="flex items-center gap-4">
+                        <Avatar className="hidden h-12 w-12 sm:flex">
+                        <AvatarImage src={`https://picsum.photos/seed/${restaurant.id}/100/100`} alt={restaurant.name} />
+                        <AvatarFallback>{restaurant.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="grid gap-1">
+                        <p className="text-sm font-medium leading-none">
+                            {restaurant.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            {restaurant.cuisine}
+                        </p>
+                        </div>
+                    </div>
+                ))}
+                </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
     </div>
-  );
+  )
 }

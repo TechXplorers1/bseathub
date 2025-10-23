@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-type DeliveryMode = 'delivery' | 'pickup';
+type DeliveryMode = 'all' |'delivery' | 'pickup';
 
 interface DeliveryModeContextType {
   deliveryMode: DeliveryMode;
@@ -12,7 +12,7 @@ interface DeliveryModeContextType {
 const DeliveryModeContext = createContext<DeliveryModeContextType | undefined>(undefined);
 
 export function DeliveryModeProvider({ children }: { children: ReactNode }) {
-  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('delivery');
+  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('all');
 
   return (
     <DeliveryModeContext.Provider value={{ deliveryMode, setDeliveryMode }}>

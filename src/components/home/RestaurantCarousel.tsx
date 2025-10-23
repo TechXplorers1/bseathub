@@ -20,7 +20,15 @@ const INITIAL_VISIBLE_COUNT = 8;
 export function RestaurantCarousel({ title, restaurants, href = "/restaurants" }: RestaurantCarouselProps) {
   const { deliveryMode } = useDeliveryMode();
   
-  const filteredRestaurants = restaurants;
+  const filteredRestaurants = restaurants.filter(restaurant => {
+    if (deliveryMode === 'delivery') {
+      return true; // Assume all restaurants deliver
+    }
+    if (deliveryMode === 'pickup') {
+      return true; // Assume all restaurants offer pickup
+    }
+    return true; // 'all'
+  });
   
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 

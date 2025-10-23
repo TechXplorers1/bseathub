@@ -116,7 +116,15 @@ export function Personalized() {
     getRecommendations();
   }, []);
   
-  const filteredRestaurants = recommendations;
+  const filteredRestaurants = recommendations.filter(restaurant => {
+    if (deliveryMode === 'delivery') {
+      return true; // Assume all restaurants deliver
+    }
+    if (deliveryMode === 'pickup') {
+      return true; // Assume all restaurants offer pickup
+    }
+    return true; // 'all'
+  });
 
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 

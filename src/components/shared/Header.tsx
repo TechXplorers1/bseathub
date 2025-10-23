@@ -110,6 +110,13 @@ export function Header() {
           </Dialog>
 
           <div className="hidden md:flex bg-gray-100 rounded-full p-1">
+             <Button 
+              variant={deliveryMode === 'all' ? 'secondary' : 'ghost'} 
+              className="rounded-full"
+              onClick={() => setDeliveryMode('all')}
+            >
+              All
+            </Button>
             <Button 
               variant={deliveryMode === 'delivery' ? 'secondary' : 'ghost'} 
               className="rounded-full"

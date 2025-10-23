@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { allRestaurants, allHomeFoods } from "@/lib/data"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const recentOrders = [
@@ -185,55 +185,52 @@ export default function DashboardPage() {
                                             {filteredOrders.map(order => (
                                                 <Collapsible asChild key={order.id} open={openOrderId === order.id} onOpenChange={() => setOpenOrderId(openOrderId === order.id ? null : order.id)}>
                                                     <React.Fragment>
-                                                        <TableRow className="bg-background">
-                                                            <TableCell>
-                                                                <div className="flex items-center gap-4">
-                                                                    <Avatar className="hidden h-10 w-10 sm:flex">
-                                                                        <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
-                                                                        <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
-                                                                    </Avatar>
-                                                                    <div className="font-medium">{order.restaurant}</div>
-                                                                </div>
-                                                            </TableCell>
-                                                             <TableCell>
-                                                                <div className="font-medium">{order.items[0]}</div>
-                                                                {order.items.length > 1 && <div className="text-xs text-muted-foreground">+{order.items.length - 1} more</div>}
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <div className="font-medium">{order.id}</div>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <Badge 
-                                                                    className="text-xs"
-                                                                    variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
-                                                                >
-                                                                    {order.status}
-                                                                </Badge>
-                                                            </TableCell>
-                                                            <TableCell>{order.date}</TableCell>
-                                                            <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
-                                                            <TableCell className="text-right">
-                                                                <div className="flex items-center justify-end gap-2">
-                                                                    <CollapsibleTrigger asChild>
-                                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                            <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                                                                        </Button>
-                                                                    </CollapsibleTrigger>
-                                                                    {(order.status === 'Preparing' || order.status === 'Confirmed') && (
-                                                                        <DropdownMenu>
-                                                                            <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                                <MoreHorizontal className="h-4 w-4" />
-                                                                            </Button>
-                                                                            </DropdownMenuTrigger>
-                                                                            <DropdownMenuContent align="end">
-                                                                            <DropdownMenuItem>Cancel Order</DropdownMenuItem>
-                                                                            </DropdownMenuContent>
-                                                                        </DropdownMenu>
-                                                                    )}
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
+                                                        <CollapsibleTrigger asChild>
+                                                            <TableRow className="bg-background cursor-pointer">
+                                                                <TableCell>
+                                                                    <div className="flex items-center gap-4">
+                                                                        <Avatar className="hidden h-10 w-10 sm:flex">
+                                                                            <AvatarImage src={`https://picsum.photos/seed/${order.restaurantId}/100/100`} alt={order.restaurant} />
+                                                                            <AvatarFallback>{order.restaurant.charAt(0)}</AvatarFallback>
+                                                                        </Avatar>
+                                                                        <div className="font-medium">{order.restaurant}</div>
+                                                                    </div>
+                                                                </TableCell>
+                                                                 <TableCell>
+                                                                    <div className="font-medium">{order.items[0]}</div>
+                                                                    {order.items.length > 1 && <div className="text-xs text-muted-foreground">+{order.items.length - 1} more</div>}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <div className="font-medium">{order.id}</div>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Badge 
+                                                                        className="text-xs"
+                                                                        variant={order.status === 'Delivered' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'outline'}
+                                                                    >
+                                                                        {order.status}
+                                                                    </Badge>
+                                                                </TableCell>
+                                                                <TableCell>{order.date}</TableCell>
+                                                                <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+                                                                <TableCell className="text-right">
+                                                                    <div className="flex items-center justify-end gap-2">
+                                                                        {(order.status === 'Preparing' || order.status === 'Confirmed') && (
+                                                                            <DropdownMenu>
+                                                                                <DropdownMenuTrigger asChild>
+                                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                                </Button>
+                                                                                </DropdownMenuTrigger>
+                                                                                <DropdownMenuContent align="end">
+                                                                                <DropdownMenuItem>Cancel Order</DropdownMenuItem>
+                                                                                </DropdownMenuContent>
+                                                                            </DropdownMenu>
+                                                                        )}
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        </CollapsibleTrigger>
                                                         <CollapsibleContent asChild>
                                                             <TableRow>
                                                                 <TableCell colSpan={7} className="p-0">

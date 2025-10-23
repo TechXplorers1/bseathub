@@ -23,7 +23,7 @@ export function ChefCuisineSpecialties({ cuisines }: { cuisines: string[] }) {
 
     return (
         <div id="Specialties">
-            <h2 className="text-2xl font-bold mb-4">Special in Cuisines 🍽️</h2>
+            <h2 className="text-2xl font-bold mb-4">Special in Cuisines</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {displaySpecialties.map((specialty) => (
                     <Card key={specialty.cuisine} className="group hover:bg-primary/5 transition-colors cursor-pointer">

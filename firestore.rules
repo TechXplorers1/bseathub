@@ -1,0 +1,147 @@
+/**
+ * @fileoverview Firestore Security Rules for SwiftDash.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a mixed security model. Restaurants and MenuItems are publicly readable, while Customer data and their associated Orders are strictly user-owned.
+ *
+ * Data Structure:
+ * - /restaurants/{restaurantId}: Publicly readable restaurant data.
+ * - /menu_items/{menuItemId}: Publicly readable menu items.
+ * - /users/{customerId}: Private customer data, accessible only by the customer.
+ * - /users/{customerId}/orders/{orderId}: Orders placed by a specific customer, accessible only by that customer.
+ * - /users/{customerId}/orders/{orderId}/order_items/{orderItemId}: Order items within an order, accessible only by the customer who owns the order.
+ *
+ * Key Security Decisions:
+ * - Restaurants and MenuItems are readable by all users (including unauthenticated users).
+ * - User listing is disallowed for the `/users` collection.
+ * - Data consistency is enforced for user-scoped data to ensure that the path (`/users/{userId}`) matches the data within the document.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Grants public read access to restaurant details.  Allows any authenticated user to create, update, and delete if they provide the correct restaurantId.
+     * @path /restaurants/{restaurantId}
+     * @allow get, list: if true;
+     * @allow create: if request.auth != null;
+     * @allow update: if request.auth != null && resource != null;
+     * @allow delete: if request.auth != null && resource != null;
+     * @deny get: if false;
+     * @deny list: if false;
+     * @deny create: if false;
+     * @deny update: if false;
+     * @deny delete: if false;
+     * @principle Allows public reads with authenticated writes on restaurants.
+     */
+    match /restaurants/{restaurantId} {
+      allow get, list: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource != null;
+      allow delete: if request.auth != null && resource != null;
+    }
+
+    /**
+     * @description Grants public read access to menu items.  Allows any authenticated user to create, update, and delete if they provide the correct menuItemId.
+     * @path /menu_items/{menuItemId}
+     * @allow get, list: if true;
+     * @allow create: if request.auth != null;
+     * @allow update: if request.auth != null && resource != null;
+     * @allow delete: if request.auth != null && resource != null;
+     * @deny get: if false;
+     * @deny list: if false;
+     * @deny create: if false;
+     * @deny update: if false;
+     * @deny delete: if false;
+     * @principle Allows public reads with authenticated writes on menu items.
+     */
+    match /menu_items/{menuItemId} {
+      allow get, list: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource != null;
+      allow delete: if request.auth != null && resource != null;
+    }
+
+    /**
+     * @description Restricts access to customer data to the owning customer.
+     * @path /users/{customerId}
+     * @allow get: if isSignedIn() && isOwner(customerId);
+     * @allow list: if false;
+     * @allow create: if isSignedIn() && isOwner(customerId) && request.resource.data.id == customerId;
+     * @allow update: if isSignedIn() && isExistingOwner(customerId) && request.resource.data.id == resource.data.id;
+     * @allow delete: if isSignedIn() && isExistingOwner(customerId);
+     * @deny get: if !isSignedIn() || !isOwner(customerId);
+     * @deny list: if true;
+     * @deny create: if !isSignedIn() || !isOwner(customerId) || request.resource.data.id != customerId;
+     * @deny update: if !isSignedIn() || !isExistingOwner(customerId) || request.resource.data.id != resource.data.id;
+     * @deny delete: if !isSignedIn() || !isExistingOwner(customerId);
+     * @principle Enforces strict user-ownership for customer profiles.
+     */
+    match /users/{customerId} {
+      allow get: if isSignedIn() && isOwner(customerId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(customerId) && request.resource.data.id == customerId;
+      allow update: if isSignedIn() && isExistingOwner(customerId) && request.resource.data.id == resource.data.id;
+      allow delete: if isSignedIn() && isExistingOwner(customerId);
+    }
+
+    /**
+     * @description Restricts access to orders to the owning customer.
+     * @path /users/{customerId}/orders/{orderId}
+     * @allow get: if isSignedIn() && isOwner(customerId);
+     * @allow list: if isSignedIn() && isOwner(customerId);
+     * @allow create: if isSignedIn() && isOwner(customerId);
+     * @allow update: if isSignedIn() && isExistingOwner(customerId);
+     * @allow delete: if isSignedIn() && isExistingOwner(customerId);
+     * @deny get: if !isSignedIn() || !isOwner(customerId);
+     * @deny list: if !isSignedIn() || !isOwner(customerId);
+     * @deny create: if !isSignedIn() || !isOwner(customerId);
+     * @deny update: if !isSignedIn() || !isExistingOwner(customerId);
+     * @deny delete: if !isSignedIn() || !isExistingOwner(customerId);
+     * @principle Enforces strict user-ownership for orders.
+     */
+    match /users/{customerId}/orders/{orderId} {
+      allow get: if isSignedIn() && isOwner(customerId);
+      allow list: if isSignedIn() && isOwner(customerId);
+      allow create: if isSignedIn() && isOwner(customerId);
+      allow update: if isSignedIn() && isExistingOwner(customerId);
+      allow delete: if isSignedIn() && isExistingOwner(customerId);
+    }
+
+    /**
+     * @description Restricts access to order items to the owning customer.
+     * @path /users/{customerId}/orders/{orderId}/order_items/{orderItemId}
+     * @allow get: if isSignedIn() && isOwner(customerId);
+     * @allow list: if isSignedIn() && isOwner(customerId);
+     * @allow create: if isSignedIn() && isOwner(customerId);
+     * @allow update: if isSignedIn() && isExistingOwner(customerId);
+     * @allow delete: if isSignedIn() && isExistingOwner(customerId);
+     * @deny get: if !isSignedIn() || !isOwner(customerId);
+     * @deny list: if !isSignedIn() || !isOwner(customerId);
+     * @deny create: if !isSignedIn() || !isOwner(customerId);
+     * @deny update: if !isSignedIn() || !isExistingOwner(customerId);
+     * @deny delete: if !isSignedIn() || !isExistingOwner(customerId);
+     * @principle Enforces strict user-ownership for order items.
+     */
+    match /users/{customerId}/orders/{orderId}/order_items/{orderItemId} {
+      allow get: if isSignedIn() && isOwner(customerId);
+      allow list: if isSignedIn() && isOwner(customerId);
+      allow create: if isSignedIn() && isOwner(customerId);
+      allow update: if isSignedIn() && isExistingOwner(customerId);
+      allow delete: if isSignedIn() && isExistingOwner(customerId);
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+  }
+}

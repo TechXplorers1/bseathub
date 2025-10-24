@@ -1,0 +1,308 @@
+{
+  "entities": {
+    "Restaurant": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Restaurant",
+      "type": "object",
+      "description": "Represents a restaurant offering food delivery through SwiftDash.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Restaurant entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the restaurant."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the restaurant."
+        },
+        "cuisineType": {
+          "type": "string",
+          "description": "The type of cuisine offered by the restaurant (e.g., Italian, Mexican)."
+        },
+        "rating": {
+          "type": "number",
+          "description": "The average rating of the restaurant (e.g., 4.5 stars)."
+        },
+        "menuItemIds": {
+          "type": "array",
+          "description": "References to MenuItems. (Relationship: Restaurant 1:N MenuItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "address",
+        "cuisineType"
+      ]
+    },
+    "MenuItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MenuItem",
+      "type": "object",
+      "description": "Represents a menu item offered by a restaurant.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MenuItem entity."
+        },
+        "restaurantId": {
+          "type": "string",
+          "description": "Reference to Restaurant. (Relationship: Restaurant 1:N MenuItem)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the menu item."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the menu item."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the menu item."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of an image representing the menu item.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "restaurantId",
+        "name",
+        "price"
+      ]
+    },
+    "Order": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Order",
+      "type": "object",
+      "description": "Represents a customer order placed through SwiftDash.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Order entity."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to Customer. (Relationship: Customer 1:N Order)"
+        },
+        "restaurantId": {
+          "type": "string",
+          "description": "Reference to Restaurant. (Relationship: Restaurant 1:N Order)"
+        },
+        "orderDate": {
+          "type": "string",
+          "description": "The date and time the order was placed.",
+          "format": "date-time"
+        },
+        "deliveryAddress": {
+          "type": "string",
+          "description": "The delivery address for the order."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the order (e.g., placed, confirmed, out for delivery, delivered)."
+        },
+        "orderItemIds": {
+          "type": "array",
+          "description": "References to OrderItems. (Relationship: Order 1:N OrderItem)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "customerId",
+        "restaurantId",
+        "orderDate",
+        "deliveryAddress",
+        "status"
+      ]
+    },
+    "OrderItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OrderItem",
+      "type": "object",
+      "description": "Represents a single item within an order.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the OrderItem entity."
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Reference to Order. (Relationship: Order 1:N OrderItem)"
+        },
+        "menuItemId": {
+          "type": "string",
+          "description": "Reference to MenuItem. (Relationship: MenuItem 1:N OrderItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the menu item in the order."
+        },
+        "specialInstructions": {
+          "type": "string",
+          "description": "Any special instructions for the preparation of the menu item."
+        }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "menuItemId",
+        "quantity"
+      ]
+    },
+    "Customer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Customer",
+      "type": "object",
+      "description": "Represents a customer using SwiftDash.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Customer entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The customer's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The customer's last name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The customer's email address.",
+          "format": "email"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The customer's phone number."
+        },
+        "address": {
+          "type": "string",
+          "description": "The customer's default delivery address."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/restaurants/{restaurantId}",
+        "definition": {
+          "entityName": "Restaurant",
+          "schema": {
+            "$ref": "#/backend/entities/Restaurant"
+          },
+          "description": "Stores restaurant details.",
+          "params": [
+            {
+              "name": "restaurantId",
+              "description": "The unique identifier for the restaurant."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/menu_items/{menuItemId}",
+        "definition": {
+          "entityName": "MenuItem",
+          "schema": {
+            "$ref": "#/backend/entities/MenuItem"
+          },
+          "description": "Stores menu items offered by restaurants.",
+          "params": [
+            {
+              "name": "menuItemId",
+              "description": "The unique identifier for the menu item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{customerId}",
+        "definition": {
+          "entityName": "Customer",
+          "schema": {
+            "$ref": "#/backend/entities/Customer"
+          },
+          "description": "Stores customer data. Accessible only by the customer.",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "The unique identifier for the customer (user ID)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{customerId}/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Stores orders placed by a customer.",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "The unique identifier for the customer."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{customerId}/orders/{orderId}/order_items/{orderItemId}",
+        "definition": {
+          "entityName": "OrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/OrderItem"
+          },
+          "description": "Stores order items within an order.",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "The unique identifier for the customer."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique identifier for the order."
+            },
+            {
+              "name": "orderItemId",
+              "description": "The unique identifier for the order item."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to mirror the data relationships within the SwiftDash application, focusing on restaurants, menu items, customer orders, and customer data. It prioritizes Authorization Independence via Denormalization and Structural Segregation to ensure secure and scalable data access. Restaurants and MenuItems are stored in top-level collections for easy listing and filtering. Orders are nested under Customers to represent the one-to-many relationship, enabling clear ownership and secure access. Customer data is stored in a private collection, ensuring only the user can access their own data. This structure enables efficient queries for restaurant listings, menu display, and order management, while supporting the core features of the application.\n\n**Authorization Independence (CRITICAL):** There is no authorization implemented for this App. If authorization needs to be implemented, then Authorization Independence can be achieved by denormalizing authorization data (e.g., restaurant owner) onto subcollections like menu items, which would remove the need for security rules to perform `get()` operations on parent documents.\n\n**QAPs (Rules are not Filters):** The segregation of data into separate collections based on entity type (Restaurants, MenuItems, Orders, Customers) allows for secure listing operations (QAPs). Each collection can have specific security rules applied to control access without relying on filtering data based on user roles or permissions within the rules themselves. For example, listing restaurants can be open to all users while customer data is restricted to the individual customer."
+  }
+}

@@ -24,6 +24,9 @@ import {
   Building2,
   ChefHat,
   LogOut,
+  Shield,
+  ClipboardList,
+  Users,
 } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -35,6 +38,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Restaurant', icon: Building2, href: '/restaurants' },
     { name: 'Chefs', icon: ChefHat, href: '/chefs' },
     { name: 'Dashboards', icon: LayoutDashboard, href: '/dashboard' },
+    { name: 'Admin dashboards', icon: Shield, href: '#' },
+    { name: 'Home food dashboard', icon: Utensils, href: '#' },
+    { name: 'restaurant dashboard', icon: ClipboardList, href: '#' },
+    { name: 'chefs dashboard', icon: Users, href: '#' },
     { name: 'Promotions', icon: Ticket, href: '#' },
     { name: 'Invite Friends', icon: Gift, href: '#' },
   ];

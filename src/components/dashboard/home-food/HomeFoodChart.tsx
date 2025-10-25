@@ -1,13 +1,15 @@
 'use client'
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
-import { salesPerformance } from '@/lib/home-food-dashboard-data';
 
+interface HomeFoodChartProps {
+    data: any[];
+}
 
-export function HomeFoodChart() {
+export function HomeFoodChart({ data }: HomeFoodChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={salesPerformance}>
+    <ResponsiveContainer width="100%" height={250}>
+      <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="name"

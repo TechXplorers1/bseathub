@@ -23,11 +23,13 @@ import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { menuItems as initialMenuItems } from '@/lib/home-food-dashboard-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
+import { AddDishDialog } from '@/components/dashboard/home-food/AddDishDialog';
 
-type MenuItem = (typeof initialMenuItems)[number];
+export type MenuItem = (typeof initialMenuItems)[number];
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+  const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
 
   const handleToggleSpecial = (id: string) => {
     setMenuItems(menuItems.map(item => 
@@ -45,7 +47,18 @@ export default function MenuPage() {
     setMenuItems(menuItems.filter(item => item.id !== id));
   }
 
+  const handleAddDish = (newDishData: Omit<MenuItem, 'id' | 'imageUrl' | 'isSpecial'>) => {
+    const newDish: MenuItem = {
+      ...newDishData,
+      id: `hf${Math.floor(Math.random() * 1000)}`,
+      imageUrl: 'https://picsum.photos/seed/food-new/64/64',
+      isSpecial: false,
+    };
+    setMenuItems([newDish, ...menuItems]);
+  };
+
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
@@ -53,7 +66,7 @@ export default function MenuPage() {
                 <CardTitle>Menu Management</CardTitle>
                 <CardDescription>Add, edit, or delete your food items.</CardDescription>
             </div>
-            <Button>
+            <Button onClick={() => setIsAddDishDialogOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Dish
             </Button>
         </div>
@@ -128,5 +141,11 @@ export default function MenuPage() {
         </Table>
       </CardContent>
     </Card>
+    <AddDishDialog 
+        isOpen={isAddDishDialogOpen}
+        onClose={() => setIsAddDishDialogOpen(false)}
+        onAddDish={handleAddDish}
+    />
+    </>
   );
 }

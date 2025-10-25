@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -30,40 +31,37 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { providerOrders } from '@/lib/home-food-dashboard-data';
+import type { ProviderOrder } from '@/lib/home-food-dashboard-data';
 import { MoreHorizontal } from 'lucide-react';
 
-export default function OrdersPage() {
-  return (
-    <Tabs defaultValue="all">
-      <div className="flex items-center">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
-        </TabsList>
-      </div>
-      <TabsContent value="all">
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders</CardTitle>
-            <CardDescription>
-              Manage your orders and view their details.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
+type OrderStatus = 'All' | 'Pending' | 'Completed' | 'Cancelled' | 'Preparing' | 'Out for Delivery';
+
+const statusFilters: OrderStatus[] = ['All', 'Pending', 'Preparing', 'Out for Delivery', 'Completed', 'Cancelled'];
+
+function OrdersTable({ orders }: { orders: ProviderOrder[] }) {
+    const [allOrders, setAllOrders] = useState<ProviderOrder[]>(orders);
+
+    const handleStatusUpdate = (orderId: string, status: ProviderOrder['status']) => {
+        setAllOrders(prevOrders => prevOrders.map(o => o.id === orderId ? { ...o, status } : o));
+    };
+
+    if (orders.length === 0) {
+        return <p className="text-center text-muted-foreground py-8">No orders found for this category.</p>
+    }
+    
+    return (
+        <Table>
+            <TableHeader>
                 <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {providerOrders.map(order => (
+            </TableHeader>
+            <TableBody>
+                {allOrders.map(order => (
                     <TableRow key={order.id}>
                         <TableCell>
                         <div className="font-medium">{order.customer.name}</div>
@@ -85,21 +83,50 @@ export default function OrdersPage() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                     <DropdownMenuItem>View Details</DropdownMenuItem>
-                                    <DropdownMenuItem>Accept Order</DropdownMenuItem>
-                                    <DropdownMenuItem>Mark as Preparing</DropdownMenuItem>
-                                    <DropdownMenuItem>Mark as Out for Delivery</DropdownMenuItem>
-                                    <DropdownMenuItem>Mark as Completed</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive">Cancel Order</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Preparing')}>Mark as Preparing</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Out for Delivery')}>Mark as Out for Delivery</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Completed')}>Mark as Completed</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive" onClick={() => handleStatusUpdate(order.id, 'Cancelled')}>Cancel Order</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </TableCell>
                     </TableRow>
                 ))}
-              </TableBody>
-            </Table>
+            </TableBody>
+        </Table>
+    );
+}
+
+export default function OrdersPage() {
+  const [activeTab, setActiveTab] = useState<OrderStatus>('All');
+  
+  const filteredOrders = providerOrders.filter(order => {
+    if (activeTab === 'All') return true;
+    return order.status === activeTab;
+  });
+
+  return (
+    <Tabs defaultValue="All" onValueChange={(value) => setActiveTab(value as OrderStatus)}>
+      <div className="flex items-center">
+        <TabsList>
+          {statusFilters.map(status => (
+            <TabsTrigger key={status} value={status}>{status}</TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Orders</CardTitle>
+            <CardDescription>
+              Manage your orders and view their details.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TabsContent value={activeTab}>
+                <OrdersTable orders={filteredOrders} />
+            </TabsContent>
           </CardContent>
         </Card>
-      </TabsContent>
     </Tabs>
   );
 }

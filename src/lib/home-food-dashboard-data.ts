@@ -1,3 +1,18 @@
+export type OrderStatus = 'Pending' | 'Completed' | 'Cancelled' | 'Preparing' | 'Out for Delivery';
+
+export type ProviderOrder = {
+    id: string;
+    customer: {
+        name: string;
+        email: string;
+        avatarUrl: string;
+    };
+    amount: number;
+    status: OrderStatus;
+    date: string;
+};
+
+
 export const overviewStats = {
     totalRevenue: 4250.75,
     totalOrders: 215,
@@ -5,7 +20,7 @@ export const overviewStats = {
     avgRating: 4.9,
 };
 
-export const recentOrders = [
+export const recentOrders: ProviderOrder[] = [
     {
       id: 'ORD-HF001',
       customer: { name: 'Jane Doe', email: 'jane.d@example.com', avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' },
@@ -43,7 +58,7 @@ export const recentOrders = [
       },
   ];
 
-  export const providerOrders = [
+  export const providerOrders: ProviderOrder[] = [
     ...recentOrders,
     {
         id: 'ORD-HF006',

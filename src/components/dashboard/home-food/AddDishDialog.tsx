@@ -4,6 +4,7 @@ import * as React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -34,11 +35,22 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import type { MenuItem } from '@/app/home-food-dashboard/menu/page';
 
+const MAX_FILE_SIZE = 500000;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+
 const dishSchema = z.object({
   name: z.string().min(3, 'Dish name must be at least 3 characters long.'),
   description: z.string().min(10, 'Description must be at least 10 characters long.'),
   price: z.coerce.number().min(0.01, 'Price must be a positive number.'),
   status: z.enum(['Available', 'Out of Stock']),
+  image: z.any()
+    .refine((files) => files?.length == 1, "Image is required.")
+    .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+    .refine(
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+      ".jpg, .jpeg, .png and .webp files are accepted."
+    ),
 });
 
 type DishFormValues = z.infer<typeof dishSchema>;
@@ -64,6 +76,8 @@ export function AddDishDialog({
       status: 'Available',
     },
   });
+  
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
 
   const handleFormSubmit = (data: DishFormValues) => {
     onAddDish(data);
@@ -72,7 +86,21 @@ export function AddDishDialog({
       description: `${data.name} has been successfully added to your menu.`,
     });
     form.reset();
+    setImagePreview(null);
     onClose();
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+        setImagePreview(null);
+    }
   };
 
   return (
@@ -86,6 +114,31 @@ export function AddDishDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 pt-4">
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dish Image</FormLabel>
+                  <FormControl>
+                    <Input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => {
+                            field.onChange(e.target.files);
+                            handleImageChange(e);
+                        }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {imagePreview && (
+                <div className="relative h-40 w-full rounded-md border">
+                    <Image src={imagePreview} alt="Image preview" fill className="object-cover rounded-md" />
+                </div>
+            )}
             <FormField
               control={form.control}
               name="name"

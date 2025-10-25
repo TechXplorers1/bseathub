@@ -77,8 +77,8 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <Card className="lg:col-span-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
           <CardHeader>
               <CardTitle>Top Selling Dishes</CardTitle>
           </CardHeader>
@@ -105,7 +105,7 @@ export default function AnalyticsPage() {
               </Table>
           </CardContent>
           </Card>
-          <Card className="lg:col-span-2">
+          <Card>
               <CardHeader>
                   <CardTitle>Order Trends & Peak Times</CardTitle>
               </CardHeader>

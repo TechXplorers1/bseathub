@@ -10,6 +10,7 @@ export type ProviderOrder = {
     amount: number;
     status: OrderStatus;
     date: string;
+    items: { name: string; quantity: number; price: number }[];
 };
 
 
@@ -27,6 +28,7 @@ export const recentOrders: ProviderOrder[] = [
       amount: 18.00,
       status: 'Completed',
       date: '2024-07-28',
+      items: [{ name: "Grandma's Lasagna", quantity: 1, price: 18.00 }],
     },
     {
       id: 'ORD-HF002',
@@ -34,6 +36,7 @@ export const recentOrders: ProviderOrder[] = [
       amount: 17.50,
       status: 'Preparing',
       date: '2024-07-28',
+      items: [{ name: 'Chicken Parmesan', quantity: 1, price: 17.50 }],
     },
     {
       id: 'ORD-HF003',
@@ -41,6 +44,7 @@ export const recentOrders: ProviderOrder[] = [
       amount: 36.00,
       status: 'Pending',
       date: '2024-07-28',
+      items: [{ name: "Grandma's Lasagna", quantity: 2, price: 18.00 }],
     },
     {
         id: 'ORD-HF004',
@@ -48,6 +52,7 @@ export const recentOrders: ProviderOrder[] = [
         amount: 17.50,
         status: 'Completed',
         date: '2024-07-27',
+        items: [{ name: 'Chicken Parmesan', quantity: 1, price: 17.50 }],
       },
       {
         id: 'ORD-HF005',
@@ -55,6 +60,7 @@ export const recentOrders: ProviderOrder[] = [
         amount: 18.00,
         status: 'Cancelled',
         date: '2024-07-26',
+        items: [{ name: "Grandma's Lasagna", quantity: 1, price: 18.00 }],
       },
   ];
 
@@ -66,6 +72,7 @@ export const recentOrders: ProviderOrder[] = [
         amount: 35.00,
         status: 'Completed',
         date: '2024-07-25',
+        items: [{ name: 'Chicken Parmesan', quantity: 2, price: 17.50 }],
     },
     {
         id: 'ORD-HF007',
@@ -73,6 +80,7 @@ export const recentOrders: ProviderOrder[] = [
         amount: 18.00,
         status: 'Out for Delivery',
         date: '2024-07-28',
+        items: [{ name: "Grandma's Lasagna", quantity: 1, price: 18.00 }],
     },
   ];
 

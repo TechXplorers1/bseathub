@@ -33,12 +33,13 @@ import { Button } from '@/components/ui/button';
 import { providerOrders } from '@/lib/home-food-dashboard-data';
 import type { ProviderOrder } from '@/lib/home-food-dashboard-data';
 import { MoreHorizontal } from 'lucide-react';
+import { OrderDetailsDialog } from '@/components/dashboard/home-food/OrderDetailsDialog';
 
 type OrderStatus = 'All' | 'Pending' | 'Completed' | 'Cancelled' | 'Preparing' | 'Out for Delivery';
 
 const statusFilters: OrderStatus[] = ['All', 'Pending', 'Preparing', 'Out for Delivery', 'Completed', 'Cancelled'];
 
-function OrdersTable({ orders }: { orders: ProviderOrder[] }) {
+function OrdersTable({ orders, onSelectOrder }: { orders: ProviderOrder[]; onSelectOrder: (order: ProviderOrder) => void; }) {
     const [allOrders, setAllOrders] = useState<ProviderOrder[]>(orders);
 
     const handleStatusUpdate = (orderId: string, status: ProviderOrder['status']) => {
@@ -82,7 +83,7 @@ function OrdersTable({ orders }: { orders: ProviderOrder[] }) {
                                 </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    <DropdownMenuItem>View Details</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => onSelectOrder(order)}>View Details</DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Preparing')}>Mark as Preparing</DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Out for Delivery')}>Mark as Out for Delivery</DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleStatusUpdate(order.id, 'Completed')}>Mark as Completed</DropdownMenuItem>
@@ -99,6 +100,7 @@ function OrdersTable({ orders }: { orders: ProviderOrder[] }) {
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>('All');
+  const [selectedOrder, setSelectedOrder] = useState<ProviderOrder | null>(null);
   
   const filteredOrders = providerOrders.filter(order => {
     if (activeTab === 'All') return true;
@@ -106,6 +108,7 @@ export default function OrdersPage() {
   });
 
   return (
+    <>
     <Tabs defaultValue="All" onValueChange={(value) => setActiveTab(value as OrderStatus)}>
       <div className="flex items-center">
         <TabsList>
@@ -123,10 +126,18 @@ export default function OrdersPage() {
           </CardHeader>
           <CardContent>
             <TabsContent value={activeTab}>
-                <OrdersTable orders={filteredOrders} />
+                <OrdersTable orders={filteredOrders} onSelectOrder={setSelectedOrder} />
             </TabsContent>
           </CardContent>
         </Card>
     </Tabs>
+     {selectedOrder && (
+        <OrderDetailsDialog
+          order={selectedOrder}
+          isOpen={!!selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
+    </>
   );
 }

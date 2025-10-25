@@ -20,10 +20,31 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
-import { menuItems } from '@/lib/home-food-dashboard-data';
+import { menuItems as initialMenuItems } from '@/lib/home-food-dashboard-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+
+type MenuItem = (typeof initialMenuItems)[number];
 
 export default function MenuPage() {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+
+  const handleToggleSpecial = (id: string) => {
+    setMenuItems(menuItems.map(item => 
+      item.id === id ? { ...item, isSpecial: !item.isSpecial } : item
+    ));
+  };
+
+  const handleToggleStatus = (id: string) => {
+    setMenuItems(menuItems.map(item => 
+      item.id === id ? { ...item, status: item.status === 'Available' ? 'Out of Stock' : 'Available' } : item
+    ));
+  }
+
+  const handleDelete = (id: string) => {
+    setMenuItems(menuItems.filter(item => item.id !== id));
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -88,10 +109,14 @@ export default function MenuPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuItem>Edit</DropdownMenuItem>
-                       <DropdownMenuItem>Mark as "Today's Special"</DropdownMenuItem>
-                      <DropdownMenuItem>Mark as "Out of Stock"</DropdownMenuItem>
+                       <DropdownMenuItem onClick={() => handleToggleSpecial(item.id)}>
+                        {item.isSpecial ? "Remove as Special" : "Mark as Special"}
+                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleToggleStatus(item.id)}>
+                        {item.status === 'Available' ? "Mark as Out of Stock" : "Mark as Available"}
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
+                      <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(item.id)}>
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

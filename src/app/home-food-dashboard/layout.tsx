@@ -13,6 +13,8 @@ import {
   Utensils,
   Settings,
   Star,
+  LifeBuoy,
+  LogOut,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +37,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 
 const navItems = [
     { href: "/home-food-dashboard", icon: Home, label: "Overview" },
@@ -42,6 +45,12 @@ const navItems = [
     { href: "/home-food-dashboard/menu", icon: Utensils, label: "Menu" },
     { href: "/home-food-dashboard/feedback", icon: Star, label: "Feedback" },
     { href: "/home-food-dashboard/analytics", icon: LineChart, label: "Analytics" },
+];
+
+const accountItems = [
+    { href: "/home-food-dashboard/settings", icon: Settings, label: "Settings" },
+    { href: "#", icon: LifeBuoy, label: "Support" },
+    { href: "#", icon: LogOut, label: "Logout" },
 ];
 
 export default function HomeFoodDashboardLayout({
@@ -63,7 +72,7 @@ export default function HomeFoodDashboardLayout({
               <span className="sr-only">Toggle notifications</span>
             </Button>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-auto">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                 {navItems.map(item => (
                     <Link
@@ -77,6 +86,19 @@ export default function HomeFoodDashboardLayout({
                     </Link>
                 ))}
             </nav>
+            <Separator className="my-4" />
+             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+                {accountItems.map(item => (
+                    <Link
+                        key={item.label}
+                        href={item.href}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                    >
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
+                    </Link>
+                ))}
+             </nav>
           </div>
           <div className="mt-auto p-4">
             <Card>
@@ -113,10 +135,10 @@ export default function HomeFoodDashboardLayout({
               <nav className="grid gap-2 text-lg font-medium">
                 <Link
                   href="#"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <Utensils className="h-6 w-6 text-primary" />
-                  <span className="sr-only">Maria's Kitchen</span>
+                  <span className="">Maria's Kitchen</span>
                 </Link>
                 {navItems.map(item => (
                      <Link
@@ -127,6 +149,17 @@ export default function HomeFoodDashboardLayout({
                         <item.icon className="h-5 w-5" />
                         {item.label}
                         {item.badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{item.badge}</Badge>}
+                    </Link>
+                ))}
+                 <Separator className="my-4" />
+                 {accountItems.map(item => (
+                     <Link
+                        key={item.label}
+                        href={item.href}
+                        className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    >
+                        <item.icon className="h-5 w-5" />
+                        {item.label}
                     </Link>
                 ))}
               </nav>
@@ -148,28 +181,12 @@ export default function HomeFoodDashboardLayout({
               </div>
             </SheetContent>
           </Sheet>
-          <div className="w-full flex-1">
-            {/* Search can go here if needed */}
+          <div className="w-full flex-1 flex items-center justify-end">
+             <Avatar>
+                <AvatarImage src="https://i.pravatar.cc/150?u=maria" alt="@maria" />
+                <AvatarFallback>M</AvatarFallback>
+            </Avatar>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <Avatar>
-                  <AvatarImage src="https://i.pravatar.cc/150?u=maria" alt="@maria" />
-                  <AvatarFallback>M</AvatarFallback>
-                </Avatar>
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-gray-50/50">
           {children}

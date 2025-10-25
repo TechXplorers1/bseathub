@@ -34,24 +34,13 @@ import {
     SelectValue,
   } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import type { MenuItem } from '@/app/restaurant-dashboard/menu/page';
-
-const MAX_FILE_SIZE = 500000;
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-
+import type { MenuItem } from '@/lib/types';
 
 const dishSchema = z.object({
   name: z.string().min(3, 'Dish name must be at least 3 characters long.'),
   description: z.string().min(10, 'Description must be at least 10 characters long.'),
   price: z.coerce.number().min(0.01, 'Price must be a positive number.'),
-  status: z.enum(['Available', 'Out of Stock']),
-  image: z.any()
-    .refine((files) => files?.length == 1, "Image is required.")
-    .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      ".jpg, .jpeg, .png and .webp files are accepted."
-    ),
+  category: z.string().min(1, 'Category is required.'),
 });
 
 type DishFormValues = z.infer<typeof dishSchema>;
@@ -59,7 +48,7 @@ type DishFormValues = z.infer<typeof dishSchema>;
 interface AddDishDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddDish: (data: Omit<MenuItem, 'id' | 'imageUrl' | 'isSpecial'>) => void;
+  onAddDish: (data: Omit<MenuItem, 'id' | 'imageId'>) => void;
 }
 
 export function AddDishDialog({
@@ -74,11 +63,9 @@ export function AddDishDialog({
       name: '',
       description: '',
       price: 0,
-      status: 'Available',
+      category: 'Main Courses',
     },
   });
-  
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
 
   const handleFormSubmit = (data: DishFormValues) => {
     onAddDish(data);
@@ -87,21 +74,7 @@ export function AddDishDialog({
       description: `${data.name} has been successfully added to your menu.`,
     });
     form.reset();
-    setImagePreview(null);
     onClose();
-  };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-        setImagePreview(null);
-    }
   };
 
   return (
@@ -115,31 +88,6 @@ export function AddDishDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4 pt-4">
-            <FormField
-              control={form.control}
-              name="image"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dish Image</FormLabel>
-                  <FormControl>
-                    <Input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={(e) => {
-                            field.onChange(e.target.files);
-                            handleImageChange(e);
-                        }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {imagePreview && (
-                <div className="relative h-40 w-full rounded-md border">
-                    <Image src={imagePreview} alt="Image preview" fill className="object-cover rounded-md" />
-                </div>
-            )}
             <FormField
               control={form.control}
               name="name"
@@ -185,10 +133,10 @@ export function AddDishDialog({
                 />
                 <FormField
                 control={form.control}
-                name="status"
+                name="category"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>Category</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                         <SelectTrigger>
@@ -196,8 +144,10 @@ export function AddDishDialog({
                         </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                        <SelectItem value="Available">Available</SelectItem>
-                        <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                        <SelectItem value="Appetizers">Appetizers</SelectItem>
+                        <SelectItem value="Main Courses">Main Courses</SelectItem>
+                        <SelectItem value="Desserts">Desserts</SelectItem>
+                        <SelectItem value="Drinks">Drinks</SelectItem>
                         </SelectContent>
                     </Select>
                     <FormMessage />
@@ -219,3 +169,4 @@ export function AddDishDialog({
     </Dialog>
   );
 }
+

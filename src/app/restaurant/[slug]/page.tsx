@@ -1,29 +1,24 @@
-import { notFound } from 'next/navigation';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
+'use client';
+import { notFound, useParams } from 'next/navigation';
 import { RestaurantClientPage } from './client-page';
-
-export function generateStaticParams() {
-  const restaurantSlugs = allRestaurants.map((restaurant) => ({
-    slug: restaurant.slug,
-  }));
-  const homeFoodSlugs = allHomeFoods.map((restaurant) => ({
-    slug: restaurant.slug,
-  }));
-  return [...restaurantSlugs, ...homeFoodSlugs];
-}
+import { useRestaurants } from '@/context/RestaurantProvider';
 
 export default function RestaurantPage({
-  params,
   searchParams,
 }: {
-  params: { slug: string };
   searchParams?: { chef?: string };
 }) {
-  const allItems = [...allRestaurants, ...allHomeFoods];
-  const restaurant = allItems.find((r) => r.slug === params.slug);
+  const params = useParams();
+  const { allItems } = useRestaurants();
+  const slug = params.slug as string;
+
+  const restaurant = allItems.find((r) => r.slug === slug);
 
   if (!restaurant) {
-    notFound();
+    // We could show a loading state here while waiting for context
+    // For now, we'll just return null or a loading indicator.
+    // A better solution might involve server-side fetching and client-side hydration.
+    return <div>Loading restaurant...</div>;
   }
 
   return (

@@ -23,14 +23,27 @@ import {
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import { menuItems as initialMenuItems } from '@/lib/restaurant-dashboard-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AddDishDialog } from '@/components/dashboard/restaurant/AddDishDialog';
+import { useRestaurants } from '@/context/RestaurantProvider';
+import type { MenuItem as MenuItemType } from '@/lib/types';
 
-export type MenuItem = (typeof initialMenuItems)[number];
 
 export default function MenuPage() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+  const { getRestaurantById, addDishToRestaurant } = useRestaurants();
+  // For this dashboard, we'll hardcode the restaurant ID for "The Golden Spoon"
+  const restaurantId = '1'; 
+  const restaurant = getRestaurantById(restaurantId);
+
+  const allMenuItems = restaurant ? restaurant.menu.flatMap(c => c.items.map(i => ({...i, isSpecial: false, status: 'Available' as const}))) : [];
+  
+  const [menuItems, setMenuItems] = useState(allMenuItems);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const updatedMenuItems = restaurant ? restaurant.menu.flatMap(c => c.items.map(i => ({...i, isSpecial: false, status: 'Available' as const}))) : [];
+    setMenuItems(updatedMenuItems);
+  }, [restaurant]);
 
   const handleToggleSpecial = (id: string) => {
     setMenuItems(menuItems.map(item => 
@@ -45,17 +58,13 @@ export default function MenuPage() {
   }
 
   const handleDelete = (id: string) => {
-    setMenuItems(menuItems.filter(item => item.id !== id));
+    // This would need a `removeDishFromRestaurant` function in the context
+    console.log("Delete not implemented in context yet");
+    // setMenuItems(menuItems.filter(item => item.id !== id));
   }
 
-  const handleAddDish = (newDishData: Omit<MenuItem, 'id' | 'imageUrl' | 'isSpecial'>) => {
-    const newDish: MenuItem = {
-      ...newDishData,
-      id: `gs${Math.floor(Math.random() * 1000)}`,
-      imageUrl: 'https://picsum.photos/seed/food-new/64/64',
-      isSpecial: false,
-    };
-    setMenuItems([newDish, ...menuItems]);
+  const handleAddDish = (newDishData: Omit<MenuItemType, 'id' | 'imageId'>) => {
+    addDishToRestaurant(restaurantId, newDishData);
   };
 
   return (
@@ -96,7 +105,7 @@ export default function MenuPage() {
                     alt={item.name}
                     className="aspect-square rounded-md object-cover"
                     height="64"
-                    src={item.imageUrl}
+                    src={`https://picsum.photos/seed/${item.id}/64/64`}
                     width="64"
                   />
                 </TableCell>
@@ -150,3 +159,4 @@ export default function MenuPage() {
     </>
   );
 }
+

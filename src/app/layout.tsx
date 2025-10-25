@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -9,6 +10,7 @@ import { SiteLayout } from '@/components/shared/SiteLayout';
 import { HeaderProvider } from '@/context/HeaderProvider';
 import { LocationProvider } from '@/context/LocationProvider';
 import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
+import { RestaurantProvider } from '@/context/RestaurantProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,14 +37,16 @@ export default function RootLayout({
       >
         <LocationProvider>
           <DeliveryModeProvider>
-            <CartProvider>
-              <SidebarProvider>
-                <HeaderProvider>
-                  <SiteLayout>{children}</SiteLayout>
-                </HeaderProvider>
-                <Toaster />
-              </SidebarProvider>
-            </CartProvider>
+            <RestaurantProvider>
+              <CartProvider>
+                <SidebarProvider>
+                  <HeaderProvider>
+                    <SiteLayout>{children}</SiteLayout>
+                  </HeaderProvider>
+                  <Toaster />
+                </SidebarProvider>
+              </CartProvider>
+            </RestaurantProvider>
           </DeliveryModeProvider>
         </LocationProvider>
       </body>

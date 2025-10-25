@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -40,7 +41,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Dashboards', icon: LayoutDashboard, href: '/dashboard' },
     { name: 'Admin dashboards', icon: Shield, href: '/admin/dashboard' },
     { name: 'Home food dashboard', icon: Utensils, href: '/home-food-dashboard' },
-    { name: 'restaurant dashboard', icon: ClipboardList, href: '#' },
+    { name: 'Restaurant dashboard', icon: Building2, href: '/restaurant-dashboard' },
     { name: 'chefs dashboard', icon: Users, href: '#' },
     { name: 'Promotions', icon: Ticket, href: '#' },
     { name: 'Invite Friends', icon: Gift, href: '#' },

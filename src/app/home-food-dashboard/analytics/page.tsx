@@ -22,22 +22,22 @@ export default function AnalyticsPage() {
     },
     lasagna: {
       label: "Grandma's Lasagna",
-      color: 'hsl(var(--chart-1))',
+      color: 'hsl(var(--primary))',
     },
     parmesan: {
       label: 'Chicken Parmesan',
-      color: 'hsl(var(--chart-2))',
+      color: 'hsl(var(--secondary-foreground))',
     },
     garlicBread: {
       label: 'Garlic Bread',
-      color: 'hsl(var(--chart-3))',
+      color: 'hsl(var(--accent))',
     },
   };
 
   const topDishesData = topSellingDishes.map(dish => ({
     name: dish.name,
     revenue: dish.revenue,
-    fill: `hsl(var(--chart-${Object.keys(chartConfig).find(key => chartConfig[key as keyof typeof chartConfig].label === dish.name) ? Object.keys(chartConfig).indexOf(Object.keys(chartConfig).find(key => chartConfig[key as keyof typeof chartConfig].label === dish.name)!) : 1}))`,
+    fill: `var(--color-${Object.keys(chartConfig).find(key => chartConfig[key as keyof typeof chartConfig].label === dish.name) || 'lasagna'})`,
   }));
 
   return (

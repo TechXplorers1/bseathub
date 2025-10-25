@@ -42,7 +42,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Admin dashboards', icon: Shield, href: '/admin/dashboard' },
     { name: 'Home food dashboard', icon: Utensils, href: '/home-food-dashboard' },
     { name: 'Restaurant dashboard', icon: Building2, href: '/restaurant-dashboard' },
-    { name: 'chefs dashboard', icon: Users, href: '#' },
+    { name: 'Chef dashboard', icon: ChefHat, href: '/chef-dashboard' },
     { name: 'Promotions', icon: Ticket, href: '#' },
     { name: 'Invite Friends', icon: Gift, href: '#' },
   ];

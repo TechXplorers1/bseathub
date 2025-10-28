@@ -18,7 +18,7 @@ import {
 
 export default function AdminDashboardPage() {
   return (
-    <div className="container mx-auto py-8">
+    <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-4">

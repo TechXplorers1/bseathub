@@ -2,36 +2,21 @@
 
 import Link from 'next/link';
 import {
-  Bell,
   Home,
   LineChart,
-  Users,
-  Menu as MenuIcon,
-  Utensils,
   Settings,
   Star,
   LifeBuoy,
   LogOut,
-  ChefHat,
   Calendar,
   DollarSign,
   Briefcase,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { Header } from '@/components/shared/Header';
-import { Footer } from '@/components/shared/Footer';
+import { useHeader } from '@/context/HeaderProvider';
+import { useEffect } from 'react';
 
 const navItems = [
   { href: '/chef-dashboard', icon: Home, label: 'Overview' },
@@ -53,6 +38,17 @@ export default function ChefDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { setHeaderTitle } = useHeader();
+  const chefName = 'Chef Ramsey';
+
+  useEffect(() => {
+    setHeaderTitle(chefName);
+    // Cleanup function to reset the title when the component unmounts
+    return () => {
+      setHeaderTitle(null);
+    };
+  }, [setHeaderTitle, chefName]);
+
   return (
       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className="hidden border-r bg-muted/40 md:block">

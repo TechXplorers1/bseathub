@@ -35,7 +35,7 @@ export function AnalyticsCharts({ revenueData, signupsData }: ChartProps) {
               <Tooltip />
               <Legend />
               <Bar dataKey="restaurants" fill="hsl(var(--primary))" />
-              <Bar dataKey="homeFood" fill="hsl(var(--secondary))" />
+              <Bar dataKey="homeFood" fill="hsl(var(--accent))" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

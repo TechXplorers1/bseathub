@@ -57,66 +57,70 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const categoriesNav = [
     { name: 'Best of Eat Hub', icon: Heart, href: '#' },
   ];
+  
+  const isDashboardPage = pathname.startsWith('/admin') || 
+                          pathname.startsWith('/chef-dashboard') || 
+                          pathname.startsWith('/home-food-dashboard') || 
+                          pathname.startsWith('/restaurant-dashboard');
 
-  if (pathname.startsWith('/home-food-dashboard')) {
-    return <>{children}</>;
-  }
 
   return (
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          variant="sidebar"
-          collapsible="icon"
-          className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
-        >
-          <SidebarContent>
-            <SidebarHeader>
-                <SidebarTrigger />
-            </SidebarHeader>
-            <SidebarMenu>
-              {sidebarNav.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton href={item.href} tooltip={item.name}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-            <SidebarSeparator />
-            <SidebarMenu>
-              {categoriesNav.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton href={item.href} tooltip={item.name}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-           <SidebarFooter>
-            <SidebarMenu>
-              {!isUserLoading && user ? (
-                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-                    <LogOut />
-                    <span>Logout</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : !isUserLoading && !user ? (
-                 <SidebarMenuItem>
-                  <SidebarMenuButton href="/login" tooltip="Sign In">
-                    <LogIn />
-                    <span>Sign In</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : null}
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
+        {!isDashboardPage && (
+          <Sidebar
+            variant="sidebar"
+            collapsible="icon"
+            className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
+          >
+            <SidebarContent>
+              <SidebarHeader>
+                  <SidebarTrigger />
+              </SidebarHeader>
+              <SidebarMenu>
+                {sidebarNav.map((item) => (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton href={item.href} tooltip={item.name}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+              <SidebarSeparator />
+              <SidebarMenu>
+                {categoriesNav.map((item) => (
+                  <SidebarMenuItem key={item.name}>
+                    <SidebarMenuButton href={item.href} tooltip={item.name}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarContent>
+             <SidebarFooter>
+              <SidebarMenu>
+                {!isUserLoading && user ? (
+                   <SidebarMenuItem>
+                    <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                      <LogOut />
+                      <span>Logout</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ) : !isUserLoading && !user ? (
+                   <SidebarMenuItem>
+                    <SidebarMenuButton href="/login" tooltip="Sign In">
+                      <LogIn />
+                      <span>Sign In</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ) : null}
+              </SidebarMenu>
+            </SidebarFooter>
+          </Sidebar>
+        )}
         <div className="flex-1 flex flex-col overflow-y-auto">
           <main className="flex-1">{children}</main>
           <Footer />

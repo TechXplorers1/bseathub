@@ -11,6 +11,7 @@ import { LocationProvider } from '@/context/LocationProvider';
 import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 import { RestaurantProvider } from '@/context/RestaurantProvider';
 import { FirebaseClientProvider } from '@/firebase';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -41,7 +42,9 @@ export default function RootLayout({
               <RestaurantProvider>
                 <CartProvider>
                     <HeaderProvider>
-                      <SiteLayout>{children}</SiteLayout>
+                      <SidebarProvider>
+                        <SiteLayout>{children}</SiteLayout>
+                      </SidebarProvider>
                     </HeaderProvider>
                     <Toaster />
                 </CartProvider>

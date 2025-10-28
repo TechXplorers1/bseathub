@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -42,6 +43,7 @@ import { useHeader } from '@/context/HeaderProvider';
 import { useEffect } from 'react';
 import { Header } from '@/components/shared/Header';
 import { Footer } from '@/components/shared/Footer';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const navItems = [
     { href: "/home-food-dashboard", icon: Home, label: "Overview" },
@@ -108,7 +110,7 @@ export default function HomeFoodDashboardLayout({
           </div>
         </div>
         <div className="flex flex-col">
-          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-gray-50/50">
+          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-gray-50/50 overflow-auto">
             {children}
           </main>
         </div>

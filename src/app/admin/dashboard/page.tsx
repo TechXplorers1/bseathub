@@ -18,8 +18,8 @@ import {
 
 export default function AdminDashboardPage() {
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
       <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -28,9 +28,9 @@ export default function AdminDashboardPage() {
           <TabsTrigger value="bookings">Chef Bookings</TabsTrigger>
         </TabsList>
         <TabsContent value="overview">
-          <div className="grid gap-6 mt-6">
+          <div className="grid gap-4 mt-4">
             <DashboardStats stats={adminStats} />
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <div className="lg:col-span-3">
                 <AnalyticsCharts
                   revenueData={chartData.revenue}

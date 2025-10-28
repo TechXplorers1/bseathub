@@ -18,12 +18,12 @@ import {
 
 export default function AdminDashboardPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <div className="space-y-4">
+      <h1 className="text-3xl font-bold">Overview</h1>
       
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         <DashboardStats stats={adminStats} />
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-3">
             <AnalyticsCharts
               revenueData={chartData.revenue}
@@ -34,9 +34,15 @@ export default function AdminDashboardPage() {
             <RecentActivity activities={recentActivities} />
           </div>
         </div>
-        <RegistrationsTable registrations={pendingRegistrations} />
-        <OrdersTable orders={allOrders} />
-        <BookingsTable bookings={allBookings} />
+        <div id="registrations">
+            <RegistrationsTable registrations={pendingRegistrations} />
+        </div>
+        <div id="orders">
+            <OrdersTable orders={allOrders} />
+        </div>
+        <div id="bookings">
+            <BookingsTable bookings={allBookings} />
+        </div>
       </div>
     </div>
   );

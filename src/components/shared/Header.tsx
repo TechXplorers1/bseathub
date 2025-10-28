@@ -17,6 +17,7 @@ import {
   Flame,
   Bell,
   LogOut,
+  User,
 } from 'lucide-react';
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
@@ -162,7 +163,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {isUserLoading && <Skeleton className="h-10 w-24 rounded-md" />}
+          {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
           {!isUserLoading && !user && (
             <Button variant="outline" className="hidden md:inline-flex" asChild>
               <Link href="/login">Sign In</Link>
@@ -174,7 +175,9 @@ export function Header() {
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? ''} />
-                    <AvatarFallback>{user.displayName?.charAt(0) ?? user.email?.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>
+                      {user.displayName?.charAt(0) ?? user.email?.charAt(0) ?? <User className="h-5 w-5" />}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>

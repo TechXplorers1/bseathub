@@ -38,6 +38,8 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { useHeader } from '@/context/HeaderProvider';
+import { useEffect } from 'react';
 
 const navItems = [
     { href: "/home-food-dashboard", icon: Home, label: "Overview" },
@@ -58,6 +60,17 @@ export default function HomeFoodDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { setHeaderTitle } = useHeader();
+  const kitchenName = "Maria's Kitchen";
+
+  useEffect(() => {
+    setHeaderTitle(kitchenName);
+    // Cleanup function to reset the title when the component unmounts
+    return () => {
+      setHeaderTitle(null);
+    };
+  }, [setHeaderTitle, kitchenName]);
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -65,7 +78,7 @@ export default function HomeFoodDashboardLayout({
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Utensils className="h-6 w-6 text-primary" />
-              <span className="">Maria's Kitchen</span>
+              <span className="">{kitchenName}</span>
             </Link>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
               <Bell className="h-4 w-4" />
@@ -138,7 +151,7 @@ export default function HomeFoodDashboardLayout({
                   className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <Utensils className="h-6 w-6 text-primary" />
-                  <span className="">Maria's Kitchen</span>
+                  <span className="">{kitchenName}</span>
                 </Link>
                 {navItems.map(item => (
                      <Link

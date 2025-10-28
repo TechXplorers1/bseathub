@@ -112,30 +112,6 @@ export function Header() {
             </DialogContent>
           </Dialog>
 
-          <div className="hidden md:flex bg-gray-100 rounded-full p-1">
-             <Button 
-              variant={deliveryMode === 'all' ? 'default' : 'ghost'} 
-              className="rounded-full"
-              onClick={() => setDeliveryMode('all')}
-            >
-              All
-            </Button>
-            <Button 
-              variant={deliveryMode === 'delivery' ? 'default' : 'ghost'} 
-              className="rounded-full"
-              onClick={() => setDeliveryMode('delivery')}
-            >
-              Delivery
-            </Button>
-            <Button 
-              variant={deliveryMode === 'pickup' ? 'default' : 'ghost'} 
-              className="rounded-full"
-              onClick={() => setDeliveryMode('pickup')}
-            >
-              Pickup
-            </Button>
-          </div>
-
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="hidden md:flex relative">

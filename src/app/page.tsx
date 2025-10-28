@@ -2,6 +2,7 @@
 
 import { Banners } from '@/components/home/Banners';
 import { ChefsCarousel } from '@/components/home/ChefsCarousel';
+import { DeliveryModeToggle } from '@/components/home/DeliveryModeToggle';
 import { FilterCategories } from '@/components/home/FilterCategories';
 import { HomeFeed } from '@/components/home/HomeFeed';
 import { HomeFoodCarousel } from '@/components/home/HomeFoodCarousel';
@@ -15,6 +16,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <DeliveryModeToggle />
         <FilterCategories />
         <Banners />
         <Personalized />

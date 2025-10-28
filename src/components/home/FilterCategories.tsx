@@ -6,10 +6,10 @@ import {
   Pizza,
   Fish,
   Beef,
-  Beer,
+  Coffee,
   Sandwich,
   Vegan,
-  Zap,
+  Sunrise,
   Star,
   Shell,
   CakeSlice,
@@ -25,10 +25,10 @@ import { cn } from '@/lib/utils';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 const mainCategories = [
-  { name: 'Breakfast', icon: Zap }, // Using Zap as a placeholder for Breakfast
+  { name: 'Breakfast', icon: Sunrise },
   { name: 'Fast Food', icon: Beef },
   { name: 'Burgers', icon: Beef },
-  { name: 'Coffee', icon: Beer }, // Using Beer as a placeholder for Coffee
+  { name: 'Coffee', icon: Coffee },
   { name: 'Pizza', icon: Pizza },
   { name: 'Halal', icon: Shell }, // Placeholder
   { name: 'Chicken', icon: Beef }, // Placeholder

@@ -1,17 +1,6 @@
 'use client';
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarSeparator,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import {
   Home,
   Ticket,
   Heart,
@@ -32,10 +21,23 @@ import {
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { useUser, useAuth } from '@/firebase';
+import { usePathname } from 'next/navigation';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+    SidebarSeparator,
+    SidebarTrigger,
+  } from '@/components/ui/sidebar';
 
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     if (auth) {
@@ -55,6 +57,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const categoriesNav = [
     { name: 'Best of Eat Hub', icon: Heart, href: '#' },
   ];
+
+  if (pathname.startsWith('/home-food-dashboard')) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex flex-col h-screen">

@@ -5,7 +5,6 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { CartProvider } from '@/context/CartProvider';
 import { Toaster } from '@/components/ui/toaster';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { SiteLayout } from '@/components/shared/SiteLayout';
 import { HeaderProvider } from '@/context/HeaderProvider';
 import { LocationProvider } from '@/context/LocationProvider';
@@ -41,12 +40,10 @@ export default function RootLayout({
             <DeliveryModeProvider>
               <RestaurantProvider>
                 <CartProvider>
-                  <SidebarProvider>
                     <HeaderProvider>
                       <SiteLayout>{children}</SiteLayout>
                     </HeaderProvider>
                     <Toaster />
-                  </SidebarProvider>
                 </CartProvider>
               </RestaurantProvider>
             </DeliveryModeProvider>

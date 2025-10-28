@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -28,11 +27,22 @@ import {
   Shield,
   ClipboardList,
   Users,
+  LogIn,
 } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { useUser, useAuth } from '@/firebase';
 
 export function SiteLayout({ children }: { children: React.ReactNode }) {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+
+  const handleLogout = () => {
+    if (auth) {
+      auth.signOut();
+    }
+  };
+
   const sidebarNav = [
     { name: 'Home', icon: Home, href: '/' },
     { name: 'Home Food', icon: Utensils, href: '/home-food' },
@@ -89,12 +99,21 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
            <SidebarFooter>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="#" tooltip="Logout">
-                  <LogOut />
-                  <span>Logout</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {!isUserLoading && user ? (
+                 <SidebarMenuItem>
+                  <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                    <LogOut />
+                    <span>Logout</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : !isUserLoading && !user ? (
+                 <SidebarMenuItem>
+                  <SidebarMenuButton href="/login" tooltip="Sign In">
+                    <LogIn />
+                    <span>Sign In</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : null}
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>

@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Flame,
   Bell,
+  LogOut,
 } from 'lucide-react';
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
@@ -35,6 +36,15 @@ import { useLocation } from '@/context/LocationProvider';
 import { useState } from 'react';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Notifications } from './Notifications';
+import { useUser, useAuth } from '@/firebase';
+import { Skeleton } from '../ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 export function Header() {
   const { itemCount } = useCart();
@@ -43,10 +53,19 @@ export function Header() {
   const [newLocation, setNewLocation] = useState(location);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+
 
   const handleLocationSave = () => {
     setLocation(newLocation);
     setIsDialogOpen(false);
+  };
+
+  const handleLogout = () => {
+    if (auth) {
+      auth.signOut();
+    }
   };
 
   const hasNotifications = true; // Placeholder for notification state
@@ -142,6 +161,31 @@ export function Header() {
               <Cart />
             </SheetContent>
           </Sheet>
+
+          {isUserLoading && <Skeleton className="h-10 w-24 rounded-md" />}
+          {!isUserLoading && !user && (
+            <Button variant="outline" className="hidden md:inline-flex" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
+          {!isUserLoading && user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? ''} />
+                    <AvatarFallback>{user.displayName?.charAt(0) ?? user.email?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </nav>
       </div>
     </header>

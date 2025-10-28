@@ -14,17 +14,18 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
 import { useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { href: '/admin/dashboard', icon: Home, label: 'Overview' },
+  { href: '/admin/dashboard?tab=overview', icon: Home, label: 'Overview', tab: 'overview' },
   {
-    href: '/admin/dashboard#registrations',
+    href: '/admin/dashboard?tab=registrations',
     icon: Users,
     label: 'Registrations',
+    tab: 'registrations',
   },
-  { href: '/admin/dashboard#orders', icon: ClipboardList, label: 'Orders' },
-  { href: '/admin/dashboard#bookings', icon: ChefHat, label: 'Chef Bookings' },
+  { href: '/admin/dashboard?tab=orders', icon: ClipboardList, label: 'Orders', tab: 'orders' },
+  { href: '/admin/dashboard?tab=bookings', icon: ChefHat, label: 'Chef Bookings', tab: 'bookings' },
 ];
 
 const accountItems = [
@@ -40,6 +41,7 @@ export default function AdminDashboardLayout({
 }) {
   const { setHeaderTitle } = useHeader();
   const adminTitle = 'Admin';
+  const pathname = usePathname();
 
   useEffect(() => {
     setHeaderTitle(adminTitle);

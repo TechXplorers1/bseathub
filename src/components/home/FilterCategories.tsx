@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tag, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 
 const mainCategories = [
   { name: 'Breakfast', icon: Zap }, // Using Zap as a placeholder for Breakfast
@@ -52,6 +53,8 @@ export function FilterCategories() {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = React.useState(false);
   const [showRightButton, setShowRightButton] = React.useState(true);
+  const { deliveryMode, setDeliveryMode } = useDeliveryMode();
+
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -127,6 +130,29 @@ export function FilterCategories() {
       </div>
 
       <div className="flex justify-start items-center space-x-2 overflow-x-auto pt-4">
+        <div className="flex bg-gray-100 rounded-full p-1 mr-2">
+            <Button
+              variant={deliveryMode === 'all' ? 'default' : 'ghost'}
+              className="rounded-full flex-shrink-0 text-sm h-9"
+              onClick={() => setDeliveryMode('all')}
+            >
+              All
+            </Button>
+            <Button
+              variant={deliveryMode === 'delivery' ? 'default' : 'ghost'}
+              className="rounded-full flex-shrink-0 text-sm h-9"
+              onClick={() => setDeliveryMode('delivery')}
+            >
+              Delivery
+            </Button>
+            <Button
+              variant={deliveryMode === 'pickup' ? 'default' : 'ghost'}
+              className="rounded-full flex-shrink-0 text-sm h-9"
+              onClick={() => setDeliveryMode('pickup')}
+            >
+              Pickup
+            </Button>
+          </div>
         {filterButtons.map((button) => (
           <Button
             key={button.name}

@@ -77,7 +77,7 @@ export default function HomeFoodDashboardLayout({
       <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className="hidden border-r bg-muted/40 md:block">
           <div className="flex h-full max-h-screen flex-col gap-2">
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto py-2">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
                   {navItems.map(item => (
                       <Link
@@ -104,22 +104,6 @@ export default function HomeFoodDashboardLayout({
                       </Link>
                   ))}
                </nav>
-            </div>
-            <div className="mt-auto p-4">
-              <Card>
-                <CardHeader className="p-2 pt-0 md:p-4">
-                  <CardTitle>Upgrade to Pro</CardTitle>
-                  <CardDescription>
-                    Unlock all features and get unlimited access to our support
-                    team.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                  <Button size="sm" className="w-full">
-                    Upgrade
-                  </Button>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

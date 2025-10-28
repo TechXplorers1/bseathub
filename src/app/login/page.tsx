@@ -14,12 +14,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Flame } from 'lucide-react';
+import { useAuth } from '@/firebase';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function LoginPage() {
   const [step, setStep] = useState(1);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
   const router = useRouter();
+  const auth = useAuth();
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +33,16 @@ export default function LoginPage() {
 
   const handleOtpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd verify the OTP here
-    console.log(`Verifying OTP ${otp}`);
-    router.push('/');
+    if (auth) {
+      signInAnonymously(auth)
+        .then(() => {
+          console.log('Anonymous sign-in successful');
+          router.push('/');
+        })
+        .catch((error) => {
+          console.error('Error signing in anonymously:', error);
+        });
+    }
   };
 
   return (

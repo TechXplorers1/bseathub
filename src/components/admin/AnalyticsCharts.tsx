@@ -61,13 +61,13 @@ export function AnalyticsCharts({ revenueData, signupsData }: ChartProps) {
               <Line
                 type="monotone"
                 dataKey="homeFood"
-                stroke="hsl(var(--secondary))"
+                stroke="hsl(var(--accent))"
                 strokeWidth={2}
               />
                <Line
                 type="monotone"
                 dataKey="chefs"
-                stroke="hsl(var(--accent))"
+                stroke="hsl(var(--secondary))"
                 strokeWidth={2}
               />
             </LineChart>

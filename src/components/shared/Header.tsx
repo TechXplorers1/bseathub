@@ -151,6 +151,12 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
+          {!isUserLoading && !user && (
+            <Button variant="outline" className="hidden md:inline-flex" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
+
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="default" className="relative rounded-full">
@@ -171,11 +177,6 @@ export function Header() {
           </Sheet>
 
           {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
-          {!isUserLoading && !user && (
-            <Button variant="outline" className="hidden md:inline-flex" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-          )}
           {!isUserLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

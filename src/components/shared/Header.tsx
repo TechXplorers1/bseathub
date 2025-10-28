@@ -18,6 +18,11 @@ import {
   Bell,
   LogOut,
   User,
+  LayoutDashboard,
+  Shield,
+  Utensils,
+  Building2,
+  ChefHat,
 } from 'lucide-react';
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
@@ -45,6 +50,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from '../ui/dropdown-menu';
 
 export function Header() {
@@ -182,6 +189,40 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                 <DropdownMenuItem asChild>
+                  <Link href="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                 <DropdownMenuLabel>Dashboards</DropdownMenuLabel>
+                  <DropdownMenuItem asChild>
+                     <Link href="/admin/dashboard">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/home-food-dashboard">
+                      <Utensils className="mr-2 h-4 w-4" />
+                      <span>Home Food</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/restaurant-dashboard">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      <span>Restaurant</span>
+                    </Link>
+                  </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                    <Link href="/chef-dashboard">
+                      <ChefHat className="mr-2 h-4 w-4" />
+                      <span>Chef</span>
+                    </Link>
+                  </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>

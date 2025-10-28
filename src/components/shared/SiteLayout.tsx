@@ -48,18 +48,12 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     { name: 'Home Food', icon: Utensils, href: '/home-food' },
     { name: 'Restaurant', icon: Building2, href: '/restaurants' },
     { name: 'Chefs', icon: ChefHat, href: '/chefs' },
-    { name: 'Dashboards', icon: LayoutDashboard, href: '/dashboard' },
-    { name: 'Admin dashboards', icon: Shield, href: '/admin/dashboard' },
-    { name: 'Home food dashboard', icon: Utensils, href: '/home-food-dashboard' },
-    { name: 'Restaurant dashboard', icon: Building2, href: '/restaurant-dashboard' },
-    { name: 'Chef dashboard', icon: ChefHat, href: '/chef-dashboard' },
     { name: 'Promotions', icon: Ticket, href: '#' },
     { name: 'Invite Friends', icon: Gift, href: '#' },
   ];
 
   const categoriesNav = [
     { name: 'Best of Eat Hub', icon: Heart, href: '#' },
-    { name: 'Account', icon: User, href: '#' },
   ];
 
   return (

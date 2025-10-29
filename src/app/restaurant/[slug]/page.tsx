@@ -1,16 +1,14 @@
 'use client';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useSearchParams } from 'next/navigation';
 import { RestaurantClientPage } from './client-page';
 import { useRestaurants } from '@/context/RestaurantProvider';
 
-export default function RestaurantPage({
-  searchParams,
-}: {
-  searchParams?: { chef?: string };
-}) {
+export default function RestaurantPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { allItems } = useRestaurants();
   const slug = params.slug as string;
+  const chefName = searchParams.get('chef') || undefined;
 
   const restaurant = allItems.find((r) => r.slug === slug);
 
@@ -21,7 +19,5 @@ export default function RestaurantPage({
     return <div>Loading restaurant...</div>;
   }
 
-  return (
-    <RestaurantClientPage restaurant={restaurant} chefName={searchParams?.chef} />
-  );
+  return <RestaurantClientPage restaurant={restaurant} chefName={chefName} />;
 }

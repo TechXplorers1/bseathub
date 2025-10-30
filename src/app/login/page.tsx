@@ -111,7 +111,7 @@ export default function LoginPage() {
             )}
           </div>
           <div className="text-center text-sm">
-            <Link href="#" className="font-medium text-primary hover:underline">
+            <Link href="/partner" className="font-medium text-primary hover:underline">
               Become a partner
             </Link>
           </div>

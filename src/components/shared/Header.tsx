@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -151,12 +152,6 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {!isUserLoading && !user && (
-            <Button variant="outline" className="hidden md:inline-flex" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-          )}
-
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="default" className="relative rounded-full">
@@ -175,6 +170,12 @@ export function Header() {
               <Cart />
             </SheetContent>
           </Sheet>
+
+          {!isUserLoading && !user && (
+            <Button variant="outline" className="hidden md:inline-flex" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          )}
 
           {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
           {!isUserLoading && user && (

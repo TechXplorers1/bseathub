@@ -171,14 +171,9 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {!isUserLoading && !user && (
-            <Button variant="outline" className="hidden md:inline-flex" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-          )}
-
           {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
-          {!isUserLoading && user && (
+          
+          {!isUserLoading && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -231,6 +226,10 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ): (
+             <Button variant="outline" className="hidden md:inline-flex" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
           )}
         </nav>
       </div>

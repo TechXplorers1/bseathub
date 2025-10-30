@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -108,6 +109,11 @@ export default function LoginPage() {
                 Didn't receive a code? Resend
               </button>
             )}
+          </div>
+          <div className="text-center text-sm">
+            <Link href="#" className="font-medium text-primary hover:underline">
+              Become a partner
+            </Link>
           </div>
         </CardFooter>
       </Card>

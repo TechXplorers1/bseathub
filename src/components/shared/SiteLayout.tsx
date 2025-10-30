@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -63,12 +64,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                           pathname.startsWith('/home-food-dashboard') || 
                           pathname.startsWith('/restaurant-dashboard');
 
+  const showSidebar = pathname === '/';
+
 
   return (
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex flex-1 overflow-hidden">
-        {!isDashboardPage && (
+        {showSidebar && !isDashboardPage && (
           <Sidebar
             variant="sidebar"
             collapsible="icon"

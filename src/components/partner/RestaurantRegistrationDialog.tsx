@@ -72,11 +72,13 @@ type StepThreeValues = z.infer<typeof stepThreeSchema>;
 interface RestaurantRegistrationDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (data: any, type: 'Restaurant') => void;
 }
 
 export function RestaurantRegistrationDialog({
   isOpen,
   onOpenChange,
+  onSubmit,
 }: RestaurantRegistrationDialogProps) {
     const { toast } = useToast();
     const [step, setStep] = React.useState(1);
@@ -100,26 +102,26 @@ export function RestaurantRegistrationDialog({
   
     const handleBack = () => setStep(prev => prev - 1);
   
-    const onSubmit = (data: any) => {
-      const allData = {
-        ...formStep1.getValues(),
-        ...formStep2.getValues(),
-        ...formStep3.getValues(),
+    const handleFinalSubmit = (data: any) => {
+        const allData = {
+          ...formStep1.getValues(),
+          ...formStep2.getValues(),
+          ...formStep3.getValues(),
+        };
+        onSubmit(allData, 'Restaurant');
+        toast({
+          title: 'Registration Submitted!',
+          description: "Thank you for registering your restaurant. We will review your application and get back to you shortly.",
+        });
+        onOpenChange(false);
+        // Reset forms after a delay to allow dialog to close
+        setTimeout(() => {
+          formStep1.reset();
+          formStep2.reset();
+          formStep3.reset();
+          setStep(1);
+        }, 500);
       };
-      console.log('Registration Data:', allData);
-      toast({
-        title: 'Registration Submitted!',
-        description: "Thank you for registering your restaurant. We will review your application and get back to you shortly.",
-      });
-      onOpenChange(false);
-      // Reset forms after a delay to allow dialog to close
-      setTimeout(() => {
-        formStep1.reset();
-        formStep2.reset();
-        formStep3.reset();
-        setStep(1);
-      }, 500);
-    };
 
     const progressValue = (step / 3) * 100;
 
@@ -215,7 +217,7 @@ export function RestaurantRegistrationDialog({
         
         {step === 3 && (
              <Form {...formStep3}>
-                <form onSubmit={formStep3.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={formStep3.handleSubmit(handleFinalSubmit)} className="space-y-4">
                     <FormField control={formStep3.control} name="logo" render={({ field }) => (
                         <FormItem><FormLabel>Upload Logo</FormLabel><FormControl><Input type="file" onChange={(e) => field.onChange(e.target.files)} /></FormControl><FormMessage /></FormItem>
                     )} />
@@ -239,7 +241,7 @@ export function RestaurantRegistrationDialog({
             {step > 1 && <Button variant="outline" onClick={handleBack}>Back</Button>}
             <div className="flex-grow"></div>
             {step < 3 && <Button onClick={handleNext}>Next</Button>}
-            {step === 3 && <Button onClick={formStep3.handleSubmit(onSubmit)}>Submit Application</Button>}
+            {step === 3 && <Button onClick={formStep3.handleSubmit(handleFinalSubmit)}>Submit Application</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>

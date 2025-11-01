@@ -64,11 +64,13 @@ type StepThreeValues = z.infer<typeof stepThreeSchema>;
 interface ChefRegistrationDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (data: any, type: 'Chef') => void;
 }
 
 export function ChefRegistrationDialog({
   isOpen,
   onOpenChange,
+  onSubmit,
 }: ChefRegistrationDialogProps) {
   const { toast } = useToast();
   const [step, setStep] = React.useState(1);
@@ -92,13 +94,13 @@ export function ChefRegistrationDialog({
 
   const handleBack = () => setStep(prev => prev - 1);
 
-  const onSubmit = (data: any) => {
+  const handleFinalSubmit = (data: any) => {
     const allData = {
       ...formStep1.getValues(),
       ...formStep2.getValues(),
       ...formStep3.getValues(),
     };
-    console.log('Chef Registration Data:', allData);
+    onSubmit(allData, 'Chef');
     toast({
       title: 'Application Submitted!',
       description: "Thank you for registering as a chef. We'll review your profile and be in touch.",
@@ -138,9 +140,6 @@ export function ChefRegistrationDialog({
                 )} />
                 <FormField control={formStep1.control} name="contactNumber" render={({ field }) => (
                     <FormItem><FormLabel>Contact Number</FormLabel><FormControl><Input type="tel" {...field} /></FormControl><FormMessage /></FormItem>
-                )} />
-                <FormField control={formStep1.control} name="currentCity" render={({ field }) => (
-                    <FormItem><FormLabel>Current City</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={formStep1.control} name="password" render={({ field }) => (
                     <FormItem><FormLabel>Password</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>
@@ -225,7 +224,7 @@ export function ChefRegistrationDialog({
 
         {step === 3 && (
             <Form {...formStep3}>
-                <form onSubmit={formStep3.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={formStep3.handleSubmit(handleFinalSubmit)} className="space-y-4">
                     <FormField control={formStep3.control} name="profilePhoto" render={({ field }) => (
                         <FormItem><FormLabel>Profile Photo</FormLabel><FormControl><Input type="file" onChange={(e) => field.onChange(e.target.files)} /></FormControl><FormMessage /></FormItem>
                     )} />
@@ -246,7 +245,7 @@ export function ChefRegistrationDialog({
             {step > 1 && <Button variant="outline" onClick={handleBack}>Back</Button>}
             <div className="flex-grow"></div>
             {step < 3 && <Button onClick={handleNext}>Next</Button>}
-            {step === 3 && <Button onClick={formStep3.handleSubmit(onSubmit)}>Submit Application</Button>}
+            {step === 3 && <Button onClick={formStep3.handleSubmit(handleFinalSubmit)}>Submit Application</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>

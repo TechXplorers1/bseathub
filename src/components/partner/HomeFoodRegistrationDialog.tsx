@@ -70,11 +70,13 @@ type StepThreeValues = z.infer<typeof stepThreeSchema>;
 interface HomeFoodRegistrationDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (data: any, type: 'Home Food') => void;
 }
 
 export function HomeFoodRegistrationDialog({
   isOpen,
   onOpenChange,
+  onSubmit,
 }: HomeFoodRegistrationDialogProps) {
     const { toast } = useToast();
     const [step, setStep] = React.useState(1);
@@ -98,13 +100,13 @@ export function HomeFoodRegistrationDialog({
   
     const handleBack = () => setStep(prev => prev - 1);
   
-    const onSubmit = (data: any) => {
+    const handleFinalSubmit = (data: any) => {
       const allData = {
         ...formStep1.getValues(),
         ...formStep2.getValues(),
         ...formStep3.getValues(),
       };
-      console.log('Registration Data:', allData);
+      onSubmit(allData, 'Home Food');
       toast({
         title: 'Registration Submitted!',
         description: "Thank you for registering. We will review your application and get back to you shortly.",
@@ -220,7 +222,7 @@ export function HomeFoodRegistrationDialog({
 
         {step === 3 && (
              <Form {...formStep3}>
-                <form onSubmit={formStep3.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={formStep3.handleSubmit(handleFinalSubmit)} className="space-y-4">
                     <FormField control={formStep3.control} name="hygieneCertificate" render={({ field }) => (
                         <FormItem><FormLabel>Hygiene Certificate / ID Proof</FormLabel><FormControl><Input type="file" onChange={(e) => field.onChange(e.target.files)} /></FormControl><FormMessage /></FormItem>
                     )} />
@@ -238,10 +240,9 @@ export function HomeFoodRegistrationDialog({
             {step > 1 && <Button variant="outline" onClick={handleBack}>Back</Button>}
             <div className="flex-grow"></div>
             {step < 3 && <Button onClick={handleNext}>Next</Button>}
-            {step === 3 && <Button onClick={formStep3.handleSubmit(onSubmit)}>Submit Application</Button>}
+            {step === 3 && <Button onClick={formStep3.handleSubmit(handleFinalSubmit)}>Submit Application</Button>}
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
-

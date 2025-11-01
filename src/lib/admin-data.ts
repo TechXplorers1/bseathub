@@ -1,3 +1,4 @@
+
 export type PendingRegistration = {
   id: string;
   name: string;
@@ -70,12 +71,22 @@ export const recentActivities: Activity[] = [
     { id: '5', name: 'New Restaurant Registration', description: 'The Noodle Bar', time: '2h ago', avatarUrl: '/icons/restaurant.svg' },
 ];
 
-export const pendingRegistrations: PendingRegistration[] = [
+export let pendingRegistrations: PendingRegistration[] = [
   { id: 'reg1', name: 'The Spicy Taco', type: 'Restaurant', date: '2024-07-28' },
   { id: 'reg2', name: "Anna's Bakery", type: 'Home Food', date: '2024-07-28' },
   { id: 'reg3', name: 'Chef Michael', type: 'Chef', date: '2024-07-27' },
   { id: 'reg4', name: 'Gourmet Grills', type: 'Restaurant', date: '2024-07-26' },
 ];
+
+export const addPendingRegistration = (registration: Omit<PendingRegistration, 'id' | 'date'>) => {
+    const newRegistration: PendingRegistration = {
+        ...registration,
+        id: `reg${Math.floor(Math.random() * 1000)}`,
+        date: new Date().toISOString().split('T')[0],
+    };
+    pendingRegistrations = [newRegistration, ...pendingRegistrations];
+};
+
 
 export const allOrders: PlatformOrder[] = [
   { id: 'ORD5551', customerName: 'John Smith', partnerName: 'The Golden Spoon', amount: 45.50, status: 'Delivered', date: '2024-07-28' },

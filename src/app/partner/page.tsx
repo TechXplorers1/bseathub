@@ -9,6 +9,7 @@ import Link from "next/link";
 import { HomeFoodRegistrationDialog } from '@/components/partner/HomeFoodRegistrationDialog';
 import { RestaurantRegistrationDialog } from '@/components/partner/RestaurantRegistrationDialog';
 import { ChefRegistrationDialog } from '@/components/partner/ChefRegistrationDialog';
+import { addPendingRegistration } from '@/lib/admin-data';
 
 const HomeFoodIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -58,6 +59,13 @@ export default function PartnerPage() {
             setIsChefDialogOpen(true);
         }
     };
+    
+    const handleRegistrationSubmit = (data: any, type: 'Home Food' | 'Restaurant' | 'Chef') => {
+        addPendingRegistration({
+          name: data.fullName || data.restaurantName || data.ownerName,
+          type: type,
+        });
+      };
 
     return (
         <>
@@ -87,9 +95,9 @@ export default function PartnerPage() {
                     ))}
                 </div>
             </div>
-            <HomeFoodRegistrationDialog isOpen={isHomeFoodDialogOpen} onOpenChange={setIsHomeFoodDialogOpen} />
-            <RestaurantRegistrationDialog isOpen={isRestaurantDialogOpen} onOpenChange={setIsRestaurantDialogOpen} />
-            <ChefRegistrationDialog isOpen={isChefDialogOpen} onOpenChange={setIsChefDialogOpen} />
+            <HomeFoodRegistrationDialog isOpen={isHomeFoodDialogOpen} onOpenChange={setIsHomeFoodDialogOpen} onSubmit={handleRegistrationSubmit} />
+            <RestaurantRegistrationDialog isOpen={isRestaurantDialogOpen} onOpenChange={setIsRestaurantDialogOpen} onSubmit={handleRegistrationSubmit} />
+            <ChefRegistrationDialog isOpen={isChefDialogOpen} onOpenChange={setIsChefDialogOpen} onSubmit={handleRegistrationSubmit} />
         </>
     )
 }

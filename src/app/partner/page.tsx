@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ChefHat, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { HomeFoodRegistrationDialog } from '@/components/partner/HomeFoodRegistrationDialog';
+import { RestaurantRegistrationDialog } from '@/components/partner/RestaurantRegistrationDialog';
 
 const HomeFoodIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -32,7 +33,7 @@ const partnerOptions = [
         title: "Restaurant Partner",
         description: "For restaurants, cafes, and cloud kitchens.",
         icon: <UtensilsCrossed size={32} />,
-        link: "/restaurant-dashboard" // Placeholder for future registration flow
+        link: "#"
     },
     {
         id: 'chef',
@@ -45,10 +46,14 @@ const partnerOptions = [
 
 export default function PartnerPage() {
     const [isHomeFoodDialogOpen, setIsHomeFoodDialogOpen] = useState(false);
+    const [isRestaurantDialogOpen, setIsRestaurantDialogOpen] = useState(false);
 
     const handleRegisterClick = (id: string) => {
         if (id === 'home-food') {
             setIsHomeFoodDialogOpen(true);
+        }
+        if (id === 'restaurant') {
+            setIsRestaurantDialogOpen(true);
         }
         // For other types, we'll let the Link component handle navigation.
     };
@@ -75,12 +80,12 @@ export default function PartnerPage() {
                                 <CardDescription className="text-base">{option.description}</CardDescription>
                             </CardContent>
                             <div className="p-6">
-                                {option.id === 'home-food' ? (
-                                     <Button onClick={() => handleRegisterClick(option.id)} className="w-full" size="lg">Register Now</Button>
-                                ) : (
+                                {option.id === 'chef' ? (
                                     <Button asChild className="w-full" size="lg">
                                         <Link href={option.link}>Register Now</Link>
                                     </Button>
+                                ) : (
+                                     <Button onClick={() => handleRegisterClick(option.id)} className="w-full" size="lg">Register Now</Button>
                                 )}
                             </div>
                         </Card>
@@ -88,6 +93,7 @@ export default function PartnerPage() {
                 </div>
             </div>
             <HomeFoodRegistrationDialog isOpen={isHomeFoodDialogOpen} onOpenChange={setIsHomeFoodDialogOpen} />
+            <RestaurantRegistrationDialog isOpen={isRestaurantDialogOpen} onOpenChange={setIsRestaurantDialogOpen} />
         </>
     )
 }

@@ -1,7 +1,12 @@
+
+'use client';
+
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChefHat, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
+import { HomeFoodRegistrationDialog } from '@/components/partner/HomeFoodRegistrationDialog';
 
 const HomeFoodIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -16,54 +21,73 @@ const HomeFoodIcon = () => (
 
 const partnerOptions = [
     {
+        id: 'home-food',
         title: "Home Food partner",
         description: "For home cooks and tiffin services",
         icon: <HomeFoodIcon />,
-        link: "/home-food-dashboard"
+        link: "#"
     },
     {
+        id: 'restaurant',
         title: "Restaurant Partner",
         description: "For restaurants, cafes, and cloud kitchens.",
         icon: <UtensilsCrossed size={32} />,
-        link: "/restaurant-dashboard"
+        link: "/restaurant-dashboard" // Placeholder for future registration flow
     },
     {
+        id: 'chef',
         title: "Chef Partner",
         description: "Grow your career, connect with clients, and showcase your passion for food.",
         icon: <ChefHat size={32} />,
-        link: "/chef-dashboard"
+        link: "/chef-dashboard" // Placeholder for future registration flow
     }
 ];
 
 export default function PartnerPage() {
+    const [isHomeFoodDialogOpen, setIsHomeFoodDialogOpen] = useState(false);
+
+    const handleRegisterClick = (id: string) => {
+        if (id === 'home-food') {
+            setIsHomeFoodDialogOpen(true);
+        }
+        // For other types, we'll let the Link component handle navigation.
+    };
+
     return (
-        <div className="min-h-screen bg-orange-50/50 flex flex-col items-center justify-center p-8">
-            <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold tracking-tight">Become a Partner</h1>
-                <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Grow with Eat Hub by joining as a Restaurant, Home Food Cook, or Private Chef.
-                </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
-                {partnerOptions.map((option) => (
-                    <Card key={option.title} className="text-center hover:shadow-xl transition-shadow duration-300">
-                        <CardHeader className="items-center">
-                            <div className="p-4 bg-primary/10 rounded-full text-primary mb-4">
-                                {option.icon}
+        <>
+            <div className="min-h-screen bg-orange-50/50 flex flex-col items-center justify-center p-8">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold tracking-tight">Become a Partner</h1>
+                    <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Grow with Eat Hub by joining as a Restaurant, Home Food Cook, or Private Chef.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+                    {partnerOptions.map((option) => (
+                        <Card key={option.title} className="text-center hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                            <CardHeader className="items-center">
+                                <div className="p-4 bg-primary/10 rounded-full text-primary mb-4">
+                                    {option.icon}
+                                </div>
+                                <CardTitle>{option.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-grow">
+                                <CardDescription className="text-base">{option.description}</CardDescription>
+                            </CardContent>
+                            <div className="p-6">
+                                {option.id === 'home-food' ? (
+                                     <Button onClick={() => handleRegisterClick(option.id)} className="w-full" size="lg">Register Now</Button>
+                                ) : (
+                                    <Button asChild className="w-full" size="lg">
+                                        <Link href={option.link}>Register Now</Link>
+                                    </Button>
+                                )}
                             </div>
-                            <CardTitle>{option.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription className="text-base">{option.description}</CardDescription>
-                        </CardContent>
-                        <div className="p-6">
-                             <Button asChild className="w-full" size="lg">
-                                <Link href={option.link}>Register Now</Link>
-                            </Button>
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    ))}
+                </div>
             </div>
-        </div>
+            <HomeFoodRegistrationDialog isOpen={isHomeFoodDialogOpen} onOpenChange={setIsHomeFoodDialogOpen} />
+        </>
     )
 }

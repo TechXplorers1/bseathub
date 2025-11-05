@@ -21,12 +21,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
-import { menuItems as initialMenuItems } from '@/lib/restaurant-dashboard-data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useState, useEffect } from 'react';
 import { AddDishDialog } from '@/components/dashboard/restaurant/AddDishDialog';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import type { MenuItem as MenuItemType } from '@/lib/types';
+
+type ExtendedMenuItem = MenuItemType & { isSpecial: boolean; status: 'Available' | 'Out of Stock' };
 
 
 export default function MenuPage() {
@@ -35,14 +36,14 @@ export default function MenuPage() {
   const restaurantId = '1'; 
   const restaurant = getRestaurantById(restaurantId);
 
-  const allMenuItems = restaurant ? restaurant.menu.flatMap(c => c.items.map(i => ({...i, isSpecial: false, status: 'Available' as const}))) : [];
-  
-  const [menuItems, setMenuItems] = useState(allMenuItems);
+  const [menuItems, setMenuItems] = useState<ExtendedMenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
 
   useEffect(() => {
-    const updatedMenuItems = restaurant ? restaurant.menu.flatMap(c => c.items.map(i => ({...i, isSpecial: false, status: 'Available' as const}))) : [];
-    setMenuItems(updatedMenuItems);
+    if (restaurant) {
+      const allMenuItems = restaurant.menu.flatMap(c => c.items.map(i => ({...i, isSpecial: false, status: 'Available' as const})));
+      setMenuItems(allMenuItems);
+    }
   }, [restaurant]);
 
   const handleToggleSpecial = (id: string) => {
@@ -159,4 +160,3 @@ export default function MenuPage() {
     </>
   );
 }
-

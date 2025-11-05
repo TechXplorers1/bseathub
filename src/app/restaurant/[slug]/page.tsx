@@ -1,7 +1,10 @@
+
 'use client';
 import { notFound, useParams, useSearchParams } from 'next/navigation';
 import { RestaurantClientPage } from './client-page';
 import { useRestaurants } from '@/context/RestaurantProvider';
+import { useEffect, useState } from 'react';
+import type { Restaurant } from '@/lib/types';
 
 export default function RestaurantPage() {
   const params = useParams();
@@ -9,8 +12,13 @@ export default function RestaurantPage() {
   const { allItems } = useRestaurants();
   const slug = params.slug as string;
   const chefName = searchParams.get('chef') || undefined;
+  const [restaurant, setRestaurant] = useState<Restaurant | undefined>();
 
-  const restaurant = allItems.find((r) => r.slug === slug);
+  useEffect(() => {
+    const foundRestaurant = allItems.find((r) => r.slug === slug);
+    setRestaurant(foundRestaurant);
+  }, [allItems, slug]);
+
 
   if (!restaurant) {
     // We could show a loading state here while waiting for context

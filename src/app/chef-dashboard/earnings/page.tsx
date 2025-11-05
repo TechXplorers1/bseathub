@@ -17,12 +17,12 @@ import {
     TableRow,
   } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { earningsData, recentBookings } from '@/lib/chef-dashboard-data';
+import { earningsData, recentBookings, overviewStats } from '@/lib/chef-dashboard-data';
 import { ChefChart } from '@/components/dashboard/chef/ChefChart';
   
   export default function EarningsPage() {
     const transactionHistory = recentBookings.filter(b => b.status === 'Completed');
-    const totalEarnings = transactionHistory.reduce((acc, booking) => acc + booking.total, 0);
+    const totalEarnings = overviewStats.totalEarnings;
   
     return (
       <div className="space-y-6">
@@ -35,7 +35,7 @@ import { ChefChart } from '@/components/dashboard/chef/ChefChart';
               <CardDescription>All-time gross earnings.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">${overviewStats.totalEarnings.toLocaleString()}</p>
+              <p className="text-4xl font-bold">${totalEarnings.toLocaleString()}</p>
             </CardContent>
           </Card>
           <Card>
@@ -101,8 +101,4 @@ import { ChefChart } from '@/components/dashboard/chef/ChefChart';
       </div>
     );
   }
-
-  const overviewStats = {
-    totalEarnings: 15600,
-  };
   

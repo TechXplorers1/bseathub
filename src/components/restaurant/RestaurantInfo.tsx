@@ -13,8 +13,8 @@ interface RestaurantInfoProps {
 
 export function RestaurantInfo({ restaurant, displayName, isChefPage }: RestaurantInfoProps) {
     return (
-        <div>
-            <h1 className="text-4xl font-bold mt-8 lg:mt-0">{displayName}</h1>
+        <div className="mt-8">
+            <h1 className="text-4xl font-bold lg:mt-0">{displayName}</h1>
             <div className="mt-6 space-y-3 text-sm">
             <h2 className="text-lg font-semibold sr-only lg:not-sr-only">
                 {isChefPage ? 'Chef Info' : 'Store Info'}

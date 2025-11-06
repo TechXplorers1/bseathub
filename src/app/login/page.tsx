@@ -47,7 +47,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-grow items-center justify-center bg-gray-100/40 dark:bg-transparent px-4 py-12">
+    <div className="flex flex-grow flex-col items-center justify-center bg-gray-100/40 dark:bg-transparent px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">

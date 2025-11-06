@@ -124,7 +124,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </SidebarFooter>
           </Sidebar>
         )}
-        <div className="flex-1 flex flex-col overflow-y-auto">
+        <div className="flex flex-col overflow-y-auto w-full">
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />
         </div>

@@ -72,7 +72,7 @@ export function MenuNav({ menuCategories, hasChef, className }: MenuNavProps) {
 
   return (
     <div className={cn('h-full', className)}>
-        <ScrollArea className="h-[calc(100vh-250px)]">
+        <ScrollArea className="h-[calc(100vh_-_10rem)]">
             <nav className="flex flex-col space-y-1 pr-4">
             {navItems.map((item) => (
                 <Button

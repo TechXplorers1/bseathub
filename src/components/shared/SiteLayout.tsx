@@ -103,25 +103,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </SidebarMenu>
             </SidebarContent>
-             <SidebarFooter>
-              <SidebarMenu>
-                {!isUserLoading && user ? (
-                   <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
-                      <LogOut />
-                      <span>Logout</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : !isUserLoading && !user ? (
-                   <SidebarMenuItem>
-                    <SidebarMenuButton href="/login" tooltip="Sign In">
-                      <LogIn />
-                      <span>Sign In</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : null}
-              </SidebarMenu>
-            </SidebarFooter>
           </Sidebar>
         )}
         <div className="flex flex-col overflow-y-auto w-full">

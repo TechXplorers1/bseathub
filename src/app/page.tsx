@@ -13,7 +13,7 @@ import { useRestaurants } from '@/context/RestaurantProvider';
 export default function Home() {
   const { restaurants, homeFoods } = useRestaurants();
   return (
-    <div className="flex flex-col container px-8">
+    <div className="flex flex-col px-8">
       <div className="w-full py-8">
         <FilterCategories />
         <Banners />

@@ -107,9 +107,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         )}
         <div className="flex flex-col overflow-y-auto w-full">
           <main className="flex-1 flex flex-col">{children}</main>
-          <Footer />
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

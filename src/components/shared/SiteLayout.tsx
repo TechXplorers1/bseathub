@@ -77,10 +77,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             collapsible="icon"
             className="group hidden md:flex text-sidebar-foreground sticky top-0 h-full"
           >
+            <SidebarHeader>
+                <SidebarTrigger />
+            </SidebarHeader>
             <SidebarContent>
-              <SidebarHeader>
-                  <SidebarTrigger />
-              </SidebarHeader>
               <SidebarMenu>
                 {sidebarNav.map((item) => (
                   <SidebarMenuItem key={item.name}>

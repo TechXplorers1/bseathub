@@ -103,9 +103,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 ))}
               </SidebarMenu>
             </SidebarContent>
+            
           </Sidebar>
         )}
-        <div className="flex flex-col overflow-y-auto w-full">
+        <div className="flex flex-col overflow-y-auto">
           <main className="flex-1 flex flex-col">{children}</main>
         </div>
       </div>

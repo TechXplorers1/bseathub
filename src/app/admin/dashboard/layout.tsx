@@ -29,7 +29,7 @@ const navItems = [
 ];
 
 const accountItems = [
-  { href: '#', icon: Settings, label: 'Settings' },
+  { href: '/admin/settings', icon: Settings, label: 'Settings' },
   { href: '#', icon: LifeBuoy, label: 'Support' },
   { href: '#', icon: LogOut, label: 'Logout' },
 ];

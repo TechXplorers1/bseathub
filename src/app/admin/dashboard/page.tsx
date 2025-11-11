@@ -47,14 +47,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-4">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
        <Tabs value={activeTab} onValueChange={onTabChange} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="registrations">Registrations</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="bookings">Chef Bookings</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-
+        
         <TabsContent value="overview">
             <div className="space-y-4">
                 <DashboardStats stats={adminStats} />

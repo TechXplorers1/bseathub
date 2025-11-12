@@ -15,6 +15,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
+import { useRatingFilter } from '@/context/RatingFilterProvider';
 
 interface HomeFeedProps {
   restaurants: Restaurant[];
@@ -27,6 +28,7 @@ const INITIAL_VISIBLE_COUNT = 8;
 export function HomeFeed({ restaurants }: HomeFeedProps) {
   const [sortOption, setSortOption] = useState<SortOption>('picked');
   const { deliveryMode } = useDeliveryMode();
+  const { ratingFilter } = useRatingFilter();
 
   const sortFunctions: Record<SortOption, (a: Restaurant, b: Restaurant) => number> = {
     picked: (a, b) => a.id.localeCompare(b.id),
@@ -35,10 +37,9 @@ export function HomeFeed({ restaurants }: HomeFeedProps) {
   };
   
   const filteredRestaurants = restaurants.filter(restaurant => {
-    if (deliveryMode === 'all') {
-      return true;
-    }
-    return restaurant.services.includes(deliveryMode);
+    const deliveryModeMatch = deliveryMode === 'all' || restaurant.services.includes(deliveryMode);
+    const ratingMatch = ratingFilter === 0 || restaurant.rating >= ratingFilter;
+    return deliveryModeMatch && ratingMatch;
   });
 
   const sortedRestaurants = [...filteredRestaurants].sort(sortFunctions[sortOption]);

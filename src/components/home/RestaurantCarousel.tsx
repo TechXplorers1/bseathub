@@ -8,6 +8,7 @@ import { Button, buttonVariants } from '../ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
+import { useRatingFilter } from '@/context/RatingFilterProvider';
 
 interface RestaurantCarouselProps {
   title: string;
@@ -19,12 +20,12 @@ const INITIAL_VISIBLE_COUNT = 8;
 
 export function RestaurantCarousel({ title, restaurants, href = "/restaurants" }: RestaurantCarouselProps) {
   const { deliveryMode } = useDeliveryMode();
+  const { ratingFilter } = useRatingFilter();
   
   const filteredRestaurants = restaurants.filter(restaurant => {
-    if (deliveryMode === 'all') {
-      return true;
-    }
-    return restaurant.services.includes(deliveryMode);
+    const deliveryModeMatch = deliveryMode === 'all' || restaurant.services.includes(deliveryMode);
+    const ratingMatch = ratingFilter === 0 || restaurant.rating >= ratingFilter;
+    return deliveryModeMatch && ratingMatch;
   });
   
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);

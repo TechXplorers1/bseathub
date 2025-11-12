@@ -70,13 +70,13 @@ export default function ChefDashboardLayout({
                     href={item.href}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                      isActive && "bg-primary text-primary-foreground hover:text-primary-foreground"
+                      isActive && "bg-accent text-accent-foreground hover:text-accent-foreground"
                     )}
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
                     {item.badge && (
-                      <Badge className={cn("ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full", isActive ? "bg-primary-foreground text-primary" : "")}>
+                      <Badge className={cn("ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full", isActive ? "bg-accent-foreground text-accent" : "")}>
                         {item.badge}
                       </Badge>
                     )}
@@ -94,7 +94,7 @@ export default function ChefDashboardLayout({
                     href={item.href}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                      isActive && "bg-primary text-primary-foreground hover:text-primary-foreground"
+                      isActive && "bg-accent text-accent-foreground hover:text-accent-foreground"
                     )}
                   >
                     <item.icon className="h-4 w-4" />

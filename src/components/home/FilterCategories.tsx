@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -171,7 +172,7 @@ export function FilterCategories() {
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="rounded-full flex-shrink-0">
                     <Star className="mr-2 h-4 w-4" />
-                    {ratingFilter > 0 ? `${ratingFilter} Star${ratingFilter > 1 ? 's' : ''} & up` : 'Rating'}
+                    {ratingFilter > 0 ? ratingOptions.find(o => o.value === ratingFilter)?.label : 'Rating'}
                     <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>

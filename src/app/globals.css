@@ -30,7 +30,7 @@
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 24.6 95% 53.1%;
+    --ring: transparent;
 
     --radius: 0.5rem;
 
@@ -69,7 +69,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 22.8 95.5% 53.3%;
+    --ring: transparent;
 
     --sidebar: 222 47.4% 11.2%;
     --sidebar-foreground: 210 40% 98%;

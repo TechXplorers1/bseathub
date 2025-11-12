@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -86,7 +87,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
           </div>
 
           <div className="lg:col-span-4">
-            <div className="sticky top-[64px] bg-background py-4 z-10 border-b -mt-2">
+            <div className="sticky top-[64px] bg-background py-4 z-10 border-b">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="relative w-full sm:max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -37,7 +37,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
         <ChefHero restaurant={restaurant} chefName={chefName} />
         
         <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
             <div className="lg:col-span-1 lg:border-r lg:pr-8">
               <div className='lg:sticky lg:top-24 self-start'>
                 <RestaurantInfo restaurant={restaurant} displayName={displayName} isChefPage={true} />
@@ -48,7 +48,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
               </div>
             </div>
 
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <ChefAbout restaurant={restaurant} chefName={chefName} />
               <Separator className="my-8" />
               <ChefCuisineSpecialties cuisines={[restaurant.cuisine, ...restaurant.categories]} />

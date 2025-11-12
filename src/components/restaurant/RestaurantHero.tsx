@@ -4,10 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
 import { getImageById } from '@/lib/placeholder-images';
 import type { Restaurant } from '@/lib/types';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
+  const [isFavorited, setIsFavorited] = useState(false);
   const image = getImageById(restaurant.imageId);
   const logo = getImageById('restaurant-3'); // Using a placeholder for logo
+
+  const toggleFavorite = () => {
+    setIsFavorited(!isFavorited);
+  };
 
   return (
     <div className="relative h-48 w-full">
@@ -34,8 +41,8 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
         </div>
       )}
       <div className="absolute top-4 right-4">
-        <Button variant="secondary" size="icon" className="rounded-full">
-          <Heart className="h-5 w-5" />
+        <Button variant="secondary" size="icon" className="rounded-full" onClick={toggleFavorite}>
+          <Heart className={cn("h-5 w-5", isFavorited && "fill-red-500 text-red-500")} />
         </Button>
       </div>
     </div>

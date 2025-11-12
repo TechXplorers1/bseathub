@@ -5,10 +5,17 @@ import { Heart } from 'lucide-react';
 import { getImageById } from '@/lib/placeholder-images';
 import type { Restaurant } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 export function ChefHero({ restaurant, chefName }: { restaurant: Restaurant, chefName: string }) {
+  const [isFavorited, setIsFavorited] = useState(false);
   const image = getImageById(restaurant.imageId);
   const chefAvatar = `https://i.pravatar.cc/150?u=${restaurant.id}`;
+
+  const toggleFavorite = () => {
+    setIsFavorited(!isFavorited);
+  };
 
   return (
     <div className="relative h-48 w-full">
@@ -29,8 +36,8 @@ export function ChefHero({ restaurant, chefName }: { restaurant: Restaurant, che
         </Avatar>
       </div>
       <div className="absolute top-4 right-4">
-        <Button variant="secondary" size="icon" className="rounded-full">
-          <Heart className="h-5 w-5" />
+        <Button variant="secondary" size="icon" className="rounded-full" onClick={toggleFavorite}>
+          <Heart className={cn("h-5 w-5", isFavorited && "fill-red-500 text-red-500")} />
         </Button>
       </div>
     </div>

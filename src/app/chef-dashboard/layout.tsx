@@ -21,6 +21,8 @@ import { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Header } from '@/components/shared/Header';
 import { Footer } from '@/components/shared/Footer';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/chef-dashboard', icon: Home, label: 'Overview' },
@@ -44,6 +46,7 @@ export default function ChefDashboardLayout({
 }) {
   const { setHeaderTitle } = useHeader();
   const chefName = 'Chef Ramsey';
+  const pathname = usePathname();
 
   useEffect(() => {
     setHeaderTitle(chefName);
@@ -59,34 +62,46 @@ export default function ChefDashboardLayout({
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex-1 py-2">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {navItems.map((item) => (
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return(
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      isActive && "bg-primary text-primary-foreground hover:text-primary-foreground"
+                    )}
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
                     {item.badge && (
-                      <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                      <Badge className={cn("ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full", isActive ? "bg-primary-foreground text-primary" : "")}>
                         {item.badge}
                       </Badge>
                     )}
                   </Link>
-                ))}
+                  )
+                })}
               </nav>
               <Separator className="my-4" />
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {accountItems.map((item) => (
+                {accountItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return(
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      isActive && "bg-primary text-primary-foreground hover:text-primary-foreground"
+                    )}
                   >
                     <item.icon className="h-4 w-4" />
                     {item.label}
                   </Link>
-                ))}
+                  )
+                })}
               </nav>
             </div>
           </div>

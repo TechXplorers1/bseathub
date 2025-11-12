@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -29,6 +30,10 @@ export function RestaurantCarousel({ title, restaurants, href = "/restaurants" }
   });
   
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
+
+  if (visibleRestaurants.length === 0) {
+    return null;
+  }
 
   return (
     <div className="py-8">

@@ -41,6 +41,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Notifications } from './Notifications';
 import { useUser, useAuth } from '@/firebase';
@@ -64,6 +65,8 @@ export function Header() {
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
 
   const handleLocationSave = () => {
@@ -76,6 +79,13 @@ export function Header() {
       auth.signOut();
     }
   };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
 
   const hasNotifications = true; // Placeholder for notification state
 
@@ -102,6 +112,9 @@ export function Header() {
             type="search"
             placeholder="Search Eat Hub"
             className="pl-9 rounded-full bg-gray-100 border-none focus-visible:ring-primary"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearch}
           />
         </div>
 
@@ -196,7 +209,7 @@ export function Header() {
                 <DropdownMenuSeparator />
                  <DropdownMenuLabel>Dashboards</DropdownMenuLabel>
                   <DropdownMenuItem asChild>
-                     <Link href="/admin/dashboard">
+                     <Link href="/admin/dashboard?tab=overview">
                       <Shield className="mr-2 h-4 w-4" />
                       <span>Admin</span>
                     </Link>

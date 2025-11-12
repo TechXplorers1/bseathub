@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -144,7 +145,7 @@ export function Personalized() {
     )
   }
 
-  if (recommendations.length === 0) {
+  if (visibleRestaurants.length === 0) {
     return null;
   }
 

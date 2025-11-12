@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -10,11 +11,11 @@ import {
   LifeBuoy,
   LogOut,
 } from 'lucide-react';
-
+import { useSearchParams } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin/dashboard?tab=overview', icon: Home, label: 'Overview', tab: 'overview' },
@@ -29,7 +30,7 @@ const navItems = [
 ];
 
 const accountItems = [
-  { href: '/admin/dashboard?tab=settings', icon: Settings, label: 'Settings' },
+  { href: '/admin/dashboard?tab=settings', icon: Settings, label: 'Settings', tab: 'settings' },
   { href: '#', icon: LifeBuoy, label: 'Support' },
   { href: '#', icon: LogOut, label: 'Logout' },
 ];
@@ -40,8 +41,9 @@ export default function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   const { setHeaderTitle } = useHeader();
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'overview';
   const adminTitle = 'Admin';
-  const pathname = usePathname();
 
   useEffect(() => {
     setHeaderTitle(adminTitle);
@@ -60,7 +62,10 @@ export default function AdminDashboardLayout({
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+                    activeTab === item.tab && 'bg-accent text-accent-foreground hover:text-accent-foreground'
+                  )}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -73,7 +78,10 @@ export default function AdminDashboardLayout({
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
+                    activeTab === item.tab && 'bg-accent text-accent-foreground hover:text-accent-foreground'
+                  )}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}

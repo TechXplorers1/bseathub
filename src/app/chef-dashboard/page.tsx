@@ -38,7 +38,7 @@ export default function ChefDashboardPage() {
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, Chef Ramsey!</h1>
+          <h1 className="text-3xl font-bold">Welcome back, Chef Maria!</h1>
           <p className="text-muted-foreground">
             Here's what's cooking in your dashboard.
           </p>
@@ -134,7 +134,7 @@ export default function ChefDashboardPage() {
               <div className="grid gap-1">
                 <p className="text-sm font-medium leading-none">Alice Wonderland</p>
                 <p className="text-sm text-muted-foreground">
-                  "Chef Ramsey was incredible! The food was out of this world..."
+                  "Chef Maria was incredible! The food was out of this world..."
                 </p>
               </div>
             </div>

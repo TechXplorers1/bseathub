@@ -45,7 +45,7 @@ export default function ChefDashboardLayout({
   children: React.ReactNode;
 }) {
   const { setHeaderTitle } = useHeader();
-  const chefName = 'Chef Ramsey';
+  const chefName = 'Chef Maria';
   const pathname = usePathname();
 
   useEffect(() => {

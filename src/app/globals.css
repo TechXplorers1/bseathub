@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 @layer base {
+  /* Critical change to eliminate horizontal scroll */
+  html {
+    overflow-x: hidden;
+  }
+  
   :root {
     --background: 240 10% 98%;
     --foreground: 224 71.4% 4.1%;
@@ -40,6 +45,12 @@
     --sidebar-accent: 180 80% 25%; /* Even Darker Teal */
     --sidebar-accent-foreground: 0 0% 98%; /* White */
     --sidebar-ring: 0 84.2% 60.2%;
+
+    /* Sidebar interaction colors */
+    --sidebar-hover-bg: hsl(142, 76%, 25%);  /* Deep green hover */
+    --sidebar-hover-text: hsl(0, 0%, 100%);  /* White text */
+    --sidebar-active-bg: hsl(25, 95%, 53%);  /* App orange (primary) */
+    --sidebar-active-text: hsl(0, 0%, 100%);
   }
 
   .dark {
@@ -74,9 +85,15 @@
     --sidebar: 222 47.4% 11.2%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-accent: 180 80% 25%; /* Even Darker Teal */
-    --sidebar-accent-foreground: 0 0% 98%; /* White */
+    --sidebar-accent: 180 80% 25%;
+    --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-ring: 0 72.2% 50.6%;
+
+    /* Slightly lighter green on hover for dark surfaces */
+    --sidebar-hover-bg: hsl(142, 76%, 35%);
+    --sidebar-hover-text: hsl(0, 0%, 100%);
+    --sidebar-active-bg: hsl(25, 95%, 53%);
+    --sidebar-active-text: hsl(0, 0%, 100%);
   }
 }
 
@@ -88,4 +105,75 @@
     @apply bg-background text-foreground;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
+}
+
+/* ---------- Sidebar UI Tweaks (cleaned & consolidated) ---------- */
+
+/* Base sidebar: width + smooth width transition + subtle visuals */
+.sidebar {
+  @apply w-44; /* Reduced from w-56, keep in sync with layout grid */
+  transition: width 240ms ease;
+  will-change: width;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Compact label text */
+.sidebar button span {
+  @apply text-sm;
+}
+
+/* Smooth label show/hide when collapsed */
+.sidebar span {
+  transition: opacity 180ms ease, max-width 180ms ease;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Gentle elevation on hover for interactive groups */
+.sidebar .group:hover,
+.sidebar .group:focus-within {
+  box-shadow: 0 1px 6px rgba(16, 24, 40, 0.03);
+}
+
+/* Ensure hidden labels don't cause horizontal scroll */
+.sidebar .overflow-hidden {
+  overflow: hidden;
+}
+
+/* ---------- Interaction Colors for Buttons/Links ---------- */
+
+/* Common button/link styles inside sidebar */
+.sidebar .sidebar-menu-button {
+  @apply transition-all duration-200 ease-in-out rounded-md;
+  background-color: transparent;
+  color: hsl(var(--sidebar-foreground));
+}
+
+/* Hover = deep green */
+.sidebar .sidebar-menu-button:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: var(--sidebar-hover-text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Focus ring for accessibility */
+.sidebar .sidebar-menu-button:focus-visible {
+  outline: 2px solid var(--sidebar-hover-bg);
+  outline-offset: 2px;
+}
+
+/* Active/selected = orange (app primary)
+   Works if you add className="active" or aria-current="page" to the link/button */
+.sidebar .sidebar-menu-button.active,
+.sidebar .sidebar-menu-button[aria-current='page'] {
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+}
+
+/* Sidebar opener/trigger hover uses same green hover tone */
+.sidebar button:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: var(--sidebar-hover-text);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }

@@ -1,4 +1,4 @@
-
+// app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full scroll-smooth">
+    <html lang="en" className="h-full w-full scroll-smooth">
       <body
         className={cn(
           'relative h-full font-sans antialiased',
@@ -41,12 +41,12 @@ export default function RootLayout({
             <DeliveryModeProvider>
               <RestaurantProvider>
                 <CartProvider>
-                    <HeaderProvider>
-                      <SidebarProvider>
-                        <SiteLayout>{children}</SiteLayout>
-                      </SidebarProvider>
-                    </HeaderProvider>
-                    <Toaster />
+                  <HeaderProvider>
+                    <SidebarProvider>
+                      <SiteLayout>{children}</SiteLayout>
+                    </SidebarProvider>
+                  </HeaderProvider>
+                  <Toaster />
                 </CartProvider>
               </RestaurantProvider>
             </DeliveryModeProvider>

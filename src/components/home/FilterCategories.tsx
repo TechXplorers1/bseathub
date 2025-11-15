@@ -43,9 +43,7 @@ const mainCategories = [
 ];
 
 const filterButtons = [
-  { name: 'Deals', icon: Tag },
   { name: 'Over 4.5', icon: Star, hasDropdown: true },
-  { name: 'Price', icon: null, hasDropdown: true },
   { name: 'Eat Hub', icon: Check },
 ];
 

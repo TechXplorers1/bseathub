@@ -13,31 +13,47 @@ export default function Home() {
   const { restaurants, homeFoods } = useRestaurants();
 
   return (
-    <div className="flex flex-col w-full min-w-0">
-      {/* Category Filters */}
+    // Changed to 'flex flex-col' to stack components.
+    <div className="flex flex-col w-full min-w-0"> 
+      
+      {/* Category Filters: NO TOP MARGIN. It should start immediately at the top of the scroll area. */}
       <FilterCategories />
 
-      {/* Promo Banners */}
-      <Banners />
-
+      {/* Promo Banners - Add margin-top only for separation from the content above, if desired.
+          Using standard vertical section spacing. */}
+      <div className="mt-4 mb-6">
+        <Banners />
+      </div>
+      {/* ... (Rest of the Home component content remains the same) ... */}
+      
       {/* Personalized Picks */}
-      <Personalized />
+      <div className="mb-6">
+        <Personalized />
+      </div>
 
       {/* Most Ordered */}
-      <MostOrdered />
+      <div className="mb-6">
+        <MostOrdered />
+      </div>
 
       {/* Home Food Carousel */}
-      <RestaurantCarousel
-        title="Home Food"
-        restaurants={homeFoods}
-        href="/home-food"
-      />
+      <div className="mb-6">
+        <RestaurantCarousel
+          title="Home Food"
+          restaurants={homeFoods}
+          href="/home-food"
+        />
+      </div>
 
       {/* Picked From Your Location */}
-      <HomeFeed restaurants={restaurants} />
+      <div className="mb-6">
+        <HomeFeed restaurants={restaurants} />
+      </div>
 
       {/* Our Chefs */}
-      <ChefsCarousel />
+      <div className="mb-8">
+        <ChefsCarousel />
+      </div>
     </div>
   );
 }

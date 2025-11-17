@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Home,
   Ticket,
@@ -36,8 +36,17 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
-  const toggleMobileSidebar = () => setIsMobileSidebarOpen((prev) => !prev);
+  // track window width so we only apply percentage margins on md+ screens
+  const [windowWidth, setWindowWidth] = useState<number | null>(null);
+  useEffect(() => {
+    const update = () => setWindowWidth(window.innerWidth);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const toggleCollapse = () => setIsCollapsed((p) => !p);
+  const toggleMobileSidebar = () => setIsMobileSidebarOpen((p) => !p);
 
   const handleLogout = async () => {
     const { signOut } = await import('@/firebase');
@@ -68,20 +77,64 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return pathname?.startsWith(href);
   };
 
-  const sidebarWidth = isCollapsed ? 'w-16' : 'w-44';
-  const mainPadding = showSidebar && !isDashboardPage
-    ? (isCollapsed ? 'md:ml-16' : 'md:ml-44')
-    : 'md:ml-0';
+  // desired percentages
+  const OPEN_SIDEBAR_PCT = 0.20; // 20%
+  const COLLAPSED_SIDEBAR_PCT = 0.10; // 10%
+  const sidebarPct = isCollapsed ? COLLAPSED_SIDEBAR_PCT : OPEN_SIDEBAR_PCT;
 
-  // Ensure footer height is respected
-  const footerHeight = 'h-14'; // 3.5rem
+  // Only apply percentage based sizing for md+ screens
+  const isMdUp = (windowWidth ?? 1024) >= 768 && typeof window !== 'undefined';
+
+  // clamp sidebar width percent between 8% and 30% for safety
+  const sidebarPercentClamped = Math.max(Math.min(sidebarPct * 100, 30), 8);
+
+  // Header/footer pixel heights (match your Header/Footer components)
+  const HEADER_HEIGHT_PX = 64; // h-16 = 4rem = 64px
+  const FOOTER_HEIGHT_PX = 56; // h-14 = 3.5rem = 56px
+  const innerScrollHeight = `calc(100vh - ${HEADER_HEIGHT_PX}px - ${FOOTER_HEIGHT_PX}px)`;
+
+  // Inline styles for sidebar and main (desktop only)
+  const sidebarStyle: React.CSSProperties =
+    isMdUp && showSidebar && !isDashboardPage
+      ? {
+          width: `${sidebarPercentClamped}%`,
+          minWidth: '80px',
+          maxWidth: '360px',
+          height: innerScrollHeight,
+          transition: 'width 240ms ease',
+          overflow: 'hidden',
+        }
+      : { width: undefined };
+
+  const mainStyle: React.CSSProperties =
+    isMdUp && showSidebar && !isDashboardPage
+      ? {
+          marginLeft: `${sidebarPercentClamped}%`,
+          height: innerScrollHeight,
+          transition: 'margin-left 240ms ease',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }
+      : {
+          marginLeft: undefined,
+          height: `calc(100vh - ${HEADER_HEIGHT_PX}px - ${FOOTER_HEIGHT_PX}px)`,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        };
+
+  // Sidebar inner content style to allow it to scroll independently
+  const sidebarInnerStyle: React.CSSProperties =
+    isMdUp && showSidebar && !isDashboardPage
+      ? { height: '100%', overflowY: 'auto' }
+      : {};
 
   return (
-    <div className="relative min-h-screen w-screen overflow-x-hidden">
+    // Make the top-level container non-scrollable; inner main/sidebar will scroll.
+    <div className="relative h-screen w-screen overflow-hidden">
       {/* Fixed Header */}
       <Header className="fixed top-0 left-0 w-full z-40 h-16 bg-white shadow-sm" />
 
-      {/* Mobile Toggle Button */}
+      {/* Mobile toggle (hamburger) */}
       {showSidebar && !isDashboardPage && (
         <Button
           variant="ghost"
@@ -94,114 +147,114 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </Button>
       )}
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar (outer container uses inline percent width & fixed inner height) */}
       {showSidebar && !isDashboardPage && (
-        <Sidebar
-          variant="sidebar"
-          collapsible="icon"
-          className={cn(
-            'hidden md:flex fixed top-16 left-0 z-10 h-[calc(100vh-4rem-3.5rem)] overflow-y-auto bg-sidebar border-r border-sidebar-border transition-all duration-300',
-            sidebarWidth
-          )}
-        >
-          <SidebarContent className="py-3">
-            <SidebarHeader className="py-2 flex items-center justify-center">
-              <button
-                onClick={toggleCollapse}
-                aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                className="flex items-center justify-center w-10 h-10 p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sidebar-menu-button"
-              >
-                <div className="h-4 w-4">‹</div>
-              </button>
-            </SidebarHeader>
-
-            <SidebarMenu className="mt-1">
-              {sidebarNav.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={isCollapsed ? item.name : undefined}
+        <aside style={sidebarStyle} className="hidden md:block fixed top-16 left-0 z-10 border-r border-sidebar-border bg-sidebar">
+          <div style={sidebarInnerStyle}>
+            <Sidebar className="h-full">
+              <SidebarContent className="py-3">
+                <SidebarHeader className={cn('py-2 px-5', isCollapsed && 'justify-center')}>
+                  <button
+                    onClick={toggleCollapse}
+                    aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                     className={cn(
-                      'group flex items-center py-2 rounded-md sidebar-menu-button transition-all',
-                      isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                      'flex items-center p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sidebar-menu-button font-bold text-lg',
+                      isCollapsed ? 'w-10 justify-center' : 'w-full justify-start'
                     )}
                   >
-                    <a href={item.href} className={isActive(item.href) ? 'active' : ''}>
-                      <item.icon size={18} className="flex-shrink-0" />
-                      {!isCollapsed && (
-                        <span className="text-sm truncate">{item.name}</span>
-                      )}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-
-            <SidebarSeparator className="my-2" />
-
-            <SidebarMenu>
-              {categoriesNav.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={isCollapsed ? item.name : undefined}
-                    className={cn(
-                      'group flex items-center py-2 rounded-md sidebar-menu-button',
-                      isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                    {isCollapsed ? (
+                      <span className="text-sm" style={{ color: 'hsl(25, 95%, 53%)' }}>EH</span>
+                    ) : (
+                      <span style={{ color: 'hsl(25, 95%, 53%)' }}>HUB Filters</span>
                     )}
-                  >
-                    <a href={item.href} className={isActive(item.href) ? 'active' : ''}>
-                      <item.icon size={18} className="flex-shrink-0" />
-                      {!isCollapsed && (
-                        <span className="text-sm truncate">{item.name}</span>
-                      )}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
+                  </button>
+                </SidebarHeader>
 
-          <SidebarFooter className="py-3">
-            <SidebarMenu>
-              {!isUserLoading &&
-                (user ? (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      onClick={handleLogout}
-                      tooltip={isCollapsed ? 'Logout' : undefined}
-                      className={cn(
-                        'group flex items-center py-2 rounded-md sidebar-menu-button',
-                        isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
-                      )}
-                    >
-                      <LogOut size={18} />
-                      {!isCollapsed && <span className="text-sm">Logout</span>}
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={isCollapsed ? 'Sign In' : undefined}
-                      className={cn(
-                        'group flex items-center py-2 rounded-md sidebar-menu-button',
-                        isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
-                      )}
-                    >
-                      <a href="/login">
-                        <LogIn size={18} />
-                        {!isCollapsed && <span className="text-sm">Sign In</span>}
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
+                <SidebarMenu className="mt-1">
+                  {sidebarNav.map((item) => (
+                    <SidebarMenuItem key={item.name}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={isCollapsed ? item.name : undefined}
+                        className={cn(
+                          'group flex items-center py-2 rounded-md sidebar-menu-button transition-all',
+                          isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                        )}
+                      >
+                        <a href={item.href} className={isActive(item.href) ? 'active' : ''}>
+                          <item.icon size={18} className="flex-shrink-0" />
+                          {!isCollapsed && <span className="text-sm truncate">{item.name}</span>}
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+
+                <SidebarSeparator className="my-2" />
+
+                <SidebarMenu>
+                  {categoriesNav.map((item) => (
+                    <SidebarMenuItem key={item.name}>
+                      <SidebarMenuButton
+                        asChild
+                        tooltip={isCollapsed ? item.name : undefined}
+                        className={cn(
+                          'group flex items-center py-2 rounded-md sidebar-menu-button',
+                          isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                        )}
+                      >
+                        <a href={item.href} className={isActive(item.href) ? 'active' : ''}>
+                          <item.icon size={18} className="flex-shrink-0" />
+                          {!isCollapsed && <span className="text-sm truncate">{item.name}</span>}
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarContent>
+
+              <SidebarFooter className="py-3">
+                <SidebarMenu>
+                  {!isUserLoading &&
+                    (user ? (
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          onClick={handleLogout}
+                          tooltip={isCollapsed ? 'Logout' : undefined}
+                          className={cn(
+                            'group flex items-center py-2 rounded-md sidebar-menu-button',
+                            isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                          )}
+                        >
+                          <LogOut size={18} />
+                          {!isCollapsed && <span className="text-sm">Logout</span>}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ) : (
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          asChild
+                          tooltip={isCollapsed ? 'Sign In' : undefined}
+                          className={cn(
+                            'group flex items-center py-2 rounded-md sidebar-menu-button',
+                            isCollapsed ? 'justify-center px-0' : 'gap-3 px-5'
+                          )}
+                        >
+                          <a href="/login">
+                            <LogIn size={18} />
+                            {!isCollapsed && <span className="text-sm">Sign In</span>}
+                          </a>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+              </SidebarFooter>
+            </Sidebar>
+          </div>
+        </aside>
       )}
 
-      {/* Mobile Sidebar (Sheet) */}
+      {/* Mobile Sidebar (sheet) */}
       {showSidebar && !isDashboardPage && (
         <Sidebar
           variant="sheet"
@@ -221,10 +274,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                       isActive(item.href) ? 'active' : ''
                     )}
                   >
-                    <a
-                      href={item.href}
-                      onClick={() => setIsMobileSidebarOpen(false)}
-                    >
+                    <a href={item.href} onClick={() => setIsMobileSidebarOpen(false)}>
                       <item.icon size={20} />
                       <span>{item.name}</span>
                     </a>
@@ -245,10 +295,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                       isActive(item.href) ? 'active' : ''
                     )}
                   >
-                    <a
-                      href={item.href}
-                      onClick={() => setIsMobileSidebarOpen(false)}
-                    >
+                    <a href={item.href} onClick={() => setIsMobileSidebarOpen(false)}>
                       <item.icon size={20} />
                       <span>{item.name}</span>
                     </a>
@@ -273,10 +320,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 </Button>
               ) : (
                 <Button asChild className="w-full justify-start">
-                  <a
-                    href="/login"
-                    onClick={() => setIsMobileSidebarOpen(false)}
-                  >
+                  <a href="/login" onClick={() => setIsMobileSidebarOpen(false)}>
                     <LogIn size={18} className="mr-2" /> Sign In
                   </a>
                 </Button>
@@ -286,20 +330,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </Sidebar>
       )}
 
-      {/* Main Content - Full width, respects sidebar & footer */}
-      <div className={`min-h-screen pt-16 pb-14 ${footerHeight}`}>
-        <main
-          className={cn(
-            'min-w-0 w-full px-4 md:px-6 lg:px-8 transition-all duration-300',
-            mainPadding
-          )}
-        >
+      {/* Main content area (the only scrollable area) */}
+      <main
+        className="fixed top-[64px] left-0 right-0 z-0 transition-all duration-300"
+        style={mainStyle}
+      >
+        <div style={{ height: '100%', boxSizing: 'border-box', padding: '1rem' }}>
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Fixed Footer */}
-      <div className="fixed bottom-0 left-0 w-full z-20 bg-white shadow-inner">
+      <div className="fixed bottom-0 left-0 w-full z-20 bg-white shadow-inner h-14">
         <Footer />
       </div>
     </div>

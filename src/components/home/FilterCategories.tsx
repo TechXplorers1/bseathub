@@ -23,6 +23,13 @@ import { Button } from '@/components/ui/button';
 import { Tag, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useRatingFilter } from '@/context/RatingFilterProvider';
 
 const mainCategories = [
   { name: 'Breakfast', icon: Sunrise },
@@ -43,7 +50,6 @@ const mainCategories = [
 ];
 
 const filterButtons = [
-  { name: 'Over 4.5', icon: Star, hasDropdown: true },
   { name: 'Eat Hub', icon: Check },
 ];
 
@@ -52,6 +58,7 @@ export function FilterCategories() {
   const [showLeftButton, setShowLeftButton] = React.useState(false);
   const [showRightButton, setShowRightButton] = React.useState(true);
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
+  const { ratingFilter, setRatingFilter } = useRatingFilter();
 
 
   const handleScroll = () => {
@@ -78,6 +85,15 @@ export function FilterCategories() {
       return () => container.removeEventListener('scroll', handleScroll);
     }
   }, []);
+
+  const ratingOptions = [
+    { value: 0, label: 'Any Rating' },
+    { value: 5, label: '5 Stars' },
+    { value: 4, label: '4 Stars & up' },
+    { value: 3, label: '3 Stars & up' },
+    { value: 2, label: '2 Stars & up' },
+    { value: 1, label: '1 Star & up' },
+  ];
 
   return (
     <div className="py-8">
@@ -151,6 +167,22 @@ export function FilterCategories() {
               Pickup
             </Button>
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="rounded-full flex-shrink-0">
+                    <Star className="mr-2 h-4 w-4" />
+                    {ratingFilter > 0 ? ratingOptions.find(o => o.value === ratingFilter)?.label : 'Rating'}
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                {ratingOptions.map(option => (
+                    <DropdownMenuItem key={option.value} onSelect={() => setRatingFilter(option.value)}>
+                        {option.label}
+                    </DropdownMenuItem>
+                ))}
+            </DropdownMenuContent>
+        </DropdownMenu>
         {filterButtons.map((button) => (
           <Button
             key={button.name}
@@ -159,7 +191,6 @@ export function FilterCategories() {
           >
             {button.icon && <button.icon className="mr-2 h-4 w-4" />}
             {button.name}
-            {button.hasDropdown && <ChevronDown className="ml-2 h-4 w-4" />}
           </Button>
         ))}
       </div>

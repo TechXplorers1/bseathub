@@ -12,6 +12,8 @@ import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 import { RestaurantProvider } from '@/context/RestaurantProvider';
 import { FirebaseClientProvider } from '@/firebase';
 import { SidebarProvider } from '@/components/ui/sidebar';
+// ✅ Import RatingFilterProvider
+import { RatingFilterProvider } from '@/context/RatingFilterProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,7 +45,10 @@ export default function RootLayout({
                 <CartProvider>
                   <HeaderProvider>
                     <SidebarProvider>
-                      <SiteLayout>{children}</SiteLayout>
+                      {/* ✅ Wrap SiteLayout with RatingFilterProvider */}
+                      <RatingFilterProvider>
+                        <SiteLayout>{children}</SiteLayout>
+                      </RatingFilterProvider>
                     </SidebarProvider>
                   </HeaderProvider>
                   <Toaster />

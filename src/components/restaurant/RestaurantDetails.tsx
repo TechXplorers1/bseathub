@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -37,7 +38,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
         <ChefHero restaurant={restaurant} chefName={chefName} />
         
         <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
             <div className="lg:col-span-1 lg:border-r lg:pr-8">
               <div className='lg:sticky lg:top-24 self-start'>
                 <RestaurantInfo restaurant={restaurant} displayName={displayName} isChefPage={true} />
@@ -48,7 +49,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
               </div>
             </div>
 
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4 overflow-hidden">
               <ChefAbout restaurant={restaurant} chefName={chefName} />
               <Separator className="my-8" />
               <ChefCuisineSpecialties cuisines={[restaurant.cuisine, ...restaurant.categories]} />
@@ -73,7 +74,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
       <RestaurantHero restaurant={restaurant} />
       
       <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
           
           <div className="lg:col-span-1 lg:border-r lg:pr-8">
             <div className='lg:sticky lg:top-24 self-start h-full'>
@@ -85,8 +86,8 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
             </div>
           </div>
 
-          <div className="lg:col-span-3">
-            <div className="sticky top-[64px] bg-background py-4 z-10 border-b -mt-2">
+          <div className="lg:col-span-4 overflow-hidden">
+            <div className="sticky top-[64px] bg-background py-4 z-10 border-b">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="relative w-full sm:max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

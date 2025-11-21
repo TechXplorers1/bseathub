@@ -41,6 +41,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Notifications } from './Notifications';
 import { useUser, useAuth } from '@/firebase';
@@ -151,6 +152,8 @@ export function Header() {
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
 
   const handleLocationSave = () => {
@@ -167,6 +170,13 @@ export function Header() {
       auth.signOut();
     }
   };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
 
   const hasNotifications = true; // Placeholder for notification state
 

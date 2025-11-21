@@ -1,4 +1,5 @@
 
+
 import { RestaurantCard } from '@/components/home/RestaurantCard';
 import { ChefCard } from '@/components/home/ChefCard';
 import { allRestaurants, allHomeFoods } from '@/lib/data';
@@ -36,10 +37,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
         chef.specialty.toLowerCase().includes(categoryName.toLowerCase())
     );
     
-    if (filteredRestaurants.length === 0 && filteredHomeFoods.length === 0 && filteredChefs.length === 0) {
-        // Or show a "No results found" message
-        // notFound(); 
-    }
+    const noResults = filteredRestaurants.length === 0 && filteredHomeFoods.length === 0 && filteredChefs.length === 0;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -48,7 +46,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredRestaurants.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Restaurants</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {filteredRestaurants.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                 ))}
@@ -59,7 +57,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredHomeFoods.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Home Food</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {filteredHomeFoods.map((restaurant) => (
                     <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                 ))}
@@ -70,7 +68,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
       {filteredChefs.length > 0 && (
         <div className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Chefs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {filteredChefs.map((chef) => (
                     <ChefCard key={chef.name} chef={chef} />
                 ))}
@@ -78,7 +76,7 @@ export default function CategoryPage({ params }: { params: { categoryName: strin
         </div>
       )}
 
-        {filteredRestaurants.length === 0 && filteredHomeFoods.length === 0 && filteredChefs.length === 0 && (
+        {noResults && (
             <p className="text-center text-muted-foreground mt-12">No results found for "{categoryName}".</p>
         )}
     </div>

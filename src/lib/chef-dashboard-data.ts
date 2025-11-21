@@ -1,4 +1,5 @@
 
+
 export type BookingStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 
 export type ChefBooking = {
@@ -70,7 +71,7 @@ export const recentBookings: ChefBooking[] = [
   },
 ];
 
-export const allBookings: ChefBooking[] = [
+export let allBookings: ChefBooking[] = [
     ...recentBookings,
     {
         id: 'BK-006',
@@ -91,6 +92,21 @@ export const allBookings: ChefBooking[] = [
         service: 'Event Catering',
     }
 ];
+
+type NewBookingData = Omit<ChefBooking, 'id' | 'status' | 'total'> & { chef: { name: string } };
+
+export const addBooking = (bookingData: NewBookingData) => {
+    const newBooking: ChefBooking = {
+      id: `BK-${Math.floor(Math.random() * 900) + 100}`,
+      customer: bookingData.customer,
+      eventDate: bookingData.eventDate,
+      guests: bookingData.guests,
+      service: bookingData.service,
+      status: 'Pending',
+      total: bookingData.guests * 100, // Dummy calculation
+    };
+    allBookings.unshift(newBooking);
+  };
 
 export const chefServices = [
     { id: 'serv1', name: 'Private Dinner', description: 'An exclusive multi-course dining experience for small groups.', price: 'Starts at $100/person', status: 'Active' },

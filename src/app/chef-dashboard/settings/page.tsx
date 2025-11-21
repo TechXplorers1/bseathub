@@ -38,7 +38,7 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="chef-name">Full Name</Label>
-                <Input id="chef-name" defaultValue="Gordon Ramsey" />
+                <Input id="chef-name" defaultValue="Maria" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="chef-bio">Professional Bio</Label>

@@ -490,6 +490,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-inner h-14 z-30">
         <Footer />
       </div>
+      <Footer />
     </div>
   );
 }

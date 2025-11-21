@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import * as React from 'react';
@@ -39,6 +40,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
         
         <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
             <div className="lg:col-span-1 lg:border-r lg:pr-8">
               <div className='lg:sticky lg:top-24 self-start'>
                 <RestaurantInfo restaurant={restaurant} displayName={displayName} isChefPage={true} />
@@ -74,6 +76,7 @@ export function RestaurantDetails({ restaurant, chefName }: { restaurant: Restau
       <RestaurantHero restaurant={restaurant} />
       
       <div className="mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-8">
           
           <div className="lg:col-span-1 lg:border-r lg:pr-8">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,6 +19,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLocation } from '@/context/LocationProvider';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
+import { useRatingFilter } from '@/context/RatingFilterProvider';
 
 const INITIAL_VISIBLE_COUNT = 8;
 
@@ -26,6 +28,7 @@ export function Personalized() {
   const [loading, setLoading] = useState(true);
   const { location } = useLocation();
   const { deliveryMode } = useDeliveryMode();
+  const { ratingFilter } = useRatingFilter();
 
   useEffect(() => {
     async function getRecommendations() {
@@ -117,10 +120,9 @@ export function Personalized() {
   }, []);
   
   const filteredRestaurants = recommendations.filter(restaurant => {
-    if (deliveryMode === 'all') {
-      return true;
-    }
-    return restaurant.services.includes(deliveryMode);
+    const deliveryModeMatch = deliveryMode === 'all' || restaurant.services.includes(deliveryMode);
+    const ratingMatch = ratingFilter === 0 || restaurant.rating >= ratingFilter;
+    return deliveryModeMatch && ratingMatch;
   });
 
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
@@ -143,7 +145,7 @@ export function Personalized() {
     )
   }
 
-  if (recommendations.length === 0) {
+  if (visibleRestaurants.length === 0) {
     return null;
   }
 

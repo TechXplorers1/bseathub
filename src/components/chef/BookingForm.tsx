@@ -34,6 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
+import { addBooking } from '@/lib/chef-dashboard-data';
 
 const bookingFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -62,7 +63,19 @@ export function BookingForm({ chefName }: { chefName: string }) {
   });
 
   const onSubmit = (data: BookingFormValues) => {
-    console.log(data);
+    addBooking({
+      customer: {
+        name: data.name,
+        avatarUrl: `https://i.pravatar.cc/150?u=${data.email}`
+      },
+      eventDate: format(data.eventDate, 'yyyy-MM-dd'),
+      guests: data.guests,
+      service: data.eventType,
+      chef: {
+        name: chefName,
+      },
+    });
+
     toast({
       title: 'Booking Request Sent!',
       description: `Your request to book ${chefName} has been sent. They will be in touch shortly.`,
@@ -171,10 +184,10 @@ export function BookingForm({ chefName }: { chefName: string }) {
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                <SelectItem value="personal">Personal Party</SelectItem>
-                                <SelectItem value="corporate">Corporate Event</SelectItem>
-                                <SelectItem value="wedding">Wedding</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="Private Dinner">Private Dinner</SelectItem>
+                                <SelectItem value="Event Catering">Event Catering</SelectItem>
+                                <SelectItem value="Home Cooking Class">Home Cooking Class</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                             </Select>
                             <FormMessage />

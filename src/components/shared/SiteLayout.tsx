@@ -1,4 +1,5 @@
-"use client";
+// components/layout/SiteLayout.tsx
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -34,18 +35,17 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const pathname = usePathname();
 
-  // show sidebar only on home page
-  const showSidebar = pathname === '/';
+  // show sidebar on home and category pages
+  const showSidebar = pathname === '/' || pathname?.startsWith('/category');
 
-  const [isCollapsed, setIsCollapsed] = useState(false); // icons-only when true
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
-  // toggles to trigger content animation on route change / menu open-close
   const [contentAnimate, setContentAnimate] = useState(false);
 
   const [windowWidth, setWindowWidth] = useState<number>(() =>
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
+
   useEffect(() => {
     const onResize = () => setWindowWidth(window.innerWidth);
     onResize();
@@ -53,7 +53,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // animate content when pathname changes or when mobile menu toggles
   useEffect(() => {
     setContentAnimate(true);
     const t = setTimeout(() => setContentAnimate(false), 320);
@@ -82,26 +81,22 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname?.startsWith(href);
 
-  // sizing
   const OPEN_PCT = 0.18;
   const COLLAPSED_PCT = 0.07;
   const sidebarPct = isCollapsed ? COLLAPSED_PCT : OPEN_PCT;
-  const isMdUp = typeof window !== 'undefined' && (windowWidth ?? 1024) >= 768;
+  const isMdUp = (windowWidth ?? 1024) >= 768;
   const sidebarPercentClamped = Math.max(Math.min(sidebarPct * 100, 30), 6);
 
-  // header/footer
   const HEADER_H = 64;
   const FOOTER_H = 56;
   const innerScrollHeight = `calc(100vh - ${HEADER_H}px - ${FOOTER_H}px)`;
 
-  // theme colors (updated for screenshot match: teal/dark green for active)
-  const ORANGE = 'hsl(25, 95%, 53%)'; // Logo/Titles
-  const HIGHLIGHT_GREEN = 'rgb(29, 125, 125)'; // ACTIVE Background (matches screenshot teal)
-  const DARK_GREEN = '#007575'; // darker hover fallback (Keeping original name for simplicity)
+  const ORANGE = 'hsl(25, 95%, 53%)';
+  const HIGHLIGHT_GREEN = 'rgb(29, 125, 125)';
+  const DARK_GREEN = '#007575';
   const SIDEBAR_BG = 'var(--sidebar, #fff)';
   const SIDEBAR_BORDER = 'var(--sidebar-border, #e6e6e6)';
 
-  // aside container (no scrolling here)
   const asideStyle: React.CSSProperties =
     isMdUp && showSidebar
       ? {
@@ -115,8 +110,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           overflow: 'hidden',
           background: SIDEBAR_BG,
           transition: 'width 200ms ease',
-          // Removed borderRight as it's not visible in the screenshot
-          // borderRight: `1px solid ${SIDEBAR_BORDER}`,
           boxSizing: 'border-box',
           zIndex: 40,
         }
@@ -132,14 +125,12 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       <style>{`
-        /* hide visual scrollbars but keep scroll */
         .sidebar-inner { -ms-overflow-style: none; scrollbar-width: none; }
         .sidebar-inner::-webkit-scrollbar { display: none; }
 
         .hub-label { font-weight: 800; color: ${ORANGE}; font-size: 0.95rem; }
         .collapsed-eh { font-weight: 900; color: ${ORANGE}; font-size: 0.9rem; }
 
-        /* desktop sidebar links - Full Width Highlighting + proper alignment */
         .sidebar-link { 
           display: inline-flex; 
           align-items: center; 
@@ -150,74 +141,60 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           transition: background .15s, color .15s; 
           height: 40px; 
           font-size: 14px; 
-          width: 100%; /* Make link fill the list item */
+          width: 100%;
           box-sizing: border-box;
-          border-radius: 8px; /* subtle rounded rect for better alignment */
+          border-radius: 8px;
         }
         
         .sidebar-list { 
           list-style: none; 
           margin: 0; 
-          padding: 6px 8px; /* small padding to give breathing space */
+          padding: 6px 8px;
           display: flex; 
           flex-direction: column; 
           gap: 6px; 
         }
 
-        .sidebar-list > li {
-            display: block;
-            transition: background .15s;
-        }
-
-        /* ACTIVE = TEAL/DARK GREEN (Matches Screenshot) */
         .sidebar-link[aria-current="page"] { 
-            background: ${ORANGE}; 
-            color: white; 
-            box-shadow: none; 
+          background: ${ORANGE}; 
+          color: white; 
+          box-shadow: none; 
         }
         
-        /* HOVER = Darker Green */
         .sidebar-link:not([aria-current="page"]):hover { 
-            background: ${DARK_GREEN}; 
-            color: white; 
-            transform: none; /* Ensure no horizontal translation */
+          background: ${DARK_GREEN}; 
+          color: white; 
+          transform: none;
         }
 
         .sidebar-collapsed .sidebar-link { 
-            justify-content: center; 
-            padding: 8px 0; 
-            width: 48px; 
-            height: 48px; 
-            border-radius: 12px; /* Apply radius only to collapsed icons */
+          justify-content: center; 
+          padding: 8px 0; 
+          width: 48px; 
+          height: 48px; 
+          border-radius: 12px;
         }
 
-        /* ensures icons are vertically centered and text doesn't wrap */
-        .sidebar-link svg { flex-shrink: 0; }
-        .sidebar-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Adjustments for non-Link elements (Logout/Sign In) */
         .logout-link, .login-button {
-            display: inline-flex; 
-            align-items: center; 
-            gap: 10px; 
-            background: transparent; 
-            border: none; 
-            cursor: pointer; 
-            padding: 8px 12px; 
-            width: 100%; 
-            text-align: left;
-            border-radius: 8px;
-            transition: background .15s;
+          display: inline-flex; 
+          align-items: center; 
+          gap: 10px; 
+          background: transparent; 
+          border: none; 
+          cursor: pointer; 
+          padding: 8px 12px; 
+          width: 100%; 
+          text-align: left;
+          border-radius: 8px;
+          transition: background .15s;
         }
         .logout-link:hover, .login-button:hover {
-             background: ${SIDEBAR_BORDER}; /* Light hover for bottom buttons */
+          background: ${SIDEBAR_BORDER};
         }
 
-        /* toggle */
         .toggle-with-icon { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: transparent; border: none; padding: 0; margin-left: auto; }
         .toggle-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; min-height: 30px; border-radius: 8px; background: rgba(0,0,0,0.04); font-weight: 700; }
 
-        /* mobile-specific styles for the sheet component */
         .mobile-sidebar-backdrop {
           position: fixed;
           inset: 0;
@@ -245,7 +222,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           overflow: hidden;
         }
 
-        /* mobile header: only close button (no "Navigation" text) */
         .mobile-sheet-header {
           display:flex;
           align-items:center;
@@ -258,7 +234,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           border-radius: 6px;
         }
 
-        /* menu links: hover = DARK_GREEN, active = HIGHLIGHT_GREEN */
         .mobile-sidebar-panel .sidebar-menu a {
           display:flex;
           gap:14px;
@@ -274,15 +249,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         .mobile-sidebar-panel .sidebar-menu a:hover { background: ${ORANGE}; color: white; }
         .mobile-sidebar-panel .sidebar-menu a[aria-current="page"] { background: ${ORANGE}; color: white; }
 
-        .mobile-sidebar-panel .sidebar-footer { padding: 12px; }
-
-        .mobile-sidebar-panel svg { min-width: 22px; min-height: 22px; }
-
-        @media (max-width: 400px) {
-          .mobile-sidebar-panel { width: 92%; }
-        }
-
-        /* --- Right side content animation --- */
         .content-body { will-change: transform, opacity; }
         .content-body.animate { animation: fadeUp .32s ease both; }
         @keyframes fadeUp {
@@ -291,10 +257,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         }
       `}</style>
 
-      {/* Header */}
       <Header className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm z-50" />
 
-      {/* Mobile hamburger under header - sticky just below the header */}
       {showSidebar && (
         <Button
           variant="ghost"
@@ -302,36 +266,87 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           onClick={toggleMobileSidebar}
           aria-label="Toggle navigation"
           className="md:hidden"
-          style={{ position: 'fixed', top: `${HEADER_H + 8}px`, left: 12, zIndex: 70 }}
+          style={{
+            position: 'fixed',
+            top: `${HEADER_H + 8}px`,
+            left: 12,
+            zIndex: 70,
+          }}
         >
-          <div className="h-4 w-4" style={{ fontSize: 18 }}>☰</div>
+          <div className="h-4 w-4" style={{ fontSize: 18 }}>
+            ☰
+          </div>
         </Button>
       )}
 
-      {/* Desktop aside */}
       {showSidebar && (
-        <aside style={asideStyle} className={cn(isCollapsed && 'sidebar-collapsed')} aria-label="Main navigation">
+        <aside
+          style={asideStyle}
+          className={cn(isCollapsed && 'sidebar-collapsed')}
+          aria-label="Main navigation"
+        >
           <div style={innerStyle} className="sidebar-inner">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'flex-start', padding: 12 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isCollapsed ? 'center' : 'flex-start',
+                padding: 12,
+              }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {!isCollapsed ? <span className="hub-label">Menu</span> : <span className="collapsed-eh">EH</span>}
+                {!isCollapsed ? (
+                  <span className="hub-label">Menu</span>
+                ) : (
+                  <span className="collapsed-eh">EH</span>
+                )}
               </div>
 
-              <button onClick={toggleCollapse} aria-expanded={!isCollapsed} className="toggle-with-icon" title={isCollapsed ? 'Expand' : 'Collapse'}>
+              <button
+                onClick={toggleCollapse}
+                aria-expanded={!isCollapsed}
+                className="toggle-with-icon"
+                title={isCollapsed ? 'Expand' : 'Collapse'}
+              >
                 <span className="toggle-icon" aria-hidden>
-                  {isCollapsed ? <span style={{ fontSize: 12 }}>≡</span> : <span style={{ transform: 'rotate(180deg)', fontSize: 14 }}>&lsaquo;</span>}
+                  {isCollapsed ? (
+                    <span style={{ fontSize: 12 }}>≡</span>
+                  ) : (
+                    <span
+                      style={{ transform: 'rotate(180deg)', fontSize: 14 }}
+                    >
+                      &lsaquo;
+                    </span>
+                  )}
                 </span>
               </button>
             </div>
 
-            <nav aria-label="Sidebar links" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <ul className="sidebar-list" style={{ flex: isCollapsed ? 'none' : '0 0 auto' }}>
+            <nav
+              aria-label="Sidebar links"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+              }}
+            >
+              <ul
+                className="sidebar-list"
+                style={{ flex: isCollapsed ? 'none' : '0 0 auto' }}
+              >
                 {sidebarNav.map((item) => (
-                  // Removed inline styles, relies on new .sidebar-list > li CSS
-                  <li key={item.name}> 
-                    <Link href={item.href} className="sidebar-link" aria-current={isActive(item.href) ? 'page' : undefined}>
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="sidebar-link"
+                      aria-current={isActive(item.href) ? 'page' : undefined}
+                    >
                       <item.icon size={20} />
-                      {!isCollapsed && <span style={{ marginLeft: 6, cursor: 'pointer' }}>{item.name}</span>}
+                      {!isCollapsed && (
+                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
+                          {item.name}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ))}
@@ -341,12 +356,19 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 <SidebarSeparator />
               </div>
 
-              <ul className="sidebar-list" style={{ marginTop: 8, paddingBottom: 12 }}>
+              <ul
+                className="sidebar-list"
+                style={{ marginTop: 8, paddingBottom: 12 }}
+              >
                 {categoriesNav.map((item) => (
                   <li key={item.name}>
                     <Link href={item.href} className="sidebar-link">
                       <item.icon size={20} />
-                      {!isCollapsed && <span style={{ marginLeft: 6, cursor: 'pointer' }}>{item.name}</span>}
+                      {!isCollapsed && (
+                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
+                          {item.name}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ))}
@@ -362,7 +384,11 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                   ) : (
                     <Link href="/login" className="login-button">
                       <LogIn size={18} />
-                      {!isCollapsed && <span style={{ marginLeft: 6, cursor: 'pointer' }}>Sign In</span>}
+                      {!isCollapsed && (
+                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
+                          Sign In
+                        </span>
+                      )}
                     </Link>
                   ))}
               </div>
@@ -371,20 +397,40 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </aside>
       )}
 
-      {/* Mobile sheet with requested highlights and removed 'Navigation' text */}
+      {/* mobile sheet */}
       {showSidebar && (
         <>
-          {isMobileSidebarOpen && <div className="mobile-sidebar-backdrop" onClick={() => setIsMobileSidebarOpen(false)} />}
+          {isMobileSidebarOpen && (
+            <div
+              className="mobile-sidebar-backdrop"
+              onClick={() => setIsMobileSidebarOpen(false)}
+            />
+          )}
 
           <div
             role="dialog"
             aria-modal="true"
             className="mobile-sidebar-panel md:hidden"
-            style={{ transform: isMobileSidebarOpen ? 'translateX(0)' : 'translateX(-110%)', opacity: isMobileSidebarOpen ? 1 : 0, pointerEvents: isMobileSidebarOpen ? 'auto' : 'none' }}
+            style={{
+              transform: isMobileSidebarOpen
+                ? 'translateX(0)'
+                : 'translateX(-110%)',
+              opacity: isMobileSidebarOpen ? 1 : 0,
+              pointerEvents: isMobileSidebarOpen ? 'auto' : 'none',
+            }}
           >
-            {/* header: only close button */}
             <div className="mobile-sheet-header">
-              <button onClick={() => setIsMobileSidebarOpen(false)} aria-label="Close navigation" style={{ background: 'transparent', border: 'none', color: 'currentColor', fontSize: 22, cursor: 'pointer' }}>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                aria-label="Close navigation"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'currentColor',
+                  fontSize: 22,
+                  cursor: 'pointer',
+                }}
+              >
                 ×
               </button>
             </div>
@@ -398,7 +444,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                         href={item.href}
                         onClick={() => setIsMobileSidebarOpen(false)}
                         aria-current={isActive(item.href) ? 'page' : undefined}
-                        // Mobile styles kept close to original for consistency within the mobile sheet
                         style={{
                           display: 'flex',
                           gap: 12,
@@ -406,7 +451,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                           padding: '10px 12px',
                           borderRadius: 10,
                           textDecoration: 'none',
-                          background: isActive(item.href) ? HIGHLIGHT_GREEN : 'transparent',
+                          background: isActive(item.href)
+                            ? HIGHLIGHT_GREEN
+                            : 'transparent',
                           color: isActive(item.href) ? 'white' : 'inherit',
                           height: 52,
                         }}
@@ -452,12 +499,32 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             <div style={{ marginTop: 'auto', padding: 12 }}>
               {!isUserLoading &&
                 (user ? (
-                  <Button onClick={() => { handleLogout(); setIsMobileSidebarOpen(false); }} variant="outline" className="w-full justify-start" style={{ height: 48 }}>
+                  <Button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    variant="outline"
+                    className="w-full justify-start"
+                    style={{ height: 48 }}
+                  >
                     <LogOut size={18} className="mr-2" /> Logout
                   </Button>
                 ) : (
-                  <Button asChild className="w-full justify-start" style={{ height: 48 }}>
-                    <Link href="/login" onClick={() => setIsMobileSidebarOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Button
+                    asChild
+                    className="w-full justify-start"
+                    style={{ height: 48 }}
+                  >
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMobileSidebarOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
                       <LogIn size={18} /> Sign In
                     </Link>
                   </Button>
@@ -467,7 +534,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </>
       )}
 
-      {/* Main content: positioned to the right of sidebar and below header */}
+      {/* main content */}
       <main
         style={{
           position: 'fixed',
@@ -480,13 +547,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           transition: 'left 200ms ease',
         }}
       >
-        {/* animated wrapper for right-side fields */}
-        <div className={`content-body ${contentAnimate ? 'animate' : ''}`} style={{ padding: 16 }}>
+        <div
+          className={`content-body ${contentAnimate ? 'animate' : ''}`}
+          style={{ padding: 16 }}
+        >
           {children}
         </div>
       </main>
 
-      {/* Footer */}
       <div className="fixed bottom-0 left-0 w-full bg-white shadow-inner h-14 z-30">
         <Footer />
       </div>

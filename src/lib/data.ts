@@ -191,7 +191,7 @@ export const allRestaurants: Restaurant[] = [
     reviews: 890,
     deliveryTime: 30,
     deliveryFee: 3.50,
-    categories: ['Vietnamese', 'Noodles', 'Pho'],
+    categories: ['Vietnamese', 'Noodle', 'Pho'],
     services: ['delivery', 'pickup'],
     type: 'restaurant',
     menu: [
@@ -411,7 +411,7 @@ export const allRestaurants: Restaurant[] = [
     reviews: 1300,
     deliveryTime: 33,
     deliveryFee: 3.80,
-    categories: ['Japanese', 'Ramen', 'Noodles'],
+    categories: ['Japanese', 'Ramen', 'Noodle'],
     services: ['delivery', 'pickup'],
     type: 'restaurant',
     menu: [
@@ -1341,7 +1341,7 @@ export const allRestaurants: Restaurant[] = [
     reviews: 1800,
     deliveryTime: 30,
     deliveryFee: 3.50,
-    categories: ['Vietnamese', 'Noodles', 'Pho'],
+    categories: ['Vietnamese', 'Noodle', 'Pho'],
     services: ['delivery'],
     type: 'restaurant',
     menu: [{ title: 'Pho', items: [{ id: '6901', name: 'Spicy Beef Pho', description: 'Our classic beef pho with a fiery kick of house-made chili oil. Not for the faint of heart!', price: 14.99, imageId: 'food-28' }] }],
@@ -1386,7 +1386,7 @@ export const allRestaurants: Restaurant[] = [
     reviews: 1200,
     deliveryTime: 30,
     deliveryFee: 3.20,
-    categories: ['Vietnamese', 'Noodles'],
+    categories: ['Vietnamese', 'Noodle'],
     services: ['delivery'],
     type: 'restaurant',
     menu: [{ title: 'Noodle Bowls', items: [{ id: '7201', name: 'Bun Thit Nuong', description: 'A refreshing and flavorful bowl of cool vermicelli noodles, topped with chargrilled pork, fresh herbs, and a savory-sweet dipping sauce.', price: 15.99, imageId: 'food-28' }] }],
@@ -2201,10 +2201,3 @@ export const allHomeFoods: Restaurant[] = [
     ],
   }
 ];
-
-    
-
-
-
-    
-

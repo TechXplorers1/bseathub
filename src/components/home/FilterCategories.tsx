@@ -1,3 +1,4 @@
+// components/home/FilterCategories.tsx (or wherever it's located)
 
 'use client';
 
@@ -19,9 +20,11 @@ import {
   Soup,
   ChevronLeft,
   ChevronRight,
+  Check,
+  ChevronDown,
 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { Tag, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import {
@@ -38,35 +41,33 @@ const mainCategories = [
   { name: 'Burgers', icon: Beef },
   { name: 'Coffee', icon: Coffee },
   { name: 'Pizza', icon: Pizza },
-  { name: 'Halal', icon: Shell }, // Placeholder
-  { name: 'Chicken', icon: Beef }, // Placeholder
-  { name: 'Bubble Tea', icon: Grape }, // Placeholder
-  { name: 'Indian', icon: Soup }, // Placeholder
+  { name: 'Halal', icon: Shell },
+  { name: 'Chicken', icon: Beef },
+  { name: 'Bubble Tea', icon: Grape },
+  { name: 'Indian', icon: Soup },
   { name: 'Desserts', icon: CakeSlice },
   { name: 'Mexican', icon: Vegan },
-  { name: 'Greek', icon: Salad }, // Placeholder
+  { name: 'Greek', icon: Salad },
   { name: 'Healthy', icon: Vegan },
   { name: 'Sandwiches', icon: Sandwich },
-  { name: 'Noodle', icon: Soup }, // Placeholder
+  { name: 'Noodle', icon: Soup },
 ];
 
-const filterButtons = [
-  { name: 'Eat Hub', icon: Check },
-];
+const filterButtons = [{ name: 'Eat Hub', icon: Check }];
 
 export function FilterCategories() {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = React.useState(false);
   const [showRightButton, setShowRightButton] = React.useState(true);
+
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
   const { ratingFilter, setRatingFilter } = useRatingFilter();
-
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setShowLeftButton(scrollLeft > 0);
-      setShowRightButton(scrollLeft < scrollWidth - clientWidth -1);
+      setShowRightButton(scrollLeft < scrollWidth - clientWidth - 1);
     }
   };
 
@@ -76,15 +77,15 @@ export function FilterCategories() {
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
-  
+
   React.useEffect(() => {
     const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      // Initial check
-      handleScroll();
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    handleScroll();
+
+    return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
   const ratingOptions = [
@@ -98,17 +99,18 @@ export function FilterCategories() {
 
   return (
     <div className="py-8">
+      {/* Category pills (horizontal scroll) */}
       <div className="relative group">
-        <div 
+        <div
           ref={scrollContainerRef}
           className="flex justify-start space-x-6 overflow-x-auto pb-4 scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {mainCategories.map((category) => (
             <Link
-                href={`/category/${encodeURIComponent(category.name)}`}
-                key={category.name}
-                className="flex flex-col items-center space-y-2 cursor-pointer group/item flex-shrink-0"
+              key={category.name}
+              href={`/category/${encodeURIComponent(category.name)}`}
+              className="flex flex-col items-center space-y-2 cursor-pointer group/item flex-shrink-0"
             >
               <div className="p-3 bg-gray-100 rounded-full group-hover/item:bg-primary/10 transition-colors">
                 <category.icon className="h-7 w-7 text-gray-700 group-hover/item:text-primary" />
@@ -120,6 +122,7 @@ export function FilterCategories() {
           ))}
         </div>
 
+        {/* left/right scroll buttons */}
         <Button
           variant="outline"
           size="icon"
@@ -131,6 +134,7 @@ export function FilterCategories() {
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
+
         <Button
           variant="outline"
           size="icon"
@@ -144,46 +148,54 @@ export function FilterCategories() {
         </Button>
       </div>
 
+      {/* delivery / rating / extra filter buttons */}
       <div className="flex justify-start items-center space-x-2 overflow-x-auto pt-4">
         <div className="flex bg-gray-100 rounded-full p-1 mr-2">
-            <Button
-              variant={deliveryMode === 'all' ? 'default' : 'ghost'}
-              className="rounded-full flex-shrink-0 text-sm h-9"
-              onClick={() => setDeliveryMode('all')}
-            >
-              All
+          <Button
+            variant={deliveryMode === 'all' ? 'default' : 'ghost'}
+            className="rounded-full flex-shrink-0 text-sm h-9"
+            onClick={() => setDeliveryMode('all')}
+          >
+            All
+          </Button>
+          <Button
+            variant={deliveryMode === 'delivery' ? 'default' : 'ghost'}
+            className="rounded-full flex-shrink-0 text-sm h-9"
+            onClick={() => setDeliveryMode('delivery')}
+          >
+            Delivery
+          </Button>
+          <Button
+            variant={deliveryMode === 'pickup' ? 'default' : 'ghost'}
+            className="rounded-full flex-shrink-0 text-sm h-9"
+            onClick={() => setDeliveryMode('pickup')}
+          >
+            Pickup
+          </Button>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="rounded-full flex-shrink-0">
+              <Star className="mr-2 h-4 w-4" />
+              {ratingFilter > 0
+                ? ratingOptions.find((o) => o.value === ratingFilter)?.label
+                : 'Rating'}
+              <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
-            <Button
-              variant={deliveryMode === 'delivery' ? 'default' : 'ghost'}
-              className="rounded-full flex-shrink-0 text-sm h-9"
-              onClick={() => setDeliveryMode('delivery')}
-            >
-              Delivery
-            </Button>
-            <Button
-              variant={deliveryMode === 'pickup' ? 'default' : 'ghost'}
-              className="rounded-full flex-shrink-0 text-sm h-9"
-              onClick={() => setDeliveryMode('pickup')}
-            >
-              Pickup
-            </Button>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="rounded-full flex-shrink-0">
-                    <Star className="mr-2 h-4 w-4" />
-                    {ratingFilter > 0 ? ratingOptions.find(o => o.value === ratingFilter)?.label : 'Rating'}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-                {ratingOptions.map(option => (
-                    <DropdownMenuItem key={option.value} onSelect={() => setRatingFilter(option.value)}>
-                        {option.label}
-                    </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {ratingOptions.map((option) => (
+              <DropdownMenuItem
+                key={option.value}
+                onSelect={() => setRatingFilter(option.value)}
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
         </DropdownMenu>
+
         {filterButtons.map((button) => (
           <Button
             key={button.name}

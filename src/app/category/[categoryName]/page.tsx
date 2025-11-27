@@ -1,54 +1,39 @@
-// app/category/[categoryName]/page.tsx
-
 import { RestaurantCard } from '@/components/home/RestaurantCard';
-import { ChefCard } from '@/components/home/ChefCard';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
-
-const chefs = allHomeFoods.map((food) => ({
-  name: food.name.split("'s")[0],
-  specialty: food.cuisine,
-  avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
-  slug: food.slug,
-}));
-
-const uniqueChefs = chefs.reduce((acc, current) => {
-  if (!acc.find((item) => item.name === current.name)) {
-    acc.push(current);
-  }
-  return acc;
-}, [] as typeof chefs);
+import { allRestaurants, allHomeFoods } from '@/lib/data'; // ⚠️ Verify this path matches where you saved data.ts
 
 type CategoryPageProps = {
-  params: { categoryName: string };
+  params: Promise<{ categoryName: string }>; // Update for Next.js 15 support
 };
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const categoryName = decodeURIComponent(params.categoryName);
+// Helper to clean up strings for comparison (removes spaces, makes lowercase)
+const normalize = (value: string) => value?.toLowerCase().trim() || '';
 
-  const categoryLower = categoryName.toLowerCase();
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  // 1. Await params (Fixes "Empty Page" on Next.js 15)
+  const resolvedParams = await params;
+  const rawCategoryName = resolvedParams.categoryName ?? '';
+  
+  // 2. Decode the URL string (e.g., "Fast%20Food" -> "Fast Food")
+  const categoryName = decodeURIComponent(rawCategoryName);
+  const categoryKey = normalize(categoryName);
 
-  const filteredRestaurants = allRestaurants.filter(
-    (restaurant) =>
-      restaurant.categories.some(
-        (cat) => cat.toLowerCase() === categoryLower
-      ) || restaurant.cuisine.toLowerCase() === categoryLower
+  // 3. Filter Restaurants
+  // We check if ANY of the restaurant's categories match the selected category key
+  const filteredRestaurants = allRestaurants.filter((restaurant) =>
+    (restaurant.categories ?? []).some(
+      (cat) => normalize(cat) === categoryKey
+    )
   );
 
-  const filteredHomeFoods = allHomeFoods.filter(
-    (restaurant) =>
-      restaurant.categories.some(
-        (cat) => cat.toLowerCase() === categoryLower
-      ) || restaurant.cuisine.toLowerCase() === categoryLower
+  // 4. Filter Home Food
+  const filteredHomeFoods = allHomeFoods.filter((item) =>
+    (item.categories ?? []).some(
+      (cat) => normalize(cat) === categoryKey
+    )
   );
 
-  const filteredChefs = uniqueChefs.filter((chef) =>
-    chef.specialty.toLowerCase().includes(categoryLower)
-  );
-
-  const noResults =
-    filteredRestaurants.length === 0 &&
-    filteredHomeFoods.length === 0 &&
-    filteredChefs.length === 0;
+  // 5. Merge into a single list (No separate headers, just one clean grid)
+  const allResults = [...filteredRestaurants, ...filteredHomeFoods];
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -56,43 +41,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         Results for "{categoryName}"
       </h1>
 
-      {filteredRestaurants.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Restaurants</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {filteredHomeFoods.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Home Food</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredHomeFoods.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {filteredChefs.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Chefs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredChefs.map((chef) => (
-              <ChefCard key={chef.name} chef={chef} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {noResults && (
-        <p className="text-center text-muted-foreground mt-12">
-          No results found for "{categoryName}".
-        </p>
+      {allResults.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {allResults.map((item) => (
+            <RestaurantCard key={item.id} restaurant={item} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-12">
+          <p className="text-lg text-muted-foreground">
+            No results found for "{categoryName}".
+          </p>
+          <p className="text-sm text-gray-400 mt-2">
+            Try selecting a different category from the menu.
+          </p>
+        </div>
       )}
     </div>
   );

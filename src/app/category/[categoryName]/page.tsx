@@ -1,39 +1,64 @@
+// app/category/[categoryName]/page.tsx
+
 import { RestaurantCard } from '@/components/home/RestaurantCard';
-import { allRestaurants, allHomeFoods } from '@/lib/data'; // ⚠️ Verify this path matches where you saved data.ts
+import { ChefCard } from '@/components/home/ChefCard';
+import { allRestaurants, allHomeFoods } from '@/lib/data';
 
 type CategoryPageProps = {
-  params: Promise<{ categoryName: string }>; // Update for Next.js 15 support
+  // Next.js 15 – params is a Promise
+  params: Promise<{ categoryName: string }>;
 };
 
-// Helper to clean up strings for comparison (removes spaces, makes lowercase)
+// helper for case-insensitive comparison
 const normalize = (value: string) => value?.toLowerCase().trim() || '';
 
+// build chefs list from home foods
+const chefs = allHomeFoods.map((food) => ({
+  name: food.name.split("'s")[0],
+  specialty: food.cuisine,
+  avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
+  slug: food.slug,
+}));
+
+const uniqueChefs = chefs.reduce((acc, current) => {
+  if (!acc.find((item) => item.name === current.name)) {
+    acc.push(current);
+  }
+  return acc;
+}, [] as typeof chefs);
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  // 1. Await params (Fixes "Empty Page" on Next.js 15)
+  // 1️⃣ await params (Next 15)
   const resolvedParams = await params;
   const rawCategoryName = resolvedParams.categoryName ?? '';
-  
-  // 2. Decode the URL string (e.g., "Fast%20Food" -> "Fast Food")
+
+  // 2️⃣ decode category from URL (Fast%20Food → Fast Food)
   const categoryName = decodeURIComponent(rawCategoryName);
   const categoryKey = normalize(categoryName);
 
-  // 3. Filter Restaurants
-  // We check if ANY of the restaurant's categories match the selected category key
+  // 3️⃣ Restaurants: only items whose categories contain this category
   const filteredRestaurants = allRestaurants.filter((restaurant) =>
     (restaurant.categories ?? []).some(
       (cat) => normalize(cat) === categoryKey
     )
   );
 
-  // 4. Filter Home Food
+  // 4️⃣ Home Food: same logic but on allHomeFoods
   const filteredHomeFoods = allHomeFoods.filter((item) =>
     (item.categories ?? []).some(
       (cat) => normalize(cat) === categoryKey
     )
   );
 
-  // 5. Merge into a single list (No separate headers, just one clean grid)
-  const allResults = [...filteredRestaurants, ...filteredHomeFoods];
+  // 5️⃣ Chefs: optional – based on cuisine / specialty
+  const filteredChefs = uniqueChefs.filter((chef) =>
+    normalize(chef.specialty).includes(categoryKey)
+  );
+
+  const noResults =
+    filteredRestaurants.length === 0 &&
+    filteredHomeFoods.length === 0 &&
+    filteredChefs.length === 0;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -41,13 +66,44 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         Results for "{categoryName}"
       </h1>
 
-      {allResults.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {allResults.map((item) => (
-            <RestaurantCard key={item.id} restaurant={item} />
-          ))}
-        </div>
-      ) : (
+      {/* Restaurants section */}
+      {filteredRestaurants.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Restaurants</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredRestaurants.map((restaurant) => (
+              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Home Food section */}
+      {filteredHomeFoods.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Home Food</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredHomeFoods.map((item) => (
+              <RestaurantCard key={item.id} restaurant={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Chefs section */}
+      {filteredChefs.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-4">Chefs</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredChefs.map((chef) => (
+              <ChefCard key={chef.name} chef={chef} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* No results state */}
+      {noResults && (
         <div className="flex flex-col items-center justify-center py-12">
           <p className="text-lg text-muted-foreground">
             No results found for "{categoryName}".

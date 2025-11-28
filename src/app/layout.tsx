@@ -10,10 +10,11 @@ import { HeaderProvider } from '@/context/HeaderProvider';
 import { LocationProvider } from '@/context/LocationProvider';
 import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 import { RestaurantProvider } from '@/context/RestaurantProvider';
-import { FirebaseClientProvider } from '@/firebase';
 import { SidebarProvider } from '@/components/ui/sidebar';
 // ✅ Import RatingFilterProvider
 import { RatingFilterProvider } from '@/context/RatingFilterProvider';
+import { FirebaseClientProvider } from '@/firebase';
+
 
 const inter = Inter({
   subsets: ['latin'],

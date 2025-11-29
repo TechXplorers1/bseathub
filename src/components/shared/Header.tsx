@@ -27,7 +27,6 @@ import {
 } from 'lucide-react';
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useHeader } from '@/context/HeaderProvider';
 import {
   Dialog,
@@ -56,6 +55,15 @@ import {
   DropdownMenuLabel,
 } from '../ui/dropdown-menu';
 
+type MobileNavSheetProps = {
+  location: string;
+  handleLocationDialog: () => void;
+  hasNotifications: boolean;
+  isUserLoading: boolean;
+  user: any;
+  handleLogout: () => void;
+};
+
 // ----------------------------------------------------
 // Mobile Nav Sheet
 // ----------------------------------------------------
@@ -66,7 +74,7 @@ function MobileNavSheet({
   isUserLoading,
   user,
   handleLogout,
-}) {
+}: MobileNavSheetProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -118,10 +126,10 @@ function MobileNavSheet({
           {/* User Section */}
           {isUserLoading && <Skeleton className="h-10 w-full rounded-md" />}
 
-          {!isUserLoading && user ? (
+          {!isUserLoading && user && (
             <div className="p-2 border-t mt-4 pt-4">
               <p className="font-medium text-sm mb-2">
-                {user.displayName || user.email}
+                {user.displayName || user.email || 'User'}
               </p>
               <Link href="/dashboard" passHref>
                 <Button
@@ -142,7 +150,9 @@ function MobileNavSheet({
                 <span>Log out</span>
               </Button>
             </div>
-          ) : (
+          )}
+
+          {!isUserLoading && !user && (
             <Link href="/login" passHref>
               <Button className="w-full hover:text-primary transition-colors duration-200">
                 Sign In
@@ -197,7 +207,6 @@ export function Header() {
     <header className="fixed top-0 left-0 w-full z-50 border-b bg-background shadow-md">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex items-center">
-          {/* Mobile Nav/Hamburger Menu */}
           <MobileNavSheet
             location={location}
             handleLocationDialog={handleLocationDialog}
@@ -233,6 +242,9 @@ export function Header() {
             type="search"
             placeholder="Search Eat Hub"
             className="pl-9 rounded-full bg-gray-100 border-none focus-visible:ring-primary transition-all duration-300 hover:bg-gray-200"
+            onKeyDown={handleSearch}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -334,10 +346,11 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
+          {/* While loading, just show skeleton */}
           {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
 
-          {/* User Dropdown */}
-          {!isUserLoading && user ? (
+          {/* User Dropdown (profile icon) */}
+          {!isUserLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -417,7 +430,10 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
+          )}
+
+          {/* Sign In button ONLY when not loading and no user */}
+          {!isUserLoading && !user && (
             <Button
               variant="outline"
               className="hidden md:inline-flex transition-colors duration-200 hover:bg-gray-50 hover:text-primary"
@@ -438,6 +454,9 @@ export function Header() {
               type="search"
               placeholder="Search Eat Hub"
               className="pl-9 pr-12 rounded-full bg-gray-100 border-none focus-visible:ring-primary w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
             />
             <Button
               variant="ghost"

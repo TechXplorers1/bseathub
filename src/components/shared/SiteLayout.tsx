@@ -36,7 +36,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // show sidebar on home and category pages
-  const showSidebar = pathname === '/' || pathname?.startsWith('/category');
+const showSidebar = true;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);

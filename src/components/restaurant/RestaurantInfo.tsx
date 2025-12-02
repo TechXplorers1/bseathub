@@ -62,7 +62,7 @@ export function RestaurantInfo({
           </div>
         )}
 
-        {/* 🔥 LOCATION BOX COMES FIRST */}
+        {/* LOCATION BOX */}
         {!isChefPage && showLocation && (
           <div className="mt-1 rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             <div className="flex items-start gap-2">
@@ -77,7 +77,6 @@ export function RestaurantInfo({
           </div>
         )}
 
-        {/* Button now appears BELOW the location */}
         {!isChefPage && (
           <Button
             variant="outline"

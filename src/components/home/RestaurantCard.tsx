@@ -14,7 +14,12 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   const image = getImageById(restaurant.imageId);
 
   return (
-    <Link href={`/restaurant/${restaurant.slug}`} className="flex">
+    <Link
+      href={`/restaurant/${restaurant.slug}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex"
+    >
       <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col">
         {image && (
           <div className="relative h-48 w-full">
@@ -25,22 +30,23 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
               className="object-cover"
               data-ai-hint={image.imageHint}
             />
-             <div className="absolute bottom-2 right-2 flex gap-2">
-                {restaurant.services.includes('delivery') && (
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                        <Bike className="h-3 w-3" />
-                        <span>Delivery</span>
-                    </Badge>
-                )}
-                {restaurant.services.includes('pickup') && (
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                        <ShoppingBag className="h-3 w-3" />
-                        <span>Pickup</span>
-                    </Badge>
-                )}
+            <div className="absolute bottom-2 right-2 flex gap-2">
+              {restaurant.services.includes('delivery') && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Bike className="h-3 w-3" />
+                  <span>Delivery</span>
+                </Badge>
+              )}
+              {restaurant.services.includes('pickup') && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <ShoppingBag className="h-3 w-3" />
+                  <span>Pickup</span>
+                </Badge>
+              )}
             </div>
           </div>
         )}
+
         <CardContent className="p-4 flex flex-col flex-1">
           <div className="flex-1">
             <div className="flex justify-between items-start">

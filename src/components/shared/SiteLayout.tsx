@@ -35,8 +35,24 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const pathname = usePathname();
 
-  // show sidebar on home and category pages
-const showSidebar = true;
+// where to show sidebar
+const isHome = pathname === '/';
+const isCategory = pathname?.startsWith('/category');
+const isRestaurantsList = pathname === '/restaurants';
+const isHomeFoodList = pathname === '/home-food';
+
+// where to HIDE sidebar (individual detail pages)
+const isRestaurantDetail = pathname?.startsWith('/restaurants/');
+const isHomeFoodDetail = pathname?.startsWith('/home-food/');
+
+// final rule:
+// - show on home, category, restaurants list, home-food list
+// - hide on individual restaurant + home food pages
+const showSidebar =
+  (isHome || isCategory || isRestaurantsList || isHomeFoodList) &&
+  !isRestaurantDetail &&
+  !isHomeFoodDetail;
+
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);

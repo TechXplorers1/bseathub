@@ -5,6 +5,7 @@ import type { MenuItem as MenuItemType, Restaurant } from '@/lib/types';
 import { MenuNav } from './MenuNav';
 import { MenuItem } from './MenuItem';
 import { MenuItemDialog } from './MenuItemDialog';
+import { BookingForm } from '../chef/BookingForm';
 import { ChefGallery } from '../chef/ChefGallery';
 import { ChefCuisineSpecialties } from '../chef/ChefCuisineSpecialties';
 import { Separator } from '../ui/separator';
@@ -16,10 +17,53 @@ import { ReviewsSection } from './ReviewsSection';
 import { ChefHero } from '../chef/ChefHero';
 import { ChefAbout } from '../chef/ChefAbout';
 import { BookChef } from '../chef/BookChef';
-import { Search } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+
+type CategoryFilterKey = 'all' | 'starters' | 'main' | 'desserts' | 'beverages';
+
+const getSectionId = (title: string) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+function filterMenuByCategory(
+  menu: Restaurant['menu'],
+  filter: CategoryFilterKey
+) {
+  if (filter === 'all') return menu;
+
+  const contains = (title: string, ...keywords: string[]) => {
+    const lower = title.toLowerCase();
+    return keywords.some((k) => lower.includes(k));
+  };
+
+  return menu.filter((category) => {
+    const title = category.title || '';
+    switch (filter) {
+      case 'starters':
+        return contains(title, 'starter', 'appetiser', 'appetizer');
+      case 'main':
+        return contains(title, 'main course', 'main dish');
+      case 'desserts':
+        return contains(title, 'dessert', 'sweet');
+      case 'beverages':
+        return contains(
+          title,
+          'beverage',
+          'drink',
+          'mocktail',
+          'shake',
+          'juice'
+        );
+      default:
+        return true;
+    }
+  });
+}
 
 export function RestaurantDetails({
   restaurant,
@@ -28,290 +72,297 @@ export function RestaurantDetails({
   restaurant: Restaurant;
   chefName?: string;
 }) {
-  const [selectedItem, setSelectedItem] = React.useState<MenuItemType | null>(null);
+  const [selectedItem, setSelectedItem] = React.useState<MenuItemType | null>(
+    null
+  );
+  const [categoryFilter, setCategoryFilter] =
+    React.useState<CategoryFilterKey>('all');
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const handleItemClick = (item: MenuItemType) => {
     setSelectedItem(item);
   };
 
-  // Function to smoothly scroll to a section by its ID, accounting for the sticky header
-  const scrollToCategory = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const yOffset = -120; // Adjust for sticky header height (top-[64px] + a little extra)
-      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
-
   const displayName = chefName ? chefName : restaurant.name;
-  const featuredItems =
-    restaurant.menu.find((c) => c.title === 'Featured Items')?.items || [];
 
-  // Define all possible categories including static sections for Restaurant
-  const restaurantNavItems = [
-    'Deals & Discounts',
-    'Featured Items',
-    ...restaurant.menu.map((cat) => cat.title).filter(title => title !== 'Featured Items'), // All other dynamic menu categories
-    'Reviews',
-  ].filter(Boolean); // Filter out any null/undefined entries
-
-  // Define all possible categories including static sections for Chef
-  const chefNavItems = ['About', 'Specialties', 'Signature Dishes', 'Reviews', 'Book a Chef', ...restaurant.menu.map((cat) => cat.title)].filter(Boolean);
-
-
-  const mainCategories = [
-    { name: 'Starters', id: 'Starters / Appetisers' },
-    { name: 'Main Course', id: 'Main Course (Veg)' },
-    { name: 'Desserts', id: 'Desserts' },
-    { name: 'Beverages', id: 'Beverages (Hot & Cold)' },
-  ];
-
-  // Component to wrap sections and apply common animation/transition
-  const AnimatedSection: React.FC<React.PropsWithChildren<{ id: string }>> = ({ id, children }) => (
-    <section
-        id={id}
-        className={cn(
-            "scroll-mt-32", // Offset for sticky header
-            "pb-8 pt-4", // Consistent padding around sections
-            "transition-all duration-500 ease-in-out"
-        )}
-    >
-      {children}
-    </section>
+  // Only keep categories that actually have items
+  const nonEmptyMenu = React.useMemo(
+    () =>
+      (restaurant.menu ?? []).filter(
+        (category) => category.items && category.items.length > 0
+      ),
+    [restaurant.menu]
   );
 
-  // =============== CHEF / HOMEFOOD PAGE ===============
+  // Which filters are actually available for this restaurant
+  const availableFilterKeys: CategoryFilterKey[] = React.useMemo(() => {
+    const keys: CategoryFilterKey[] = ['all'];
+    if (filterMenuByCategory(nonEmptyMenu, 'starters').length > 0) {
+      keys.push('starters');
+    }
+    if (filterMenuByCategory(nonEmptyMenu, 'main').length > 0) {
+      keys.push('main');
+    }
+    if (filterMenuByCategory(nonEmptyMenu, 'desserts').length > 0) {
+      keys.push('desserts');
+    }
+    if (filterMenuByCategory(nonEmptyMenu, 'beverages').length > 0) {
+      keys.push('beverages');
+    }
+    return keys;
+  }, [nonEmptyMenu]);
+
+  React.useEffect(() => {
+    if (!availableFilterKeys.includes(categoryFilter)) {
+      setCategoryFilter('all');
+    }
+  }, [availableFilterKeys, categoryFilter]);
+
+  // Category + search filtering
+  const filteredMenu = React.useMemo(() => {
+    const byCategory = filterMenuByCategory(nonEmptyMenu, categoryFilter);
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return byCategory;
+
+    return byCategory
+      .map((category) => ({
+        ...category,
+        items: category.items.filter((item) => {
+          const name = item.name?.toLowerCase() ?? '';
+          const desc = item.description?.toLowerCase() ?? '';
+          return name.includes(term) || desc.includes(term);
+        }),
+      }))
+      .filter((category) => category.items.length > 0);
+  }, [nonEmptyMenu, categoryFilter, searchTerm]);
+
+  const menuCategories = nonEmptyMenu.map((category) => category.title);
+
+  const visibleItems = filteredMenu.flatMap((category) => category.items);
+  const featuredItems = visibleItems.slice(0, 3);
+
+  // For search “item names wise” list
+  const searchResultItems =
+    searchTerm.trim().length > 0 ? visibleItems.slice(0, 12) : [];
+
+  const filterButtons: { key: CategoryFilterKey; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'starters', label: 'Starters' },
+    { key: 'main', label: 'Main course' },
+    { key: 'desserts', label: 'Desserts' },
+    { key: 'beverages', label: 'Beverages' },
+  ].filter((btn) => availableFilterKeys.includes(btn.key));
+
+  const scrollStyle = `
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+  `;
+
+  // 🔹 Chef Page
   if (chefName) {
     return (
       <div className="flex flex-col bg-background">
+        <style>{scrollStyle}</style>
+
         <ChefHero restaurant={restaurant} chefName={chefName} />
 
-        <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-12">
-            
-            {/* ⬅️ SIDEBAR (STICKY & RESPONSIVE) */}
-            <div className="lg:col-span-1 lg:border-r lg:pr-8">
-              <div className="lg:sticky lg:top-24 self-start h-full pb-8">
+        <div className="mx-auto w-full px-4 sm:px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-6 gap-2">
+            <div className="lg:col-span-1 lg:border-r lg:pr-4">
+              <div className="lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar">
                 <RestaurantInfo
                   restaurant={restaurant}
                   displayName={displayName}
                   isChefPage={true}
                 />
-                <Separator className="my-6" />
-                
-                {/* Vertical Menu Nav for Desktop */}
-                <div className="hidden lg:block">
-                  <MenuNav navItems={chefNavItems} hasChef={true} />
-                </div>
-                
-                {/* Mobile horizontal menu nav (for Chef content) */}
-                <div className="lg:hidden -mx-4 px-4 pt-4">
-                  <MenuNav
-                    navItems={chefNavItems}
-                    hasChef={true}
-                    orientation="horizontal"
-                  />
-                </div>
-                
+                <Separator className="my-3" />
+                <MenuNav menuCategories={[]} hasChef={true} />
               </div>
             </div>
 
-            {/* ➡️ MAIN CONTENT (ANIMATED SECTIONS) */}
-            <div className="lg:col-span-4 overflow-hidden">
-              <AnimatedSection id="About">
-                <ChefAbout restaurant={restaurant} chefName={chefName} />
-              </AnimatedSection>
-
-              <Separator className="my-10" />
-
-              <AnimatedSection id="Specialties">
-                <h2 className="text-3xl font-bold mb-6">Specialties</h2>
-                <ChefCuisineSpecialties
-                  cuisines={[restaurant.cuisine, ...restaurant.categories]}
-                />
-              </AnimatedSection>
-
-              <Separator className="my-10" />
-
-              <AnimatedSection id="Signature Dishes">
-                <h2 className="text-3xl font-bold mb-6">Signature Dishes</h2>
+            <div className="lg:col-span-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+              <ChefAbout restaurant={restaurant} chefName={chefName} />
+              <Separator className="my-4 md:my-5" />
+              <ChefCuisineSpecialties
+                cuisines={[restaurant.cuisine, ...restaurant.categories]}
+              />
+              <Separator className="my-4 md:my-5" />
+              <div id="signature-dishes">
                 <ChefGallery />
-              </AnimatedSection>
-
-              <Separator className="my-10" />
-
-              <AnimatedSection id="Reviews">
-                <ReviewsSection />
-              </AnimatedSection>
-
-              <Separator className="my-10" />
-
-              <AnimatedSection id="Book a Chef">
-                <h2 className="text-3xl font-bold mb-6">Book This Chef</h2>
-                <BookChef chefName={chefName} />
-              </AnimatedSection>
-
-              {/* Dynamic Menu Categories for Chef */}
-              {restaurant.menu.length > 0 && (
-                <>
-                  <Separator className="my-10" />
-                  <h2 className="text-3xl font-bold mb-6">Chef's Menu</h2>
-                  <div className="space-y-10">
-                    {restaurant.menu.map((category, index) => (
-                      <AnimatedSection key={category.title} id={category.title}>
-                        <h3 className="text-2xl font-semibold mb-4">
-                          {category.title}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {category.items.map((item) => (
-                            <MenuItem
-                              key={item.id}
-                              item={item}
-                              onClick={() => handleItemClick(item)}
-                            />
-                          ))}
-                        </div>
-                      </AnimatedSection>
-                    ))}
-                  </div>
-                </>
-              )}
+              </div>
+              <Separator className="my-4 md:my-5" />
+              <ReviewsSection />
+              <Separator className="my-4 md:my-5" />
+              <BookChef chefName={chefName} />
             </div>
           </div>
         </div>
-
-        {selectedItem && (
-          <MenuItemDialog
-            item={selectedItem}
-            open={!!selectedItem}
-            onOpenChange={(open) => {
-              if (!open) setSelectedItem(null);
-            }}
-          />
-        )}
       </div>
     );
   }
 
-  // =============== NORMAL RESTAURANT PAGE ===============
+  // 🔹 Normal Restaurant Page
   return (
     <div className="flex flex-col bg-background">
+      <style>{scrollStyle}</style>
+
       <RestaurantHero restaurant={restaurant} />
 
-      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-12">
-          
-          {/* ⬅️ LEFT SIDEBAR (STICKY & RESPONSIVE) */}
-          <div className="lg:col-span-1 lg:border-r lg:pr-8">
-            <div className="lg:sticky lg:top-24 self-start h-full pb-8">
+      <div className="mx-auto w-full px-4 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-6 gap-2">
+          {/* Left Sidebar */}
+          <div className="lg:col-span-1 lg:border-r lg:pr-4">
+            <div className="lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar">
               <RestaurantInfo restaurant={restaurant} displayName={displayName} />
-              <Separator className="my-6" />
-              
-              {/* Vertical Menu Nav for Desktop */}
-              <div className="hidden lg:block">
-                <MenuNav navItems={restaurantNavItems} hasChef={false} />
-              </div>
+              <Separator className="my-3" />
+              <MenuNav menuCategories={menuCategories} hasChef={!!chefName} />
             </div>
           </div>
 
-          {/* ➡️ MAIN CONTENT (ANIMATED SECTIONS) */}
-          <div className="lg:col-span-4 overflow-hidden">
-            
-            {/* TOP STICKY BAR (Search & Quick Nav) */}
-            <div className="sticky top-[64px] bg-background pt-4 pb-2 z-20 border-b space-y-3 transition-all duration-300 shadow-sm">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                {/* Search Field */}
-                <div className="relative w-full sm:max-w-xs">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder={`Search ${restaurant.name}`}
-                    className="pl-9 rounded-full bg-gray-100 border-none transition-shadow duration-300 focus-within:shadow-md"
-                  />
-                </div>
-                
-                {/* Quick Category Buttons (Only for Restaurant Page, not Chef) */}
-                <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
-                  {mainCategories.map((category) => (
+          {/* Right Content */}
+          <div className="lg:col-span-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+            {/* Search + filter area */}
+            <div className="pt-3 pb-2 border-b">
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+                  <div className="relative w-full sm:max-w-md md:max-w-lg">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder={`Search ${restaurant.name}`}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9 rounded-full bg-gray-50 border border-gray-200 text-black placeholder:text-slate-400 focus-visible:border-orange-500 focus-visible:outline-none focus-visible:ring-0 transition-colors duration-200"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
                     <Button
-                      key={category.name}
                       variant="outline"
-                      className="rounded-full hover:bg-primary/10 transition-colors duration-200"
-                      onClick={() => scrollToCategory(category.id)}
+                      className="rounded-full h-9 px-4 border-gray-200 text-black hover:border-orange-400 hover:text-orange-500 transition-colors text-xs sm:text-sm"
                     >
-                      {category.name}
+                      <span>Opens 6:30 AM</span>
+                      <ChevronDown className="h-4 w-4 ml-1" />
                     </Button>
-                  ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* MOBILE HORIZONTAL MENU NAV (Below Search Bar) */}
-              <div className="lg:hidden -mx-4 px-4">
-                <MenuNav
-                  navItems={restaurantNavItems}
-                  hasChef={false}
-                  orientation="horizontal"
-                />
+                {/* Category filter buttons */}
+                {filterButtons.length > 1 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {filterButtons.map((btn) => (
+                      <Button
+                        key={btn.key}
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setCategoryFilter(btn.key)}
+                        className={cn(
+                          'rounded-full px-3 py-1 text-[11px] sm:text-xs md:text-sm font-semibold transition-all duration-200 border',
+                          categoryFilter === btn.key
+                            ? 'bg-orange-500 text-white border-orange-500 shadow-sm hover:bg-orange-600'
+                            : 'bg-white text-black border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300'
+                        )}
+                      >
+                        {btn.label}
+                      </Button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* DEALS & DISCOUNTS */}
-            {/* Only render if restaurant has deals - for demo, we assume it does */}
-            <AnimatedSection id="Deals & Discounts">
-              <h2 className="text-3xl font-bold mb-6">Deals & Discounts</h2>
+            {/* Search results: item names list */}
+            {searchResultItems.length > 0 && (
+              <section className="mt-3">
+                <h3 className="text-sm font-semibold text-black mb-1.5">
+                  Search results
+                </h3>
+                <div className="flex flex-col gap-1.5">
+                  {searchResultItems.map((item) => (
+                    <button
+                      key={`sr-${item.id}`}
+                      type="button"
+                      onClick={() => handleItemClick(item)}
+                      className="w-full text-left text-xs sm:text-sm font-semibold text-black px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition-colors"
+                    >
+                      {item.name}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Deals & Discounts */}
+            <section id="deals-and-discounts" className="mt-3 md:mt-4">
               <DealsAndDiscounts />
-            </AnimatedSection>
+            </section>
 
-            <Separator className="my-10" />
+            <Separator className="my-4 md:my-5" />
 
-            {/* FEATURED ITEMS */}
+            {/* Featured Items */}
             {featuredItems.length > 0 && (
               <>
-                <AnimatedSection id="Featured Items">
-                  {/* <h2 className="text-3xl font-bold mb-6">Featured Items</h2> */}
-                  <FeaturedItems items={featuredItems} onItemClick={handleItemClick} />
-                </AnimatedSection>
-                <Separator className="my-10" />
+                <section id="featured-items">
+                  <FeaturedItems
+                    items={featuredItems}
+                    onItemClick={handleItemClick}
+                  />
+                </section>
+                <Separator className="my-4 md:my-5" />
               </>
             )}
 
-            {/* REVIEWS */}
-            <AnimatedSection id="Reviews">
-              {/* <h2 className="text-3xl font-bold mb-6">Reviews</h2> */}
+            {/* Reviews */}
+            <section id="reviews">
               <ReviewsSection />
-            </AnimatedSection>
+            </section>
 
-            <Separator className="my-10" />
+            <Separator className="my-4 md:my-5" />
 
-            <h2 className="text-3xl font-bold mb-6">Full Menu</h2>
+            {/* Full Menu */}
+            <div className="mt-2 pb-5 md:pb-6">
+              {nonEmptyMenu.length === 0 ? (
+                <p className="text-sm text-slate-500 mt-2">
+                  Menu coming soon for this restaurant.
+                </p>
+              ) : filteredMenu.length === 0 ? (
+                <p className="text-sm text-slate-500 mt-2">
+                  No items match your filters.
+                </p>
+              ) : (
+                filteredMenu.map((category, index) => (
+                  <React.Fragment key={category.title}>
+                    <section id={getSectionId(category.title)}>
+                      <h2 className="text-xl md:text-2xl font-bold text-black mt-4 mb-3 tracking-tight transition-transform duration-200 hover:translate-x-1">
+                        {category.title}
+                      </h2>
 
-            {/* MENU CATEGORIES */}
-            <div className="space-y-10">
-              {restaurant.menu.map((category, index) => {
-                if (category.title === 'Featured Items') return null; // Featured is rendered above
-
-                return (
-                  <AnimatedSection key={category.title} id={category.title}>
-                    <h3 className="text-2xl font-semibold mb-4">
-                      {category.title}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {category.items.map((item) => (
-                        <MenuItem
-                          key={item.id}
-                          item={item}
-                          onClick={() => handleItemClick(item)}
-                        />
-                      ))}
-                    </div>
-                  </AnimatedSection>
-                );
-              })}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                        {category.items.map((item) => (
+                          <MenuItem
+                            key={item.id}
+                            item={item}
+                            onClick={() => handleItemClick(item)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                    {index < filteredMenu.length - 1 && (
+                      <Separator className="my-4 md:my-5" />
+                    )}
+                  </React.Fragment>
+                ))
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Item dialog */}
       {selectedItem && (
         <MenuItemDialog
           item={selectedItem}

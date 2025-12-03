@@ -38,6 +38,8 @@ export function MenuItemDialog({
     onOpenChange(false);
   };
 
+  const hasRating = typeof item.rating === 'number';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl p-0">
@@ -49,14 +51,14 @@ export function MenuItemDialog({
                 src={image.imageUrl}
                 alt={item.name}
                 fill
-                className="object-cover rounded-l-lg"
+                className="object-cover rounded-l-lg md:rounded-l-lg md:rounded-r-none"
                 data-ai-hint={image.imageHint}
               />
             )}
           </div>
 
           {/* Details side */}
-          <div className="p-6 flex flex-col">
+          <div className="p-6 flex flex-col bg-white">
             <DialogHeader>
               <DialogTitle className="text-2xl mb-1">
                 {item.name}
@@ -64,22 +66,36 @@ export function MenuItemDialog({
 
               {/* Restaurant name */}
               {item.restaurantName && (
-                <p className="text-sm font-semibold text-primary">
+                <p className="text-sm font-semibold text-orange-500">
                   From: {item.restaurantName}
                 </p>
               )}
 
-              {/* Rating */}
-              {typeof item.rating === 'number' && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  ⭐ {item.rating.toFixed(1)} / 5.0
-                </p>
+              {/* Rating row */}
+              {hasRating && (
+                <div className="mt-1 flex items-center gap-1.5 text-sm">
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 text-[10px]">
+                    ⭐
+                  </span>
+                  <span className="font-semibold">
+                    {item.rating!.toFixed(1)}
+                  </span>
+                  <span className="text-muted-foreground text-xs">
+                    / 5.0
+                  </span>
+                </div>
               )}
 
               {/* Recipe / Description */}
-              <DialogDescription className="text-base text-muted-foreground mt-3">
-                {item.recipe ?? item.description}
-              </DialogDescription>
+              {item.recipe ? (
+                <DialogDescription className="text-base text-muted-foreground mt-3">
+                  {item.recipe}
+                </DialogDescription>
+              ) : item.description ? (
+                <DialogDescription className="text-base text-muted-foreground mt-3">
+                  {item.description}
+                </DialogDescription>
+              ) : null}
             </DialogHeader>
 
             <div className="flex-grow" />

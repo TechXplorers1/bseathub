@@ -51,7 +51,7 @@ export function RestaurantInfo({
 
         {!isChefPage && (
           <p className="text-muted-foreground">
-            $ • {restaurant.cuisine}
+             • {restaurant.cuisine}
           </p>
         )}
 

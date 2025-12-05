@@ -102,7 +102,7 @@ export function MenuItemDialog({
 
             <DialogFooter className="mt-6 sm:justify-between items-center">
               <div className="text-2xl font-bold">
-                <span>₹{item.price.toFixed(2)}</span>
+                <span>${item.price.toFixed(2)}</span>
               </div>
               <Button size="lg" onClick={handleAddToCart}>
                 Add To Cart

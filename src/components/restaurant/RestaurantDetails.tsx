@@ -141,10 +141,6 @@ export function RestaurantDetails({
   const visibleItems = filteredMenu.flatMap((category) => category.items);
   const featuredItems = visibleItems.slice(0, 3);
 
-  // For search “item names wise” list
-  const searchResultItems =
-    searchTerm.trim().length > 0 ? visibleItems.slice(0, 12) : [];
-
   const filterButtons: { key: CategoryFilterKey; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'starters', label: 'Starters' },
@@ -275,27 +271,6 @@ export function RestaurantDetails({
               </div>
             </div>
 
-            {/* Search results: item names list */}
-            {searchResultItems.length > 0 && (
-              <section className="mt-3">
-                <h3 className="text-sm font-semibold text-black mb-1.5">
-                  Search results
-                </h3>
-                <div className="flex flex-col gap-1.5">
-                  {searchResultItems.map((item) => (
-                    <button
-                      key={`sr-${item.id}`}
-                      type="button"
-                      onClick={() => handleItemClick(item)}
-                      className="w-full text-left text-xs sm:text-sm font-semibold text-black px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition-colors"
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
             {/* Deals & Discounts */}
             <section id="deals-and-discounts" className="mt-3 md:mt-4">
               <DealsAndDiscounts />
@@ -315,13 +290,6 @@ export function RestaurantDetails({
                 <Separator className="my-4 md:my-5" />
               </>
             )}
-
-            {/* Reviews */}
-            <section id="reviews">
-              <ReviewsSection />
-            </section>
-
-            <Separator className="my-4 md:my-5" />
 
             {/* Full Menu */}
             <div className="mt-2 pb-5 md:pb-6">
@@ -358,6 +326,13 @@ export function RestaurantDetails({
                 ))
               )}
             </div>
+
+            {/* Reviews at bottom */}
+            <section id="reviews">
+              <ReviewsSection />
+            </section>
+
+            <Separator className="my-4 md:my-5" />
           </div>
         </div>
       </div>

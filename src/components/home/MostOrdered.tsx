@@ -20,6 +20,7 @@ const mostOrderedItems: EnrichedMenuItem[] = allItems
     restaurant.menu.flatMap((category) =>
       category.items.map((item) => ({
         ...item,
+        type: restaurant.type,
         restaurantName: restaurant.name,
         // Prefer item rating, else fall back to restaurant rating
         rating:

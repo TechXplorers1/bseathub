@@ -27,6 +27,33 @@ const uniqueChefs = chefs.reduce((acc, current) => {
   return acc;
 }, [] as typeof chefs);
 
+/**
+ * Let Next.js know all category route params that should be statically generated at build time.
+ * We gather categories from your static data (restaurants + home foods) and return them.
+ */
+export async function generateStaticParams(): Promise<{ categoryName: string }[]> {
+  const categorySet = new Set<string>();
+
+  // collect categories from restaurants
+  allRestaurants.forEach((r) => {
+    (r.categories ?? []).forEach((c) => {
+      if (typeof c === 'string' && c.trim()) categorySet.add(c.trim());
+    });
+  });
+
+  // collect categories from home foods
+  allHomeFoods.forEach((f) => {
+    (f.categories ?? []).forEach((c) => {
+      if (typeof c === 'string' && c.trim()) categorySet.add(c.trim());
+    });
+  });
+
+  // map to route param objects. We encode to make sure spaces/special chars are route-safe.
+  return Array.from(categorySet).map((cat) => ({
+    categoryName: encodeURIComponent(cat),
+  }));
+}
+
 export default async function CategoryPage({ params }: CategoryPageProps) {
   // 1️⃣ await params (Next 15)
   const resolvedParams = await params;
@@ -38,16 +65,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   // 3️⃣ Restaurants: only items whose categories contain this category
   const filteredRestaurants = allRestaurants.filter((restaurant) =>
-    (restaurant.categories ?? []).some(
-      (cat) => normalize(cat) === categoryKey
-    )
+    (restaurant.categories ?? []).some((cat) => normalize(cat) === categoryKey)
   );
 
   // 4️⃣ Home Food: same logic but on allHomeFoods
   const filteredHomeFoods = allHomeFoods.filter((item) =>
-    (item.categories ?? []).some(
-      (cat) => normalize(cat) === categoryKey
-    )
+    (item.categories ?? []).some((cat) => normalize(cat) === categoryKey)
   );
 
   // 5️⃣ Chefs: optional – based on cuisine / specialty
@@ -62,9 +85,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">
-        Results for "{categoryName}"
-      </h1>
+      <h1 className="text-3xl font-bold mb-8">Results for "{categoryName}"</h1>
 
       {/* Restaurants section */}
       {filteredRestaurants.length > 0 && (
@@ -108,9 +129,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <p className="text-lg text-muted-foreground">
             No results found for "{categoryName}".
           </p>
-          <p className="text-sm text-gray-400 mt-2">
-            Try selecting a different category from the menu.
-          </p>
+          <p className="text-sm text-gray-400 mt-2">Try selecting a different category from the menu.</p>
         </div>
       )}
     </div>

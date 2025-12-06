@@ -5,6 +5,7 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { useHeader } from '@/context/HeaderProvider';
 import type { Restaurant } from '@/lib/types';
 import { useEffect } from 'react';
+import { ModernChefPage } from '@/components/chef/ModernChefPage';
 
 export function RestaurantClientPage({
   restaurant,
@@ -18,9 +19,12 @@ export function RestaurantClientPage({
 
   useEffect(() => {
     setOpen(false);
+
     if (chefName) {
-      setHeaderTitle(`Chef's ${chefName}`);
+      // header when viewing chef profile
+      setHeaderTitle(`Chef ${chefName}`);
     } else {
+      // header for normal restaurant page
       setHeaderTitle(restaurant.name);
     }
 
@@ -29,5 +33,11 @@ export function RestaurantClientPage({
     };
   }, [setOpen, setHeaderTitle, restaurant.name, chefName]);
 
-  return <RestaurantDetails restaurant={restaurant} chefName={chefName} />;
+  // 👉 If a chef was selected (?chef= in URL), show the chef profile layout
+  if (chefName) {
+    return <ModernChefPage restaurant={restaurant} chefName={chefName} />;
+  }
+
+  // 👉 Otherwise show normal restaurant details page
+  return <RestaurantDetails restaurant={restaurant} />;
 }

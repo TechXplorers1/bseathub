@@ -181,7 +181,8 @@ export function RestaurantDetails({
               </div>
             </div>
 
-            <div className="lg:col-span-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+            {/* 🔴 RIGHT: stick + internal scroll after hero */}
+            <div className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
               <ChefAbout restaurant={restaurant} chefName={chefName} />
               <Separator className="my-4 md:my-5" />
               <ChefCuisineSpecialties
@@ -220,8 +221,8 @@ export function RestaurantDetails({
             </div>
           </div>
 
-          {/* Right Content */}
-          <div className="lg:col-span-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+          {/* Right Content – stick + internal scroll */}
+          <div className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
             {/* Search + filter area */}
             <div className="pt-3 pb-2 border-b">
               <div className="flex flex-col gap-2">

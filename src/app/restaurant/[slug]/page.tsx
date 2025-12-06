@@ -1,31 +1,40 @@
-
-'use client';
-import { notFound, useParams, useSearchParams } from 'next/navigation';
+// app/restaurant/[slug]/page.tsx
+import { notFound } from 'next/navigation';
+import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { RestaurantClientPage } from './client-page';
-import { useRestaurants } from '@/context/RestaurantProvider';
-import { useEffect, useState } from 'react';
 import type { Restaurant } from '@/lib/types';
 
-export default function RestaurantPage() {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const { allItems } = useRestaurants();
-  const slug = params.slug as string;
-  const chefName = searchParams.get('chef') || undefined;
-  const [restaurant, setRestaurant] = useState<Restaurant | undefined>();
+// this file is SERVER, so NO "use client" here
 
-  useEffect(() => {
-    const foundRestaurant = allItems.find((r) => r.slug === slug);
-    setRestaurant(foundRestaurant);
-  }, [allItems, slug]);
+type PageProps = {
+  params: { slug: string };
+  searchParams: { chef?: string };
+};
 
+const allItems: Restaurant[] = [...allRestaurants, ...allHomeFoods];
+
+// required when using `output: 'export'` with a dynamic segment
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return allItems.map((r) => ({ slug: r.slug }));
+}
+
+export default function RestaurantPage({ params, searchParams }: PageProps) {
+  const restaurant = allItems.find((r) => r.slug === params.slug);
 
   if (!restaurant) {
-    // We could show a loading state here while waiting for context
-    // For now, we'll just return null or a loading indicator.
-    // A better solution might involve server-side fetching and client-side hydration.
-    return <div>Loading restaurant...</div>;
+    notFound();
   }
 
-  return <RestaurantClientPage restaurant={restaurant} chefName={chefName} />;
+  const chefName = searchParams.chef
+    ? decodeURIComponent(searchParams.chef)
+    : undefined;
+
+  return (
+    <RestaurantClientPage
+      restaurant={restaurant}
+      chefName={chefName}
+    />
+  );
 }

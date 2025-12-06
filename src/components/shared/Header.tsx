@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // ⬅️ add useEffect here
 import { useRouter } from 'next/navigation';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Notifications } from './Notifications';
@@ -180,6 +180,29 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
 
+  // 🔹 STATIC LOGIN STATE FROM LOCALSTORAGE
+  const [isStaticLoggedIn, setIsStaticLoggedIn] = useState(false);
+  const [staticUserPhone, setStaticUserPhone] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const loggedIn = localStorage.getItem('eathubLoggedIn') === 'true';
+    const phone = localStorage.getItem('eathubUserPhone');
+    setIsStaticLoggedIn(loggedIn);
+    setStaticUserPhone(phone);
+  }, []);
+
+  // If static login exists, use that as the "user" for UI
+  const effectiveUser = isStaticLoggedIn
+    ? {
+        displayName: staticUserPhone,
+        email: null,
+        photoURL: null,
+      }
+    : user;
+
+  const effectiveIsUserLoading = isUserLoading && !isStaticLoggedIn;
+
   const handleLocationSave = () => {
     setLocation(newLocation);
     setIsDialogOpen(false);
@@ -193,6 +216,16 @@ export function Header() {
     if (auth) {
       auth.signOut();
     }
+
+    // Clear static login state
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('eathubLoggedIn');
+      localStorage.removeItem('eathubUserPhone');
+    }
+
+    setIsStaticLoggedIn(false);
+    setStaticUserPhone(null);
+    router.push('/');
   };
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -211,8 +244,8 @@ export function Header() {
             location={location}
             handleLocationDialog={handleLocationDialog}
             hasNotifications={hasNotifications}
-            isUserLoading={isUserLoading}
-            user={user}
+            isUserLoading={effectiveIsUserLoading}
+            user={effectiveUser}
             handleLogout={handleLogout}
           />
 
@@ -347,10 +380,12 @@ export function Header() {
           </Sheet>
 
           {/* While loading, just show skeleton */}
-          {isUserLoading && <Skeleton className="h-10 w-10 rounded-full" />}
+          {effectiveIsUserLoading && (
+            <Skeleton className="h-10 w-10 rounded-full" />
+          )}
 
           {/* User Dropdown (profile icon) */}
-          {!isUserLoading && user && (
+          {!effectiveIsUserLoading && effectiveUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -358,17 +393,23 @@ export function Header() {
                   className="relative h-10 w-10 rounded-full transition-all duration-200 hover:ring-2 hover:ring-primary/50 hover:text-primary"
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src={user.photoURL ?? ''}
-                      alt={user.displayName ?? ''}
-                    />
-                    <AvatarFallback className="bg-gray-200">
-                      {user.displayName?.charAt(0) ??
-                        user.email?.charAt(0) ?? (
-                          <User className="h-5 w-5" />
-                        )}
-                    </AvatarFallback>
-                  </Avatar>
+  <AvatarImage
+    src={effectiveUser.photoURL ?? ''}
+    alt={effectiveUser.displayName ?? ''}
+  />
+  <AvatarFallback className="bg-gray-200">
+    {(() => {
+      const name = effectiveUser.displayName || effectiveUser.email || '';
+      // If we have a name/email that starts with a letter, use that letter.
+      if (/^[A-Za-z]/.test(name)) {
+        return name.charAt(0).toUpperCase();
+      }
+      // Otherwise (phone numbers like +91..., etc.) show the profile icon
+      return <User className="h-5 w-5" />;
+    })()}
+  </AvatarFallback>
+</Avatar>
+
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -432,8 +473,8 @@ export function Header() {
             </DropdownMenu>
           )}
 
-          {/* Sign In button ONLY when not loading and no user */}
-          {!isUserLoading && !user && (
+          {/* Sign In button ONLY when no user and not loading */}
+          {!effectiveIsUserLoading && !effectiveUser && (
             <Button
               variant="outline"
               className="hidden md:inline-flex transition-colors duration-200 hover:bg-gray-50 hover:text-primary"
@@ -484,4 +525,4 @@ export function Header() {
       )}
     </header>
   );
-}
+} 

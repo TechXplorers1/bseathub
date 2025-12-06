@@ -108,7 +108,7 @@ export default function LoginPage() {
       }
 
       console.log(`Sending OTP to ${candidate}`);
-      // TODO: trigger OTP send to `candidate`
+      // STATIC: no real OTP, just move to step 2
       setStep(2);
     } catch (error) {
       console.error('Phone validation error:', error);
@@ -122,28 +122,38 @@ export default function LoginPage() {
 
     const digits = otp.replace(/\D/g, '');
 
-    // Only requirement: exactly 4 digits
+    // Only requirement: exactly 4 digits (any 4 digits accepted)
     if (digits.length !== 4) {
       setOtpError('Please enter the 4-digit code.');
       return;
     }
 
-    // Try to sign in anonymously. The Header component relies on this
-    // to switch from 'Sign In' button to the User Profile/Dropdown.
+    // Build phone candidate to store
+    const candidate = buildE164(phoneNumber, selectedCountry.dialCode) || phoneNumber;
+
+    // Try to sign in anonymously (optional, can fail silently)
     if (auth) {
       try {
-        // Attempt anonymous sign-in
         await signInAnonymously(auth);
         console.log('Successfully signed in anonymously.');
       } catch (error) {
         console.error('Anonymous sign-in failed, continuing anyway:', error);
-        // Continue to the next screen regardless of anonymous sign-in success/failure
       }
     } else {
       console.warn('Auth not initialized; skipping Firebase sign-in');
     }
 
-    // Always treat 4-digit entry as success in UI flow and navigate to home
+    // 🔹 STATIC LOGIN FLAG IN LOCALSTORAGE
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('eathubLoggedIn', 'true');
+        localStorage.setItem('eathubUserPhone', candidate);
+      } catch (err) {
+        console.warn('Failed to write login state to localStorage', err);
+      }
+    }
+
+    // Go to home
     router.push('/');
   };
 
@@ -160,12 +170,10 @@ export default function LoginPage() {
           <CardDescription>
             {step === 1
               ? 'Enter your phone number to receive a verification code.'
-              : `We sent a code to ${
-                  formatForDisplay(
-                    buildE164(phoneNumber, selectedCountry.dialCode),
-                    selectedCountry.dialCode
-                  )
-                }`}
+              : `We sent a code to ${formatForDisplay(
+                  buildE164(phoneNumber, selectedCountry.dialCode),
+                  selectedCountry.dialCode
+                )}`}
           </CardDescription>
         </CardHeader>
 
@@ -231,7 +239,6 @@ export default function LoginPage() {
                   }}
                   required
                 />
-                {/* Only shows when not 4 digits */}
                 {otpError && <p className="text-sm text-destructive">{otpError}</p>}
               </div>
 
@@ -247,7 +254,6 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => {
-                // TODO: re-send OTP logic
                 console.log('Resending OTP...');
               }}
               className="underline text-sm text-muted-foreground hover:text-primary"

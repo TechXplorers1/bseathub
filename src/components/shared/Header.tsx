@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { useLocation } from '@/context/LocationProvider';
-import { useState, useEffect } from 'react'; // ⬅️ add useEffect here
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Notifications } from './Notifications';
@@ -64,9 +64,6 @@ type MobileNavSheetProps = {
   handleLogout: () => void;
 };
 
-// ----------------------------------------------------
-// Mobile Nav Sheet
-// ----------------------------------------------------
 function MobileNavSheet({
   location,
   handleLocationDialog,
@@ -89,7 +86,6 @@ function MobileNavSheet({
       <SheetContent side="left" className="sm:max-w-xs">
         <h3 className="text-lg font-semibold mb-6">Menu</h3>
         <div className="flex flex-col space-y-4">
-          {/* Location Button */}
           <Button
             variant="ghost"
             className="w-full justify-start text-base hover:text-primary transition-colors duration-200"
@@ -102,7 +98,6 @@ function MobileNavSheet({
             </span>
           </Button>
 
-          {/* Notifications Trigger */}
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -123,7 +118,6 @@ function MobileNavSheet({
 
           <DropdownMenuSeparator />
 
-          {/* User Section */}
           {isUserLoading && <Skeleton className="h-10 w-full rounded-md" />}
 
           {!isUserLoading && user && (
@@ -165,8 +159,6 @@ function MobileNavSheet({
   );
 }
 
-// ----------------------------------------------------
-
 export function Header() {
   const { itemCount } = useCart();
   const { headerTitle } = useHeader();
@@ -186,10 +178,46 @@ export function Header() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const loggedIn = localStorage.getItem('eathubLoggedIn') === 'true';
-    const phone = localStorage.getItem('eathubUserPhone');
-    setIsStaticLoggedIn(loggedIn);
-    setStaticUserPhone(phone);
+
+    const readFromStorage = () => {
+      const loggedIn = localStorage.getItem('eathubLoggedIn') === 'true';
+      const phone = localStorage.getItem('eathubUserPhone');
+      setIsStaticLoggedIn(loggedIn);
+      setStaticUserPhone(phone);
+    };
+
+    // initial read on mount
+    readFromStorage();
+
+    // handler for cross-tab storage events
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'eathubLoggedIn' || e.key === 'eathubUserPhone' || e.key === null) {
+        readFromStorage();
+      }
+    };
+
+    // handler for our custom in-page events
+    const onStaticLogin = (e: Event) => {
+      const ce = e as CustomEvent;
+      const phoneFromDetail = ce?.detail?.phone;
+      setIsStaticLoggedIn(true);
+      setStaticUserPhone(phoneFromDetail || localStorage.getItem('eathubUserPhone'));
+    };
+
+    const onStaticLogout = () => {
+      setIsStaticLoggedIn(false);
+      setStaticUserPhone(null);
+    };
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('eathub:login', onStaticLogin);
+    window.addEventListener('eathub:logout', onStaticLogout);
+
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('eathub:login', onStaticLogin);
+      window.removeEventListener('eathub:logout', onStaticLogout);
+    };
   }, []);
 
   // If static login exists, use that as the "user" for UI
@@ -221,6 +249,9 @@ export function Header() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('eathubLoggedIn');
       localStorage.removeItem('eathubUserPhone');
+      // notify other components in the same tab
+      const ev = new CustomEvent('eathub:logout');
+      window.dispatchEvent(ev);
     }
 
     setIsStaticLoggedIn(false);
@@ -268,7 +299,6 @@ export function Header() {
           </Link>
         </div>
 
-        {/* Search Bar (desktop) */}
         <div className="relative flex-1 mx-4 max-w-lg hidden sm:flex">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -282,7 +312,6 @@ export function Header() {
         </div>
 
         <nav className="flex items-center space-x-2">
-          {/* Mobile Search Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -292,7 +321,6 @@ export function Header() {
             <Search className="h-5 w-5" />
           </Button>
 
-          {/* Location Dialog Trigger (Desktop only) */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button
@@ -337,7 +365,6 @@ export function Header() {
             </DialogContent>
           </Dialog>
 
-          {/* Notifications Sheet (Desktop only) */}
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -356,7 +383,6 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {/* Cart Sheet */}
           <Sheet>
             <SheetTrigger asChild>
               <Button
@@ -379,12 +405,10 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {/* While loading, just show skeleton */}
           {effectiveIsUserLoading && (
             <Skeleton className="h-10 w-10 rounded-full" />
           )}
 
-          {/* User Dropdown (profile icon) */}
           {!effectiveIsUserLoading && effectiveUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -393,23 +417,20 @@ export function Header() {
                   className="relative h-10 w-10 rounded-full transition-all duration-200 hover:ring-2 hover:ring-primary/50 hover:text-primary"
                 >
                   <Avatar className="h-10 w-10">
-  <AvatarImage
-    src={effectiveUser.photoURL ?? ''}
-    alt={effectiveUser.displayName ?? ''}
-  />
-  <AvatarFallback className="bg-gray-200">
-    {(() => {
-      const name = effectiveUser.displayName || effectiveUser.email || '';
-      // If we have a name/email that starts with a letter, use that letter.
-      if (/^[A-Za-z]/.test(name)) {
-        return name.charAt(0).toUpperCase();
-      }
-      // Otherwise (phone numbers like +91..., etc.) show the profile icon
-      return <User className="h-5 w-5" />;
-    })()}
-  </AvatarFallback>
-</Avatar>
-
+                    <AvatarImage
+                      src={effectiveUser.photoURL ?? ''}
+                      alt={effectiveUser.displayName ?? ''}
+                    />
+                    <AvatarFallback className="bg-gray-200">
+                      {(() => {
+                        const name = effectiveUser.displayName || effectiveUser.email || '';
+                        if (/^[A-Za-z]/.test(name)) {
+                          return name.charAt(0).toUpperCase();
+                        }
+                        return <User className="h-5 w-5" />;
+                      })()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -473,7 +494,6 @@ export function Header() {
             </DropdownMenu>
           )}
 
-          {/* Sign In button ONLY when no user and not loading */}
           {!effectiveIsUserLoading && !effectiveUser && (
             <Button
               variant="outline"
@@ -486,7 +506,6 @@ export function Header() {
         </nav>
       </div>
 
-      {/* Mobile Search Input */}
       {isSearchVisible && (
         <div className="px-4 pb-2 sm:hidden">
           <div className="relative flex w-full">
@@ -525,4 +544,4 @@ export function Header() {
       )}
     </header>
   );
-} 
+}

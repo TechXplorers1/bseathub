@@ -35,24 +35,23 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
   const pathname = usePathname();
 
-// where to show sidebar
-const isHome = pathname === '/';
-const isCategory = pathname?.startsWith('/category');
-const isRestaurantsList = pathname === '/restaurants';
-const isHomeFoodList = pathname === '/home-food';
+  // where to show sidebar
+  const isHome = pathname === '/';
+  const isCategory = pathname?.startsWith('/category');
+  const isRestaurantsList = pathname === '/restaurants';
+  const isHomeFoodList = pathname === '/home-food';
 
-// where to HIDE sidebar (individual detail pages)
-const isRestaurantDetail = pathname?.startsWith('/restaurants/');
-const isHomeFoodDetail = pathname?.startsWith('/home-food/');
+  // where to HIDE sidebar (individual detail pages)
+  const isRestaurantDetail = pathname?.startsWith('/restaurants/');
+  const isHomeFoodDetail = pathname?.startsWith('/home-food/');
 
-// final rule:
-// - show on home, category, restaurants list, home-food list
-// - hide on individual restaurant + home food pages
-const showSidebar =
-  (isHome || isCategory || isRestaurantsList || isHomeFoodList) &&
-  !isRestaurantDetail &&
-  !isHomeFoodDetail;
-
+  // final rule:
+  // - show on home, category, restaurants list, home-food list
+  // - hide on individual restaurant + home food pages
+  const showSidebar =
+    (isHome || isCategory || isRestaurantsList || isHomeFoodList) &&
+    !isRestaurantDetail &&
+    !isHomeFoodDetail;
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -120,7 +119,7 @@ const showSidebar =
           top: `${HEADER_H}px`,
           left: 0,
           width: `${sidebarPercentClamped}%`,
-          minWidth: isCollapsed ? '56px' : '72px',
+          minWidth: isCollapsed ? '60px' : '72px', // Slightly wider min-width for collapsed state
           maxWidth: '320px',
           height: innerScrollHeight,
           overflow: 'hidden',
@@ -145,7 +144,7 @@ const showSidebar =
         .sidebar-inner::-webkit-scrollbar { display: none; }
 
         .hub-label { font-weight: 800; color: ${ORANGE}; font-size: 0.95rem; }
-        .collapsed-eh { font-weight: 900; color: ${ORANGE}; font-size: 0.9rem; }
+        /* Removed .collapsed-eh class as it's no longer needed */
 
         .sidebar-link { 
           display: inline-flex; 
@@ -186,9 +185,10 @@ const showSidebar =
         .sidebar-collapsed .sidebar-link { 
           justify-content: center; 
           padding: 8px 0; 
-          width: 48px; 
-          height: 48px; 
+          width: 44px; /* Slightly smaller width for collapsed items */
+          height: 44px; 
           border-radius: 12px;
+          margin: 0 auto; /* Center items horizontally */
         }
 
         .logout-link, .login-button {
@@ -208,8 +208,17 @@ const showSidebar =
           background: ${SIDEBAR_BORDER};
         }
 
-        .toggle-with-icon { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: transparent; border: none; padding: 0; margin-left: auto; }
-        .toggle-icon { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; min-height: 30px; border-radius: 8px; background: rgba(0,0,0,0.04); font-weight: 700; }
+        /* Updated toggle button styles */
+        .toggle-button-container {
+           display: flex;
+           align-items: center;
+           padding: 12px 16px;
+           height: 60px;
+           box-sizing: border-box;
+        }
+        .toggle-icon-btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; padding: 4px; }
+        .toggle-icon-visual { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; background: rgba(0,0,0,0.04); font-weight: 700; font-size: 18px; color: ${ORANGE}; }
+        .toggle-icon-visual:hover { background: rgba(0,0,0,0.08); }
 
         .mobile-sidebar-backdrop {
           position: fixed;
@@ -302,35 +311,29 @@ const showSidebar =
           aria-label="Main navigation"
         >
           <div style={innerStyle} className="sidebar-inner">
+            {/* REDESIGNED SIDEBAR HEADER */}
             <div
+              className="toggle-button-container"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: isCollapsed ? 'center' : 'flex-start',
-                padding: 12,
+                // Center content if collapsed, spread if expanded
+                justifyContent: isCollapsed ? 'center' : 'space-between',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {!isCollapsed ? (
-                  <span className="hub-label">Menu</span>
-                ) : (
-                  <span className="collapsed-eh">EH</span>
-                )}
-              </div>
+              {!isCollapsed && <span className="hub-label">Menu</span>}
 
               <button
                 onClick={toggleCollapse}
                 aria-expanded={!isCollapsed}
-                className="toggle-with-icon"
+                className="toggle-icon-btn"
                 title={isCollapsed ? 'Expand' : 'Collapse'}
               >
-                <span className="toggle-icon" aria-hidden>
+                <span className="toggle-icon-visual" aria-hidden>
                   {isCollapsed ? (
-                    <span style={{ fontSize: 12 }}>≡</span>
+                    // Hamburger menu when collapsed
+                    <span>≡</span>
                   ) : (
-                    <span
-                      style={{ transform: 'rotate(180deg)', fontSize: 14 }}
-                    >
+                    // Arrow pointing LEFT when open (&lsaquo; is left single arrow)
+                    <span style={{ position: 'relative', top: '-1px' }}>
                       &lsaquo;
                     </span>
                   )}
@@ -357,7 +360,8 @@ const showSidebar =
                       className="sidebar-link"
                       aria-current={isActive(item.href) ? 'page' : undefined}
                     >
-                      <item.icon size={20} />
+                      {/* UPDATED: Icon size decreased to 18 */}
+                      <item.icon size={18} />
                       {!isCollapsed && (
                         <span style={{ marginLeft: 6, cursor: 'pointer' }}>
                           {item.name}
@@ -379,7 +383,8 @@ const showSidebar =
                 {categoriesNav.map((item) => (
                   <li key={item.name}>
                     <Link href={item.href} className="sidebar-link">
-                      <item.icon size={20} />
+                      {/* UPDATED: Icon size decreased to 18 */}
+                      <item.icon size={18} />
                       {!isCollapsed && (
                         <span style={{ marginLeft: 6, cursor: 'pointer' }}>
                           {item.name}

@@ -79,6 +79,29 @@ export function RestaurantDetails({
     React.useState<CategoryFilterKey>('all');
   const [searchTerm, setSearchTerm] = React.useState('');
 
+  // NEW: hero observer state + ref
+  const heroRef = React.useRef<HTMLElement | null>(null);
+  const [heroOutOfView, setHeroOutOfView] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!heroRef.current) return;
+    const el = heroRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const e = entries[0];
+        // when hero is not intersecting the viewport -> heroOutOfView = true
+        setHeroOutOfView(!e.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0, // any intersection counts
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [heroRef.current]);
+
   const handleItemClick = (item: MenuItemType) => {
     setSelectedItem(item);
   };
@@ -159,30 +182,50 @@ export function RestaurantDetails({
     }
   `;
 
-  // 🔹 Chef Page
+  // helper classes that switch behavior depending on hero visibility
+  const leftColumnClass = cn(
+    'lg:col-span-1 lg:pr-4',
+    // when hero is out of view -> enable sticky + internal scrolling
+    heroOutOfView
+      ? 'lg:border-r lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar'
+      : 'pr-1' // while hero is visible, let it be normal flow (page scrolls)
+  );
+
+  const rightColumnClass = cn(
+    'lg:col-span-4 lg:pr-1',
+    heroOutOfView
+      ? 'lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto no-scrollbar'
+      : ''
+  );
+
+  // ----------------------------
+  // Chef Page branch
+  // ----------------------------
   if (chefName) {
     return (
       <div className="flex flex-col bg-background">
         <style>{scrollStyle}</style>
 
-        <ChefHero restaurant={restaurant} chefName={chefName} />
+        {/* Wrap the hero (chef) with the ref we observe */}
+        <div ref={(el) => (heroRef.current = el as any)}>
+          <ChefHero restaurant={restaurant} chefName={chefName} />
+        </div>
 
         <div className="mx-auto w-full px-4 sm:px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-6 gap-2">
-            <div className="lg:col-span-1 lg:border-r lg:pr-4">
-              <div className="lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar">
-                <RestaurantInfo
-                  restaurant={restaurant}
-                  displayName={displayName}
-                  isChefPage={true}
-                />
-                <Separator className="my-3" />
-                <MenuNav menuCategories={[]} hasChef={true} />
-              </div>
+            <div className={leftColumnClass}>
+              {/* While hero visible these will flow naturally (no internal scroll),
+                  once hero out of view the classes above make this sticky + scrollable */}
+              <RestaurantInfo
+                restaurant={restaurant}
+                displayName={displayName}
+                isChefPage={true}
+              />
+              <Separator className="my-3" />
+              <MenuNav menuCategories={[]} hasChef={true} />
             </div>
 
-            {/* 🔴 RIGHT: stick + internal scroll after hero */}
-            <div className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+            <div className={rightColumnClass}>
               <ChefAbout restaurant={restaurant} chefName={chefName} />
               <Separator className="my-4 md:my-5" />
               <ChefCuisineSpecialties
@@ -203,26 +246,29 @@ export function RestaurantDetails({
     );
   }
 
-  // 🔹 Normal Restaurant Page
+  // ----------------------------
+  // Normal Restaurant Page branch
+  // ----------------------------
   return (
     <div className="flex flex-col bg-background">
       <style>{scrollStyle}</style>
 
-      <RestaurantHero restaurant={restaurant} />
+      {/* Observe this hero too */}
+      <div ref={(el) => (heroRef.current = el as any)}>
+        <RestaurantHero restaurant={restaurant} />
+      </div>
 
       <div className="mx-auto w-full px-4 sm:px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 lg:gap-6 gap-2">
           {/* Left Sidebar */}
-          <div className="lg:col-span-1 lg:border-r lg:pr-4">
-            <div className="lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar">
-              <RestaurantInfo restaurant={restaurant} displayName={displayName} />
-              <Separator className="my-3" />
-              <MenuNav menuCategories={menuCategories} hasChef={!!chefName} />
-            </div>
+          <div className={leftColumnClass}>
+            <RestaurantInfo restaurant={restaurant} displayName={displayName} />
+            <Separator className="my-3" />
+            <MenuNav menuCategories={menuCategories} hasChef={!!chefName} />
           </div>
 
-          {/* Right Content – stick + internal scroll */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1 no-scrollbar">
+          {/* Right Content */}
+          <div className={rightColumnClass}>
             {/* Search + filter area */}
             <div className="pt-3 pb-2 border-b">
               <div className="flex flex-col gap-2">

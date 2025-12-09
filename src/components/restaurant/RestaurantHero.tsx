@@ -86,9 +86,10 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
         </div>
       </div>
 
-      {/* LOGO CIRCLE */}
+      {/* LOGO SQUARE (Changed from Circle) */}
       {logo && (
-        <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-full border-4 border-white bg-white overflow-hidden z-30 shadow-md">
+        // CHANGED: rounded-full -> rounded-xl
+        <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-white overflow-hidden z-30 shadow-md">
           <Image
             src={logo.imageUrl}
             alt={`${restaurant.name} logo`}

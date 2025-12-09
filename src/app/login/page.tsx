@@ -143,11 +143,14 @@ export default function LoginPage() {
       console.warn('Auth not initialized; skipping Firebase sign-in');
     }
 
-    // 🔹 STATIC LOGIN FLAG IN LOCALSTORAGE
+    // 🔹 STATIC LOGIN FLAG IN LOCALSTORAGE + dispatch event
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('eathubLoggedIn', 'true');
         localStorage.setItem('eathubUserPhone', candidate);
+        // dispatch a custom event so other components (Header) can react immediately
+        const ev = new CustomEvent('eathub:login', { detail: { phone: candidate } });
+        window.dispatchEvent(ev);
       } catch (err) {
         console.warn('Failed to write login state to localStorage', err);
       }

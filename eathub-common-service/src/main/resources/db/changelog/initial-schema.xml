@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- USER & ACCESS CONTROL -->
+    <changeSet id="1" author="antigravity">
+        <createTable tableName="users">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(20)"/>
+            <column name="avatar_url" type="VARCHAR(1000)"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createTable tableName="roles">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="user_roles">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_user_roles_user" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="role_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_user_roles_role" referencedTableName="roles" referencedColumnNames="id"/>
+            </column>
+            <column name="assigned_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+        <createTable tableName="admins">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_admins_user" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="privileges" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- ONBOARDING -->
+    <changeSet id="2" author="antigravity">
+        <createTable tableName="pending_registrations">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_pending_reg_user" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="provider_type" type="VARCHAR(50)"/> <!-- Restaurant | HomeFood | Chef -->
+            <column name="contact_info" type="VARCHAR(255)"/>
+            <column name="request_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="status" type="VARCHAR(50)"/> <!-- Pending | Approved | Rejected -->
+            <column name="reviewed_by" type="VARCHAR(36)">
+                <constraints foreignKeyName="fk_pending_reg_admin" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- RESTAURANT -->
+    <changeSet id="3" author="antigravity">
+        <createTable tableName="restaurants">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="owner_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_restaurants_owner" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="cuisine" type="VARCHAR(255)"/>
+            <column name="rating" type="FLOAT" defaultValueNumeric="0"/>
+            <column name="reviews_count" type="INT" defaultValueNumeric="0"/>
+            <column name="avg_delivery_time" type="INT"/>
+            <column name="base_delivery_fee" type="FLOAT"/>
+            <column name="is_open" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="operational_status" type="VARCHAR(50)"/>
+        </createTable>
+
+        <createTable tableName="restaurant_addresses">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="restaurant_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_res_address_restaurant" referencedTableName="restaurants" referencedColumnNames="id"/>
+            </column>
+            <column name="address_line1" type="VARCHAR(255)"/>
+            <column name="address_line2" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="state" type="VARCHAR(100)"/>
+            <column name="country" type="VARCHAR(100)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+            <column name="latitude" type="FLOAT"/>
+            <column name="longitude" type="FLOAT"/>
+        </createTable>
+
+        <createTable tableName="restaurant_legal_profiles">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="restaurant_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_legal_profile_restaurant" referencedTableName="restaurants" referencedColumnNames="id"/>
+            </column>
+            <column name="legal_business_name" type="VARCHAR(255)"/>
+            <column name="gst_number" type="VARCHAR(50)"/>
+            <column name="pan_number" type="VARCHAR(50)"/>
+            <column name="fssai_license_number" type="VARCHAR(100)"/>
+            <column name="fssai_expiry_date" type="DATE"/>
+            <column name="business_type" type="VARCHAR(100)"/>
+            <column name="registered_address" type="TEXT"/>
+            <column name="bank_account_holder_name" type="VARCHAR(255)"/>
+            <column name="bank_account_number" type="VARCHAR(100)"/>
+            <column name="bank_ifsc" type="VARCHAR(50)"/>
+            <column name="bank_name" type="VARCHAR(255)"/>
+            <column name="payment_gateway" type="VARCHAR(100)"/>
+            <column name="gateway_merchant_id" type="VARCHAR(100)"/>
+            <column name="payout_schedule" type="VARCHAR(50)"/>
+            <column name="kyc_status" type="VARCHAR(50)"/>
+            <column name="verified_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <!-- HOME FOOD PROVIDER -->
+    <changeSet id="4" author="antigravity">
+        <createTable tableName="home_food_providers">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="owner_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_home_food_owner" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="brand_name" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="food_type" type="VARCHAR(100)"/>
+            <column name="rating" type="FLOAT" defaultValueNumeric="0"/>
+            <column name="reviews_count" type="INT" defaultValueNumeric="0"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+        </createTable>
+
+        <createTable tableName="home_food_addresses">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="home_food_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_home_address_provider" referencedTableName="home_food_providers" referencedColumnNames="id"/>
+            </column>
+            <column name="address_line1" type="VARCHAR(255)"/>
+            <column name="city" type="VARCHAR(100)"/>
+            <column name="state" type="VARCHAR(100)"/>
+            <column name="postal_code" type="VARCHAR(20)"/>
+        </createTable>
+
+        <createTable tableName="home_food_compliance">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="home_food_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_compliance_provider" referencedTableName="home_food_providers" referencedColumnNames="id"/>
+            </column>
+            <column name="id_proof_type" type="VARCHAR(50)"/>
+            <column name="id_proof_number" type="VARCHAR(100)"/>
+            <column name="hygiene_verified" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="verified_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <!-- CHEF -->
+    <changeSet id="5" author="antigravity">
+        <createTable tableName="chefs">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="owner_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_chefs_owner" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="bio" type="TEXT"/>
+            <column name="experience" type="VARCHAR(255)"/>
+            <column name="rating" type="FLOAT" defaultValueNumeric="0"/>
+            <column name="reviews_count" type="INT" defaultValueNumeric="0"/>
+            <column name="avatar_url" type="VARCHAR(1000)"/>
+        </createTable>
+
+        <createTable tableName="chef_services">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chef_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_chef_service_chef" referencedTableName="chefs" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="base_price" type="FLOAT"/>
+            <column name="status" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- MENU / CATALOG -->
+    <changeSet id="6" author="antigravity">
+        <createTable tableName="menu_categories">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="restaurant_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_menu_cat_restaurant" referencedTableName="restaurants" referencedColumnNames="id"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+        </createTable>
+
+        <createTable tableName="menu_items">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="restaurant_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_menu_item_restaurant" referencedTableName="restaurants" referencedColumnNames="id"/>
+            </column>
+            <column name="category_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_menu_item_category" referencedTableName="menu_categories" referencedColumnNames="id"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="price" type="FLOAT"/>
+            <column name="image_id" type="VARCHAR(255)"/>
+            <column name="is_special" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="status" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- ORDERING SYSTEM -->
+    <changeSet id="7" author="antigravity">
+        <createTable tableName="order_status">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="is_terminal" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="sequence" type="INT"/>
+        </createTable>
+
+        <createTable tableName="orders">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_orders_customer" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="source_type" type="VARCHAR(50)"/> <!-- Restaurant | HomeFood -->
+            <column name="restaurant_id" type="VARCHAR(36)">
+                <constraints foreignKeyName="fk_orders_restaurant" referencedTableName="restaurants" referencedColumnNames="id"/>
+            </column>
+            <column name="home_food_provider_id" type="VARCHAR(36)">
+                <constraints foreignKeyName="fk_orders_home_food" referencedTableName="home_food_providers" referencedColumnNames="id"/>
+            </column>
+            <column name="current_status_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_orders_status" referencedTableName="order_status" referencedColumnNames="id"/>
+            </column>
+            <column name="order_placed_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="expected_delivery_at" type="TIMESTAMP"/>
+            <column name="delivery_address" type="TEXT"/>
+            <column name="subtotal_amount" type="FLOAT"/>
+            <column name="tax_amount" type="FLOAT"/>
+            <column name="delivery_fee" type="FLOAT"/>
+            <column name="platform_fee" type="FLOAT"/>
+            <column name="discount_amount" type="FLOAT"/>
+            <column name="total_amount" type="FLOAT"/>
+            <column name="payment_method" type="VARCHAR(50)"/>
+            <column name="payment_status" type="VARCHAR(50)"/>
+            <column name="order_notes" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="order_status_history">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="order_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_order_history_order" referencedTableName="orders" referencedColumnNames="id"/>
+            </column>
+            <column name="status_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_order_history_status" referencedTableName="order_status" referencedColumnNames="id"/>
+            </column>
+            <column name="changed_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="changed_by" type="VARCHAR(255)"/>
+            <column name="reason" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="order_items">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="order_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_order_items_order" referencedTableName="orders" referencedColumnNames="id"/>
+            </column>
+            <column name="item_name" type="VARCHAR(255)"/>
+            <column name="item_type" type="VARCHAR(50)"/> <!-- MenuItem | HomeFoodItem -->
+            <column name="item_ref_id" type="VARCHAR(36)"/>
+            <column name="quantity" type="INT"/>
+            <column name="unit_price" type="FLOAT"/>
+            <column name="total_price" type="FLOAT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- CHEF BOOKING & REVIEWS -->
+    <changeSet id="8" author="antigravity">
+        <createTable tableName="chef_bookings">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_chef_booking_customer" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="chef_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_chef_booking_chef" referencedTableName="chefs" referencedColumnNames="id"/>
+            </column>
+            <column name="service_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_chef_booking_service" referencedTableName="chef_services" referencedColumnNames="id"/>
+            </column>
+            <column name="event_date" type="TIMESTAMP"/>
+            <column name="guests" type="INT"/>
+            <column name="total_amount" type="FLOAT"/>
+            <column name="status" type="VARCHAR(50)"/>
+        </createTable>
+
+        <createTable tableName="reviews">
+            <column name="id" type="VARCHAR(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="VARCHAR(36)">
+                <constraints nullable="false" foreignKeyName="fk_reviews_customer" referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="target_id" type="VARCHAR(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_type" type="VARCHAR(50)"/> <!-- Restaurant | HomeFood | Chef -->
+            <column name="rating" type="FLOAT"/>
+            <column name="comment" type="TEXT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

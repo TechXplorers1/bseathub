@@ -3,22 +3,30 @@ spring:
     name: eathub-common-service
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/eathub_db
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: eathub
     password: password
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.sql
+    enabled: true
+    user: eathub
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+
 server:
-  port: 8080
+  port: 8081
 
 logging:
   level:

@@ -16,8 +16,12 @@ public class MenuItem {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id", nullable = false)
+    @JoinColumn(name = "restaurant_id") // Remove nullable = false if it can be a home-food item
     private Restaurant restaurant;
+
+    @ManyToOne
+    @JoinColumn(name = "home_food_id") // Add this field
+    private HomeFoodProvider homeFood;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)

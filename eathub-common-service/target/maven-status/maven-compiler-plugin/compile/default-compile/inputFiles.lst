@@ -1,5 +1,9 @@
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\config\SecurityConfig.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\controller\MenuController.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\controller\RestaurantController.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\MenuCategoryDTO.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\MenuItemDTO.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\MenuResponseDTO.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\EathubCommonApplication.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\Admin.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\Chef.java
@@ -16,6 +20,9 @@ C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eat
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\Role.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\User.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\UserRole.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\MenuCategoryRepository.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\MenuItemRepository.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\RestaurantRepository.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\UserRepository.java
+C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\service\MenuService.java
 C:\Users\csc\Desktop\eathub\bseathub\eathub-common-service\src\main\java\com\eathub\common\service\RestaurantService.java

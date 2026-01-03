@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
--- changeset antigravity:1.0.0 logicalFilePath:db/changelog/db.changelog-master.sql
--- Create Users Table
+-- changeset eathub:1.0.0 logicalFilePath:db/changelog/db.changelog-master.sql
+-- Create Users & Access Control
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -11,14 +11,12 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create Roles Table
 CREATE TABLE IF NOT EXISTS roles (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(255)
 );
 
--- Create User_Roles Table
 CREATE TABLE IF NOT EXISTS user_roles (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
@@ -28,28 +26,27 @@ CREATE TABLE IF NOT EXISTS user_roles (
     CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
--- Create Admins Table
 CREATE TABLE IF NOT EXISTS admins (
     id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL UNIQUE,
     privileges TEXT,
     CONSTRAINT fk_admins_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Create Pending_Registration Table
+-- Onboarding
 CREATE TABLE IF NOT EXISTS pending_registrations (
     id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
-    provider_type VARCHAR(50), -- Restaurant | HomeFood | Chef
+    provider_type VARCHAR(50),
     contact_info VARCHAR(255),
     request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(50), -- Pending | Approved | Rejected
+    status VARCHAR(50),
     reviewed_by VARCHAR(36),
     CONSTRAINT fk_pending_reg_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_pending_reg_admin FOREIGN KEY (reviewed_by) REFERENCES users(id)
 );
 
--- Create Restaurants Table
+-- Provider: Restaurant
 CREATE TABLE IF NOT EXISTS restaurants (
     id VARCHAR(36) PRIMARY KEY,
     owner_id VARCHAR(36) NOT NULL,
@@ -65,7 +62,6 @@ CREATE TABLE IF NOT EXISTS restaurants (
     CONSTRAINT fk_restaurants_owner FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
--- Create Restaurant_Address Table
 CREATE TABLE IF NOT EXISTS restaurant_addresses (
     id VARCHAR(36) PRIMARY KEY,
     restaurant_id VARCHAR(36) NOT NULL UNIQUE,
@@ -80,7 +76,6 @@ CREATE TABLE IF NOT EXISTS restaurant_addresses (
     CONSTRAINT fk_res_address_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
 );
 
--- Create Restaurant_Legal_Profile Table
 CREATE TABLE IF NOT EXISTS restaurant_legal_profiles (
     id VARCHAR(36) PRIMARY KEY,
     restaurant_id VARCHAR(36) NOT NULL UNIQUE,
@@ -103,7 +98,7 @@ CREATE TABLE IF NOT EXISTS restaurant_legal_profiles (
     CONSTRAINT fk_legal_profile_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
 );
 
--- Create Home_Food_Providers Table
+-- Provider: Home Food
 CREATE TABLE IF NOT EXISTS home_food_providers (
     id VARCHAR(36) PRIMARY KEY,
     owner_id VARCHAR(36) NOT NULL,
@@ -116,7 +111,6 @@ CREATE TABLE IF NOT EXISTS home_food_providers (
     CONSTRAINT fk_home_food_owner FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
--- Create Home_Food_Addresses Table
 CREATE TABLE IF NOT EXISTS home_food_addresses (
     id VARCHAR(36) PRIMARY KEY,
     home_food_id VARCHAR(36) NOT NULL UNIQUE,
@@ -127,7 +121,6 @@ CREATE TABLE IF NOT EXISTS home_food_addresses (
     CONSTRAINT fk_home_address_provider FOREIGN KEY (home_food_id) REFERENCES home_food_providers(id)
 );
 
--- Create Home_Food_Compliance Table
 CREATE TABLE IF NOT EXISTS home_food_compliance (
     id VARCHAR(36) PRIMARY KEY,
     home_food_id VARCHAR(36) NOT NULL UNIQUE,
@@ -138,7 +131,7 @@ CREATE TABLE IF NOT EXISTS home_food_compliance (
     CONSTRAINT fk_compliance_provider FOREIGN KEY (home_food_id) REFERENCES home_food_providers(id)
 );
 
--- Create Chefs Table
+-- Provider: Chef
 CREATE TABLE IF NOT EXISTS chefs (
     id VARCHAR(36) PRIMARY KEY,
     owner_id VARCHAR(36) NOT NULL,
@@ -151,7 +144,6 @@ CREATE TABLE IF NOT EXISTS chefs (
     CONSTRAINT fk_chefs_owner FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
--- Create Chef_Services Table
 CREATE TABLE IF NOT EXISTS chef_services (
     id VARCHAR(36) PRIMARY KEY,
     chef_id VARCHAR(36) NOT NULL,
@@ -162,30 +154,35 @@ CREATE TABLE IF NOT EXISTS chef_services (
     CONSTRAINT fk_chef_service_chef FOREIGN KEY (chef_id) REFERENCES chefs(id)
 );
 
--- Create Menu_Categories Table
+-- Unified Menu System
 CREATE TABLE IF NOT EXISTS menu_categories (
     id VARCHAR(36) PRIMARY KEY,
-    restaurant_id VARCHAR(36) NOT NULL,
-    title VARCHAR(255),
-    CONSTRAINT fk_menu_cat_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
+    title VARCHAR(255) NOT NULL,
+    restaurant_id VARCHAR(36),
+    home_food_id VARCHAR(36),
+    CONSTRAINT fk_menu_cat_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
+    CONSTRAINT fk_menu_cat_home_food FOREIGN KEY (home_food_id) REFERENCES home_food_providers(id)
 );
 
--- Create Menu_Items Table
 CREATE TABLE IF NOT EXISTS menu_items (
     id VARCHAR(36) PRIMARY KEY,
-    restaurant_id VARCHAR(36) NOT NULL,
     category_id VARCHAR(36) NOT NULL,
-    name VARCHAR(255),
+    name VARCHAR(255) NOT NULL,
     description TEXT,
-    price FLOAT,
+    price FLOAT NOT NULL,
     image_id VARCHAR(255),
     is_special BOOLEAN DEFAULT FALSE,
     status VARCHAR(50),
+    restaurant_id VARCHAR(36),
+    home_food_id VARCHAR(36),
+    chef_id VARCHAR(36),
+    CONSTRAINT fk_menu_item_category FOREIGN KEY (category_id) REFERENCES menu_categories(id),
     CONSTRAINT fk_menu_item_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
-    CONSTRAINT fk_menu_item_category FOREIGN KEY (category_id) REFERENCES menu_categories(id)
+    CONSTRAINT fk_menu_item_home_food FOREIGN KEY (home_food_id) REFERENCES home_food_providers(id),
+    CONSTRAINT fk_menu_item_chef FOREIGN KEY (chef_id) REFERENCES chefs(id)
 );
 
--- Create Order_Status Table
+-- Orders and Reviews
 CREATE TABLE IF NOT EXISTS order_status (
     id VARCHAR(36) PRIMARY KEY,
     code VARCHAR(50) NOT NULL UNIQUE,
@@ -194,7 +191,6 @@ CREATE TABLE IF NOT EXISTS order_status (
     sequence INT
 );
 
--- Create Orders Table
 CREATE TABLE IF NOT EXISTS orders (
     id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,
@@ -215,12 +211,9 @@ CREATE TABLE IF NOT EXISTS orders (
     payment_status VARCHAR(50),
     order_notes TEXT,
     CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES users(id),
-    CONSTRAINT fk_orders_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(id),
-    CONSTRAINT fk_orders_home_food FOREIGN KEY (home_food_provider_id) REFERENCES home_food_providers(id),
     CONSTRAINT fk_orders_status FOREIGN KEY (current_status_id) REFERENCES order_status(id)
 );
 
--- Create Order_Status_History Table
 CREATE TABLE IF NOT EXISTS order_status_history (
     id VARCHAR(36) PRIMARY KEY,
     order_id VARCHAR(36) NOT NULL,
@@ -228,11 +221,10 @@ CREATE TABLE IF NOT EXISTS order_status_history (
     changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     changed_by VARCHAR(255),
     reason TEXT,
-    CONSTRAINT fk_order_history_order FOREIGN KEY (order_id) REFERENCES orders(id),
-    CONSTRAINT fk_order_history_status FOREIGN KEY (status_id) REFERENCES order_status(id)
+    CONSTRAINT fk_osh_order FOREIGN KEY (order_id) REFERENCES orders(id),
+    CONSTRAINT fk_osh_status FOREIGN KEY (status_id) REFERENCES order_status(id)
 );
 
--- Create Order_Items Table
 CREATE TABLE IF NOT EXISTS order_items (
     id VARCHAR(36) PRIMARY KEY,
     order_id VARCHAR(36) NOT NULL,
@@ -245,7 +237,6 @@ CREATE TABLE IF NOT EXISTS order_items (
     CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
--- Create Chef_Bookings Table
 CREATE TABLE IF NOT EXISTS chef_bookings (
     id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,
@@ -260,7 +251,6 @@ CREATE TABLE IF NOT EXISTS chef_bookings (
     CONSTRAINT fk_chef_booking_service FOREIGN KEY (service_id) REFERENCES chef_services(id)
 );
 
--- Create Reviews Table
 CREATE TABLE IF NOT EXISTS reviews (
     id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,

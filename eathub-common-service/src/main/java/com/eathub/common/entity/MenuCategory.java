@@ -17,8 +17,12 @@ public class MenuCategory {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "restaurant_id", nullable = false)
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    @ManyToOne
+    @JoinColumn(name = "home_food_id")
+    private HomeFoodProvider homeFood;
 
     private String title;
 

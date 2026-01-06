@@ -1,5 +1,6 @@
 package com.eathub.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
@@ -26,6 +27,8 @@ public class MenuCategory {
 
     private String title;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    // cascade = CascadeType.ALL is vital to save items automatically
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Allows items to be shown in Postman response
     private Set<MenuItem> items;
 }

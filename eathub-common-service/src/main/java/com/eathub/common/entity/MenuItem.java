@@ -1,5 +1,6 @@
 package com.eathub.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,17 +16,18 @@ public class MenuItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference // Stops recursion: Item won't try to load Category again
+    private MenuCategory category;
+
     @ManyToOne
-    @JoinColumn(name = "restaurant_id") // Remove nullable = false if it can be a home-food item
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
     @ManyToOne
-    @JoinColumn(name = "home_food_id") // Add this field
+    @JoinColumn(name = "home_food_id")
     private HomeFoodProvider homeFood;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private MenuCategory category;
 
     private String name;
 

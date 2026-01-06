@@ -15,16 +15,28 @@ public class MenuService {
 
     @Transactional
     public void importMenu(List<MenuCategory> categories) {
+        if (categories == null)
+            return;
+
         for (MenuCategory category : categories) {
             if (category.getItems() != null) {
                 for (MenuItem item : category.getItems()) {
+                    // CRITICAL: Link the item back to the category so 'category_id' is populated
                     item.setCategory(category);
-                    // Link to the same provider as the category
-                    item.setRestaurant(category.getRestaurant());
-                    item.setHomeFood(category.getHomeFood());
+
+                    // Sync the provider info from the category to the individual item
+                    if (category.getRestaurant() != null) {
+                        item.setRestaurant(category.getRestaurant());
+                    }
+                    if (category.getHomeFood() != null) {
+                        item.setHomeFood(category.getHomeFood());
+                    }
                 }
             }
         }
+        // Because of 'cascade = CascadeType.ALL' in MenuCategory,
+        // saving the categories will automatically save all items into menu_items
+        // table.
         menuCategoryRepository.saveAll(categories);
     }
 

@@ -18,7 +18,7 @@ const chefs = allHomeFoods.map(food => {
     } else if (hasNonVeg && !hasVeg) {
         preference = 'Non-Veg';
     }
-    
+
     return {
         name: food.name.split("'s")[0],
         specialty: food.cuisine,
@@ -46,23 +46,23 @@ const uniqueChefs = chefs.reduce((acc, current) => {
 const INITIAL_VISIBLE_COUNT = 8;
 
 export function ChefsCarousel() {
-  const visibleChefs = uniqueChefs.slice(0, INITIAL_VISIBLE_COUNT);
+    const visibleChefs = uniqueChefs.slice(0, INITIAL_VISIBLE_COUNT);
 
-  return (
-    <div className="py-8">
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
-            <h2 className="text-2xl font-bold">Book a Private Chefs</h2>
-            {uniqueChefs.length > INITIAL_VISIBLE_COUNT && (
-                <Link href="/chefs" className={cn(buttonVariants({ variant: 'ghost' }))}>
-                    See all <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-            )}
+    return (
+        <div className="py-8">
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <h2 className="text-2xl font-bold">Book a Private Chefs</h2>
+                {uniqueChefs.length > INITIAL_VISIBLE_COUNT && (
+                    <Link href="/chefs" className={cn(buttonVariants({ variant: 'ghost' }))}>
+                        See all <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {visibleChefs.map((chef) => (
+                    <ChefCard key={chef.name} chef={chef} />
+                ))}
+            </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {visibleChefs.map((chef) => (
-                <ChefCard key={chef.name} chef={chef} />
-            ))}
-        </div>
-    </div>
-  );
+    );
 }

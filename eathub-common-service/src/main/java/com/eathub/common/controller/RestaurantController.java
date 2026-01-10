@@ -10,7 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/restaurants")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000") 
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:9004"})
 public class RestaurantController {
     private final RestaurantService restaurantService;
 

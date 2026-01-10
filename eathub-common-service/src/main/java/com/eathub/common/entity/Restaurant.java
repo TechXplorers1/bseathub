@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "restaurants")
 @Getter
@@ -44,5 +46,6 @@ public class Restaurant {
     private RestaurantLegalProfile legalProfile;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @JsonManagedReference // This tells Jackson to include the categories
     private Set<MenuCategory> menuCategories;
 }

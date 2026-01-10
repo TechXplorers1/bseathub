@@ -1,4 +1,4 @@
--- liquibase formatted sql
+--liquibase formatted sql
 
 -- changeset eathub:1.0.0 logicalFilePath:db/changelog/db.changelog-master.sql
 -- Create Users & Access Control
@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS admins (
     privileges TEXT,
     CONSTRAINT fk_admins_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
 
 -- Onboarding
 CREATE TABLE IF NOT EXISTS pending_registrations (
@@ -261,13 +262,3 @@ CREATE TABLE IF NOT EXISTS reviews (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_reviews_customer FOREIGN KEY (customer_id) REFERENCES users(id)
 );
-
--- changeset eathub:1.0.1
--- Add type columns
-ALTER TABLE restaurants ADD COLUMN restaurant_type VARCHAR(50) DEFAULT 'restaurant';
-ALTER TABLE home_food_providers ADD COLUMN provider_type VARCHAR(50) DEFAULT 'home-food';
-
--- changeset eathub:1.0.2
--- Add image_id
-ALTER TABLE restaurants ADD COLUMN image_id VARCHAR(255);
-ALTER TABLE home_food_providers ADD COLUMN image_id VARCHAR(255);

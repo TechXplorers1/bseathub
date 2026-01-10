@@ -16,7 +16,7 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
@@ -24,6 +24,10 @@ public class Restaurant {
 
     @Column(unique = true)
     private String slug;
+
+    // Fix: Explicitly define the column name to prevent collision with Hibernate keywords
+    @Column(name = "restaurant_type") 
+    private String type; 
 
     private String cuisine;
     private Double rating;

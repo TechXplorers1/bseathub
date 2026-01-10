@@ -1,59 +1,46 @@
 'use client';
 
-import { Banners } from '@/components/home/Banners';
-import { ChefsCarousel } from '@/components/home/ChefsCarousel';
-import { FilterCategories } from '@/components/home/FilterCategories';
 import { HomeFeed } from '@/components/home/HomeFeed';
-import { MostOrdered } from '@/components/home/MostOrdered';
-import { Personalized } from '@/components/home/Personalized';
 import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { useRestaurants } from '@/context/RestaurantProvider';
+import { FilterCategories } from '@/components/home/FilterCategories';
+import { Banners } from '@/components/home/Banners';
 
 export default function Home() {
-  const { restaurants, homeFoods } = useRestaurants();
+  const { restaurants, homeFoods, loading, allItems } = useRestaurants();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-lg animate-pulse">Loading delicious food...</p>
+      </div>
+    );
+  }
 
   return (
-    // Changed to 'flex flex-col' to stack components.
-    <div className="flex flex-col w-full min-w-0"> 
-      
-      {/* Category Filters: NO TOP MARGIN. It should start immediately at the top of the scroll area. */}
+    <div className="flex flex-col w-full min-w-0">
       <FilterCategories />
 
-      {/* Promo Banners - Add margin-top only for separation from the content above, if desired.
-          Using standard vertical section spacing. */}
       <div className="mt-4 mb-6">
         <Banners />
       </div>
-      {/* ... (Rest of the Home component content remains the same) ... */}
-      
-      {/* Personalized Picks */}
-      <div className="mb-6">
-        <Personalized />
+
+      {/* Debug Info: Remove this after you see the items */}
+      <div className="text-xs text-gray-400 px-4">
+        Found {allItems.length} total items. ({restaurants.length} Restaurants, {homeFoods.length} Home-food)
       </div>
 
-      {/* Most Ordered */}
-      <div className="mb-6">
-        <MostOrdered />
-      </div>
+      {homeFoods.length > 0 && (
+        <div className="mb-6">
+          <RestaurantCarousel
+            title="Home Food"
+            restaurants={homeFoods}
+            href="/home-food"
+          />
+        </div>
+      )}
 
-      {/* Home Food Carousel */}
-      <div className="mb-6">
-        <RestaurantCarousel
-          title="Home Food"
-          restaurants={homeFoods}
-          href="/home-food"
-        />
-      </div>
-
-      {/* Picked From Your Location */}
-      <div className="mb-6">
-        <HomeFeed restaurants={restaurants} />
-      </div>
-
-      {/* Our Chefs */}
-      <div className="mb-8">
-        <ChefsCarousel />
-      </div>
+      <HomeFeed restaurants={restaurants} />
     </div>
   );
 }

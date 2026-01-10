@@ -1,81 +1,65 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import { createContext, useContext, useState } from 'react';
-import type { Restaurant, MenuItem, MenuCategory } from '@/lib/types';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import type { Restaurant } from '@/lib/types';
 
 interface RestaurantContextType {
   restaurants: Restaurant[];
   homeFoods: Restaurant[];
   allItems: Restaurant[];
+  loading: boolean;
   getRestaurantById: (id: string) => Restaurant | undefined;
-  addDishToRestaurant: (restaurantId: string, dish: Omit<MenuItem, 'id' | 'imageId'> & { category: string }) => void;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 export function RestaurantProvider({ children }: { children: ReactNode }) {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>(allRestaurants);
-  const [homeFoods, setHomeFoods] = useState<Restaurant[]>(allHomeFoods);
+  const [allItems, setAllItems] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const response = await fetch('http://localhost:8081/api/v1/restaurants');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.json();
+
+        const mappedData = data.map((item: any) => ({
+          ...item,
+          // Handle field name differences between Java Backend and Next.js Frontend
+          type: item.type || 'restaurant', // Fallback if DB column is empty
+          deliveryTime: item.avgDeliveryTime || 30,
+          reviews: item.reviewsCount || 0,
+          rating: item.rating || 0,
+          // CRITICAL: Ensure services is an array so .includes() doesn't crash
+          services: Array.isArray(item.services) && item.services.length > 0
+            ? item.services
+            : ['delivery', 'pickup'],
+          imageId: item.imageId || 'restaurant-1'
+        }));
+
+        setAllItems(mappedData);
+      } catch (error) {
+        console.error("Failed to fetch restaurants:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  // Filter logic
+  const restaurants = allItems.filter(item => item.type === 'restaurant');
+  const homeFoods = allItems.filter(item => item.type === 'home-food');
 
   const getRestaurantById = (id: string) => {
-    return [...restaurants, ...homeFoods].find((r) => r.id === id);
+    return allItems.find((r) => r.id === id);
   };
-
-  const addDishToRestaurant = (restaurantId: string, dish: Omit<MenuItem, 'id' | 'imageId'> & { category: string }) => {
-    const newDish: MenuItem = {
-      ...dish,
-      id: `new-${Date.now()}`,
-      imageId: 'food-1', // placeholder
-    };
-
-    const updateRestaurants = (prevRestaurants: Restaurant[]) => {
-      return prevRestaurants.map(r => {
-        if (r.id === restaurantId) {
-          const newMenu = [...r.menu];
-          let categoryExists = false;
-
-          for (let i = 0; i < newMenu.length; i++) {
-            if (newMenu[i].title === dish.category) {
-              newMenu[i] = {
-                ...newMenu[i],
-                items: [...newMenu[i].items, newDish],
-              };
-              categoryExists = true;
-              break;
-            }
-          }
-
-          if (!categoryExists) {
-            newMenu.push({
-              title: dish.category,
-              items: [newDish],
-            });
-          }
-
-          return { ...r, menu: newMenu };
-        }
-        return r;
-      });
-    };
-
-    setRestaurants(updateRestaurants);
-    setHomeFoods(updateRestaurants);
-  };
-  
-  const allItems = [...restaurants, ...homeFoods];
 
   return (
-    <RestaurantContext.Provider
-      value={{
-        restaurants,
-        homeFoods,
-        allItems,
-        getRestaurantById,
-        addDishToRestaurant,
-      }}
-    >
+    <RestaurantContext.Provider value={{ restaurants, homeFoods, allItems, loading, getRestaurantById }}>
       {children}
     </RestaurantContext.Provider>
   );
@@ -83,8 +67,6 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
 
 export function useRestaurants() {
   const context = useContext(RestaurantContext);
-  if (context === undefined) {
-    throw new Error('useRestaurants must be used within a RestaurantProvider');
-  }
+  if (context === undefined) throw new Error('useRestaurants must be used within a RestaurantProvider');
   return context;
 }

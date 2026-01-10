@@ -11,10 +11,8 @@ import { LocationProvider } from '@/context/LocationProvider';
 import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 import { RestaurantProvider } from '@/context/RestaurantProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
-// ✅ Import RatingFilterProvider
 import { RatingFilterProvider } from '@/context/RatingFilterProvider';
 import { FirebaseClientProvider } from '@/firebase';
-
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full w-full scroll-smooth">
+    // Added suppressHydrationWarning here to ignore extension-injected attributes
+    <html lang="en" className="h-full w-full scroll-smooth" suppressHydrationWarning>
       <body
+        // Added suppressHydrationWarning here as well
+        suppressHydrationWarning
         className={cn(
           'relative h-full font-sans antialiased',
           inter.variable
@@ -46,7 +47,6 @@ export default function RootLayout({
                 <CartProvider>
                   <HeaderProvider>
                     <SidebarProvider>
-                      {/* ✅ Wrap SiteLayout with RatingFilterProvider */}
                       <RatingFilterProvider>
                         <SiteLayout>{children}</SiteLayout>
                       </RatingFilterProvider>

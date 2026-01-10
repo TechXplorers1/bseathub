@@ -3,7 +3,7 @@ spring:
     name: eathub-common-service
   
   datasource:
-    url: jdbc:postgresql://localhost:5434/postgres
+    url: jdbc:postgresql://192.168.29.146:5434/postgres?options=-c%20timezone=Asia/Kolkata
     username: eathub
     password: password
     driver-class-name: org.postgresql.Driver

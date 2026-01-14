@@ -18,39 +18,57 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch('http://localhost:8081/api/v1/restaurants');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        // 1. Fetch from both endpoints simultaneously
+        const [resRestaurants, resHomeFood] = await Promise.all([
+          fetch('http://localhost:8081/api/v1/restaurants'),
+          fetch('http://localhost:8081/api/v1/home-food')
+        ]);
 
-        const data = await response.json();
+        if (!resRestaurants.ok || !resHomeFood.ok) {
+          throw new Error('Failed to fetch data from one or more endpoints');
+        }
 
-        const mappedData = data.map((item: any) => ({
+        const restaurantsData = await resRestaurants.json();
+        const homeFoodData = await resHomeFood.json();
+
+        // 2. Map and Normalize Restaurant Data
+        const mappedRestaurants = restaurantsData.map((item: any) => ({
           ...item,
-          // Handle field name differences between Java Backend and Next.js Frontend
-          type: item.type || 'restaurant', // Fallback if DB column is empty
           deliveryTime: item.avgDeliveryTime || 30,
+          deliveryFee: item.baseDeliveryFee || 0,
           reviews: item.reviewsCount || 0,
-          rating: item.rating || 0,
-          // CRITICAL: Ensure services is an array so .includes() doesn't crash
-          services: Array.isArray(item.services) && item.services.length > 0
-            ? item.services
-            : ['delivery', 'pickup'],
-          imageId: item.imageId || 'restaurant-1'
+          imageId: item.imageId || 'restaurant-1',
+          services: item.services || ['delivery', 'pickup'],
+          type: 'restaurant' // Force type for filtering
         }));
 
-        setAllItems(mappedData);
+        // 3. Map and Normalize Home Food Data
+        const mappedHomeFoods = homeFoodData.map((item: any) => ({
+          ...item,
+          // Use fields returned by your HomeFoodResponseDTO
+          deliveryTime: item.deliveryTime || 45,
+          deliveryFee: item.deliveryFee || 0,
+          reviews: item.reviews || 0,
+          imageId: item.imageId || 'food-1',
+          services: item.services || ['delivery'],
+          type: 'home-food' // Force type for filtering
+        }));
+
+        // 4. Combine into one state
+        setAllItems([...mappedRestaurants, ...mappedHomeFoods]);
       } catch (error) {
-        console.error("Failed to fetch restaurants:", error);
+        console.error("Database Fetch Error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRestaurants();
+    fetchAllData();
   }, []);
 
-  // Filter logic
+  // Filter logic remains the same, but now populates from combined data
   const restaurants = allItems.filter(item => item.type === 'restaurant');
   const homeFoods = allItems.filter(item => item.type === 'home-food');
 

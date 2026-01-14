@@ -3,7 +3,6 @@ package com.eathub.common.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -16,27 +15,32 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class Restaurant {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private String id; // Matches VARCHAR(36) in SQL
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    private User owner; // Matches owner_id FK in SQL
 
     private String name;
 
     @Column(unique = true)
     private String slug;
 
-    // Fix: Explicitly define the column name to prevent collision with Hibernate keywords
     @Column(name = "restaurant_type") 
     private String type; 
 
-    private String cuisine;
+    private String cuisine; // Matches 'cuisine' in SQL
+    
     private Double rating;
-    private Integer reviewsCount;
+    
+    private Integer reviewsCount; // Matches 'reviews_count' in SQL
+    
     private Integer avgDeliveryTime;
+    
     private Double baseDeliveryFee;
+    
     private Boolean isOpen;
+    
     private String operationalStatus;
 
     @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
@@ -46,6 +50,27 @@ public class Restaurant {
     private RestaurantLegalProfile legalProfile;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    @JsonManagedReference // This tells Jackson to include the categories
+    @JsonManagedReference
     private Set<MenuCategory> menuCategories;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    // --- Compatibility Helpers for RestaurantService ---
+
+    /**
+     * Alias for setCuisine to match RestaurantCreateRequestDTO logic
+     * used in RestaurantService.registerRestaurant
+     */
+    public void setCuisineType(String cuisineType) {
+        this.cuisine = cuisineType;
+    }
+
+    /**
+     * Alias for getCuisine to match RestaurantResponseDTO logic
+     * used in RestaurantService.mapToResponseDTO
+     */
+    public String getCuisineType() {
+        return this.cuisine;
+    }
 }

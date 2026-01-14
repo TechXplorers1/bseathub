@@ -79,7 +79,7 @@ public class RestaurantService {
         dto.setId(restaurant.getId());
         dto.setName(restaurant.getName());
         dto.setDescription(restaurant.getDescription());
-        dto.setCuisineType(restaurant.getCuisineType());
+        dto.setCuisineType(restaurant.getCuisine());
         dto.setSlug(restaurant.getSlug());
         dto.setRating(restaurant.getRating());
         dto.setReviewsCount(restaurant.getReviewsCount());

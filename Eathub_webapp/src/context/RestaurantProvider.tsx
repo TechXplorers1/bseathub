@@ -19,47 +19,54 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const fetchAllData = async () => {
+      setLoading(true);
       try {
-        // 1. Fetch from both endpoints simultaneously
+        // 1. Use Promise.allSettled to allow one to fail while the other succeeds
         const [resRestaurants, resHomeFood] = await Promise.all([
-          fetch('http://localhost:8081/api/v1/restaurants'),
-          fetch('http://localhost:8081/api/v1/home-food')
+          fetch('http://localhost:8081/api/v1/restaurants').catch(err => ({ ok: false, statusText: err.message })),
+          fetch('http://localhost:8081/api/v1/home-food').catch(err => ({ ok: false, statusText: err.message }))
         ]);
 
-        if (!resRestaurants.ok || !resHomeFood.ok) {
-          throw new Error('Failed to fetch data from one or more endpoints');
+        let mappedRestaurants: Restaurant[] = [];
+        let mappedHomeFoods: Restaurant[] = [];
+
+        // 2. Process Restaurants
+        if (resRestaurants.ok) {
+          const restaurantsData = await (resRestaurants as Response).json();
+          mappedRestaurants = restaurantsData.map((item: any) => ({
+            ...item,
+            deliveryTime: item.avgDeliveryTime || 30,
+            deliveryFee: item.baseDeliveryFee || 0,
+            reviews: item.reviewsCount || 0,
+            imageId: item.imageId || 'restaurant-1',
+            services: item.services || ['delivery', 'pickup'],
+            type: 'restaurant'
+          }));
+        } else {
+          console.error(`Restaurants API Error: ${(resRestaurants as any).status} ${(resRestaurants as any).statusText}`);
         }
 
-        const restaurantsData = await resRestaurants.json();
-        const homeFoodData = await resHomeFood.json();
+        // 3. Process Home Food
+        if (resHomeFood.ok) {
+          const homeFoodData = await (resHomeFood as Response).json();
+          mappedHomeFoods = homeFoodData.map((item: any) => ({
+            ...item,
+            deliveryTime: item.deliveryTime || 45,
+            deliveryFee: item.deliveryFee || 0,
+            reviews: item.reviews || 0,
+            imageId: item.imageId || 'food-1',
+            services: item.services || ['delivery'],
+            type: 'home-food'
+          }));
+        } else {
+          console.error(`Home Food API Error: ${(resHomeFood as any).status} ${(resHomeFood as any).statusText}`);
+        }
 
-        // 2. Map and Normalize Restaurant Data
-        const mappedRestaurants = restaurantsData.map((item: any) => ({
-          ...item,
-          deliveryTime: item.avgDeliveryTime || 30,
-          deliveryFee: item.baseDeliveryFee || 0,
-          reviews: item.reviewsCount || 0,
-          imageId: item.imageId || 'restaurant-1',
-          services: item.services || ['delivery', 'pickup'],
-          type: 'restaurant' // Force type for filtering
-        }));
-
-        // 3. Map and Normalize Home Food Data
-        const mappedHomeFoods = homeFoodData.map((item: any) => ({
-          ...item,
-          // Use fields returned by your HomeFoodResponseDTO
-          deliveryTime: item.deliveryTime || 45,
-          deliveryFee: item.deliveryFee || 0,
-          reviews: item.reviews || 0,
-          imageId: item.imageId || 'food-1',
-          services: item.services || ['delivery'],
-          type: 'home-food' // Force type for filtering
-        }));
-
-        // 4. Combine into one state
+        // 4. Combine whatever data we successfully retrieved
         setAllItems([...mappedRestaurants, ...mappedHomeFoods]);
+
       } catch (error) {
-        console.error("Database Fetch Error:", error);
+        console.error("Critical Fetch Error:", error);
       } finally {
         setLoading(false);
       }
@@ -68,7 +75,6 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
     fetchAllData();
   }, []);
 
-  // Filter logic remains the same, but now populates from combined data
   const restaurants = allItems.filter(item => item.type === 'restaurant');
   const homeFoods = allItems.filter(item => item.type === 'home-food');
 

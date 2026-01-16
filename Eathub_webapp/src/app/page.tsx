@@ -5,6 +5,7 @@ import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import { FilterCategories } from '@/components/home/FilterCategories';
 import { Banners } from '@/components/home/Banners';
+import { ChefsCarousel } from '@/components/home/ChefsCarousel';
 
 export default function Home() {
   const { restaurants, homeFoods, loading, allItems } = useRestaurants();
@@ -41,6 +42,7 @@ export default function Home() {
       )}
 
       <HomeFeed restaurants={restaurants} />
+      <ChefsCarousel />
     </div>
   );
 }

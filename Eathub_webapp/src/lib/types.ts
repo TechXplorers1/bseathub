@@ -48,3 +48,15 @@ export interface Order {
   status: 'Delivered' | 'Preparing' | 'Confirmed' | 'Cancelled' | 'Pickup';
   date: string;
 }
+
+export interface Chef {
+  id: string;
+  name: string;
+  specialty: string;
+  avatarUrl: string;
+  slug: string;
+  preference: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
+  rating: number;
+  reviews: number;
+  bio: string;
+}

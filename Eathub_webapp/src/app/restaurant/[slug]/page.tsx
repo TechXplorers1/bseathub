@@ -4,20 +4,21 @@ import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { RestaurantClientPage } from './client-page';
 import type { Restaurant } from '@/lib/types';
 
-// this file is SERVER, so NO "use client" here
-
 type PageProps = {
   params: { slug: string };
   searchParams: { chef?: string };
 };
 
-const allItems: Restaurant[] = [...allRestaurants, ...allHomeFoods];
+const allItems: Restaurant[] = [...allRestaurants, ...allHomeFoods].filter(
+  (r) => typeof r.slug === 'string' && r.slug.length > 0
+);
 
-// required when using `output: 'export'` with a dynamic segment
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return allItems.map((r) => ({ slug: r.slug }));
+export async function generateStaticParams() {
+  return allItems.map((r) => ({
+    slug: r.slug,
+  }));
 }
 
 export default function RestaurantPage({ params, searchParams }: PageProps) {

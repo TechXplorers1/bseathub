@@ -1,142 +1,98 @@
-// app/category/[categoryName]/page.tsx
+"use client";
 
-import { RestaurantCard } from '@/components/home/RestaurantCard';
-import { ChefCard } from '@/components/home/ChefCard';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
+import { useState, useEffect, use } from "react";
+// Ensure this path matches where you created the ProviderCard
+import { ProviderCard } from "@/components/discovery/ProviderCard";
 
 type CategoryPageProps = {
-  // Next.js 15 – params is a Promise
   params: Promise<{ categoryName: string }>;
 };
 
-// helper for case-insensitive comparison
-const normalize = (value: string) => value?.toLowerCase().trim() || '';
+export default function CategoryPage({ params }: CategoryPageProps) {
+  const resolvedParams = use(params);
+  const categoryName = decodeURIComponent(resolvedParams.categoryName);
 
-// build chefs list from home foods
-const chefs = allHomeFoods.map((food) => ({
-  name: food.name.split("'s")[0],
-  specialty: food.cuisine,
-  avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
-  slug: food.slug,
-  // Add missing properties required by ChefCard
-  rating: (food as any).rating ?? 4.5,
-  reviews: (food as any).reviews ?? 0,
-  restaurantName: food.name,
-  restaurantImageId: food.imageId,
-  categories: food.categories || [],
-  bio: `Expert home chef specializing in authentic ${food.cuisine} dishes.`,
-}));
+  const [providers, setProviders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const uniqueChefs = chefs.reduce((acc, current) => {
-  if (!acc.find((item) => item.name === current.name)) {
-    acc.push(current);
-  }
-  return acc;
-}, [] as typeof chefs);
+  useEffect(() => {
+    async function fetchProviders() {
+      try {
+        setLoading(true);
 
-/**
- * Let Next.js know all category route params that should be statically generated at build time.
- * We gather categories from your static data (restaurants + home foods) and return them.
- */
-export async function generateStaticParams(): Promise<{ categoryName: string }[]> {
-  const categorySet = new Set<string>();
+        // This calls the DiscoveryController we created
+        const apiUrl = `http://localhost:8081/api/v1/discovery/category/${encodeURIComponent(categoryName)}`;
 
-  // collect categories from restaurants
-  allRestaurants.forEach((r) => {
-    (r.categories ?? []).forEach((c) => {
-      if (typeof c === 'string' && c.trim()) categorySet.add(c.trim());
-    });
-  });
+        const response = await fetch(apiUrl);
 
-  // collect categories from home foods
-  allHomeFoods.forEach((f) => {
-    (f.categories ?? []).forEach((c) => {
-      if (typeof c === 'string' && c.trim()) categorySet.add(c.trim());
-    });
-  });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch providers (${response.status})`);
+        }
 
-  // map to route param objects. We encode to make sure spaces/special chars are route-safe.
-  return Array.from(categorySet).map((cat) => ({
-    categoryName: encodeURIComponent(cat),
-  }));
-}
+        const data = await response.json();
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  // 1️⃣ await params (Next 15)
-  const resolvedParams = await params;
-  const rawCategoryName = resolvedParams.categoryName ?? '';
+        /**
+         * GROUND LEVEL LOGIC:
+         * The backend returns: { restaurants: [...], homeFoods: [...] }
+         * We merge them into one array so the .map() function below works.
+         */
+        const combined = [
+          ...(data.restaurants || []).map((item: any) => ({
+            ...item,
+            type: "RESTAURANT" as const,
+          })),
+          ...(data.homeFoods || []).map((item: any) => ({
+            ...item,
+            type: "HOME_FOOD" as const,
+          })),
+          ...(data.chefs || []).map((item: any) => ({
+            ...item,
+            type: "CHEF" as const,
+          })),
+        ];
 
-  // 2️⃣ decode category from URL (Fast%20Food → Fast Food)
-  const categoryName = decodeURIComponent(rawCategoryName);
-  const categoryKey = normalize(categoryName);
 
-  // 3️⃣ Restaurants: only items whose categories contain this category
-  const filteredRestaurants = allRestaurants.filter((restaurant) =>
-    (restaurant.categories ?? []).some((cat) => normalize(cat) === categoryKey)
-  );
+        setProviders(combined);
+      } catch (error) {
+        console.error("Discovery error:", error);
+        setProviders([]);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  // 4️⃣ Home Food: same logic but on allHomeFoods
-  const filteredHomeFoods = allHomeFoods.filter((item) =>
-    (item.categories ?? []).some((cat) => normalize(cat) === categoryKey)
-  );
-
-  // 5️⃣ Chefs: optional – based on cuisine / specialty
-  const filteredChefs = uniqueChefs.filter((chef) =>
-    normalize(chef.specialty).includes(categoryKey)
-  );
-
-  const noResults =
-    filteredRestaurants.length === 0 &&
-    filteredHomeFoods.length === 0 &&
-    filteredChefs.length === 0;
+    fetchProviders();
+  }, [categoryName]);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8">Results for "{categoryName}"</h1>
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold capitalize">{categoryName}</h1>
+        <p className="text-muted-foreground mt-2">
+          Explore top-rated places offering {categoryName} near you.
+        </p>
+      </header>
 
-      {/* Restaurants section */}
-      {filteredRestaurants.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Restaurants</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Home Food section */}
-      {filteredHomeFoods.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Home Food</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredHomeFoods.map((item) => (
-              <RestaurantCard key={item.id} restaurant={item} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Chefs section */}
-      {filteredChefs.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Chefs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredChefs.map((chef) => (
-              <ChefCard key={chef.name} chef={chef} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* No results state */}
-      {noResults && (
-        <div className="flex flex-col items-center justify-center py-12">
-          <p className="text-lg text-muted-foreground">
-            No results found for "{categoryName}".
-          </p>
-          <p className="text-sm text-gray-400 mt-2">Try selecting a different category from the menu.</p>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {providers.length > 0 ? (
+            providers.map((provider) => (
+              <ProviderCard
+                key={`${provider.type}-${provider.id}`}
+                provider={provider}
+              />
+            ))
+          ) : (
+            <div className="col-span-full py-20 text-center border-2 border-dashed rounded-xl bg-gray-50">
+              <p className="text-lg text-muted-foreground">
+                No restaurants or chefs currently found for "{categoryName}".
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -215,25 +215,29 @@ export function HomeFoodRegistrationDialog({
     setShowConfirmPassword(false);
   };
 
-  const handleFinalSubmit = (data: StepThreeValues) => {
+  // Example for HomeFoodRegistrationDialog.tsx
+  const handleFinalSubmit = async (data: StepThreeValues) => {
     const allData = {
       ...formStep1.getValues(),
       ...formStep2.getValues(),
       ...data,
-      fullPhoneNumber: `${formStep1.getValues().phoneCountryCode}${formStep1.getValues().contactNumber}`,
     };
 
-    onSubmit(allData, 'Home Food');
-
-    toast({
-      title: 'Registration Submitted!',
-      description:
-        'Thank you for registering. We will review your application and get back to you shortly.',
+    // Call your backend instead of the local/firebase action
+    const response = await fetch('http://localhost:8081/api/auth/partner/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'Home Food',
+        data: allData
+      }),
     });
 
-    onOpenChange(false);
-    router.push('/home-food-dashboard');
-    resetAll();
+    if (response.ok) {
+      toast({ title: 'Registration Successful!' });
+      onOpenChange(false);
+      router.push('/home-food-dashboard');
+    }
   };
 
   const progressValue = (step / 3) * 100;

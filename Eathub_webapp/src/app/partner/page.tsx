@@ -13,11 +13,11 @@ import { registerUser } from "@/components/actions/SaveRegistrations"; // Import
 // Icon Component
 const HomeFoodIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-        <path d="M12 16a2.5 2.5 0 0 0-5 0v2.5"/>
-        <path d="M17 16a2.5 2.5 0 0 1-5 0v2.5"/>
-        <path d="M12 11V8"/>
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+        <path d="M12 16a2.5 2.5 0 0 0-5 0v2.5" />
+        <path d="M17 16a2.5 2.5 0 0 1-5 0v2.5" />
+        <path d="M12 11V8" />
     </svg>
 );
 
@@ -56,7 +56,7 @@ export default function PartnerPage() {
 
     // UPDATED: Now connects to Firebase Realtime Database
     const handleRegistrationSubmit = async (data: any, type: 'Home Food' | 'Restaurant' | 'Chef') => {
-        
+
         // 1. Call the backend action
         const result = await registerUser(data, type);
 
@@ -66,7 +66,7 @@ export default function PartnerPage() {
                 title: "Registration Successful!",
                 description: `Welcome to Eat Hub! You have registered as a ${type}.`,
             });
-            
+
             // Close the specific dialog
             if (type === 'Home Food') setIsHomeFoodDialogOpen(false);
             if (type === 'Restaurant') setIsRestaurantDialogOpen(false);
@@ -108,21 +108,21 @@ export default function PartnerPage() {
                     ))}
                 </div>
             </div>
-            
-            <HomeFoodRegistrationDialog 
-                isOpen={isHomeFoodDialogOpen} 
-                onOpenChange={setIsHomeFoodDialogOpen} 
-                onSubmit={(data) => handleRegistrationSubmit(data, 'Home Food')} 
+
+            <HomeFoodRegistrationDialog
+                isOpen={isHomeFoodDialogOpen}
+                onOpenChange={setIsHomeFoodDialogOpen}
+                onSubmit={(data) => handleRegistrationSubmit(data, 'Home Food')}
             />
-            <RestaurantRegistrationDialog 
-                isOpen={isRestaurantDialogOpen} 
-                onOpenChange={setIsRestaurantDialogOpen} 
-                onSubmit={(data) => handleRegistrationSubmit(data, 'Restaurant')} 
+            <RestaurantRegistrationDialog
+                isOpen={isRestaurantDialogOpen}
+                onOpenChange={setIsRestaurantDialogOpen}
+                onSubmit={(data) => handleRegistrationSubmit(data, 'Restaurant')}
             />
-            <ChefRegistrationDialog 
-                isOpen={isChefDialogOpen} 
-                onOpenChange={setIsChefDialogOpen} 
-                onSubmit={(data) => handleRegistrationSubmit(data, 'Chef')} 
+            <ChefRegistrationDialog
+                isOpen={isChefDialogOpen}
+                onOpenChange={setIsChefDialogOpen}
+                onSubmit={(data) => handleRegistrationSubmit(data, 'Chef')}
             />
         </>
     )

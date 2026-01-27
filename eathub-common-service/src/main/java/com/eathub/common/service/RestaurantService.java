@@ -41,13 +41,16 @@ public class RestaurantService {
         restaurant.setName(dto.getName());
         restaurant.setDescription(dto.getDescription());
         restaurant.setCuisineType(dto.getCuisineType());
+        restaurant.setImageId(dto.getImageId());    
         restaurant.setSlug(dto.getSlug());
-        restaurant.setOwner(owner);
+        restaurant.setOwnerId(ownerId);
+
 
         // UI defaults
         restaurant.setRating(4.0);
         restaurant.setReviewsCount(0);
         restaurant.setIsOpen(true);
+        restaurant.setOperationalStatus("OPEN");
 
         Restaurant savedRestaurant =
                 restaurantRepository.save(restaurant);
@@ -84,6 +87,7 @@ public class RestaurantService {
         dto.setRating(restaurant.getRating());
         dto.setReviewsCount(restaurant.getReviewsCount());
         dto.setIsOpen(restaurant.getIsOpen());
+          dto.setImageId(restaurant.getImageId());
 
         return dto;
     }

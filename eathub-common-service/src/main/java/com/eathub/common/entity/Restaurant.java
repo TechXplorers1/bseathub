@@ -17,9 +17,9 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id; // Matches VARCHAR(36) in SQL
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner; // Matches owner_id FK in SQL
+    @Column(name = "owner_id", nullable = false)
+    private String ownerId;
+
 
     private String name;
 
@@ -55,6 +55,9 @@ public class Restaurant {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "image_id")
+    private String imageId;
 
     // --- Compatibility Helpers for RestaurantService ---
 

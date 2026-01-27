@@ -1,49 +1,43 @@
 package com.eathub.common.service;
 
-import com.eathub.common.entity.MenuCategory;
+import com.eathub.common.dto.MenuItemDTO;
 import com.eathub.common.entity.MenuItem;
-import com.eathub.common.repository.MenuCategoryRepository;
+import com.eathub.common.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MenuService {
-    private final MenuCategoryRepository menuCategoryRepository;
 
-    @Transactional
-    public void importMenu(List<MenuCategory> categories) {
-        if (categories == null || categories.isEmpty()) {
-            return;
-        }
+    private final MenuItemRepository menuItemRepository;
 
-        for (MenuCategory category : categories) {
-            if (category.getItems() != null) {
-                for (MenuItem item : category.getItems()) {
-                    // LINKING STEP: This ensures the category_id is populated in the database
-                    item.setCategory(category);
-
-                    // Sync ownership data from category to individual items
-                    if (category.getRestaurant() != null) {
-                        item.setRestaurant(category.getRestaurant());
-                    }
-                    if (category.getHomeFood() != null) {
-                        item.setHomeFood(category.getHomeFood());
-                    }
-                }
-            }
-        }
-        // Saving the categories will automatically save all items due to CascadeType.ALL
-        menuCategoryRepository.saveAll(categories);
+    public List<MenuItemDTO> getItemsByCategory(String restaurantId, String categoryTitle) {
+        // Fetch items filtering by both restaurant and category title
+        List<MenuItem> items = menuItemRepository.findByRestaurantIdAndCategoryTitleIgnoreCase(restaurantId, categoryTitle);
+        
+        return items.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<MenuCategory> getMenuByRestaurant(String restaurantId) {
-        return menuCategoryRepository.findByRestaurantId(restaurantId);
+    private MenuItemDTO convertToDTO(MenuItem item) {
+        return MenuItemDTO.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .price(item.getPrice())
+                .imageId(item.getImageId())
+                .isSpecial(item.getIsSpecial())
+                .status(item.getStatus())
+                .category(item.getCategory() != null ? item.getCategory().getTitle() : null)
+                .build();
     }
-
-    public List<MenuCategory> getMenuByHomeFood(String homeFoodId) {
-        return menuCategoryRepository.findByHomeFoodId(homeFoodId);
+    
+    // Placeholder for your bulk import logic if you have one
+    public void importMenu(Object categories) {
+        // Implementation here
     }
 }

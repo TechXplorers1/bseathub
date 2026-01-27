@@ -1,6 +1,7 @@
 package com.eathub.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,10 +19,11 @@ public class MenuCategory {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
-    @JsonBackReference // This tells Jackson NOT to include the restaurant again here
     private Restaurant restaurant;
+
 
     @ManyToOne
     @JoinColumn(name = "home_food_id")

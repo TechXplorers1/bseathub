@@ -14,4 +14,5 @@ public class RestaurantResponseDTO {
     private Double rating;
     private Integer reviewsCount;
     private Boolean isOpen;
+    private String imageId;     
 }

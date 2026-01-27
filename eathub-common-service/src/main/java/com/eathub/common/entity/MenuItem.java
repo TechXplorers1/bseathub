@@ -1,6 +1,8 @@
 package com.eathub.common.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,15 +20,18 @@ public class MenuItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    @JsonBackReference // Stops recursion: Item won't try to load Category again
+    @JsonBackReference
     private MenuCategory category;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_food_id")
+    @JsonIgnoreProperties({"categories", "menuItems"}) // Add this line
     private HomeFoodProvider homeFood;
 
     private String name;

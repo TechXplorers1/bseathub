@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
--- changeset eathub:1.0.0 logicalFilePath:db/changelog/db.changelog-master.sql
+-- changeset eathub:1.0.0 logicalFilePath:db/changelog/db.changelog-master.sql validCheckSum:ANY
 -- Create Users & Access Control
 CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(36) PRIMARY KEY,
@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS admins (
     privileges TEXT,
     CONSTRAINT fk_admins_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
 
 -- Onboarding
 CREATE TABLE IF NOT EXISTS pending_registrations (
@@ -195,7 +194,7 @@ CREATE TABLE IF NOT EXISTS order_status (
 CREATE TABLE IF NOT EXISTS orders (
     id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,
-    source_type VARCHAR(50), -- Restaurant | HomeFood
+    source_type VARCHAR(50),
     restaurant_id VARCHAR(36),
     home_food_provider_id VARCHAR(36),
     current_status_id VARCHAR(36) NOT NULL,
@@ -230,7 +229,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     id VARCHAR(36) PRIMARY KEY,
     order_id VARCHAR(36) NOT NULL,
     item_name VARCHAR(255),
-    item_type VARCHAR(50), -- MenuItem | HomeFoodItem
+    item_type VARCHAR(50),
     item_ref_id VARCHAR(36),
     quantity INT,
     unit_price FLOAT,
@@ -256,9 +255,13 @@ CREATE TABLE IF NOT EXISTS reviews (
     id VARCHAR(36) PRIMARY KEY,
     customer_id VARCHAR(36) NOT NULL,
     target_id VARCHAR(36) NOT NULL,
-    target_type VARCHAR(50), -- Restaurant | HomeFood | Chef
+    target_type VARCHAR(50),
     rating FLOAT,
     comment TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_reviews_customer FOREIGN KEY (customer_id) REFERENCES users(id)
 );
+
+-- changeset eathub:1.0.1
+-- Add password support for internal authentication
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);

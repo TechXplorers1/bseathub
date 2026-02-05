@@ -1,5 +1,5 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import {
   DollarSign,
   Users,
@@ -32,14 +32,19 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 export default function HomeFoodDashboardPage() {
+  const [userName, setUserName] = useState('Maria');
+
+  useEffect(() => {
+    const name = localStorage.getItem('userName');
+    if (name) setUserName(name);
+  }, []);
+
   return (
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, Maria!</h1>
-          <p className="text-muted-foreground">
-            Here's a quick look at your kitchen's performance.
-          </p>
+          <h1 className="text-3xl font-bold">Welcome back, {userName}!</h1>
+          <p className="text-muted-foreground">Here's a quick look at your kitchen's performance.</p>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">

@@ -1,16 +1,10 @@
-
 'use client';
 
 import Link from 'next/link';
 import {
-  Bell,
   Home,
   LineChart,
-  Package,
-  Package2,
   ShoppingCart,
-  Users,
-  Menu as MenuIcon,
   Utensils,
   Settings,
   Star,
@@ -19,31 +13,10 @@ import {
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
-import { useEffect } from 'react';
-import { Header } from '@/components/shared/Header';
-import { Footer } from '@/components/shared/Footer';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
   { href: "/home-food-dashboard", icon: Home, label: "Overview" },
@@ -56,7 +29,6 @@ const navItems = [
 const accountItems = [
   { href: "/home-food-dashboard/settings", icon: Settings, label: "Settings" },
   { href: "#", icon: LifeBuoy, label: "Support" },
-  { href: "#", icon: LogOut, label: "Logout" },
 ];
 
 export default function HomeFoodDashboardLayout({
@@ -65,20 +37,34 @@ export default function HomeFoodDashboardLayout({
   children: React.ReactNode;
 }) {
   const { setHeaderTitle, setHeaderPath } = useHeader();
-  const kitchenName = "Maria's Kitchen";
+  const router = useRouter();
+
+  // Use state to manage the display name from localstorage
+  const [kitchenName, setKitchenName] = useState("Maria's Kitchen");
 
   useEffect(() => {
-    setHeaderTitle(kitchenName);
+    // 1. Retrieve the name stored during the default login process
+    const storedName = localStorage.getItem('userName');
+    const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
+
+    setKitchenName(finalName);
+    setHeaderTitle(finalName);
     setHeaderPath('/home-food-dashboard');
-    // Cleanup function to reset the title when the component unmounts
+
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
     };
-  }, [setHeaderTitle, setHeaderPath, kitchenName]);
+  }, [setHeaderTitle, setHeaderPath]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push('/login');
+  };
 
   return (
     <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      {/* Sidebar */}
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex-1 py-2">
@@ -91,7 +77,11 @@ export default function HomeFoodDashboardLayout({
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
-                  {item.badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{item.badge}</Badge>}
+                  {item.badge && (
+                    <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               ))}
             </nav>
@@ -107,10 +97,20 @@ export default function HomeFoodDashboardLayout({
                   {item.label}
                 </Link>
               ))}
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </nav>
           </div>
         </div>
       </div>
+
+      {/* Main Content Area */}
       <div className="flex flex-col">
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/40 overflow-auto">
           {children}

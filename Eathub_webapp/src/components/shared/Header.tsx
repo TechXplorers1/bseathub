@@ -4,48 +4,15 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import {
-  Search,
-  ShoppingCart,
-  MapPin,
-  ChevronDown,
-  Flame,
-  Bell,
-  LogOut,
-  User,
-  LayoutDashboard,
-  Shield,
-  Utensils,
-  Building2,
-  ChefHat,
-  Menu,
-} from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Search, ShoppingCart, Flame, LogOut, LayoutDashboard } from 'lucide-react';
+
 import { Cart } from './Cart';
 import { useCart } from '@/context/CartProvider';
-import { useHeader } from '@/context/HeaderProvider';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useLocation } from '@/context/LocationProvider';
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useDeliveryMode } from '@/context/DeliveryModeProvider';
-import { Notifications } from './Notifications';
-import { useUser, useAuth } from '@/firebase';
+import { useRouter } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,421 +22,94 @@ import {
   DropdownMenuLabel,
 } from '../ui/dropdown-menu';
 
-// Helper to determine context
-const getDashboardContext = (pathname: string | null) => {
-  if (!pathname) return 'customer';
-  if (pathname.startsWith('/admin')) return 'admin';
-  if (pathname.startsWith('/restaurant-dashboard')) return 'restaurant';
-  if (pathname.startsWith('/home-food-dashboard')) return 'home-food';
-  if (pathname.startsWith('/chef-dashboard')) return 'chef';
-  return 'customer';
-};
-
-type MobileNavSheetProps = {
-  location: string;
-  handleLocationDialog: () => void;
-  hasNotifications: boolean;
-  isUserLoading: boolean;
-  user: any;
-  handleLogout: () => void;
-  dashboardContext: string;
-  logoLink: string;
-};
-
-function MobileNavSheet({
-  location,
-  handleLocationDialog,
-  hasNotifications,
-  isUserLoading,
-  user,
-  handleLogout,
-  dashboardContext,
-  logoLink
-}: MobileNavSheetProps) {
-
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden hover:text-primary transition-colors duration-200"
-        >
-          <Menu className="h-6 w-6" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="sm:max-w-xs">
-        <h3 className="text-lg font-semibold mb-6">Menu</h3>
-        <div className="flex flex-col space-y-4">
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-base hover:text-primary transition-colors duration-200"
-            onClick={handleLocationDialog}
-          >
-            <MapPin className="h-5 w-5 mr-3" />
-            <span>
-              Delivery to:
-              <br /> {location}
-            </span>
-          </Button>
-
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-base relative hover:text-primary transition-colors duration-200"
-              >
-                <Bell className="h-5 w-5 mr-3" />
-                <span>Notifications</span>
-                {hasNotifications && (
-                  <span className="absolute left-8 top-3 h-2 w-2 rounded-full bg-primary" />
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <Notifications />
-            </SheetContent>
-          </Sheet>
-
-          <DropdownMenuSeparator />
-
-          {isUserLoading && <Skeleton className="h-10 w-full rounded-md" />}
-
-          {!isUserLoading && user && (
-            <div className="p-2 border-t mt-4 pt-4">
-              <p className="font-medium text-sm mb-2">
-                {user.displayName || user.email || 'User'}
-              </p>
-
-              {/* --- RESTRICTED MOBILE MENU LINKS --- */}
-              {dashboardContext === 'customer' && (
-                <Link href="/dashboard" passHref>
-                  <Button variant="ghost" className="w-full justify-start text-base hover:text-primary transition-colors duration-200">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Button>
-                </Link>
-              )}
-
-              {dashboardContext === 'admin' && (
-                <Link href="/admin/dashboard" passHref>
-                  <Button variant="ghost" className="w-full justify-start text-base hover:text-primary transition-colors duration-200">
-                    <Shield className="mr-2 h-4 w-4" />
-                    <span>Admin Dashboard</span>
-                  </Button>
-                </Link>
-              )}
-
-              {dashboardContext === 'restaurant' && (
-                <Link href="/restaurant-dashboard" passHref>
-                  <Button variant="ghost" className="w-full justify-start text-base hover:text-primary transition-colors duration-200">
-                    <Building2 className="mr-2 h-4 w-4" />
-                    <span>Restaurant Dashboard</span>
-                  </Button>
-                </Link>
-              )}
-
-              {/* Add other specific contexts if needed for mobile */}
-
-              <Button
-                variant="ghost"
-                className="w-full justify-start text-base text-red-600 hover:bg-red-50 hover:text-primary mt-2 transition-colors duration-200"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </Button>
-            </div>
-          )}
-
-          {!isUserLoading && !user && (
-            <Link href="/login" passHref>
-              <Button className="w-full hover:text-primary transition-colors duration-200">
-                Sign In
-              </Button>
-            </Link>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
-
 export function Header() {
   const { itemCount } = useCart();
-  const { headerTitle, headerPath } = useHeader();
-  const { location, setLocation } = useLocation();
-  const [newLocation, setNewLocation] = useState(location);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const { deliveryMode, setDeliveryMode } = useDeliveryMode();
-  const { user, isUserLoading } = useUser();
-  const auth = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
-  const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Determine Dashboard Context based on URL
-  const dashboardContext = getDashboardContext(pathname);
+  const [auth, setAuth] = useState<{
+    email: string | null;
+    role: string | null;
+    token: string | null;
+  }>({ email: null, role: null, token: null });
 
-  // 2. Determine Logo Link based on Context
-  const getLogoLink = () => {
-    switch (dashboardContext) {
-      case 'restaurant': return '/restaurant-dashboard';
-      case 'home-food': return '/home-food-dashboard';
-      case 'chef': return '/chef-dashboard';
-      case 'admin': return '/admin/dashboard';
-      default: return '/'; // Default for customers
-    }
-  };
-
-  const logoLink = getLogoLink();
-
-  // 🔹 STATIC LOGIN STATE FROM LOCALSTORAGE
-  const [isStaticLoggedIn, setIsStaticLoggedIn] = useState(false);
-  const [staticUserPhone, setStaticUserPhone] = useState<string | null>(null);
-
+  // ✅ FIX: load auth + react instantly to login/logout
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const loadAuth = () => {
+      const email = localStorage.getItem('userEmail');
+      const role = localStorage.getItem('userRole');
+      const token = localStorage.getItem('token');
 
-    const readFromStorage = () => {
-      const loggedIn = localStorage.getItem('eathubLoggedIn') === 'true';
-      const phone = localStorage.getItem('eathubUserPhone');
-      setIsStaticLoggedIn(loggedIn);
-      setStaticUserPhone(phone);
+      setAuth({ email, role, token });
+      setIsLoading(false);
     };
 
-    readFromStorage();
+    loadAuth();
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'eathubLoggedIn' || e.key === 'eathubUserPhone' || e.key === null) {
-        readFromStorage();
-      }
-    };
-
-    const onStaticLogin = (e: Event) => {
-      const ce = e as CustomEvent;
-      const phoneFromDetail = ce?.detail?.phone;
-      setIsStaticLoggedIn(true);
-      setStaticUserPhone(phoneFromDetail || localStorage.getItem('eathubUserPhone'));
-    };
-
-    const onStaticLogout = () => {
-      setIsStaticLoggedIn(false);
-      setStaticUserPhone(null);
-    };
-
-    window.addEventListener('storage', onStorage);
-    window.addEventListener('eathub:login', onStaticLogin);
-    window.addEventListener('eathub:logout', onStaticLogout);
-
+    // Listen to localStorage changes (cross-tab) + custom event (same tab)
+    window.addEventListener('storage', loadAuth);
+    window.addEventListener('auth-change', loadAuth);
     return () => {
-      window.removeEventListener('storage', onStorage);
-      window.removeEventListener('eathub:login', onStaticLogin);
-      window.removeEventListener('eathub:logout', onStaticLogout);
+      window.removeEventListener('storage', loadAuth);
+      window.removeEventListener('auth-change', loadAuth);
     };
   }, []);
 
-  const effectiveUser = isStaticLoggedIn
-    ? {
-      displayName: staticUserPhone,
-      email: null,
-      photoURL: null,
-    }
-    : user;
-
-  const effectiveIsUserLoading = isUserLoading && !isStaticLoggedIn;
-
-  const handleLocationSave = () => {
-    setLocation(newLocation);
-    setIsDialogOpen(false);
-  };
-
-  const handleLocationDialog = () => {
-    setIsDialogOpen(true);
-  };
-
   const handleLogout = () => {
-    if (auth) {
-      auth.signOut();
-    }
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('eathubLoggedIn');
-      localStorage.removeItem('eathubUserPhone');
-      const ev = new CustomEvent('eathub:logout');
-      window.dispatchEvent(ev);
-    }
-    setIsStaticLoggedIn(false);
-    setStaticUserPhone(null);
+    localStorage.clear();
+    setAuth({ email: null, role: null, token: null });
+    window.dispatchEvent(new Event('auth-change'));
     router.push('/');
+    router.refresh();
   };
 
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim() !== '') {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
+  // ✅ SAFE role → dashboard mapping
+  const getDashboardInfo = () => {
+    if (!auth.role) return null;
+
+    const map: Record<string, { label: string; href: string }> = {
+      USER: { label: 'User Dashboard', href: '/dashboard' },
+      HOMEFOOD: { label: 'Homefood Dashboard', href: '/home-food-dashboard' },
+      RESTAURANT: { label: 'Restaurant Dashboard', href: '/restaurant-dashboard' },
+      CHEF: { label: 'Chef Dashboard', href: '/chef-dashboard' },
+    };
+
+    return map[auth.role] || null;
   };
 
-  const hasNotifications = true;
+  const dashboard = getDashboardInfo();
+  const isLoggedIn = !!auth.token;
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 border-b bg-background shadow-md">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center">
-          <MobileNavSheet
-            location={location}
-            handleLocationDialog={handleLocationDialog}
-            hasNotifications={hasNotifications}
-            isUserLoading={effectiveIsUserLoading}
-            user={effectiveUser}
-            handleLogout={handleLogout}
-            dashboardContext={dashboardContext}
-            logoLink={logoLink}
-          />
+    <header className="fixed top-0 w-full z-50 border-b bg-background shadow-md">
+      <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto">
 
-          {/* DYNAMIC LOGO LINK OR INITIAL TITLE - SCROLLABLE */}
-          {headerTitle ? (
-            headerPath ? (
-              <Link
-                href={headerPath}
-                className="flex items-center space-x-2 ml-2 md:ml-0 cursor-pointer group"
-                onClick={() => {
-                  const container = document.getElementById('main-scroll-container');
-                  if (container) container.scrollTo({ top: 0, behavior: 'auto' });
-                  window.scrollTo({ top: 0, behavior: 'auto' });
-                }}
-              >
-                <span className="text-xl font-bold text-foreground transition-colors duration-200 group-hover:text-primary">
-                  {headerTitle}
-                </span>
-              </Link>
-            ) : (
-              <div
-                className="flex items-center space-x-2 ml-2 md:ml-0 cursor-pointer group"
-                onClick={() => {
-                  // Try scrolling the custom main container
-                  const container = document.getElementById('main-scroll-container');
-                  if (container) {
-                    container.scrollTo({ top: 0, behavior: 'auto' });
-                  }
-                  // Also try window scroll just in case
-                  window.scrollTo({ top: 0, behavior: 'auto' });
-                }}
-              >
-                <span className="text-xl font-bold text-foreground transition-colors duration-200 group-hover:text-primary">
-                  {headerTitle}
-                </span>
-              </div>
-            )
-          ) : (
-            <Link
-              href={logoLink}
-              className="flex items-center space-x-2 ml-2 md:ml-0"
-            >
-              <Flame className="h-7 w-7 text-primary transition-transform duration-300 hover:rotate-6" />
-              <span className="text-lg md:text-2xl font-bold text-primary transition-colors duration-200 hover:text-primary">
-                Eat Hub
-              </span>
-            </Link>
-          )}
-        </div>
+        {/* LOGO */}
+        <Link href="/" className="flex items-center space-x-2">
+          <Flame className="h-7 w-7 text-primary" />
+          <span className="text-xl font-bold text-primary">Eat Hub</span>
+        </Link>
 
-        <div className="relative flex-1 mx-4 max-w-lg hidden sm:flex">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* SEARCH */}
+        <div className="hidden sm:flex relative max-w-md w-full mx-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
           <Input
-            type="search"
             placeholder="Search Eat Hub"
-            className="pl-9 rounded-full bg-gray-100 border-none focus-visible:ring-primary transition-all duration-300 hover:bg-gray-200"
-            onKeyDown={handleSearch}
+            className="pl-9 rounded-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
+        {/* RIGHT NAV */}
         <nav className="flex items-center space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="sm:hidden transition-colors duration-200 hover:text-primary"
-            onClick={() => setIsSearchVisible(true)}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="hidden lg:flex items-center h-10 px-4 py-2 text-sm font-medium rounded-full bg-gray-100 hover:bg-gray-200 hover:text-primary transition-colors duration-200"
-              >
-                <MapPin className="h-5 w-5 mr-2" />
-                <span className="truncate max-w-[100px]">{location}</span>
-                <ChevronDown className="h-4 w-4 ml-2" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Edit Location</DialogTitle>
-                <DialogDescription>
-                  Update your delivery address here. Click save when you're
-                  done.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="location" className="text-right">
-                    Address
-                  </Label>
-                  <Input
-                    id="location"
-                    value={newLocation}
-                    onChange={(e) => setNewLocation(e.target.value)}
-                    className="col-span-3 transition-colors duration-200"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  onClick={handleLocationSave}
-                  className="transition-all duration-200 hover:text-primary"
-                >
-                  Save changes
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
           <Sheet>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden md:flex relative transition-colors duration-200 hover:bg-gray-100 hover:text-primary"
-              >
-                <Bell className="transition-transform duration-300 hover:scale-105" />
-                {hasNotifications && (
-                  <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-primary animate-ping-once" />
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <Notifications />
-            </SheetContent>
-          </Sheet>
-
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="default"
-                className="relative rounded-full transition-all duration-200 hover:scale-[1.02]"
-              >
+              <Button variant="ghost" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {itemCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -right-2 -top-2 h-5 min-w-[1.25rem] justify-center rounded-full px-1 text-xs transition-all duration-300"
-                  >
+                  <Badge className="absolute -top-1 -right-1 px-1.5 py-0.5 text-[10px]">
                     {itemCount}
                   </Badge>
                 )}
@@ -480,163 +120,64 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          {effectiveIsUserLoading && (
+          {/* AUTH SECTION */}
+          {isLoading ? (
             <Skeleton className="h-10 w-10 rounded-full" />
-          )}
-
-          {!effectiveIsUserLoading && effectiveUser && (
+          ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-10 w-10 rounded-full transition-all duration-200 hover:ring-2 hover:ring-primary/50 hover:text-primary"
-                >
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src={effectiveUser.photoURL ?? ''}
-                      alt={effectiveUser.displayName ?? ''}
-                    />
-                    <AvatarFallback className="bg-gray-200">
-                      {(() => {
-                        const name = effectiveUser.displayName || effectiveUser.email || '';
-                        if (/^[A-Za-z]/.test(name)) {
-                          return name.charAt(0).toUpperCase();
-                        }
-                        return <User className="h-5 w-5" />;
-                      })()}
+                <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
+                  <Avatar>
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {auth.email ? auth.email[0].toUpperCase() : 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
 
-                {/* --- CONDITIONALLY RENDER MENU ITEMS BASED ON CONTEXT --- */}
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{auth.email}</p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {auth.role?.toLowerCase()}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
 
-                {/* 1. REGULAR CUSTOMER (Shows on Main Site) */}
-                {dashboardContext === 'customer' && (
+                {/* ✅ FIX: show dashboard ONLY if it exists */}
+                {dashboard && (
                   <>
-                    <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                      <Link href="/dashboard">
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                    </DropdownMenuItem>
-
-                    {/* Optional: You can keep these here if a regular user can switch, 
-                        or remove them if you want Strict separation */}
                     <DropdownMenuSeparator />
-                    <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">Switch to Partner</DropdownMenuLabel>
-                    <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                      <Link href="/restaurant-dashboard">
-                        <Building2 className="mr-2 h-4 w-4" />
-                        <span>Restaurant Partner</span>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={dashboard.href}
+                        className="cursor-pointer w-full flex items-center"
+                      >
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        {dashboard.label}
                       </Link>
                     </DropdownMenuItem>
-                    {/* Add others if needed */}
                   </>
-                )}
-
-                {/* 2. ADMIN ONLY */}
-                {dashboardContext === 'admin' && (
-                  <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                    <Link href="/admin/dashboard">
-                      <Shield className="mr-2 h-4 w-4" />
-                      <span>Admin Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-
-                {/* 3. HOME FOOD ONLY */}
-                {dashboardContext === 'home-food' && (
-                  <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                    <Link href="/home-food-dashboard">
-                      <Utensils className="mr-2 h-4 w-4" />
-                      <span>Home Food Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-
-                {/* 4. RESTAURANT ONLY */}
-                {dashboardContext === 'restaurant' && (
-                  <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                    <Link href="/restaurant-dashboard">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      <span>Restaurant Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-
-                {/* 5. CHEF ONLY */}
-                {dashboardContext === 'chef' && (
-                  <DropdownMenuItem asChild className="transition-colors duration-150 data-[highlighted]:text-primary">
-                    <Link href="/chef-dashboard">
-                      <ChefHat className="mr-2 h-4 w-4" />
-                      <span>Chef Dashboard</span>
-                    </Link>
-                  </DropdownMenuItem>
                 )}
 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
-                  className="transition-colors duration-150 hover:bg-red-50 hover:text-primary"
+                  className="text-destructive cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-
-          {!effectiveIsUserLoading && !effectiveUser && (
-            <Button
-              variant="outline"
-              className="hidden md:inline-flex transition-colors duration-200 hover:bg-gray-50 hover:text-primary"
-              asChild
-            >
+          ) : (
+            <Button variant="outline" asChild>
               <Link href="/login">Sign In</Link>
             </Button>
           )}
         </nav>
       </div>
-
-      {isSearchVisible && (
-        <div className="px-4 pb-2 sm:hidden">
-          <div className="relative flex w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search Eat Hub"
-              className="pl-9 pr-12 rounded-full bg-gray-100 border-none focus-visible:ring-primary w-full"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 transition-colors duration-200 hover:text-primary"
-              onClick={() => setIsSearchVisible(false)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

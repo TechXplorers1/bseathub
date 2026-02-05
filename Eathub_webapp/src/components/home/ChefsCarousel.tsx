@@ -11,17 +11,31 @@ import type { Chef } from '@/lib/types';
 export function ChefsCarousel() {
     const [chefs, setChefs] = useState<Chef[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchChefs = async () => {
             try {
-                // Note: Using the port 8081 from your backend setup
-                const response = await fetch('http://localhost:8081/api/v1/chefs');
-                if (!response.ok) throw new Error('Failed to fetch chefs');
+                // Ensure this matches your @RequestMapping in ChefController
+                const response = await fetch('http://localhost:8081/api/v1/chefs', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Access Denied: Check Backend SecurityConfig');
+                    }
+                    throw new Error('Failed to fetch chefs');
+                }
+
                 const data = await response.json();
-                setChefs(data);
-            } catch (error) {
+                setChefs(Array.isArray(data) ? data : []);
+            } catch (error: any) {
                 console.error("Error loading chefs:", error);
+                setError(error.message);
             } finally {
                 setLoading(false);
             }
@@ -30,7 +44,10 @@ export function ChefsCarousel() {
         fetchChefs();
     }, []);
 
-    if (loading) return <div className="h-64 flex items-center justify-center">Loading Chefs...</div>;
+    if (loading) return <div className="h-64 flex items-center justify-center font-medium">Fetching our top chefs...</div>;
+
+    if (error) return <div className="h-64 flex items-center justify-center text-red-500">Error: {error}</div>;
+
     if (chefs.length === 0) return null;
 
     const INITIAL_VISIBLE_COUNT = 8;

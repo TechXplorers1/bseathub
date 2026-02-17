@@ -1,7 +1,15 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode
+} from 'react';
 import type { Restaurant } from '@/lib/types';
+
+const API_BASE = "http://localhost:8081/api/v1";
 
 interface RestaurantContextType {
   restaurants: Restaurant[];
@@ -9,81 +17,131 @@ interface RestaurantContextType {
   allItems: Restaurant[];
   loading: boolean;
   getRestaurantById: (id: string) => Restaurant | undefined;
+  addDishToRestaurant: (
+    restaurantId: string,
+    dishData: any
+  ) => Promise<void>;
 }
 
-const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
+const RestaurantContext =
+  createContext<RestaurantContextType | undefined>(undefined);
 
-export function RestaurantProvider({ children }: { children: ReactNode }) {
-  const [allItems, setAllItems] = useState<Restaurant[]>([]);
+export function RestaurantProvider({
+  children
+}: { children: ReactNode }) {
+
+  const [allItems, setAllItems] =
+    useState<Restaurant[]>([]);
+
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAllData = async () => {
-      setLoading(true);
-      try {
-        // 1. Use Promise.allSettled to allow one to fail while the other succeeds
-        const [resRestaurants, resHomeFood] = await Promise.all([
-          fetch('http://localhost:8081/api/v1/restaurants').catch(err => ({ ok: false, statusText: err.message })),
-          fetch('http://localhost:8081/api/v1/home-food').catch(err => ({ ok: false, statusText: err.message }))
+  const fetchAllData = async () => {
+    setLoading(true);
+
+    try {
+      const [restaurantsRes, homeFoodRes] =
+        await Promise.all([
+          fetch(`${API_BASE}/restaurants`),
+          fetch(`${API_BASE}/home-food`)
         ]);
 
-        let mappedRestaurants: Restaurant[] = [];
-        let mappedHomeFoods: Restaurant[] = [];
+      const restaurantsData =
+        restaurantsRes.ok
+          ? await restaurantsRes.json()
+          : [];
 
-        // 2. Process Restaurants
-        if (resRestaurants.ok) {
-          const restaurantsData = await (resRestaurants as Response).json();
-          mappedRestaurants = restaurantsData.map((item: any) => ({
-            ...item,
-            deliveryTime: item.avgDeliveryTime || 30,
-            deliveryFee: item.baseDeliveryFee || 0,
-            reviews: item.reviewsCount || 0,
-            imageId: item.imageId || 'restaurant-1',
-            services: item.services || ['delivery', 'pickup'],
-            type: 'restaurant'
-          }));
-        } else {
-          console.error(`Restaurants API Error: ${(resRestaurants as any).status} ${(resRestaurants as any).statusText}`);
-        }
+      const homeFoodData =
+        homeFoodRes.ok
+          ? await homeFoodRes.json()
+          : [];
 
-        // 3. Process Home Food
-        if (resHomeFood.ok) {
-          const homeFoodData = await (resHomeFood as Response).json();
-          mappedHomeFoods = homeFoodData.map((item: any) => ({
-            ...item,
-            deliveryTime: item.deliveryTime || 45,
-            deliveryFee: item.deliveryFee || 0,
-            reviews: item.reviews || 0,
-            imageId: item.imageId || 'food-1',
-            services: item.services || ['delivery'],
-            type: 'home-food'
-          }));
-        } else {
-          console.error(`Home Food API Error: ${(resHomeFood as any).status} ${(resHomeFood as any).statusText}`);
-        }
+      const mappedRestaurants =
+        restaurantsData.map((item: any) => ({
+          ...item,
+          type: 'restaurant',
+          deliveryTime: item.avgDeliveryTime ?? 30,
+          deliveryFee: item.baseDeliveryFee ?? 0,
+          reviews: item.reviewsCount ?? 0,
+          services: item.services ?? ['delivery', 'pickup'],
+          menu: item.menuCategories?.map((cat: any) => ({
+            id: cat.id,
+            name: cat.title,
+            items: cat.items ?? []
+          })) ?? []
+        }));
 
-        // 4. Combine whatever data we successfully retrieved
-        setAllItems([...mappedRestaurants, ...mappedHomeFoods]);
+      const mappedHomeFoods =
+        homeFoodData.map((item: any) => ({
+          ...item,
+          type: 'home-food',
+          menu: item.menuCategories?.map((cat: any) => ({
+            id: cat.id,
+            name: cat.title,
+            items: cat.items ?? []
+          })) ?? []
+        }));
 
-      } catch (error) {
-        console.error("Critical Fetch Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setAllItems([
+        ...mappedRestaurants,
+        ...mappedHomeFoods
+      ]);
 
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAllData();
   }, []);
 
-  const restaurants = allItems.filter(item => item.type === 'restaurant');
-  const homeFoods = allItems.filter(item => item.type === 'home-food');
+  const addDishToRestaurant = async (
+    restaurantId: string,
+    dishData: any
+  ) => {
 
-  const getRestaurantById = (id: string) => {
-    return allItems.find((r) => r.id === id);
+    if (!restaurantId)
+      throw new Error("Invalid restaurant ID");
+
+    const response =
+      await fetch(
+        `${API_BASE}/restaurants/${restaurantId}/menu-items`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dishData),
+        }
+      );
+
+    if (!response.ok)
+      throw new Error("Failed to add dish");
+
+    await fetchAllData();
   };
 
+  const restaurants =
+    allItems.filter(i => i.type === 'restaurant');
+
+  const homeFoods =
+    allItems.filter(i => i.type === 'home-food');
+
+  const getRestaurantById =
+    (id: string) =>
+      allItems.find(r => r.id === id);
+
   return (
-    <RestaurantContext.Provider value={{ restaurants, homeFoods, allItems, loading, getRestaurantById }}>
+    <RestaurantContext.Provider
+      value={{
+        restaurants,
+        homeFoods,
+        allItems,
+        loading,
+        getRestaurantById,
+        addDishToRestaurant
+      }}
+    >
       {children}
     </RestaurantContext.Provider>
   );
@@ -91,6 +149,9 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
 
 export function useRestaurants() {
   const context = useContext(RestaurantContext);
-  if (context === undefined) throw new Error('useRestaurants must be used within a RestaurantProvider');
+  if (!context)
+    throw new Error(
+      'useRestaurants must be used inside Provider'
+    );
   return context;
 }

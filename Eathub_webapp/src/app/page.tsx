@@ -41,6 +41,16 @@ export default function Home() {
         </div>
       )}
 
+      {restaurants.length > 0 && (
+        <div className="mb-8">
+          <RestaurantCarousel
+            title="Restaurants"
+            restaurants={restaurants}
+            href="/restaurants"
+          />
+        </div>
+      )}
+
       <HomeFeed restaurants={restaurants} />
       <ChefsCarousel />
     </div>

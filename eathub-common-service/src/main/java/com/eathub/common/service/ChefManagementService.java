@@ -42,16 +42,18 @@ public class ChefManagementService {
     }
 
     private ChefResponseDTO mapToDTO(Chef chef) {
-        ChefResponseDTO dto = new ChefResponseDTO();
-        dto.setId(chef.getId());
-        dto.setName(chef.getName());
-        dto.setBio(chef.getBio());
-        dto.setExperience(chef.getExperience());
-        dto.setAvatarUrl(chef.getAvatarUrl());
-        dto.setRating(chef.getRating());
-        dto.setReviews(chef.getReviewsCount());
-        dto.setSpecialty(chef.getExperience()); // Mapping experience to specialty for UI
-        dto.setPreference("Veg & Non-Veg"); // Default preference
-        return dto;
+    ChefResponseDTO dto = new ChefResponseDTO();
+    dto.setId(chef.getId());
+    dto.setName(chef.getName());
+    dto.setBio(chef.getBio());
+    dto.setExperience(chef.getExperience());
+    dto.setAvatarUrl(chef.getAvatarUrl());
+    dto.setRating(chef.getRating());
+    dto.setReviews(chef.getReviewsCount());
+    
+    // Fix: These should eventually come from the database
+    dto.setSpecialty("General"); 
+    dto.setPreference("Veg & Non-Veg");
+    return dto;
     }
 }

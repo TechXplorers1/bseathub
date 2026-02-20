@@ -17,10 +17,12 @@ public class Chef {
     private String id;
 
     @OneToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id") // Use @JoinColumn for associations
     private User owner;
 
     private String name;
+    private String slug;      
+    private String specialty;
 
     @Column(columnDefinition = "TEXT")
     private String bio;

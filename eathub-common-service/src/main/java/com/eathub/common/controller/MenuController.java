@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/menu")
+@RequestMapping("/v1/menu")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:9004") 
 public class MenuController {

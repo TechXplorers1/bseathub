@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/home-food")
+@RequestMapping("/v1/home-food")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:9004") // Adjusted to standard Next.js port
 public class HomeFoodController {

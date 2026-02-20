@@ -3,6 +3,8 @@ package com.eathub.common.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -10,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "address", "legalProfile", "menuCategories"})
 @AllArgsConstructor
 @Builder
 public class Restaurant {
@@ -17,8 +20,9 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id; // Matches VARCHAR(36) in SQL
 
-    @Column(name = "owner_id", nullable = false)
-    private String ownerId;
+    @ManyToOne
+@JoinColumn(name = "owner_id")
+private User owner;
 
 
     private String name;
@@ -59,20 +63,10 @@ public class Restaurant {
     @Column(name = "image_id")
     private String imageId;
 
-    // --- Compatibility Helpers for RestaurantService ---
-
-    /**
-     * Alias for setCuisine to match RestaurantCreateRequestDTO logic
-     * used in RestaurantService.registerRestaurant
-     */
     public void setCuisineType(String cuisineType) {
         this.cuisine = cuisineType;
     }
 
-    /**
-     * Alias for getCuisine to match RestaurantResponseDTO logic
-     * used in RestaurantService.mapToResponseDTO
-     */
     public String getCuisineType() {
         return this.cuisine;
     }

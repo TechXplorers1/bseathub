@@ -24,9 +24,11 @@ public class MenuItem {
     private MenuCategory category;
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    
 
 
     @ManyToOne(fetch = FetchType.LAZY)

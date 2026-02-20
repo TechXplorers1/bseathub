@@ -1,5 +1,6 @@
 package com.eathub.common.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private UserRole role;

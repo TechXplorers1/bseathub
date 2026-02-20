@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:9004")
 public class AuthController {
 
     private final AuthService authService;
@@ -28,5 +28,11 @@ public class AuthController {
     public ResponseEntity<?> registerPartner(@RequestBody PartnerRegistrationRequest request) {
         // Spring will now be able to instantiate PartnerRegistrationRequest because it is static
         return ResponseEntity.ok(authService.registerPartner(request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
+        // The service should validate the token and return user details
+        return ResponseEntity.ok(authService.getCurrentUser(token));
     }
 }

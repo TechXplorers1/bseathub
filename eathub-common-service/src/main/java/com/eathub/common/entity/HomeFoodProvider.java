@@ -40,6 +40,6 @@ public class HomeFoodProvider {
     private String imageId;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    @JoinColumn(name = "owner_id")
+    private User owner; // Change String to User
 }

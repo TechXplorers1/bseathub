@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/v1/discovery")
+@RequestMapping("/v1/discovery")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:9004")
 public class DiscoveryController {
@@ -37,4 +37,4 @@ public class DiscoveryController {
             return ResponseEntity.internalServerError().build();
         }
     }
-}
+} 

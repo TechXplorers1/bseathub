@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
     description TEXT,
     price FLOAT NOT NULL,
     image_id VARCHAR(255),
-    is_special BOOLEAN DEFAULT FALSE,
+    is_special BOOLEAN DEFAULT TRUE,
     status VARCHAR(50),
     restaurant_id VARCHAR(36),
     home_food_id VARCHAR(36),
@@ -264,4 +264,4 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 -- changeset eathub:1.0.1
 -- Add password support for internal authentication
-ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);  

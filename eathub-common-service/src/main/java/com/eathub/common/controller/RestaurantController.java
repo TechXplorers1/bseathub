@@ -6,13 +6,16 @@ import com.eathub.common.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.eathub.common.dto.MenuItemRequestDTO;
+
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/restaurants")
+@RequestMapping("/v1/restaurants")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:9004"})
+@CrossOrigin(origins = {"http://localhost:9004"})
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -42,4 +45,19 @@ public class RestaurantController {
                 restaurantService.getRestaurantBySlug(slug)
         );
     }
+
+    @GetMapping("/{restaurantId}/stats")
+    public ResponseEntity<Map<String, Object>> getDashboardStats(@PathVariable String restaurantId) {
+        // This will return the revenue, active orders, and rating
+        return ResponseEntity.ok(restaurantService.getDashboardOverview(restaurantId));
+    }
+
+    @PostMapping("/{restaurantId}/menu-items")
+    public ResponseEntity<String> addMenuItem(
+        @PathVariable String restaurantId,
+        @RequestBody MenuItemRequestDTO request) {
+    
+    restaurantService.addDish(restaurantId, request);
+    return ResponseEntity.ok("Dish added successfully");
+}
 }

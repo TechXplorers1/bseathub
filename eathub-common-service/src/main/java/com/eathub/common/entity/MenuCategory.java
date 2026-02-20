@@ -3,6 +3,8 @@ package com.eathub.common.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
@@ -19,7 +21,7 @@ public class MenuCategory {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;

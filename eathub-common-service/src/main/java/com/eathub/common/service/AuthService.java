@@ -1,99 +1,105 @@
 package com.eathub.common.service;
 
 import com.eathub.common.dto.AuthDTOs.*;
-import com.eathub.common.entity.User;
-import com.eathub.common.entity.UserRole;
-import com.eathub.common.repository.UserRepository;
-import com.eathub.common.service.JwtService;
+import com.eathub.common.entity.*;
+import com.eathub.common.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final ChefRepository chefRepository; 
+    private final HomeFoodProviderRepository homeFoodRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // ... Existing register() and login() methods ...
-
-    // AuthService.java
-@Transactional
+    @Transactional
 public AuthResponse registerPartner(PartnerRegistrationRequest request) {
-    try {
-        if (request == null || request.getData() == null) {
-            throw new RuntimeException("Invalid request payload");
-        }
+    Map<String, Object> data = request.getData();
+    String type = request.getType();
+    String email = (String) data.get("email");
 
-        Map<String, Object> data = request.getData();
-        String email = (String) data.get("email");
-
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already registered");
-        }
-
-        // Use safe extraction to prevent NullPointerExceptions
-        String rawPassword = (String) data.get("password");
-        if (rawPassword == null) throw new RuntimeException("Password is required");
-
-        String name = "Restaurant".equalsIgnoreCase(request.getType()) 
-                      ? (String) data.getOrDefault("restaurantName", "Unknown Restaurant") 
-                      : (String) data.getOrDefault("fullName", "Unknown Partner");
-
-        User user = User.builder()
-                .name(name)
-                .email(email)
-                .password(passwordEncoder.encode(rawPassword))
-                .role(UserRole.PARTNER)
-                .build();
-
-        userRepository.save(user);
-
-        // This method will handle specific tables (Restaurants/Chefs)
-        saveSpecificPartnerData(user, request.getType(), data);
-
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getEmail(), user.getRole().name());
-
-    } catch (Exception e) {
-        // Log the actual error to your terminal
-        System.err.println("REGISTRATION ERROR: " + e.getMessage());
-        e.printStackTrace(); 
-        throw new RuntimeException(e.getMessage());
+    if (userRepository.existsByEmail(email)) {
+        throw new RuntimeException("Email already registered");
     }
+
+    // --- FIX: Logic to capture the correct Name for the User table ---
+    String displayName;
+    UserRole targetRole;
+
+    if ("Restaurant".equalsIgnoreCase(type)) {
+        targetRole = UserRole.RESTAURANT;
+        displayName = (String) data.get("restaurantName"); // Use restaurant name
+    } else if ("Home Food".equalsIgnoreCase(type)) {
+        targetRole = UserRole.HOMEFOOD;
+        displayName = (String) data.get("kitchenName"); // Use kitchen name
+    } else if ("Chef".equalsIgnoreCase(type)) {
+        targetRole = UserRole.CHEF;
+        displayName = (String) data.get("fullName"); // Use chef name
+    } else {
+        targetRole = UserRole.USER;
+        displayName = (String) data.getOrDefault("fullName", "Partner");
+    }
+
+    // Create User with the correct Name
+    User user = User.builder()
+            .name(displayName)
+            .email(email)
+            .password(passwordEncoder.encode((String) data.get("password")))
+            .role(targetRole)
+            .build();
+
+    User savedUser = userRepository.save(user);
+
+    // Store in specific tables
+    if (targetRole == UserRole.RESTAURANT) {
+        Restaurant res = new Restaurant();
+        res.setOwner(savedUser);
+        res.setName(displayName);
+        res.setSlug(generateSlug(displayName));
+        res.setCuisineType((String) data.get("cuisineType"));
+        res.setIsOpen(true);
+        restaurantRepository.save(res);
+    } 
+    else if (targetRole == UserRole.HOMEFOOD) {
+        HomeFoodProvider hfp = new HomeFoodProvider();
+        hfp.setOwner(savedUser);
+        hfp.setBrandName(displayName);
+        hfp.setSlug(generateSlug(displayName));
+        hfp.setIsActive(true);
+        homeFoodRepository.save(hfp);
+    }
+    else if (targetRole == UserRole.CHEF) {
+    Chef chef = new Chef();
+    chef.setOwner(savedUser);
+    chef.setName(displayName);
+    chef.setSlug(generateSlug(displayName));
+    chef.setSpecialty((String) data.get("specialty"));
+    chefRepository.save(chef);
 }
 
+    return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name());
+}
 
-    private void saveSpecificPartnerData(User user, String type, Map<String, Object> data) {
-        switch (type) {
-            case "Restaurant":
-                // Map fields like data.get("gstNumber"), data.get("fssaiLicenseNumber")
-                break;
-            case "Home Food":
-                // Map fields like data.get("kitchenName"), data.get("idProofNumber")
-                break;
-            case "Chef":
-                // Map fields like data.get("experience"), data.get("specialtyCuisines")
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid partner type: " + type);
-        }
+    private String generateSlug(String name) {
+        if (name == null) name = "partner";
+        return name.toLowerCase().replaceAll("[^a-z0-9]", "-") + "-" + UUID.randomUUID().toString().substring(0, 5);
     }
-    
-    // Fixed Login method from your snippet
+
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Invalid password");
         }
-
-        String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getEmail(), user.getRole().name());
+        return new AuthResponse(jwtService.generateToken(user), user.getEmail(), user.getRole().name());
     }
 }

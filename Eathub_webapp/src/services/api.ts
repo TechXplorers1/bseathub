@@ -45,3 +45,29 @@ export async function registerPartner(payload: { type: string; data: any }) {
 
     return await response.json(); // Returns AuthResponse { token, email, role }
 }
+
+export const addDishToRestaurant = async (restaurantId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/menu-items`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to add dish");
+    }
+    return res.text();
+};
+
+// Add this to your api.ts if it's missing
+export const login = async (credentials: any) => {
+    const res = await fetch(`${BASE_URL}/auth/login`, { // Using the /v1/auth/login endpoint
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+    });
+    if (!res.ok) throw new Error("Invalid email or password");
+    return res.json();
+};

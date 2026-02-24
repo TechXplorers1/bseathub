@@ -21,66 +21,77 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PlusCircle, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AddDishDialog } from '@/components/dashboard/restaurant/AddDishDialog';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import type { MenuItem as MenuItemType } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 type ExtendedMenuItem = MenuItemType & { isSpecial: boolean; status: 'Available' | 'Out of Stock' };
 
 export default function MenuPage() {
   const { getRestaurantById, addDishToRestaurant, loading } = useRestaurants();
+  const { toast } = useToast();
 
-  // FIX: Get the actual ID from localStorage (Ensure your Login page sets 'userId' or 'restaurantId')
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [menuItems, setMenuItems] = useState<ExtendedMenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
+  const [restaurant, setRestaurant] = useState<any>(null);
 
+  // Load the Restaurant ID on mount
   useEffect(() => {
-    const storedId = localStorage.getItem('userId'); // or 'restaurantId'
+    const storedId = localStorage.getItem('userId') || localStorage.getItem('restaurantId');
     if (storedId) setRestaurantId(storedId);
   }, []);
 
-  const restaurant = restaurantId ? getRestaurantById(restaurantId) : null;
+  // Function to refresh menu data
+  const refreshMenu = useCallback(async () => {
+    if (!restaurantId) return;
+    const data = await getRestaurantById(restaurantId);
+    setRestaurant(data);
 
-  useEffect(() => {
-    if (restaurant && restaurant.menu) {
-      // Flattening nested categories into a single list for the UI table
-      const allMenuItems = restaurant.menu.flatMap(category =>
-        category.items.map(item => ({
+    if (data && data.menu) {
+      const allMenuItems = data.menu.flatMap((category: any) =>
+        category.items.map((item: any) => ({
           ...item,
-          isSpecial: false,
-          status: 'Available' as const
+          isSpecial: item.isSpecial ?? false,
+          status: item.status || 'Available',
         }))
       );
       setMenuItems(allMenuItems);
     }
-  }, [restaurant]);
+  }, [restaurantId, getRestaurantById]);
 
-  const handleAddDish = async (newDishData: any) => {
-    if (!restaurantId || !restaurant) return;
+  // Initial load of menu
+  useEffect(() => {
+    refreshMenu();
+  }, [refreshMenu]);
 
-    // FIX: The backend needs categoryId (UUID), but the form gives a string name.
-    // We find the category UUID from the restaurant's existing menu categories.
-    const category = restaurant.menu.find(c => c.name === newDishData.category);
+  const handleAddDish = async (formData: DishFormValues) => {
+    if (!restaurantId) return;
+    const selectedCategory = restaurant?.menu.find(
+      (cat) => cat.title.toLowerCase() === formData.category.toLowerCase()
+    );
 
-    if (!category) {
-      alert("Error: Selected category not found for this restaurant in database.");
-      return;
+    if (!selectedCategory) {
+      throw new Error("Selected category not found in database");
     }
 
+    // 2. Prepare the payload for Spring Boot
     const payload = {
-      name: newDishData.name,
-      description: newDishData.description,
-      price: newDishData.price,
-      categoryId: category.id // Send the UUID to RestaurantService.java
+      name: formData.name,
+      description: formData.description,
+      price: formData.price,
+      categoryId: selectedCategory.id, // This is the UUID required by your DB
+      status: formData.status,
+      isSpecial: formData.isSpecial
     };
 
-    try {
-      await addDishToRestaurant(restaurantId, payload);
-    } catch (err) {
-      console.error("Failed to add dish", err);
-    }
+    // 3. Call your API service
+    await addDishToRestaurant(restaurantId, payload);
+
+    // 4. Refresh your local state so the new item appears in the table
+    // fetchMenuItems(); 
   };
 
   const handleToggleSpecial = (id: string) => {
@@ -95,7 +106,7 @@ export default function MenuPage() {
     ));
   }
 
-  if (loading && !restaurantId) {
+  if (loading && !menuItems.length) {
     return <div className="flex justify-center p-10"><Loader2 className="animate-spin" /></div>;
   }
 
@@ -106,7 +117,9 @@ export default function MenuPage() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Menu Management</CardTitle>
-              <CardDescription>Add, edit, or delete your food items for {restaurant?.name || 'your restaurant'}.</CardDescription>
+              <CardDescription>
+                Add, edit, or delete your food items for {restaurant?.name || 'your restaurant'}.
+              </CardDescription>
             </div>
             <Button onClick={() => setIsAddDishDialogOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Dish
@@ -140,7 +153,7 @@ export default function MenuPage() {
                         alt={item.name}
                         className="aspect-square rounded-md object-cover"
                         height="64"
-                        src={`https://picsum.photos/seed/${item.id}/64/64`}
+                        src={item.imageId ? `/api/images/${item.imageId}` : `https://picsum.photos/seed/${item.id}/64/64`}
                         width="64"
                       />
                     </TableCell>

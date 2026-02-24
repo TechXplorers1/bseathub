@@ -84,17 +84,42 @@ export default function MenuPage() {
     setMenuItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleAddDish = (
-    newDishData: Omit<MenuItem, 'id' | 'imageUrl' | 'isSpecial'>
-  ) => {
-    const newDish: MenuItem = {
-      ...newDishData,
-      id: `hf${Math.floor(Math.random() * 100000)}`,
-      imageUrl: 'https://picsum.photos/seed/food-new/64/64',
-      isSpecial: false,
+  // page.tsx - Update handleAddDish function
+  const handleAddDish = async (newDishData: any) => {
+    if (!restaurant || !restaurantId) return;
+
+    const category = restaurant.menu.find(
+      (c: any) => c.name.toLowerCase() === newDishData.category.toLowerCase()
+    );
+
+    if (!category) {
+      toast({
+        title: "Error",
+        description: "Category UUID not found for this name.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // UPDATED PAYLOAD: Include isSpecial and status from the form
+    const payload = {
+      name: newDishData.name,
+      description: newDishData.description,
+      price: parseFloat(newDishData.price),
+      categoryId: category.id,
+      isSpecial: newDishData.isSpecial,
+      status: newDishData.status
     };
 
-    setMenuItems((prev) => [newDish, ...prev]);
+    try {
+      await addDishToRestaurant(restaurantId, payload);
+      setIsAddDishDialogOpen(false);
+      refreshMenu();
+      toast({ title: "Saved to Database!" });
+    } catch (err) {
+      console.error("DB Save Failed:", err);
+      toast({ title: "Save Failed", variant: "destructive" });
+    }
   };
 
   /* ------------------------------------------------------------------------ */

@@ -87,14 +87,25 @@ export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps
     },
   });
 
-  const handleFormSubmit = (data: DishFormValues) => {
-    onAddDish(data);
-    toast({
-      title: 'Dish Added!',
-      description: `${data.name} has been successfully added to your menu.`,
-    });
-    form.reset();
-    onClose();
+  // Inside AddDishDialog.tsx
+  const handleFormSubmit = async (data: DishFormValues) => {
+    try {
+      // This calls the function passed from page.tsx
+      await onAddDish(data);
+
+      toast({
+        title: 'Success!',
+        description: `${data.name} has been saved to the database.`,
+      });
+      form.reset();
+      onClose();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not save the dish. Please try again.",
+      });
+    }
   };
 
   return (
@@ -110,7 +121,15 @@ export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps
         <Form {...form}>
           {/* We use flex-1 and min-h-0 to force the form to stay within the dialog bounds */}
           <form
-            onSubmit={form.handleSubmit(handleFormSubmit)}
+            onSubmit={form.handleSubmit(handleFormSubmit, (errors) => {
+              // If the button "does nothing," check your Inspect > Console!
+              console.log(" Form Validation Failed:", errors);
+              toast({
+                variant: "destructive",
+                title: "Check Form Fields",
+                description: "Please fix the errors in the form before submitting.",
+              });
+            })}
             className="flex flex-col flex-1 min-h-0"
           >
             <ScrollArea className="flex-1 px-6">

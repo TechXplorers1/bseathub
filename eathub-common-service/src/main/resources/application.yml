@@ -39,3 +39,4 @@ logging:
     org.hibernate.SQL: DEBUG
     org.springframework.web: DEBUG
     liquibase: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

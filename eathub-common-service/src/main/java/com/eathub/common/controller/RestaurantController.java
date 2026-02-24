@@ -52,7 +52,7 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getDashboardOverview(restaurantId));
     }
 
-    @PostMapping("/{restaurantId}/menu-items")
+    @PostMapping("/{restaurantId}/menu-items")  
     public ResponseEntity<String> addMenuItem(
         @PathVariable String restaurantId,
         @RequestBody MenuItemRequestDTO request) {

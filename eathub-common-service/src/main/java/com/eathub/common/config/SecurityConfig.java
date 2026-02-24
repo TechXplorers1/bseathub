@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 import java.util.List;
 
@@ -19,26 +20,28 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/v1/auth/**",
-                    "/error",
-                    "/v1/chefs/**",
-                    "/v1/restaurants/**",
-                    "/v1/home-food/**",
-                    "/v1/discovery/**",
-                    "/v1/menu/**"
-                ).permitAll() 
-                .anyRequest().authenticated()
-            );
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            // ADD THIS LINE to allow browser preflight checks
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() 
+            .requestMatchers(
+                "/v1/auth/**",
+                "/error",
+                "/v1/chefs/**",
+                "/v1/restaurants/**",
+                "/v1/home-food/**",
+                "/v1/discovery/**",
+                "/v1/menu/**"
+            ).permitAll() 
+            .anyRequest().authenticated()
+        );
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -55,8 +58,14 @@ public class SecurityConfig {
         return source;
     }
 
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // This treats passwords as plain text
+        return NoOpPasswordEncoder.getInstance();
     }
 }

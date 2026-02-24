@@ -9,8 +9,11 @@ import com.eathub.common.repository.MenuItemRepository;
 import com.eathub.common.repository.RestaurantRepository;
 import com.eathub.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -110,7 +113,10 @@ public class RestaurantService {
 public void addDish(String restaurantId, MenuItemRequestDTO dto) {
     try {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant ID " + restaurantId + " not found"));
+        .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Restaurant ID " + restaurantId + " not found"
+        ));
 
         MenuCategory category = menuCategoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category ID " + dto.getCategoryId() + " missing"));
@@ -124,6 +130,7 @@ public void addDish(String restaurantId, MenuItemRequestDTO dto) {
                 // UPDATED: Map status and isSpecial from the DTO instead of hardcoding
                 .status(dto.getStatus() != null ? dto.getStatus() : "Available")
                 .isSpecial(dto.getIsSpecial() != null ? dto.getIsSpecial() : false)
+                .imageId(dto.getImageUrl())
                 .build();
 
         menuItemRepository.save(newItem);

@@ -17,16 +17,17 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
-    }   
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-   @PostMapping("/partner/register")
+    @PostMapping("/partner/register")
     public ResponseEntity<?> registerPartner(@RequestBody PartnerRegistrationRequest request) {
-        // Spring will now be able to instantiate PartnerRegistrationRequest because it is static
+        // Spring will now be able to instantiate PartnerRegistrationRequest because it
+        // is static
         return ResponseEntity.ok(authService.registerPartner(request));
     }
 

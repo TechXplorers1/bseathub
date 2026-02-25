@@ -60,4 +60,12 @@ public class RestaurantController {
     restaurantService.addDish(restaurantId, request);
     return ResponseEntity.ok("Dish added successfully");
 }
+@GetMapping("/id/{restaurantId}")
+public ResponseEntity<RestaurantResponseDTO> getById(
+        @PathVariable String restaurantId) {
+
+    return ResponseEntity.ok(
+            restaurantService.getRestaurantById(restaurantId)
+    );
+}
 }

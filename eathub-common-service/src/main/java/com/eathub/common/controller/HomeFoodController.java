@@ -1,10 +1,12 @@
 package com.eathub.common.controller;
 
 import com.eathub.common.dto.HomeFoodRequestDTO;
+import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.dto.HomeFoodResponseDTO;
 import com.eathub.common.service.HomeFoodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -25,5 +27,14 @@ public class HomeFoodController {
     @ResponseStatus(HttpStatus.CREATED)
     public HomeFoodResponseDTO register(@RequestBody HomeFoodRequestDTO request) {
         return service.registerHomeFoodProvider(request);
+    }
+
+    @PostMapping("/{ownerId}/menu-items")
+    public ResponseEntity<String> addMenuItem(
+            @PathVariable String ownerId,
+            @RequestBody MenuItemRequestDTO request) {
+
+        service.addDish(ownerId, request);
+        return ResponseEntity.ok("Dish added successfully");
     }
 }

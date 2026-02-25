@@ -95,11 +95,25 @@ public AuthResponse registerPartner(PartnerRegistrationRequest request) {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        // if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-        //     throw new RuntimeException("Invalid password");
-        // }
-        return new AuthResponse(jwtService.generateToken(user), user.getEmail(), user.getRole().name());
+
+    User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    String restaurantId = null;
+
+    // ⭐ if user is restaurant → fetch restaurant
+    if (user.getRole() == UserRole.RESTAURANT) {
+        restaurantId = restaurantRepository
+                .findByOwnerId(user.getId())
+                .map(Restaurant::getId)
+                .orElse(null);
     }
+
+    return new AuthResponse(
+            jwtService.generateToken(user),
+            user.getEmail(),
+            user.getRole().name(),
+            restaurantId
+    );
+}
 }

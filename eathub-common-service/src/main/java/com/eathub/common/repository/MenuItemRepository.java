@@ -12,6 +12,8 @@ import java.util.List;
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, String> {
 
+    List<MenuItem> findByRestaurantId(String restaurantId);
+
     // Keep this for standard menu fetching
     List<MenuItem> findByRestaurantIdAndCategoryTitleIgnoreCase(String restaurantId, String title);
 

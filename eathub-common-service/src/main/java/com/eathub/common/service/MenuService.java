@@ -67,6 +67,13 @@ public void importMenu(List<MenuCategory> categories) {
         return mapToDTO(saved);
     }
 
+    public List<MenuItemDTO> getItemsByCategory(String restaurantId, String title) {
+        return menuItemRepository.findByRestaurantIdAndCategoryTitleIgnoreCase(restaurantId, title)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<MenuItemDTO> getAllMenuItems() {
         return menuItemRepository.findAll()
                 .stream()
@@ -86,4 +93,11 @@ public void importMenu(List<MenuCategory> categories) {
                 .imageId(item.getImageId())
                 .build();
     }
+    
+    public List<MenuItemDTO> getItemsByRestaurant(String restaurantId) {
+    return menuItemRepository.findByRestaurantId(restaurantId)
+            .stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+}
 }

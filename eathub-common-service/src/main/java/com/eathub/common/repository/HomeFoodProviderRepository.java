@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface HomeFoodProviderRepository extends JpaRepository<HomeFoodProvider, String> {
     Optional<HomeFoodProvider> findBySlug(String slug);
+
+    Optional<HomeFoodProvider> findByOwnerId(String ownerId);
 }

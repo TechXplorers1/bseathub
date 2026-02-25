@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "address", "legalProfile", "menuCategories"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "address", "legalProfile"})
 @AllArgsConstructor
 @Builder
 public class Restaurant {

@@ -44,4 +44,16 @@ public class MenuController {
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
+
+    @GetMapping("/restaurants/{restaurantId}")
+    public ResponseEntity<List<MenuItemDTO>> getItemsByRestaurant(
+            @PathVariable String restaurantId
+    ) {
+        try {
+            return ResponseEntity.ok(menuService.getItemsByRestaurant(restaurantId));
+        } catch (Exception e) {
+            System.out.println("Error getItemsByRestaurant: " + e.getMessage());
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+    }
 }

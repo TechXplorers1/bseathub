@@ -12,4 +12,8 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, Stri
 
     // Fetches categories for a specific home food provider
     List<MenuCategory> findByHomeFoodId(String homeFoodId);
+
+    java.util.Optional<MenuCategory> findByRestaurantIdAndTitleIgnoreCase(String restaurantId, String title);
+
+    java.util.Optional<MenuCategory> findByHomeFoodIdAndTitleIgnoreCase(String homeFoodId, String title);
 }

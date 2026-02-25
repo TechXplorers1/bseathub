@@ -1,5 +1,8 @@
 // src/services/api.ts
 const BASE_URL = 'http://localhost:8081/api/v1';
+const AUTH_URL = `${BASE_URL}/auth`;
+
+
 
 export const fetchRestaurants = async () => {
     const res = await fetch(`${BASE_URL}/restaurants`); // Matches @RequestMapping("/v1/restaurants")
@@ -69,5 +72,11 @@ export const login = async (credentials: any) => {
         body: JSON.stringify(credentials),
     });
     if (!res.ok) throw new Error("Invalid email or password");
+    return res.json();
+};
+
+export const fetchItemsByRestaurant = async (restaurantId: string) => {
+    const res = await fetch(`http://localhost:8081/api/v1/menu/restaurants/${restaurantId}`);
+    if (!res.ok) throw new Error("Failed to fetch restaurant menu items");
     return res.json();
 };

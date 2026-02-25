@@ -22,15 +22,18 @@ import {
 import { MoreHorizontal, PlusCircle, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useState, useEffect, useCallback } from 'react';
-import { AddDishDialog } from '@/components/dashboard/restaurant/AddDishDialog';
+import { AddDishDialog, type DishFormValues } from '@/components/dashboard/restaurant/AddDishDialog';
+
 import { useRestaurants } from '@/context/RestaurantProvider';
 import type { MenuItem as MenuItemType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import * as api from "@/services/api";
+import { fetchItemsByRestaurant } from '@/services/api';
 
 type ExtendedMenuItem = MenuItemType & { isSpecial: boolean; status: 'Available' | 'Out of Stock' };
 
 export default function MenuPage() {
-  const { getRestaurantById, addDishToRestaurant, loading } = useRestaurants();
+  const { getRestaurantById, fetchFullRestaurantData, addDishToRestaurant, loading } = useRestaurants();
   const { toast } = useToast();
 
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
@@ -38,60 +41,92 @@ export default function MenuPage() {
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<any>(null);
 
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("restaurant") || "{}");
+
+    if (!stored?.id) return;
+
+    const url = `http://localhost:8081/api/v1/menu/restaurants/${stored.id}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then((data) => {
+        const mapped = data.map((item: any) => ({
+          ...item,
+          isSpecial: item.isSpecial ?? false,
+          status: item.status || "Available",
+        }));
+
+        setMenuItems(mapped);
+      })
+      .catch(console.error);
+
+  }, []);
   // Load the Restaurant ID on mount
   useEffect(() => {
-    const storedId = localStorage.getItem('userId') || localStorage.getItem('restaurantId');
+    const storedId = localStorage.getItem('restaurantId');
     if (storedId) setRestaurantId(storedId);
   }, []);
 
   // Function to refresh menu data
   const refreshMenu = useCallback(async () => {
     if (!restaurantId) return;
-    const data = await getRestaurantById(restaurantId);
-    setRestaurant(data);
 
-    if (data && data.menu) {
-      const allMenuItems = data.menu.flatMap((category: any) =>
-        category.items.map((item: any) => ({
-          ...item,
-          isSpecial: item.isSpecial ?? false,
-          status: item.status || 'Available',
-        }))
-      );
-      setMenuItems(allMenuItems);
+    try {
+      const data = await fetchItemsByRestaurant(restaurantId);
+
+      const mappedItems = data.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        status: item.status ?? "Available",
+        isSpecial: item.isSpecial ?? false,
+        imageUrl: item.imageUrl || "/placeholder-food.jpg",
+        description: item.description,
+        category: item.categoryName
+      }));
+
+      setMenuItems(mappedItems);
+    } catch (error) {
+      console.error("Failed to refresh menu:", error);
     }
-  }, [restaurantId, getRestaurantById]);
+  }, [restaurantId]);
 
   // Initial load of menu
   useEffect(() => {
-    refreshMenu();
-  }, [refreshMenu]);
+    if (restaurantId) {
+      refreshMenu();
+    }
+  }, [restaurantId]);
 
   const handleAddDish = async (formData: DishFormValues) => {
-    if (!restaurantId) return;
-    const selectedCategory = restaurant?.menu.find(
-      (cat) => cat.title.toLowerCase() === formData.category.toLowerCase()
-    );
+    try {
+      if (!restaurantId) {
+        console.log("No restaurantId");
+        return;
+      }
 
-    if (!selectedCategory) {
-      throw new Error("Selected category not found in database");
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        price: Number(formData.price),
+        categoryName: formData.category,
+        status: formData.status,
+        isSpecial: formData.isSpecial,
+        imageUrl: formData.imageUrl || ""
+      };
+
+      console.log("Sending payload:", payload);
+
+      await addDishToRestaurant(restaurantId, payload, 'restaurant');
+
+      console.log("API success");
+
+      await refreshMenu();
+
+    } catch (e) {
+      console.error("ADD DISH ERROR:", e);
     }
-
-    // 2. Prepare the payload for Spring Boot
-    const payload = {
-      name: formData.name,
-      description: formData.description,
-      price: formData.price,
-      categoryId: selectedCategory.id, // This is the UUID required by your DB
-      status: formData.status,
-      isSpecial: formData.isSpecial
-    };
-
-    // 3. Call your API service
-    await addDishToRestaurant(restaurantId, payload);
-
-    // 4. Refresh your local state so the new item appears in the table
-    // fetchMenuItems(); 
   };
 
   const handleToggleSpecial = (id: string) => {
@@ -126,7 +161,7 @@ export default function MenuPage() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="max-h-[70vh] overflow-y-auto scrollbar-hide">
           <Table>
             <TableHeader>
               <TableRow>

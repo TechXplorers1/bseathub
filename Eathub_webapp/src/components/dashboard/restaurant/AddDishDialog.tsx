@@ -61,7 +61,8 @@ const dishSchema = z.object({
   status: z.enum(['Available', 'Out of Stock']).default('Available'),
 });
 
-type DishFormValues = z.infer<typeof dishSchema>;
+export type DishFormValues = z.infer<typeof dishSchema>;
+
 
 interface AddDishDialogProps {
   isOpen: boolean;
@@ -89,6 +90,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps
 
   // Inside AddDishDialog.tsx
   const handleFormSubmit = async (data: DishFormValues) => {
+    console.log("Submitting form with data:", data);
     try {
       // This calls the function passed from page.tsx
       await onAddDish(data);

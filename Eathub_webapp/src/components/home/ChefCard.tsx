@@ -6,22 +6,8 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, ArrowRight, ChefHat } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import type { Restaurant } from '@/lib/types';
+import type { Chef, Restaurant } from '@/lib/types';
 import { cn } from '@/lib/utils';
-
-interface Chef {
-    name: string;
-    specialty: string;
-    avatarUrl: string;
-    slug: string;
-    preference?: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
-    rating: number;
-    reviews: number;
-    restaurantName: string;
-    restaurantImageId: string;
-    categories: string[];
-    bio: string;
-}
 
 interface ChefCardProps {
     chef: Chef;
@@ -51,7 +37,7 @@ export function ChefCard({ chef }: ChefCardProps) {
                                 <Badge variant="secondary" className="flex items-center gap-1 flex-shrink-0">
                                     <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                                     <span>
-                                        {chef.rating != null ? chef.rating.toFixed(1) : "N/A"}
+                                        {chef.rating != null ? chef.rating.toFixed(1) : "0.0"}
                                     </span>
                                 </Badge>
                             </div>

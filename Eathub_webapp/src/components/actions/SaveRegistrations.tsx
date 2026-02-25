@@ -1,6 +1,6 @@
 import { ref, set } from "firebase/database";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { db, auth } from "@/firebase"; 
+import { rtdb, auth } from "@/firebase";
 
 export const registerUser = async (data: any, userType: string) => {
   try {
@@ -12,11 +12,11 @@ export const registerUser = async (data: any, userType: string) => {
     // (Note: To save images, you must upload them to Firebase Storage separately first)
     const cleanData = { ...profileData };
     const fileKeys = [
-      'profilePhoto', 'certificates', 'portfolio', 
-      'hygieneCertificate', 'menu', 'logo', 
+      'profilePhoto', 'certificates', 'portfolio',
+      'hygieneCertificate', 'menu', 'logo',
       'restaurantPhotos', 'foodLicense'
     ];
-    
+
     fileKeys.forEach(key => {
       if (cleanData[key]) {
         delete cleanData[key]; // Removing file objects to prevent errors
@@ -29,7 +29,8 @@ export const registerUser = async (data: any, userType: string) => {
 
     // 4. Save Profile to Realtime Database "Users" Table
     // We use the 'uid' as the key so the database entry matches the login account
-    await set(ref(db, `Users/${uid}`), {
+    await set(ref(rtdb, `Users/${uid}`), {
+
       ...cleanData,
       userType: userType, // "Chef", "Home Food", or "Restaurant"
       createdAt: new Date().toISOString(),
@@ -43,7 +44,7 @@ export const registerUser = async (data: any, userType: string) => {
   } catch (error: any) {
     console.error("Registration Error:", error);
     let errorMessage = "Failed to register. Please try again.";
-    
+
     if (error.code === 'auth/email-already-in-use') {
       errorMessage = "This email is already registered.";
     } else if (error.code === 'auth/weak-password') {

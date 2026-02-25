@@ -17,10 +17,14 @@ interface RestaurantContextType {
   allItems: Restaurant[];
   loading: boolean;
   getRestaurantById: (id: string) => Restaurant | undefined;
+  getRestaurantByOwnerId: (ownerId: string) => Restaurant | undefined;
+  fetchFullRestaurantData: (id: string) => Promise<Restaurant>;
   addDishToRestaurant: (
-    restaurantId: string,
-    dishData: any
+    providerId: string,
+    dishData: any,
+    type: 'restaurant' | 'home-food'
   ) => Promise<void>;
+
 }
 
 const RestaurantContext =
@@ -65,7 +69,8 @@ export function RestaurantProvider({
           services: item.services ?? ['delivery', 'pickup'],
           menu: item.menuCategories?.map((cat: any) => ({
             id: cat.id,
-            name: cat.title,
+            title: cat.title,
+
             items: cat.items ?? []
           })) ?? []
         }));
@@ -76,7 +81,8 @@ export function RestaurantProvider({
           type: 'home-food',
           menu: item.menuCategories?.map((cat: any) => ({
             id: cat.id,
-            name: cat.title,
+            title: cat.title,
+
             items: cat.items ?? []
           })) ?? []
         }));
@@ -98,16 +104,18 @@ export function RestaurantProvider({
   }, []);
 
   const addDishToRestaurant = async (
-    restaurantId: string,
-    dishData: any
+    providerId: string,
+    dishData: any,
+    type: 'restaurant' | 'home-food' = 'restaurant'
   ) => {
 
-    if (!restaurantId)
-      throw new Error("Invalid restaurant ID");
+    if (!providerId)
+      throw new Error(`Invalid ${type} ID`);
 
+    const path = type === 'restaurant' ? 'restaurants' : 'home-food';
     const response =
       await fetch(
-        `${API_BASE}/restaurants/${restaurantId}/menu-items`,
+        `${API_BASE}/${path}/${providerId}/menu-items`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -116,10 +124,12 @@ export function RestaurantProvider({
       );
 
     if (!response.ok)
-      throw new Error("Failed to add dish");
+      throw new Error(`Failed to add dish to ${type}`);
 
+    // Re-fetch all to pick up the new menu item safely
     await fetchAllData();
   };
+
 
   const restaurants =
     allItems.filter(i => i.type === 'restaurant');
@@ -131,6 +141,36 @@ export function RestaurantProvider({
     (id: string) =>
       allItems.find(r => r.id === id);
 
+  const getRestaurantByOwnerId =
+    (ownerId: string) =>
+      allItems.find(r => r.owner?.id === ownerId);
+
+  const fetchFullRestaurantData = async (id: string): Promise<Restaurant> => {
+    const response = await fetch(`${API_BASE}/restaurants/id/${id}`);
+    if (!response.ok) throw new Error("Failed to fetch full restaurant data");
+    const item = await response.json();
+
+    // Map the response to our frontend Restaurant type
+    const mapped = {
+      ...item,
+      type: item.type || 'restaurant',
+      deliveryTime: item.avgDeliveryTime ?? 30,
+      deliveryFee: item.baseDeliveryFee ?? 0,
+      reviews: item.reviewsCount ?? 0,
+      services: item.services ?? ['delivery', 'pickup'],
+      menu: item.menuCategories?.map((cat: any) => ({
+        id: cat.id,
+        title: cat.title,
+        items: cat.items ?? []
+      })) ?? []
+    };
+
+    // Update local state if it's already in the list
+    setAllItems(prev => prev.map(r => r.id === id ? mapped : r));
+
+    return mapped;
+  };
+
   return (
     <RestaurantContext.Provider
       value={{
@@ -139,6 +179,8 @@ export function RestaurantProvider({
         allItems,
         loading,
         getRestaurantById,
+        getRestaurantByOwnerId,
+        fetchFullRestaurantData,
         addDishToRestaurant
       }}
     >

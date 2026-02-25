@@ -79,7 +79,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = async () => {
     const { signOut } = await import('@/firebase');
-    signOut();
+    if (signOut) signOut();
   };
 
   const sidebarNav = [

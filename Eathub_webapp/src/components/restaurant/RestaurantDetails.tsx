@@ -164,13 +164,13 @@ export function RestaurantDetails({
   const visibleItems = filteredMenu.flatMap((category) => category.items);
   const featuredItems = visibleItems.slice(0, 3);
 
-  const filterButtons: { key: CategoryFilterKey; label: string }[] = [
+  const filterButtons = ([
     { key: 'all', label: 'All' },
     { key: 'starters', label: 'Starters' },
     { key: 'main', label: 'Main course' },
     { key: 'desserts', label: 'Desserts' },
     { key: 'beverages', label: 'Beverages' },
-  ].filter((btn) => availableFilterKeys.includes(btn.key));
+  ] as const).filter((btn) => availableFilterKeys.includes(btn.key as CategoryFilterKey));
 
   const scrollStyle = `
     .no-scrollbar {

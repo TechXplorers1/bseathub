@@ -4,6 +4,8 @@ import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore'
+import { getDatabase } from 'firebase/database'
+
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
@@ -36,9 +38,19 @@ export function getSdks(firebaseApp: FirebaseApp) {
   return {
     firebaseApp,
     auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
+    firestore: getFirestore(firebaseApp),
+    rtdb: getDatabase(firebaseApp)
   };
 }
+
+// For compatibility with components expecting direct exports
+const sdks = initializeFirebase();
+export const firebaseApp = sdks.firebaseApp;
+export const auth = sdks.auth;
+export const db = sdks.firestore; // Exporting firestore as db for compatibility
+export const rtdb = sdks.rtdb;
+
+export const signOut = () => auth.signOut();
 
 export * from './provider';
 export * from './client-provider';

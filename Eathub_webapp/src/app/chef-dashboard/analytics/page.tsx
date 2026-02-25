@@ -34,12 +34,13 @@ export default function AnalyticsPage() {
       color: 'hsl(var(--accent))',
     },
   };
-  
+
   const servicePopularityData = servicePopularity.map(service => ({
     ...service,
     name: service.name,
     bookings: service.value,
-    fill: chartConfig[service.name.toLowerCase().replace(' ', '') as keyof typeof chartConfig]?.color || 'hsl(var(--muted-foreground))',
+    fill: (chartConfig as any)[service.name.toLowerCase().replace(' ', '') as keyof typeof chartConfig]?.color || 'hsl(var(--muted-foreground))',
+
   }));
 
   return (
@@ -80,31 +81,31 @@ export default function AnalyticsPage() {
         </Card>
       </div>
       <div className="grid grid-cols-1 gap-6">
-          <Card>
+        <Card>
           <CardHeader>
-              <CardTitle>Top Services by Bookings</CardTitle>
+            <CardTitle>Top Services by Bookings</CardTitle>
           </CardHeader>
           <CardContent>
-              <Table>
+            <Table>
               <TableHeader>
-                  <TableRow>
+                <TableRow>
                   <TableHead>Service</TableHead>
                   <TableHead className="text-right">Bookings</TableHead>
-                  </TableRow>
+                </TableRow>
               </TableHeader>
               <TableBody>
-                  {servicePopularity.map((service) => (
+                {servicePopularity.map((service) => (
                   <TableRow key={service.name}>
-                      <TableCell className="font-medium">{service.name}</TableCell>
-                      <TableCell className="text-right">
+                    <TableCell className="font-medium">{service.name}</TableCell>
+                    <TableCell className="text-right">
                       {service.value}
-                      </TableCell>
+                    </TableCell>
                   </TableRow>
-                  ))}
+                ))}
               </TableBody>
-              </Table>
+            </Table>
           </CardContent>
-          </Card>
+        </Card>
       </div>
     </div>
   );

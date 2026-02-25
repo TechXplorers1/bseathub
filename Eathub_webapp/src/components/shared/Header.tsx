@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import {
   Dialog,
   DialogContent,
@@ -50,7 +51,12 @@ import {
 import { allRestaurants, allHomeFoods } from '@/lib/data';
 import type { Chef } from '@/lib/types';
 
-export function Header() {
+interface HeaderProps {
+  className?: string;
+}
+
+export function Header({ className }: HeaderProps) {
+
   const { itemCount } = useCart();
   const { location, setLocation } = useLocation();
   const router = useRouter();
@@ -181,7 +187,8 @@ export function Header() {
   const hasNotifications = true;
 
   return (
-    <header className="fixed top-0 w-full z-50 border-b bg-background shadow-md">
+    <header className={cn("fixed top-0 w-full z-50 border-b bg-background shadow-md", className)}>
+
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
 
         {/* LOGO */}

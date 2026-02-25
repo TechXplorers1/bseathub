@@ -18,9 +18,12 @@ export interface Restaurant {
   services: ('delivery' | 'pickup')[];
   menu: MenuCategory[];
   type: RestaurantType;
+  isOpen?: boolean;
+  owner?: { id: string };
 }
 
 export interface MenuCategory {
+  id?: string;
   title: string;
   items: MenuItem[];
 }
@@ -50,13 +53,16 @@ export interface Order {
 }
 
 export interface Chef {
-  id: string;
+  id?: string;
   name: string;
   specialty: string;
   avatarUrl: string;
   slug: string;
-  preference: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
-  rating: number;
-  reviews: number;
-  bio: string;
+  preference?: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
+  rating?: number;
+  reviews?: number;
+  bio?: string;
+  restaurantName?: string;
+  restaurantImageId?: string;
+  categories?: string[];
 }

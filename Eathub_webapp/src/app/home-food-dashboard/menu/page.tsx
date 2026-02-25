@@ -30,15 +30,56 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { AddDishDialog } from '@/components/dashboard/home-food/AddDishDialog';
+import { useToast } from '@/hooks/use-toast';
+import { addDishToRestaurant } from '@/services/api';
+import { useRestaurants } from '@/context/RestaurantProvider';
 
 export type MenuItem = (typeof initialMenuItems)[number];
 
 export default function MenuPage() {
+  const { fetchFullRestaurantData, addDishToRestaurant, loading } = useRestaurants();
   const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
+
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [restaurant, setRestaurant] = useState<any>(null);
+
+  // Load the Provider ID on mount
+  useEffect(() => {
+    const storedId = localStorage.getItem('userId') || localStorage.getItem('homeFoodId');
+    if (storedId) setRestaurantId(storedId);
+  }, []);
+
+  // Function to refresh menu data
+  const refreshMenu = useCallback(async () => {
+    if (!restaurantId) return;
+    try {
+      const data = await fetchFullRestaurantData(restaurantId);
+      setRestaurant(data);
+
+      if (data && data.menu) {
+        const allMenuItems = data.menu.flatMap((category: any) =>
+          category.items.map((item: any) => ({
+            ...item,
+            isSpecial: item.isSpecial ?? false,
+            status: item.status || 'Available',
+          }))
+        );
+        setMenuItems(allMenuItems);
+      }
+    } catch (error) {
+      console.error("Failed to refresh menu:", error);
+    }
+  }, [restaurantId, fetchFullRestaurantData]);
+
+  // Initial load of menu
+  useEffect(() => {
+    refreshMenu();
+  }, [refreshMenu]);
 
   /* ----------------------------- SEARCH LOGIC ----------------------------- */
 
@@ -88,37 +129,25 @@ export default function MenuPage() {
   const handleAddDish = async (newDishData: any) => {
     if (!restaurant || !restaurantId) return;
 
-    const category = restaurant.menu.find(
-      (c: any) => c.name.toLowerCase() === newDishData.category.toLowerCase()
-    );
-
-    if (!category) {
-      toast({
-        title: "Error",
-        description: "Category UUID not found for this name.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // UPDATED PAYLOAD: Include isSpecial and status from the form
-    const payload = {
-      name: newDishData.name,
-      description: newDishData.description,
-      price: parseFloat(newDishData.price),
-      categoryId: category.id,
-      isSpecial: newDishData.isSpecial,
-      status: newDishData.status
-    };
-
     try {
-      await addDishToRestaurant(restaurantId, payload);
+      const payload = {
+        name: newDishData.name,
+        description: newDishData.description,
+        price: parseFloat(newDishData.price),
+        categoryName: newDishData.category,
+        isSpecial: newDishData.isSpecial,
+        status: newDishData.status,
+        imageUrl: newDishData.imageUrl || ""
+      };
+
+      await addDishToRestaurant(restaurantId, payload, 'home-food');
+
       setIsAddDishDialogOpen(false);
-      refreshMenu();
+      await refreshMenu();
       toast({ title: "Saved to Database!" });
-    } catch (err) {
+    } catch (err: any) {
       console.error("DB Save Failed:", err);
-      toast({ title: "Save Failed", variant: "destructive" });
+      toast({ title: "Save Failed", description: err.message, variant: "destructive" });
     }
   };
 

@@ -1,6 +1,8 @@
 package com.eathub.common.controller;
 
 import com.eathub.common.dto.MenuItemDTO;
+import com.eathub.common.dto.MenuItemRequestDTO;
+import com.eathub.common.dto.MenuResponseDTO;
 import com.eathub.common.entity.MenuCategory;
 import com.eathub.common.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/menu")
@@ -38,8 +42,6 @@ public class MenuController {
 
             return ResponseEntity.ok(items);
         } catch (Exception e) {
-            // ✅ Prevents UI breaking due to 500
-            // ✅ You can also log this error
             System.out.println("Error in getItemsByCategory API: " + e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
@@ -55,5 +57,28 @@ public class MenuController {
             System.out.println("Error getItemsByRestaurant: " + e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
+    }
+
+    @PutMapping("/{id}")
+    public MenuItemDTO update(
+        @PathVariable String id,
+        @RequestBody MenuItemRequestDTO dto
+    ){
+        return menuService.update(id, dto);
+    }
+
+    @PatchMapping("/{id}/featured")
+    public void updateFeatured(@PathVariable String id, @RequestBody Map<String, Boolean> body){
+        menuService.updateFeatured(id, body.get("isSpecial"));
+    }
+
+    @PatchMapping("/{id}/status")
+    public void updateStatus(@PathVariable String id, @RequestBody Map<String, String> body){
+        menuService.updateStatus(id, body.get("status"));
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id){
+        menuService.delete(id);
     }
 }

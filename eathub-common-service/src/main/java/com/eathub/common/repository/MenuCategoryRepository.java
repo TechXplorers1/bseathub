@@ -16,4 +16,6 @@ public interface MenuCategoryRepository extends JpaRepository<MenuCategory, Stri
     java.util.Optional<MenuCategory> findByRestaurantIdAndTitleIgnoreCase(String restaurantId, String title);
 
     java.util.Optional<MenuCategory> findByHomeFoodIdAndTitleIgnoreCase(String homeFoodId, String title);
+
+    java.util.Optional<MenuCategory> findByTitle(String title);
 }

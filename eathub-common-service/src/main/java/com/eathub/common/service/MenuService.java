@@ -2,6 +2,7 @@ package com.eathub.common.service;
 
 import com.eathub.common.dto.MenuItemDTO;
 import com.eathub.common.dto.MenuItemRequestDTO;
+import com.eathub.common.dto.MenuResponseDTO;
 import com.eathub.common.entity.MenuCategory;
 import com.eathub.common.entity.MenuItem;
 import com.eathub.common.entity.Restaurant;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID; 
 import java.util.stream.Collectors;
 
 @Service
@@ -99,5 +101,62 @@ public void importMenu(List<MenuCategory> categories) {
             .stream()
             .map(this::mapToDTO)
             .collect(Collectors.toList());
-}
+    }
+
+    // ================= CRUD UPDATE METHODS =================
+
+    public MenuItemDTO update(String id, MenuItemRequestDTO dto) {
+
+        MenuItem item = menuItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        item.setName(dto.getName());
+        item.setDescription(dto.getDescription());
+        item.setPrice(dto.getPrice());
+        item.setIsSpecial(dto.getIsSpecial());
+        item.setStatus(dto.getStatus());
+
+        if (dto.getCategoryName() != null) {
+            MenuCategory category = menuCategoryRepository.findByTitle(dto.getCategoryName())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            item.setCategory(category);
+        }
+
+        menuItemRepository.save(item);
+
+        return mapToDTO(item);
+    }
+
+    public void updateFeatured(String id, Boolean isSpecial) {
+        MenuItem item = menuItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        item.setIsSpecial(isSpecial);
+        menuItemRepository.save(item);
+    }
+
+    public void updateStatus(String id, String status) {
+        MenuItem item = menuItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        item.setStatus(status);
+        menuItemRepository.save(item);
+    }
+
+    public void delete(String id) {
+        menuItemRepository.deleteById(id);
+    }
+
+    // RESPONSE MAPPER (missing before)
+    private MenuResponseDTO mapToResponse(MenuItem item) {
+        return MenuResponseDTO.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .price(item.getPrice())
+                .status(item.getStatus())
+                .isSpecial(item.getIsSpecial())
+                .category(item.getCategory() != null ? item.getCategory().getTitle() : null)
+                .build();
+    }
 }

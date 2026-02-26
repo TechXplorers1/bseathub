@@ -68,16 +68,17 @@ interface AddDishDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onAddDish: (data: DishFormValues) => void;
+  defaultValues?: DishFormValues;
 }
 
-export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps) {
+export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: AddDishDialogProps) {
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
   const form = useForm<DishFormValues>({
     resolver: zodResolver(dishSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       name: '',
       description: '',
       price: 0,
@@ -87,6 +88,12 @@ export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps
       status: 'Available',
     },
   });
+
+  React.useEffect(() => {
+    if (defaultValues) {
+      form.reset(defaultValues);
+    }
+  }, [defaultValues, form]);
 
   // Inside AddDishDialog.tsx
   const handleFormSubmit = async (data: DishFormValues) => {
@@ -173,7 +180,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish }: AddDishDialogProps
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-orange-600 font-semibold">Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select value={field.value} onValueChange={field.onChange}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select category" />

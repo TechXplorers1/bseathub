@@ -40,6 +40,7 @@ export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<ExtendedMenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<ExtendedMenuItem | null>(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("restaurant") || "{}");
@@ -101,10 +102,7 @@ export default function MenuPage() {
 
   const handleAddDish = async (formData: DishFormValues) => {
     try {
-      if (!restaurantId) {
-        console.log("No restaurantId");
-        return;
-      }
+      if (!restaurantId) return;
 
       const payload = {
         name: formData.name,
@@ -116,30 +114,53 @@ export default function MenuPage() {
         imageUrl: formData.imageUrl || ""
       };
 
-      console.log("Sending payload:", payload);
+      console.log("Payload:", payload);
 
-      await addDishToRestaurant(restaurantId, payload, 'restaurant');
+      // ✅ EDIT MODE
+      if (editingItem) {
+        await api.updateMenuItem(editingItem.id, payload);
+        toast({ title: "Dish updated successfully" });
+      }
+      // ✅ ADD MODE
+      else {
+        await addDishToRestaurant(restaurantId, payload, "restaurant");
+        toast({ title: "Dish added successfully" });
+      }
 
-      console.log("API success");
-
+      setEditingItem(null);
+      setIsAddDishDialogOpen(false);
       await refreshMenu();
 
     } catch (e) {
-      console.error("ADD DISH ERROR:", e);
+      console.error("SAVE DISH ERROR:", e);
     }
   };
 
-  const handleToggleSpecial = (id: string) => {
-    setMenuItems(menuItems.map(item =>
-      item.id === id ? { ...item, isSpecial: !item.isSpecial } : item
-    ));
+  const handleToggleSpecial = async (item: ExtendedMenuItem) => {
+    const newValue = !item.isSpecial;
+
+    await api.toggleFeatured(item.id, newValue);
+
+    setMenuItems(prev =>
+      prev.map(i => i.id === item.id ? { ...i, isSpecial: newValue } : i)
+    );
   };
 
-  const handleToggleStatus = (id: string) => {
-    setMenuItems(menuItems.map(item =>
-      item.id === id ? { ...item, status: item.status === 'Available' ? 'Out of Stock' : 'Available' } : item
-    ));
-  }
+  const handleToggleStatus = async (item: ExtendedMenuItem) => {
+    const newStatus = item.status === 'Available'
+      ? 'Out of Stock'
+      : 'Available';
+
+    await api.updateStatus(item.id, newStatus);
+
+    setMenuItems(prev =>
+      prev.map(i => i.id === item.id ? { ...i, status: newStatus } : i)
+    );
+  };
+  const handleDelete = async (id: string) => {
+    await api.deleteMenuItem(id);
+    await refreshMenu();
+  };
 
   if (loading && !menuItems.length) {
     return <div className="flex justify-center p-10"><Loader2 className="animate-spin" /></div>;
@@ -213,15 +234,27 @@ export default function MenuPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleSpecial(item.id)}>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEditingItem(item);
+                              setIsAddDishDialogOpen(true);
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleToggleSpecial(item)}>
                             {item.isSpecial ? "Remove Featured" : "Mark as Featured"}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleStatus(item.id)}>
+                          <DropdownMenuItem onClick={() => handleToggleStatus(item)}>
                             {item.status === 'Available' ? "Mark Out of Stock" : "Mark Available"}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Delete
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -234,8 +267,24 @@ export default function MenuPage() {
       </Card>
       <AddDishDialog
         isOpen={isAddDishDialogOpen}
-        onClose={() => setIsAddDishDialogOpen(false)}
+        onClose={() => {
+          setIsAddDishDialogOpen(false);
+          setEditingItem(null);
+        }}
         onAddDish={handleAddDish}
+        defaultValues={
+          editingItem
+            ? {
+              name: editingItem.name ?? "",
+              description: editingItem.description ?? "",
+              price: editingItem.price ?? 0,
+              category: editingItem.category ?? "",
+              status: editingItem.status ?? "Available",
+              isSpecial: editingItem.isSpecial ?? false,
+              imageUrl: editingItem.imageId ?? ""
+            }
+            : undefined
+        }
       />
     </>
   );

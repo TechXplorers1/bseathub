@@ -80,3 +80,46 @@ export const fetchItemsByRestaurant = async (restaurantId: string) => {
     if (!res.ok) throw new Error("Failed to fetch restaurant menu items");
     return res.json();
 };
+
+export const updateMenuItem = async (menuItemId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/menu/${menuItemId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        const error = await res.text();
+        throw new Error(error || "Failed to update menu item");
+    }
+
+    return res.json();
+};
+
+export const deleteMenuItem = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/menu/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Failed to delete menu item");
+};
+
+export const toggleFeatured = async (id: string, isSpecial: boolean) => {
+    const res = await fetch(`${BASE_URL}/menu/${id}/featured`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isSpecial }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update featured");
+};
+
+export const updateStatus = async (id: string, status: string) => {
+    const res = await fetch(`${BASE_URL}/menu/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update status");
+};

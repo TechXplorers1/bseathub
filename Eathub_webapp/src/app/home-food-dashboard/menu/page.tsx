@@ -22,7 +22,7 @@ import {
 import { MoreHorizontal, PlusCircle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
-import { menuItems as initialMenuItems } from '@/lib/home-food-dashboard-data';
+import { menuItems as mockMenuItems } from '@/lib/home-food-dashboard-data';
 import {
   Card,
   CardHeader,
@@ -33,53 +33,88 @@ import {
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { AddDishDialog } from '@/components/dashboard/home-food/AddDishDialog';
 import { useToast } from '@/hooks/use-toast';
-import { addDishToRestaurant } from '@/services/api';
-import { useRestaurants } from '@/context/RestaurantProvider';
+import {
+  addHomeFoodDish,
+  fetchHomeFoodMenu,
+  updateMenuItem,
+  deleteMenuItem,
+  toggleFeatured,
+  updateStatus
+} from '@/services/api';
 
-export type MenuItem = (typeof initialMenuItems)[number];
+export type MenuItem = {
+  id: string;
+  name: string;
+  price: number;
+  status: string;
+  imageUrl: string;
+  isSpecial: boolean;
+  description?: string;
+  categoryName?: string;
+  category?: string;
+};
 
 export default function MenuPage() {
-  const { fetchFullRestaurantData, addDishToRestaurant, loading } = useRestaurants();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState<MenuItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
-  const [restaurant, setRestaurant] = useState<any>(null);
+  const [providerId, setProviderId] = useState<string | null>(null);
 
   // Load the Provider ID on mount
   useEffect(() => {
-    const storedId = localStorage.getItem('userId') || localStorage.getItem('homeFoodId');
-    if (storedId) setRestaurantId(storedId);
+    // Only use homeFoodId - falling back to userId/ownerId causes 500 errors on the Home Food dashboard
+    const rawId = localStorage.getItem('homeFoodId');
+    const id = rawId ? rawId.trim() : null;
+
+    if (id) {
+      setProviderId(id);
+    } else {
+      console.warn("Home Food Provider ID not found in localStorage.");
+      setMenuItems(mockMenuItems);
+      setIsLoading(false);
+    }
   }, []);
 
-  // Function to refresh menu data
+  // Function to refresh menu data from Backend
   const refreshMenu = useCallback(async () => {
-    if (!restaurantId) return;
-    try {
-      const data = await fetchFullRestaurantData(restaurantId);
-      setRestaurant(data);
+    if (!providerId) return;
 
-      if (data && data.menu) {
-        const allMenuItems = data.menu.flatMap((category: any) =>
-          category.items.map((item: any) => ({
-            ...item,
-            isSpecial: item.isSpecial ?? false,
-            status: item.status || 'Available',
-          }))
-        );
-        setMenuItems(allMenuItems);
+    setIsLoading(true);
+    try {
+      const data = await fetchHomeFoodMenu(providerId);
+      if (Array.isArray(data)) {
+        const mappedItems = data.map((item: any) => ({
+          ...item,
+          imageUrl: item.imageId || item.imageUrl || "/placeholder-dish.jpg",
+          categoryName: item.category, // Backend DTO returns category title as "category"
+          isSpecial: item.isSpecial ?? false,
+          status: item.status || 'Available',
+        }));
+        setMenuItems(mappedItems);
       }
     } catch (error) {
       console.error("Failed to refresh menu:", error);
+      toast({
+        title: "Fetch Failed",
+        description: error instanceof Error ? error.message : "Could not load menu from server. Showing local data.",
+        variant: "destructive"
+      });
+      setMenuItems(mockMenuItems);
+    } finally {
+      setIsLoading(false);
     }
-  }, [restaurantId, fetchFullRestaurantData]);
+  }, [providerId, toast]);
 
   // Initial load of menu
   useEffect(() => {
-    refreshMenu();
-  }, [refreshMenu]);
+    if (providerId) {
+      refreshMenu();
+    }
+  }, [providerId, refreshMenu]);
 
   /* ----------------------------- SEARCH LOGIC ----------------------------- */
 
@@ -90,64 +125,98 @@ export default function MenuPage() {
 
     return menuItems.filter((item) =>
       item.name.toLowerCase().includes(query) ||
-      item.status.toLowerCase().includes(query) ||
+      (item.status && item.status.toLowerCase().includes(query)) ||
       item.price.toString().includes(query)
     );
   }, [menuItems, searchQuery]);
 
+
+
   /* ----------------------------- ACTIONS ---------------------------------- */
 
-  const handleToggleSpecial = (id: string) => {
-    setMenuItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isSpecial: !item.isSpecial } : item
-      )
-    );
+  const handleToggleSpecial = async (id: string, currentStatus: boolean) => {
+    try {
+      await toggleFeatured(id, !currentStatus);
+      await refreshMenu();
+      toast({ title: `Marked as ${!currentStatus ? 'Special' : 'Regular'}` });
+    } catch (error: any) {
+      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    }
   };
 
-  const handleToggleStatus = (id: string) => {
-    setMenuItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-            ...item,
-            status:
-              item.status === 'Available'
-                ? 'Out of Stock'
-                : 'Available',
-          }
-          : item
-      )
-    );
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'Available' ? 'Out of Stock' : 'Available';
+    try {
+      await updateStatus(id, newStatus);
+      await refreshMenu();
+      toast({ title: `Status updated to ${newStatus}` });
+    } catch (error: any) {
+      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setMenuItems((prev) => prev.filter((item) => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this dish?")) return;
+    try {
+      await deleteMenuItem(id);
+      await refreshMenu();
+      toast({ title: "Dish Deleted" });
+    } catch (error: any) {
+      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+    }
   };
 
-  // page.tsx - Update handleAddDish function
-  const handleAddDish = async (newDishData: any) => {
-    if (!restaurant || !restaurantId) return;
+  const handleEdit = (item: MenuItem) => {
+    setEditingDish(item);
+    setIsAddDishDialogOpen(true);
+  };
+
+  const handleSaveDish = async (formData: any) => {
+    console.log("DEBUG: handleSaveDish triggered with ProviderID:", providerId);
+    if (!providerId) {
+      toast({ title: "Error", description: "Provider ID not found. Please log in again.", variant: "destructive" });
+      return;
+    }
 
     try {
       const payload = {
-        name: newDishData.name,
-        description: newDishData.description,
-        price: parseFloat(newDishData.price),
-        categoryName: newDishData.category,
-        isSpecial: newDishData.isSpecial,
-        status: newDishData.status,
-        imageUrl: newDishData.imageUrl || ""
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        categoryName: formData.category, // Matches field 'category' in AddDishDialog
+        isSpecial: formData.isSpecial,
+        status: formData.status,
+        imageUrl: formData.imageUrl      // Matches field 'imageUrl' in AddDishDialog
       };
 
-      await addDishToRestaurant(restaurantId, payload, 'home-food');
+      console.log("DEBUG: Prepared Payload:", payload);
+
+      if (editingDish) {
+        console.log("DEBUG: Updating existing dish:", editingDish.id);
+        await updateMenuItem(editingDish.id, payload);
+        toast({ title: "Dish Updated!" });
+      } else {
+        console.log("DEBUG: Adding new dish via addHomeFoodDish");
+        const response = await addHomeFoodDish(providerId, payload);
+        if (!response.ok) {
+          const error = await response.text();
+          console.error("DEBUG: Save Failed at API:", error);
+          throw new Error(error || "Failed to save dish");
+        }
+        toast({ title: "Dish Added!" });
+      }
 
       setIsAddDishDialogOpen(false);
+      setEditingDish(null);
       await refreshMenu();
-      toast({ title: "Saved to Database!" });
+
     } catch (err: any) {
-      console.error("DB Save Failed:", err);
-      toast({ title: "Save Failed", description: err.message, variant: "destructive" });
+      console.error("Save Failed:", err);
+      toast({
+        title: "Save Failed",
+        description: err.message,
+        variant: "destructive"
+      });
     }
   };
 
@@ -178,7 +247,7 @@ export default function MenuPage() {
                 />
               </div>
 
-              <Button onClick={() => setIsAddDishDialogOpen(true)}>
+              <Button onClick={() => { setEditingDish(null); setIsAddDishDialogOpen(true); }}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add New Dish
               </Button>
@@ -186,136 +255,153 @@ export default function MenuPage() {
           </div>
         </CardHeader>
 
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Image</span>
-                </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Today's Special</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Price
-                </TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {filteredMenuItems.length === 0 ? (
+        <CardContent className="p-0">
+          <div className="w-full overflow-x-auto">
+            <Table className="min-w-[700px]">
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground py-8"
-                  >
-                    No items found
-                  </TableCell>
+                  <TableHead className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Image</span>
+                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Today's Special</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Price
+                  </TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
-              ) : (
-                filteredMenuItems.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="hidden sm:table-cell">
-                      <Image
-                        alt={item.name}
-                        className="aspect-square rounded-md object-cover"
-                        height={64}
-                        width={64}
-                        src={item.imageUrl}
-                      />
-                    </TableCell>
+              </TableHeader>
 
-                    <TableCell className="font-medium">
-                      {item.name}
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={
-                          item.status === 'Available'
-                            ? 'secondary'
-                            : 'outline'
-                        }
-                      >
-                        {item.status}
-                      </Badge>
-                    </TableCell>
-
-                    <TableCell>
-                      {item.isSpecial && (
-                        <Badge variant="default">Special</Badge>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="hidden md:table-cell">
-                      ${item.price.toFixed(2)}
-                    </TableCell>
-
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>
-                            Actions
-                          </DropdownMenuLabel>
-
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleToggleSpecial(item.id)
-                            }
-                          >
-                            {item.isSpecial
-                              ? 'Remove as Special'
-                              : 'Mark as Special'}
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleToggleStatus(item.id)
-                            }
-                          >
-                            {item.status === 'Available'
-                              ? 'Mark as Out of Stock'
-                              : 'Mark as Available'}
-                          </DropdownMenuItem>
-
-                          <DropdownMenuSeparator />
-
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      Loading menu...
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : filteredMenuItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-muted-foreground py-8"
+                    >
+                      No items found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredMenuItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="relative h-16 w-16 overflow-hidden rounded-md border">
+                          <Image
+                            alt={item.name}
+                            className="object-cover"
+                            fill
+                            src={item.imageUrl || "/placeholder-dish.jpg"}
+                          />
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="font-medium">
+                        <div>
+                          {item.name}
+                          {item.categoryName && (
+                            <div className="text-xs text-muted-foreground font-normal">
+                              {item.categoryName}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <Badge
+                          variant={
+                            item.status === 'Available'
+                              ? 'secondary'
+                              : 'outline'
+                          }
+                        >
+                          {item.status}
+                        </Badge>
+                      </TableCell>
+
+                      <TableCell>
+                        {item.isSpecial && (
+                          <Badge variant="default">Special</Badge>
+                        )}
+                      </TableCell>
+
+                      <TableCell className="hidden md:table-cell">
+                        ${item.price.toFixed(2)}
+                      </TableCell>
+
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>
+                              Actions
+                            </DropdownMenuLabel>
+
+                            <DropdownMenuItem onClick={() => handleEdit(item)}>Edit</DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleToggleSpecial(item.id, item.isSpecial)
+                              }
+                            >
+                              {item.isSpecial
+                                ? 'Remove as Special'
+                                : 'Mark as Special'}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleToggleStatus(item.id, item.status)
+                              }
+                            >
+                              {item.status === 'Available'
+                                ? 'Mark as Out of Stock'
+                                : 'Mark as Available'}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator />
+
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
       <AddDishDialog
         isOpen={isAddDishDialogOpen}
-        onClose={() => setIsAddDishDialogOpen(false)}
-        onAddDish={handleAddDish}
+        onClose={() => { setIsAddDishDialogOpen(false); setEditingDish(null); }}
+        onAddDish={handleSaveDish}
+        initialData={editingDish}
       />
     </>
   );

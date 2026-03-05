@@ -16,7 +16,12 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   const services = restaurant.services || [];
 
   return (
-    <Link href={`/restaurant/${restaurant.slug}`} className="flex group">
+    <Link
+      href={`/restaurant/${restaurant.slug}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex group"
+    >
       <Card className="overflow-hidden transition-all hover:shadow-xl w-full flex flex-col border-muted/60">
         <div className="relative h-48 w-full overflow-hidden">
           <Image

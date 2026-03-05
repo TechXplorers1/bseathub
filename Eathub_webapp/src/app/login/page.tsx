@@ -137,8 +137,13 @@ export default function LoginPage() {
       localStorage.setItem('userEmail', response.email);
       localStorage.setItem('eathubLoggedIn', 'true');
 
-      if (response.restaurantId) {
-        localStorage.setItem('restaurantId', response.restaurantId);
+      // Store Specific ID for Dashboards
+      if (response.providerId) {
+        if (response.role === 'RESTAURANT') {
+          localStorage.setItem('restaurantId', response.providerId);
+        } else if (response.role === 'HOMEFOOD') {
+          localStorage.setItem('homeFoodId', response.providerId);
+        }
       }
 
       // Notify other components (like Header) that auth state changed

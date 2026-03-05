@@ -123,3 +123,47 @@ export const updateStatus = async (id: string, status: string) => {
 
     if (!res.ok) throw new Error("Failed to update status");
 };
+
+
+export const addHomeFoodDish = async (providerId: string, payload: any) => {
+    const url = `http://localhost:8081/api/v1/home-food/${providerId}/menu-items`;
+    console.log("DEBUG: addHomeFoodDish calling URL:", url);
+    console.log("DEBUG: Payload:", payload);
+    const res = await fetch(
+        url,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        }
+    );
+
+    if (!res.ok) {
+        const error = await res.text();
+        console.error("DEBUG: addHomeFoodDish response NOT OK:", res.status, error);
+        throw new Error(error || "Failed to add dish");
+    }
+
+    return res;
+};
+
+export const fetchHomeFoodMenu = async (providerId: string) => {
+    const res = await fetch(
+        `http://localhost:8081/api/v1/home-food/${providerId}/menu-items`
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch menu");
+
+    return res.json();
+};
+export const fetchHomeFoodCategories = async (providerId: string) => {
+    const res = await fetch(
+        `http://localhost:8081/api/v1/menu/categories/home-food/${providerId}`
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch categories");
+
+    return res.json();
+};

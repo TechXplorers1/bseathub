@@ -29,7 +29,7 @@ public class MenuCategory {
 
     @ManyToOne
     @JoinColumn(name = "home_food_id")
-    private HomeFoodProvider homeFood;
+    private HomeFoodProvider homeFoodProvider;
 
     private String title;
 

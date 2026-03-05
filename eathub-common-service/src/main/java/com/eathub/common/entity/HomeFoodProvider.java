@@ -1,5 +1,7 @@
 package com.eathub.common.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -42,4 +44,7 @@ public class HomeFoodProvider {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner; // Change String to User
+
+    @OneToMany(mappedBy = "homeFoodProvider", cascade = CascadeType.ALL)
+    private Set<MenuCategory> categories;
 }

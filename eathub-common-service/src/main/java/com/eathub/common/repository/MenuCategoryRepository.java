@@ -3,19 +3,26 @@ package com.eathub.common.repository;
 import com.eathub.common.entity.MenuCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MenuCategoryRepository extends JpaRepository<MenuCategory, String> {
-    // Fetches categories for a specific restaurant to display on its menu page
-    List<MenuCategory> findByRestaurantId(String restaurantId);
 
-    // Fetches categories for a specific home food provider
-    List<MenuCategory> findByHomeFoodId(String homeFoodId);
+    List<MenuCategory> findByRestaurant_Id(String restaurantId);
 
-    java.util.Optional<MenuCategory> findByRestaurantIdAndTitleIgnoreCase(String restaurantId, String title);
+    List<MenuCategory> findByHomeFoodProvider_Id(String homeFoodId);
 
-    java.util.Optional<MenuCategory> findByHomeFoodIdAndTitleIgnoreCase(String homeFoodId, String title);
+    Optional<MenuCategory> findByRestaurant_IdAndTitleIgnoreCase(
+            String restaurantId,
+            String title
+    );
 
-    java.util.Optional<MenuCategory> findByTitle(String title);
+    Optional<MenuCategory> findByHomeFoodProvider_IdAndTitleIgnoreCase(
+            String homeFoodId,
+            String title
+    );
+
+    Optional<MenuCategory> findByTitle(String title);
 }

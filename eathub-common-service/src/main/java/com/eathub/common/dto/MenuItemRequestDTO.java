@@ -18,4 +18,5 @@ public class MenuItemRequestDTO {
     private String status; // Added to match frontend
     private Boolean isSpecial;
     private String imageUrl;
+    private String homeFoodId;
 }

@@ -2,6 +2,7 @@ package com.eathub.common.service;
 
 import com.eathub.common.dto.HomeFoodRequestDTO;
 import com.eathub.common.dto.HomeFoodResponseDTO;
+import com.eathub.common.dto.MenuItemDTO;
 import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.entity.MenuCategory;
 import com.eathub.common.entity.MenuItem;
@@ -22,103 +23,177 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeFoodService {
 
-    private final HomeFoodProviderRepository repository;
-    private final UserRepository userRepository;
-    private final MenuCategoryRepository menuCategoryRepository;
-    private final MenuItemRepository menuItemRepository;
+        private final HomeFoodProviderRepository repository;
+        private final UserRepository userRepository;
+        private final MenuCategoryRepository menuCategoryRepository;
+        private final MenuItemRepository menuItemRepository;
 
-    /**
-     * Retrieves all Home Food Providers from the database.
-     */
-    public List<HomeFoodResponseDTO> getAllHomeFoods() {
-        return repository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
+        // ================= GET ALL PROVIDERS =================
 
-    /**
-     * Pushes new Home Food Provider data into the database.
-     * This is called when a chef joins the app.
-     */
-    @Transactional
-    public HomeFoodResponseDTO registerHomeFoodProvider(HomeFoodRequestDTO dto) {
-        // 1. Verify the User (Owner) exists
-        User owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getOwnerId()));
-
-        // 2. Map Request DTO to Entity
-        HomeFoodProvider provider = HomeFoodProvider.builder()
-                .brandName(dto.getBrandName())
-                .slug(dto.getSlug())
-                .foodType(dto.getFoodType())
-                .description(dto.getDescription())
-                .imageId(dto.getImageId() != null ? dto.getImageId() : "home-food-default")
-                .rating(5.0) // New sign-ups start with a default 5.0 rating
-                .reviewsCount(0)
-                .isActive(true) // Set to active by default
-                .owner(owner)
-                .build();
-
-        // 3. Save to PostgreSQL
-        HomeFoodProvider savedProvider = repository.save(provider);
-
-        // 4. Return the response DTO
-        return mapToDTO(savedProvider);
-    }
-
-    @Transactional
-    public void addDish(String ownerId, MenuItemRequestDTO dto) {
-        HomeFoodProvider provider = repository.findByOwnerId(ownerId)
-                .orElseThrow(() -> new RuntimeException("Home Food Provider not found for owner: " + ownerId));
-
-        MenuCategory category;
-        if (dto.getCategoryId() != null && !dto.getCategoryId().isEmpty()) {
-            category = menuCategoryRepository.findById(dto.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category ID " + dto.getCategoryId() + " missing"));
-        } else if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
-            // Find or create by name for this provider
-            category = menuCategoryRepository
-                    .findByHomeFoodIdAndTitleIgnoreCase(provider.getId(), dto.getCategoryName())
-                    .orElseGet(() -> {
-                        MenuCategory newCat = MenuCategory.builder()
-                                .title(dto.getCategoryName())
-                                .homeFood(provider)
-                                .build();
-                        return menuCategoryRepository.save(newCat);
-                    });
-        } else {
-            throw new RuntimeException("Category ID or Name must be provided");
+        public List<HomeFoodResponseDTO> getAllHomeFoods() {
+                return repository.findAll()
+                                .stream()
+                                .map(this::mapToDTO)
+                                .collect(Collectors.toList());
         }
 
-        MenuItem newItem = MenuItem.builder()
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .price(dto.getPrice())
-                .category(category)
-                .homeFood(provider)
-                .status(dto.getStatus() != null ? dto.getStatus() : "Available")
-                .isSpecial(dto.getIsSpecial() != null ? dto.getIsSpecial() : false)
-                .imageId(dto.getImageUrl())
-                .build();
+        // ================= REGISTER PROVIDER =================
 
-        menuItemRepository.save(newItem);
-    }
+        @Transactional
+        public HomeFoodResponseDTO registerHomeFoodProvider(HomeFoodRequestDTO dto) {
 
-    /**
-     * Helper method to map Entity to Response DTO
-     */
-    private HomeFoodResponseDTO mapToDTO(HomeFoodProvider provider) {
-        HomeFoodResponseDTO dto = new HomeFoodResponseDTO();
-        dto.setId(provider.getId());
-        dto.setName(provider.getBrandName());
-        dto.setSlug(provider.getSlug());
-        dto.setCuisine(provider.getFoodType());
-        dto.setRating(provider.getRating());
-        dto.setReviews(provider.getReviewsCount());
-        dto.setImageId(provider.getImageId() != null ? provider.getImageId() : "home-food-default");
-        dto.setDeliveryTime(30);
-        dto.setDeliveryFee(0.0);
-        return dto;
-    }
+                User owner = userRepository.findById(dto.getOwnerId())
+                                .orElseThrow(() -> new RuntimeException("User not found with ID: " + dto.getOwnerId()));
+
+                HomeFoodProvider provider = HomeFoodProvider.builder()
+                                .brandName(dto.getBrandName())
+                                .slug(dto.getSlug())
+                                .foodType(dto.getFoodType())
+                                .description(dto.getDescription())
+                                .imageId(dto.getImageId() != null ? dto.getImageId() : "home-food-default")
+                                .rating(5.0)
+                                .reviewsCount(0)
+                                .isActive(true)
+                                .owner(owner)
+                                .build();
+
+                return mapToDTO(repository.save(provider));
+        }
+
+        // ================= ADD DISH =================
+
+        @Transactional
+        public MenuItemDTO addDish(String providerId, MenuItemRequestDTO dto) {
+
+                System.out.println("DEBUG: Adding dish for HomeFoodProviderID: [" + providerId + "]");
+
+                HomeFoodProvider provider = repository.findById(providerId.trim())
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Home Food Provider not found with ID: " + providerId));
+
+                System.out.println("DEBUG: Found Provider: " + provider.getBrandName());
+
+                MenuCategory category;
+
+                if (dto.getCategoryId() != null && !dto.getCategoryId().isEmpty()) {
+                        System.out.println("DEBUG: Using Category ID: " + dto.getCategoryId());
+                        category = menuCategoryRepository.findById(dto.getCategoryId())
+                                        .orElseThrow(() -> new RuntimeException("Category not found"));
+
+                } else if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
+                        System.out.println("DEBUG: Finding/Creating Category by Name: " + dto.getCategoryName());
+                        category = menuCategoryRepository
+                                        .findByHomeFoodProvider_IdAndTitleIgnoreCase(provider.getId(),
+                                                        dto.getCategoryName())
+                                        .orElseGet(() -> {
+                                                System.out.println("DEBUG: Category not found, creating new: "
+                                                                + dto.getCategoryName());
+                                                MenuCategory newCategory = MenuCategory.builder()
+                                                                .title(dto.getCategoryName())
+                                                                .homeFoodProvider(provider)
+                                                                .build();
+                                                return menuCategoryRepository.save(newCategory);
+                                        });
+
+                } else {
+                        throw new RuntimeException("Category ID or Category Name must be provided");
+                }
+
+                System.out.println("DEBUG: Creating MenuItem: " + dto.getName() + " with price " + dto.getPrice());
+
+                MenuItem item = MenuItem.builder()
+                                .name(dto.getName())
+                                .description(dto.getDescription())
+                                .price(dto.getPrice())
+                                .category(category)
+                                .homeFood(provider)
+                                .restaurant(null)
+                                .status(dto.getStatus() != null ? dto.getStatus() : "Available")
+                                .isSpecial(dto.getIsSpecial() != null ? dto.getIsSpecial() : false)
+                                .imageId(dto.getImageUrl())
+                                .build();
+
+                MenuItem savedItem = menuItemRepository.save(item);
+                System.out.println("DEBUG: MenuItem Saved with ID: " + savedItem.getId());
+                return mapMenuItem(savedItem);
+        }
+
+        // ================= GET MENU =================
+
+        @Transactional(readOnly = true)
+        public List<MenuItemDTO> getHomeFoodMenu(String providerId) {
+
+                HomeFoodProvider provider = repository.findById(providerId.trim())
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Home Food Provider not found with ID: " + providerId));
+
+                return menuItemRepository.findByHomeFoodIdEager(provider.getId())
+                                .stream()
+                                .map(this::mapMenuItem)
+                                .toList();
+        }
+
+        // ================= UPDATE ITEM =================
+
+        @Transactional
+        public MenuItemDTO updateMenuItem(String itemId, MenuItemRequestDTO dto) {
+
+                MenuItem item = menuItemRepository.findById(itemId)
+                                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+                item.setName(dto.getName());
+                item.setDescription(dto.getDescription());
+                item.setPrice(dto.getPrice());
+                item.setStatus(dto.getStatus());
+                item.setIsSpecial(dto.getIsSpecial());
+                item.setImageId(dto.getImageUrl());
+                item.setRestaurant(null); // Ensure restaurant is null for home food updates
+
+                return mapMenuItem(menuItemRepository.save(item));
+        }
+
+        // ================= DELETE ITEM =================
+
+        public void deleteMenuItem(String itemId) {
+                menuItemRepository.deleteById(itemId);
+        }
+
+        // ================= DTO MAPPERS =================
+
+        private HomeFoodResponseDTO mapToDTO(HomeFoodProvider provider) {
+                HomeFoodResponseDTO dto = new HomeFoodResponseDTO();
+                dto.setId(provider.getId());
+                dto.setName(provider.getBrandName());
+                dto.setSlug(provider.getSlug());
+                dto.setCuisine(provider.getFoodType());
+                dto.setRating(provider.getRating());
+                dto.setReviews(provider.getReviewsCount());
+                dto.setImageId(provider.getImageId());
+                dto.setDeliveryTime(30);
+                dto.setDeliveryFee(0.0);
+                return dto;
+        }
+
+        private MenuItemDTO mapMenuItem(MenuItem item) {
+                return MenuItemDTO.builder()
+                                .id(item.getId())
+                                .name(item.getName())
+                                .description(item.getDescription())
+                                .price(item.getPrice())
+                                .status(item.getStatus())
+                                .isSpecial(Boolean.TRUE.equals(item.getIsSpecial()))
+                                .imageId(item.getImageId())
+                                .category(getCategoryTitleSafe(item.getCategory()))
+                                .build();
+        }
+
+        private String getCategoryTitleSafe(MenuCategory category) {
+                if (category == null)
+                        return null;
+                try {
+                        return category.getTitle();
+                } catch (Exception e) {
+                        return "General";
+                }
+        }
 }

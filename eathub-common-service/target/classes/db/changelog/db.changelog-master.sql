@@ -265,3 +265,6 @@ CREATE TABLE IF NOT EXISTS reviews (
 -- changeset eathub:1.0.1
 -- Add password support for internal authentication
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);  
+-- changeset eathub:1.0.2
+-- Fix image truncation error by changing image_id to TEXT
+ALTER TABLE menu_items ALTER COLUMN image_id TYPE TEXT;

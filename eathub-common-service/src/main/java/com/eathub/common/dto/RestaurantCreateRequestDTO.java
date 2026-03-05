@@ -4,21 +4,22 @@ import lombok.Data;
 
 @Data
 public class RestaurantCreateRequestDTO {
+
     private String name;
     private String description;
     private String cuisineType;
     private String restaurantType;
     private String slug;
     private String ownerId;
-    private String role; // Accepts "CHEF", "RESTAURANT", "HOMEFOOD", etc.
+    private String role;
 
-    // Address Fields
+    // Address
     private String addressLine1;
     private String city;
     private String state;
     private String pincode;
 
-    // Legal Fields
+    // Legal
     private String gstNumber;
     private String bankAccountNumber;
 }

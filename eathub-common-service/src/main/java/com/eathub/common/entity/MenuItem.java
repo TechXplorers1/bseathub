@@ -28,12 +28,9 @@ public class MenuItem {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_food_id")
-    @JsonIgnoreProperties({"categories", "menuItems"}) // Add this line
+    @JsonIgnoreProperties({ "categories", "menuItems" }) // Add this line
     private HomeFoodProvider homeFood;
 
     private String name;
@@ -42,6 +39,7 @@ public class MenuItem {
     private String description;
 
     private Double price;
+    @Column(columnDefinition = "TEXT")
     private String imageId;
     private Boolean isSpecial;
     private String status;

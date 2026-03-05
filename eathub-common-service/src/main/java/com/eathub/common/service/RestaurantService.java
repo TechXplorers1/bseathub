@@ -111,12 +111,12 @@ public class RestaurantService {
 
     // RestaurantService.java - Update addDish method
     @Transactional
-    public void addDish(String restaurantId, MenuItemRequestDTO dto) {
+    public void addDish(String restaurant_Id, MenuItemRequestDTO dto) {
         try {
-            Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            Restaurant restaurant = restaurantRepository.findById(restaurant_Id)
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND,
-                            "Restaurant ID " + restaurantId + " not found"));
+                            "Restaurant ID " + restaurant_Id + " not found"));
 
             MenuCategory category;
             if (dto.getCategoryId() != null && !dto.getCategoryId().isEmpty()) {
@@ -125,7 +125,7 @@ public class RestaurantService {
             } else if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
                 // Find or create by name for this restaurant
                 category = menuCategoryRepository
-                        .findByRestaurantIdAndTitleIgnoreCase(restaurantId, dto.getCategoryName())
+                        .findByRestaurant_IdAndTitleIgnoreCase(restaurant_Id, dto.getCategoryName())
                         .orElseGet(() -> {
                             MenuCategory newCat = MenuCategory.builder()
                                     .title(dto.getCategoryName())
@@ -161,5 +161,8 @@ public class RestaurantService {
     return restaurantRepository.findById(id)
             .map(this::mapToResponseDTO)
             .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+}
+public java.util.Map<String, Object> getDashboardOverview(String id) {
+    return java.util.Map.of("status", "active"); // Minimal response to keep it running
 }
 }

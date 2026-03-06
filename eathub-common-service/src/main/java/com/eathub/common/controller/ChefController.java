@@ -2,6 +2,8 @@ package com.eathub.common.controller;
 
 import com.eathub.common.dto.ChefRequestDTO;
 import com.eathub.common.dto.ChefResponseDTO;
+import com.eathub.common.dto.ChefServiceRequestDTO;
+import com.eathub.common.dto.ChefServiceResponseDTO;
 import com.eathub.common.service.ChefManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,5 +26,28 @@ public class ChefController {
     @PostMapping("/register")
     public ChefResponseDTO register(@RequestBody ChefRequestDTO request) {
         return service.registerChef(request);
+    }
+
+    // ================= CHEF SERVICES =================
+
+    @GetMapping("/{chefId}/services")
+    public List<ChefServiceResponseDTO> getServices(@PathVariable String chefId) {
+        return service.getChefServices(chefId);
+    }
+
+    @PostMapping("/{chefId}/services")
+    public ChefServiceResponseDTO addService(@PathVariable String chefId, @RequestBody ChefServiceRequestDTO request) {
+        return service.addService(chefId, request);
+    }
+
+    @PutMapping("/services/{serviceId}")
+    public ChefServiceResponseDTO updateService(@PathVariable String serviceId,
+            @RequestBody ChefServiceRequestDTO request) {
+        return service.updateService(serviceId, request);
+    }
+
+    @DeleteMapping("/services/{serviceId}")
+    public void deleteService(@PathVariable String serviceId) {
+        service.deleteService(serviceId);
     }
 }

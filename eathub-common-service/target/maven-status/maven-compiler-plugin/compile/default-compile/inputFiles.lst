@@ -9,6 +9,8 @@ C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\c
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\AuthDTOs.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\ChefRequestDTO.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\ChefResponseDTO.java
+C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\ChefServiceRequestDTO.java
+C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\ChefServiceResponseDTO.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\HomeFoodRequestDTO.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\HomeFoodResponseDTO.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\dto\MenuCategoryDTO.java
@@ -35,6 +37,7 @@ C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\c
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\User.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\entity\UserRole.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\ChefRepository.java
+C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\ChefServiceRepository.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\HomeFoodProviderRepository.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\MenuCategoryRepository.java
 C:\Users\BHARATH\Desktop\BSEATHUB\bseathub\eathub-common-service\src\main\java\com\eathub\common\repository\MenuItemRepository.java

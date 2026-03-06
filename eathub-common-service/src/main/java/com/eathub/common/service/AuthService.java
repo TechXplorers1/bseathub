@@ -108,6 +108,9 @@ public class AuthService {
         } else if (user.getRole() == UserRole.HOMEFOOD) {
             providerId = homeFoodRepository.findByOwnerId(user.getId())
                     .map(HomeFoodProvider::getId).orElse(null);
+        } else if (user.getRole() == UserRole.CHEF) {
+            providerId = chefRepository.findByOwnerId(user.getId())
+                    .map(Chef::getId).orElse(null);
         }
 
         return new AuthResponse(

@@ -21,7 +21,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        try {
+            return ResponseEntity.ok(authService.login(request));
+        } catch (RuntimeException e) {
+            System.err.println("Login Failed: " + e.getMessage());
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
     }
 
     @PostMapping("/partner/register")

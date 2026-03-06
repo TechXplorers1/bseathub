@@ -143,6 +143,8 @@ export default function LoginPage() {
           localStorage.setItem('restaurantId', response.providerId);
         } else if (response.role === 'HOMEFOOD') {
           localStorage.setItem('homeFoodId', response.providerId);
+        } else if (response.role === 'CHEF') {
+          localStorage.setItem('chefId', response.providerId);
         }
       }
 
@@ -159,6 +161,7 @@ export default function LoginPage() {
 
       // STAY ON HOME PAGE (Redirecting to '/' ensures you see the landing page)
       router.push('/');
+
 
     } catch (error: any) {
       toast({

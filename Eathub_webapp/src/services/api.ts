@@ -76,7 +76,7 @@ export const login = async (credentials: any) => {
 };
 
 export const fetchItemsByRestaurant = async (restaurantId: string) => {
-    const res = await fetch(`http://localhost:8081/api/v1/menu/restaurants/${restaurantId}`);
+    const res = await fetch(`${BASE_URL}/menu/restaurants/${restaurantId}`);
     if (!res.ok) throw new Error("Failed to fetch restaurant menu items");
     return res.json();
 };
@@ -126,7 +126,7 @@ export const updateStatus = async (id: string, status: string) => {
 
 
 export const addHomeFoodDish = async (providerId: string, payload: any) => {
-    const url = `http://localhost:8081/api/v1/home-food/${providerId}/menu-items`;
+    const url = `${BASE_URL}/home-food/${providerId}/menu-items`;
     console.log("DEBUG: addHomeFoodDish calling URL:", url);
     console.log("DEBUG: Payload:", payload);
     const res = await fetch(
@@ -150,9 +150,7 @@ export const addHomeFoodDish = async (providerId: string, payload: any) => {
 };
 
 export const fetchHomeFoodMenu = async (providerId: string) => {
-    const res = await fetch(
-        `http://localhost:8081/api/v1/home-food/${providerId}/menu-items`
-    );
+    const res = await fetch(`${BASE_URL}/home-food/${providerId}/menu-items`);
 
     if (!res.ok) throw new Error("Failed to fetch menu");
 
@@ -166,4 +164,45 @@ export const fetchHomeFoodCategories = async (providerId: string) => {
     if (!res.ok) throw new Error("Failed to fetch categories");
 
     return res.json();
+};
+
+/* ================= CHEF SERVICES ================= */
+
+export const fetchChefServices = async (chefId: string) => {
+    const res = await fetch(`${BASE_URL}/chefs/${chefId}/services`);
+    if (!res.ok) throw new Error("Failed to fetch chef services");
+    return res.json();
+};
+
+export const addChefService = async (chefId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/chefs/${chefId}/services`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to add service");
+    }
+    return res.json();
+};
+
+export const updateChefService = async (serviceId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/chefs/services/${serviceId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update service");
+    }
+    return res.json();
+};
+
+export const deleteChefService = async (serviceId: string) => {
+    const res = await fetch(`${BASE_URL}/chefs/services/${serviceId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete service");
 };

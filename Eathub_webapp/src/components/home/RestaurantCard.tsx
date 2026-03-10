@@ -17,7 +17,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
   return (
     <Link
-      href={`/restaurant/${restaurant.slug}`}
+      href={`/restaurant/${restaurant.slug || restaurant.id}`}
       target="_blank"
       rel="noopener noreferrer"
       className="flex group"

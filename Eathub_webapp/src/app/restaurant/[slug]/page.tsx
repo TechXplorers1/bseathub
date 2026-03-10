@@ -3,34 +3,75 @@ import { notFound } from 'next/navigation';
 import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { RestaurantClientPage } from './client-page';
 import type { Restaurant } from '@/lib/types';
+import { fetchRestaurantBySlug, fetchChefBySlug, fetchHomeFoodBySlug } from '@/services/api';
 
 type PageProps = {
   params: { slug: string };
   searchParams: { chef?: string };
 };
 
-const allItems: Restaurant[] = [...allRestaurants, ...allHomeFoods].filter(
-  (r) => typeof r.slug === 'string' && r.slug.length > 0
-);
+export const dynamic = 'force-dynamic';
 
-export const dynamicParams = false;
+export default async function RestaurantPage({ params, searchParams }: PageProps) {
+  const { slug } = await params;
+  const sParams = await searchParams;
+  const chefName = sParams.chef ? decodeURIComponent(sParams.chef) : undefined;
 
-export async function generateStaticParams() {
-  return allItems.map((r) => ({
-    slug: r.slug,
-  }));
-}
+  let restaurant: Restaurant | null = null;
 
-export default function RestaurantPage({ params, searchParams }: PageProps) {
-  const restaurant = allItems.find((r) => r.slug === params.slug);
+  // 1. Try fetching from Backend first (Source of Truth)
+  try {
+    if (chefName) {
+      // If it's a chef, we fetch from chefs endpoint
+      try {
+        const chef = await fetchChefBySlug(slug);
+        if (chef) {
+          restaurant = {
+            id: chef.id,
+            name: chef.name,
+            slug: chef.slug,
+            imageId: chef.avatarUrl || 'food-1',
+            cuisine: chef.specialty || 'Chef Special',
+            rating: chef.rating || 5.0,
+            reviews: chef.reviews || 0,
+            deliveryTime: 40,
+            deliveryFee: 5.0,
+            categories: chef.categories || ['Chef Table'],
+            services: ['delivery'],
+            menu: [],
+            type: 'restaurant',
+          } as any;
+        }
+      } catch (chefErr) {
+        console.warn(`Chef not found in backend for slug: ${slug}`);
+      }
+    } else {
+      // Try restaurant first
+      try {
+        restaurant = await fetchRestaurantBySlug(slug);
+      } catch (restErr) {
+        // Then try home food
+        try {
+          restaurant = await fetchHomeFoodBySlug(slug);
+        } catch (hfErr) {
+          console.warn(`Provider not found in backend (Restaurant or HomeFood) for slug: ${slug}`);
+        }
+      }
+    }
+  } catch (globalErr) {
+    console.error("Critical error during backend hydration:", globalErr);
+  }
+
+  // 2. Fallback to Mock Data if backend failed
+  if (!restaurant) {
+    console.log(`Falling back to mock data for slug: ${slug}`);
+    const allMockItems = [...allRestaurants, ...allHomeFoods];
+    restaurant = allMockItems.find((r) => r.slug === slug) || null;
+  }
 
   if (!restaurant) {
     notFound();
   }
-
-  const chefName = searchParams.chef
-    ? decodeURIComponent(searchParams.chef)
-    : undefined;
 
   return (
     <RestaurantClientPage

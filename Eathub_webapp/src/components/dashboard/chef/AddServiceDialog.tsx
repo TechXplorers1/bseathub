@@ -40,7 +40,7 @@ import {
 const serviceSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
-    basePrice: z.coerce.number().min(0.01, "Price must be greater than 0"),
+    basePrice: z.string().min(0.01, "Price must be greater than 0"),
     status: z.enum(['Active', 'Inactive', 'Unavailable']),
 });
 
@@ -86,7 +86,7 @@ export function AddServiceDialog({
             form.reset({
                 name: '',
                 description: '',
-                basePrice: 0,
+                basePrice: "",
                 status: 'Active',
             });
         }
@@ -163,7 +163,11 @@ export function AddServiceDialog({
                                     <FormItem>
                                         <FormLabel>Base Price ($)</FormLabel>
                                         <FormControl>
-                                            <Input type="number" step="0.01" {...field} />
+                                            <Input
+                                                type="text"
+                                                placeholder="e.g. Starts at $100/person or Custom Quote"
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

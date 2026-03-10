@@ -188,7 +188,9 @@ export default function ServicesPage() {
                       <TableCell className="text-muted-foreground max-w-sm">
                         <p className="truncate">{service.description}</p>
                       </TableCell>
-                      <TableCell>${service.basePrice?.toFixed(2)}</TableCell>
+                      <TableCell>
+                        {service.basePrice ? service.basePrice : "Not specified"}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={service.status === 'Active' ? 'secondary' : 'outline'}>
                           {service.status}

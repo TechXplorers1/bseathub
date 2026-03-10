@@ -2,23 +2,20 @@
 const BASE_URL = 'http://localhost:8081/api/v1';
 const AUTH_URL = `${BASE_URL}/auth`;
 
-
-
 export const fetchRestaurants = async () => {
-    const res = await fetch(`${BASE_URL}/restaurants`); // Matches @RequestMapping("/v1/restaurants")
+    const res = await fetch(`${BASE_URL}/restaurants`);
     if (!res.ok) throw new Error("Failed to fetch restaurants");
     return res.json();
 };
 
 export const fetchHomeFoods = async () => {
-    // FIX: Changed from /homefood to /home-food to match Backend
     const res = await fetch(`${BASE_URL}/home-food`);
     if (!res.ok) throw new Error("Failed to fetch homefood");
     return res.json();
 };
 
 export const fetchChefs = async () => {
-    const res = await fetch(`${BASE_URL}/chefs`); // Matches @RequestMapping("/v1/chefs")
+    const res = await fetch(`${BASE_URL}/chefs`);
     if (!res.ok) throw new Error("Failed to fetch chefs");
     return res.json();
 };
@@ -29,9 +26,6 @@ export async function getMenu(providerId: string, type: 'restaurant' | 'home-foo
     return await response.json();
 }
 
-/**
- * Registers a new partner (Restaurant, Chef, or Home Food)
- */
 export async function registerPartner(payload: { type: string; data: any }) {
     const response = await fetch(`${AUTH_URL}/partner/register`, {
         method: 'POST',
@@ -46,7 +40,7 @@ export async function registerPartner(payload: { type: string; data: any }) {
         throw new Error(errorData.message || 'Registration failed');
     }
 
-    return await response.json(); // Returns AuthResponse { token, email, role }
+    return await response.json();
 }
 
 export const addDishToRestaurant = async (restaurantId: string, payload: any) => {
@@ -64,9 +58,8 @@ export const addDishToRestaurant = async (restaurantId: string, payload: any) =>
     return res.text();
 };
 
-// Add this to your api.ts if it's missing
 export const login = async (credentials: any) => {
-    const res = await fetch(`${BASE_URL}/auth/login`, { // Using the /v1/auth/login endpoint
+    const res = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -124,11 +117,8 @@ export const updateStatus = async (id: string, status: string) => {
     if (!res.ok) throw new Error("Failed to update status");
 };
 
-
 export const addHomeFoodDish = async (providerId: string, payload: any) => {
     const url = `${BASE_URL}/home-food/${providerId}/menu-items`;
-    console.log("DEBUG: addHomeFoodDish calling URL:", url);
-    console.log("DEBUG: Payload:", payload);
     const res = await fetch(
         url,
         {
@@ -142,7 +132,6 @@ export const addHomeFoodDish = async (providerId: string, payload: any) => {
 
     if (!res.ok) {
         const error = await res.text();
-        console.error("DEBUG: addHomeFoodDish response NOT OK:", res.status, error);
         throw new Error(error || "Failed to add dish");
     }
 
@@ -151,18 +140,13 @@ export const addHomeFoodDish = async (providerId: string, payload: any) => {
 
 export const fetchHomeFoodMenu = async (providerId: string) => {
     const res = await fetch(`${BASE_URL}/home-food/${providerId}/menu-items`);
-
     if (!res.ok) throw new Error("Failed to fetch menu");
-
     return res.json();
 };
+
 export const fetchHomeFoodCategories = async (providerId: string) => {
-    const res = await fetch(
-        `http://localhost:8081/api/v1/menu/categories/home-food/${providerId}`
-    );
-
+    const res = await fetch(`${BASE_URL}/menu/categories/home-food/${providerId}`);
     if (!res.ok) throw new Error("Failed to fetch categories");
-
     return res.json();
 };
 
@@ -205,4 +189,26 @@ export const deleteChefService = async (serviceId: string) => {
         method: "DELETE",
     });
     if (!res.ok) throw new Error("Failed to delete service");
+};
+
+/* ================= SLUG BASED FETCHING ================= */
+
+export const fetchRestaurantBySlug = async (slug: string) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${slug}`);
+    if (!res.ok) throw new Error("Restaurant not found");
+    return res.json();
+};
+
+export const fetchChefBySlug = async (slug: string) => {
+    const res = await fetch(`${BASE_URL}/chefs/slug/${slug}`);
+    if (!res.ok) throw new Error("Chef not found");
+    return res.json();
+};
+
+export const fetchHomeFoodBySlug = async (slug: string) => {
+    // Note: If backend home-food controller doesn't have slug endpoint yet, 
+    // it will return 404. Assuming it might be needed.
+    const res = await fetch(`${BASE_URL}/home-food/slug/${slug}`);
+    if (!res.ok) throw new Error("Home food provider not found");
+    return res.json();
 };

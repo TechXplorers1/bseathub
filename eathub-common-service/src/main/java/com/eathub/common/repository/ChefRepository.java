@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface ChefRepository extends JpaRepository<Chef, String> {
     Optional<Chef> findByOwnerId(String ownerId);
+
+    Optional<Chef> findBySlug(String slug);
 }

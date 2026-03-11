@@ -30,6 +30,13 @@ public class ChefManagementService {
                 .collect(Collectors.toList());
     }
 
+    public ChefResponseDTO getChefBySlug(String slug) {
+        return chefRepository.findBySlug(slug)
+                .map(this::mapToDTO)
+                .or(() -> chefRepository.findById(slug).map(this::mapToDTO))
+                .orElseThrow(() -> new RuntimeException("Chef not found with slug or ID: " + slug));
+    }
+
     public ChefResponseDTO registerChef(ChefRequestDTO dto) {
         User owner = userRepository.findById(dto.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -39,6 +46,7 @@ public class ChefManagementService {
                 .bio(dto.getBio())
                 .experience(dto.getExperience())
                 .avatarUrl(dto.getAvatarUrl())
+                .slug(dto.getSlug())
                 .rating(5.0)
                 .reviewsCount(0)
                 .owner(owner)
@@ -107,6 +115,7 @@ public class ChefManagementService {
         dto.setAvatarUrl(chef.getAvatarUrl());
         dto.setRating(chef.getRating());
         dto.setReviews(chef.getReviewsCount());
+        dto.setSlug(chef.getSlug());
 
         // Fix: These should eventually come from the database
         dto.setSpecialty("General");

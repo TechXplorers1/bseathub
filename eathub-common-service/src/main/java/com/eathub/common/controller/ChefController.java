@@ -4,6 +4,8 @@ import com.eathub.common.dto.ChefRequestDTO;
 import com.eathub.common.dto.ChefResponseDTO;
 import com.eathub.common.dto.ChefServiceRequestDTO;
 import com.eathub.common.dto.ChefServiceResponseDTO;
+import com.eathub.common.entity.Chef;
+import com.eathub.common.repository.ChefRepository;
 import com.eathub.common.service.ChefManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ChefController {
 
     private final ChefManagementService service;
+    private final ChefRepository chefRepository;
 
     @GetMapping
     public List<ChefResponseDTO> getAll() {
@@ -26,6 +29,11 @@ public class ChefController {
     @PostMapping("/register")
     public ChefResponseDTO register(@RequestBody ChefRequestDTO request) {
         return service.registerChef(request);
+    }
+
+    @GetMapping("/slug/{slug}")
+    public ChefResponseDTO getBySlug(@PathVariable String slug) {
+        return service.getChefBySlug(slug);
     }
 
     // ================= CHEF SERVICES =================

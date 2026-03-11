@@ -3,6 +3,7 @@ package com.eathub.common.controller;
 import com.eathub.common.dto.HomeFoodRequestDTO;
 import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.dto.HomeFoodResponseDTO;
+import com.eathub.common.repository.HomeFoodProviderRepository;
 import com.eathub.common.service.HomeFoodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,31 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:9004") // Adjusted to standard Next.js port
 public class HomeFoodController {
     private final HomeFoodService homeFoodService;
+    private final HomeFoodProviderRepository repository;
 
     @GetMapping
     public List<HomeFoodResponseDTO> getAll() {
         return homeFoodService.getAllHomeFoods();
+    }
+
+    @GetMapping("/slug/{slug}")
+    public HomeFoodResponseDTO getBySlug(@PathVariable String slug) {
+        return repository.findBySlug(slug)
+                .or(() -> repository.findById(slug))
+                .map(provider -> {
+                    HomeFoodResponseDTO dto = new HomeFoodResponseDTO();
+                    dto.setId(provider.getId());
+                    dto.setName(provider.getBrandName());
+                    dto.setSlug(provider.getSlug());
+                    dto.setCuisine(provider.getFoodType());
+                    dto.setRating(provider.getRating());
+                    dto.setReviews(provider.getReviewsCount());
+                    dto.setImageId(provider.getImageId() != null ? provider.getImageId() : "home-food-default");
+                    dto.setDeliveryTime(30);
+                    dto.setDeliveryFee(0.0);
+                    return dto;
+                })
+                .orElseThrow(() -> new RuntimeException("Home food provider not found with slug or ID: " + slug));
     }
 
     // This is the "Push" call for when a new provider joins
@@ -31,13 +53,9 @@ public class HomeFoodController {
 
     @PostMapping("/{providerId}/menu-items")
     public ResponseEntity<?> addDish(@PathVariable String providerId, @RequestBody MenuItemRequestDTO dto) {
-        System.out.println("DEBUG: HomeFoodController.addDish received request for provider: " + providerId);
-        System.out.println("DEBUG: Payload: " + dto.getName() + ", " + dto.getPrice() + ", CategoryName: "
-                + dto.getCategoryName());
         try {
             return ResponseEntity.ok(homeFoodService.addDish(providerId, dto));
         } catch (Exception e) {
-            System.err.println("ERROR in HomeFoodController.addDish: " + e.getMessage());
             return ResponseEntity.status(500).body("Error adding dish: " + e.getMessage());
         }
     }

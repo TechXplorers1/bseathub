@@ -1,12 +1,12 @@
 package com.eathub.common.repository;
 
 import com.eathub.common.entity.HomeFoodProvider;
-import com.eathub.common.entity.MenuItem;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
-import java.util.Set;
+import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
+@Repository
 public interface HomeFoodProviderRepository extends JpaRepository<HomeFoodProvider, String> {
     Optional<HomeFoodProvider> findBySlug(String slug);
 

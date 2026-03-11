@@ -12,7 +12,8 @@ public class ChefResponseDTO {
     private String avatarUrl;
     private Double rating;
     private Integer reviews;
+    private String slug;
     // Fields required by your frontend ChefCard.tsx
-    private String specialty; 
+    private String specialty;
     private String preference; // Veg, Non-Veg, or Veg & Non-Veg
 }

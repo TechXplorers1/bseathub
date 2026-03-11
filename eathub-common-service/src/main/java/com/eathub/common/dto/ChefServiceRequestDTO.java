@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class ChefServiceRequestDTO {
     private String name;
     private String description;
-    private Double basePrice;
+    private String basePrice;
     private String status;
 }

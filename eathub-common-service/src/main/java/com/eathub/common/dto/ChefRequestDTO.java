@@ -10,4 +10,5 @@ public class ChefRequestDTO {
     private String experience;
     private String avatarUrl;
     private String ownerId; // Links to User table
+    private String slug;
 }

@@ -37,7 +37,8 @@ public class RestaurantService {
     public RestaurantResponseDTO getRestaurantBySlug(String slug) {
         return restaurantRepository.findBySlug(slug)
                 .map(this::mapToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with slug: " + slug));
+                .or(() -> restaurantRepository.findById(slug).map(this::mapToResponseDTO))
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with slug or ID: " + slug));
     }
 
     @Transactional
@@ -158,11 +159,12 @@ public class RestaurantService {
     }
 
     public RestaurantResponseDTO getRestaurantById(String id) {
-    return restaurantRepository.findById(id)
-            .map(this::mapToResponseDTO)
-            .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-}
-public java.util.Map<String, Object> getDashboardOverview(String id) {
-    return java.util.Map.of("status", "active"); // Minimal response to keep it running
-}
+        return restaurantRepository.findById(id)
+                .map(this::mapToResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+    }
+
+    public java.util.Map<String, Object> getDashboardOverview(String id) {
+        return java.util.Map.of("status", "active"); // Minimal response to keep it running
+    }
 }

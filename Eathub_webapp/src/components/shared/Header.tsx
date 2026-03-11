@@ -23,6 +23,7 @@ import { Cart } from './Cart';
 import { Notifications } from './Notifications';
 import { useCart } from '@/context/CartProvider';
 import { useLocation } from '@/context/LocationProvider';
+import { useHeader } from '@/context/HeaderProvider';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
@@ -59,6 +60,7 @@ export function Header({ className }: HeaderProps) {
 
   const { itemCount } = useCart();
   const { location, setLocation } = useLocation();
+  const { headerTitle, headerPath } = useHeader();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,11 +193,30 @@ export function Header({ className }: HeaderProps) {
 
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
 
-        {/* LOGO */}
-        <Link href="/" className="flex items-center space-x-2 shrink-0">
-          <Flame className="h-8 w-8 text-primary" />
-          <span className="hidden md:inline text-xl font-bold text-primary">Eat Hub</span>
-        </Link>
+        {/* LOGO & DYNAMIC TITLE */}
+        <div className="flex items-center gap-2 shrink-0 overflow-hidden max-w-[150px] sm:max-w-none">
+          {headerTitle ? (
+            <button
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (headerPath) {
+                  router.push(headerPath);
+                }
+              }}
+              className="flex items-center space-x-2 group hover:opacity-80 transition-all duration-300"
+            >
+              <Flame className="h-8 w-8 text-primary shrink-0" />
+              <span className="text-xl font-bold text-primary truncate">
+                {headerTitle}
+              </span>
+            </button>
+          ) : (
+            <Link href="/" className="flex items-center space-x-2">
+              <Flame className="h-8 w-8 text-primary" />
+              <span className="hidden md:inline text-xl font-bold text-primary">Eat Hub</span>
+            </Link>
+          )}
+        </div>
 
         {/* SEARCH BAR */}
         <div className="flex-1 relative max-w-md ml-4" ref={searchRef}>

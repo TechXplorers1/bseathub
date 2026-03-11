@@ -18,6 +18,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
+import { useState } from 'react';
+import { fetchRestaurantById } from '@/services/api';
 
 const navItems = [
   { href: '/restaurant-dashboard', icon: Home, label: 'Overview' },
@@ -44,17 +46,35 @@ export default function RestaurantDashboardLayout({
   children: React.ReactNode;
 }) {
   const { setHeaderTitle, setHeaderPath } = useHeader();
-  const restaurantName = 'The Golden Spoon';
+  const [restaurantName, setRestaurantName] = useState('The Golden Spoon');
 
   useEffect(() => {
-    setHeaderTitle(restaurantName);
+    const loadProfile = async () => {
+      const restaurantId = localStorage.getItem('restaurantId');
+      if (restaurantId) {
+        try {
+          const profile = await fetchRestaurantById(restaurantId);
+          if (profile && profile.name) {
+            setRestaurantName(profile.name);
+            setHeaderTitle(profile.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch restaurant profile:", error);
+          setHeaderTitle(restaurantName); // Fallback to default
+        }
+      } else {
+        setHeaderTitle(restaurantName);
+      }
+    };
+
+    loadProfile();
     setHeaderPath('/restaurant-dashboard');
 
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
     };
-  }, [setHeaderTitle, setHeaderPath]);
+  }, [setHeaderTitle, setHeaderPath, restaurantName]);
 
   const toggleSidebar = () => {
     document

@@ -20,21 +20,20 @@ export function RestaurantClientPage({
   useEffect(() => {
     setOpen(false);
 
-    if (chefName) {
-      // header when viewing chef profile
-      setHeaderTitle(`Chef ${chefName}`);
-      setHeaderPath(window.location.pathname + window.location.search); // Use current path as reset
-    } else {
-      // header for normal restaurant page
-      setHeaderTitle(restaurant.name);
-      setHeaderPath(`/restaurant/${restaurant.slug}`);
-    }
+    // Set the dynamic header title and path
+    const name = chefName ? `Chef ${chefName}` : restaurant.name;
+    const path = chefName
+      ? `/restaurant/${restaurant.slug}?chef=${encodeURIComponent(chefName)}`
+      : `/restaurant/${restaurant.slug}`;
+
+    setHeaderTitle(name);
+    setHeaderPath(path);
 
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
     };
-  }, [setOpen, setHeaderTitle, setHeaderPath, restaurant.name, restaurant.slug, chefName]);
+  }, [setOpen, setHeaderTitle, setHeaderPath, restaurant.slug, restaurant.name, chefName]);
 
   // 👉 If a chef was selected (?chef= in URL), show the chef profile layout
   if (chefName) {

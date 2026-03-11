@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { fetchHomeFoodById } from '@/services/api';
 
 const navItems = [
   { href: "/home-food-dashboard", icon: Home, label: "Overview" },
@@ -47,12 +48,32 @@ export default function HomeFoodDashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // 1. Retrieve the name stored during the default login process
-    const storedName = localStorage.getItem('userName');
-    const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
+    const loadProfile = async () => {
+      const homeFoodId = localStorage.getItem('homeFoodId');
+      if (homeFoodId) {
+        try {
+          const profile = await fetchHomeFoodById(homeFoodId);
+          if (profile && profile.name) {
+            setKitchenName(profile.name);
+            setHeaderTitle(profile.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch homefood profile:", error);
+          // Fallback to name in localStorage or default
+          const storedName = localStorage.getItem('userName');
+          const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
+          setKitchenName(finalName);
+          setHeaderTitle(finalName);
+        }
+      } else {
+        const storedName = localStorage.getItem('userName');
+        const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
+        setKitchenName(finalName);
+        setHeaderTitle(finalName);
+      }
+    };
 
-    setKitchenName(finalName);
-    setHeaderTitle(finalName);
+    loadProfile();
     setHeaderPath('/home-food-dashboard');
 
     return () => {

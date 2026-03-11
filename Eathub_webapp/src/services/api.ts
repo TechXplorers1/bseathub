@@ -212,3 +212,21 @@ export const fetchHomeFoodBySlug = async (slug: string) => {
     if (!res.ok) throw new Error("Home food provider not found");
     return res.json();
 };
+
+export const fetchHomeFoodById = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/home-food/slug/${id}`);
+    if (!res.ok) throw new Error("Home food provider not found");
+    return res.json();
+};
+
+export const fetchRestaurantById = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/restaurants/id/${id}`);
+    if (!res.ok) throw new Error("Restaurant not found");
+    return res.json();
+};
+
+export const fetchChefById = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/chefs/slug/${id}`);
+    if (!res.ok) throw new Error("Chef not found");
+    return res.json();
+};

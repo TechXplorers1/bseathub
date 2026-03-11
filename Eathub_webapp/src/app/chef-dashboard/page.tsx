@@ -44,10 +44,10 @@ export default function ChefDashboardPage() {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-bold tracking-tight">
             Welcome back, {roleName}!
           </h1>
           <p className="text-muted-foreground">
@@ -56,12 +56,12 @@ export default function ChefDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Earnings"
           value={`$${overviewStats.totalEarnings.toLocaleString()}`}
           icon={DollarSign}
-          description="+15.2% from last month"
+          description="+12.5% from last month"
         />
         <StatCard
           title="Upcoming Bookings"
@@ -89,7 +89,7 @@ export default function ChefDashboardPage() {
             <div className="grid gap-2">
               <CardTitle>Recent Bookings</CardTitle>
               <CardDescription>
-                A summary of your most recent bookings and requests.
+                A summary of your most recent bookings.
               </CardDescription>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
@@ -98,14 +98,15 @@ export default function ChefDashboardPage() {
               </Link>
             </Button>
           </CardHeader>
-
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Event Date</TableHead>
-                  <TableHead className="hidden sm:table-cell">Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="hidden xl:table-cell">
+                    Status
+                  </TableHead>
                   <TableHead className="text-right">Total</TableHead>
                 </TableRow>
               </TableHeader>
@@ -126,7 +127,7 @@ export default function ChefDashboardPage() {
                       </div>
                     </TableCell>
                     <TableCell>{booking.eventDate}</TableCell>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="hidden xl:table-cell">
                       <Badge
                         variant={
                           booking.status === 'Completed'
@@ -157,9 +158,9 @@ export default function ChefDashboardPage() {
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="grid gap-8">
+          <CardContent className="grid gap-6">
             <div className="flex items-start gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
+              <Avatar className="h-9 w-9">
                 <AvatarImage src="https://i.pravatar.cc/150?u=alice" alt="Avatar" />
                 <AvatarFallback>AW</AvatarFallback>
               </Avatar>
@@ -167,14 +168,14 @@ export default function ChefDashboardPage() {
                 <p className="text-sm font-medium leading-none">
                   Alice Wonderland
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground line-clamp-2 italic">
                   "Chef Maria was incredible! The food was out of this world..."
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
+              <Avatar className="h-9 w-9">
                 <AvatarImage src="https://i.pravatar.cc/150?u=bruce" alt="Avatar" />
                 <AvatarFallback>BW</AvatarFallback>
               </Avatar>
@@ -182,14 +183,14 @@ export default function ChefDashboardPage() {
                 <p className="text-sm font-medium leading-none">
                   Bruce Wayne
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground line-clamp-2 italic">
                   "The catering for our gala was flawless. Exceeded all expectations."
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
+              <Avatar className="h-9 w-9">
                 <AvatarImage src="https://i.pravatar.cc/150?u=peter" alt="Avatar" />
                 <AvatarFallback>PP</AvatarFallback>
               </Avatar>
@@ -197,7 +198,7 @@ export default function ChefDashboardPage() {
                 <p className="text-sm font-medium leading-none">
                   Peter Parker
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground line-clamp-2 italic">
                   "Great cooking class! Learned a lot and had a ton of fun."
                 </p>
               </div>
@@ -205,6 +206,7 @@ export default function ChefDashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   );
 }
+

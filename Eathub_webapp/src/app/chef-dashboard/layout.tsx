@@ -19,10 +19,10 @@ import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
 import { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { useState } from 'react';
+import { fetchChefById } from '@/services/api';
 import { Header } from '@/components/shared/Header';
 import { Footer } from '@/components/shared/Footer';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/chef-dashboard', icon: Home, label: 'Overview' },
@@ -44,73 +44,87 @@ export default function ChefDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { setHeaderTitle } = useHeader();
-  const chefName = 'Chef Maria';
-  const pathname = usePathname();
+  const { setHeaderTitle, setHeaderPath } = useHeader();
+  const [chefName, setChefName] = useState('Chef Maria');
 
   useEffect(() => {
-    setHeaderTitle(chefName);
-    // Cleanup function to reset the title when the component unmounts
+    const loadProfile = async () => {
+      const chefId = localStorage.getItem('chefId');
+      if (chefId) {
+        try {
+          const profile = await fetchChefById(chefId);
+          if (profile && profile.name) {
+            setChefName(profile.name);
+            setHeaderTitle(profile.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch chef profile:", error);
+          setHeaderTitle(chefName); // Fallback to default
+        }
+      } else {
+        setHeaderTitle(chefName);
+      }
+    };
+
+    loadProfile();
+    setHeaderPath('/chef-dashboard');
     return () => {
       setHeaderTitle(null);
+      setHeaderPath(null);
     };
-  }, [setHeaderTitle, chefName]);
+  }, [setHeaderTitle, setHeaderPath, chefName]);
 
   return (
-      <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <div className="hidden border-r bg-muted/40 md:block">
-          <div className="flex h-full max-h-screen flex-col gap-2">
-            <div className="flex-1 py-2">
-              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return(
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                      isActive && "bg-accent text-accent-foreground hover:text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                    {item.badge && (
-                      <Badge className={cn("ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full", isActive ? "bg-accent-foreground text-accent" : "")}>
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </Link>
-                  )
-                })}
-              </nav>
-              <Separator className="my-4" />
-              <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                {accountItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return(
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                      isActive && "bg-accent text-accent-foreground hover:text-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
-                  )
-                })}
-              </nav>
-            </div>
+    <div className="flex min-h-screen w-full bg-muted/40">
+      {/* Sidebar */}
+      <aside className="hidden border-r bg-background md:block w-[220px] lg:w-[280px]">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <span className="">Chef Dashboard</span>
+            </Link>
+          </div>
+          <div className="flex-1">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4 mt-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                  {item.badge && (
+                    <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                      {item.badge}
+                    </Badge>
+                  )}
+                </Link>
+              ))}
+            </nav>
+            <Separator className="my-4" />
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+              {accountItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
-        <div className="flex flex-col">
-          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/40 overflow-auto">
-            {children}
-          </main>
-        </div>
+      </aside>
+
+      <div className="flex flex-col flex-1">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {children}
+        </main>
       </div>
+    </div>
   );
 }
+

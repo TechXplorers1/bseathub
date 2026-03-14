@@ -1,16 +1,20 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AboutCard } from './AboutCard';
 import { ModernChefHero } from './ModernChefHero';
 import { QuickInfoCard } from './QuickInfoCard';
 import { ReviewsCard } from './ReviewsCard';
 import { SignatureDishes } from './SignatureDishes';
 import { SpecialtiesCard } from './SpecialtiesCard';
-import type { Restaurant } from '@/lib/types';
+import type { Restaurant, MenuCategory, MenuItem as MenuItemType } from '@/lib/types';
 import { allHomeFoods } from '@/lib/data';
 import { BookChef } from './BookChef';
 import { cn } from '@/lib/utils';
+import { fetchGroupedChefServices } from '@/services/api';
+import { MenuItem } from '../restaurant/MenuItem';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { MenuItemDialog } from '../restaurant/MenuItemDialog';
 
 type ChefTab = 'book' | 'signature' | 'enquiry';
 
@@ -29,8 +33,38 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   // animatingSection controls the temporary zoom "pop" animation
   const [animatingSection, setAnimatingSection] = useState<ChefTab | null>(null);
 
+  const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);
+
+  const [services, setServices] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadServices = async () => {
+      // Assuming restaurant.id is the chef profile ID here if chefName is present
+      // or we need to find the actual chef ID. 
+      // For now, let's assume restaurant might contain it or we need another fetch.
+      // Based on client-page.tsx, restaurant is passed down.
+      if (restaurant.id) {
+        setLoading(true);
+        try {
+          // If restaurant.id is actually the restaurant ID but we need chef ID,
+          // we might need to fetch chef by slug first.
+          // But looking at the backend, chef has its own ID.
+          const grouped = await fetchGroupedChefServices(restaurant.id);
+          setServices(grouped);
+        } catch (err) {
+          console.error("Failed to load chef services:", err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    loadServices();
+  }, [restaurant.id]);
+
   const signatureRef = useRef<HTMLDivElement | null>(null);
   const bookingRef = useRef<HTMLDivElement | null>(null);
+  const servicesRef = useRef<HTMLDivElement | null>(null);
 
   const handleTabChange = (tab: ChefTab) => {
     setActiveTab(tab);
@@ -99,6 +133,28 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
             >
               <SignatureDishes items={signatureDishes} />
             </section>
+
+            {/* CATEGORIZED SERVICES */}
+            <section ref={servicesRef} className="space-y-4">
+              {services.map((category) => (
+                <Card key={category.title} id={category.title}>
+                  <CardHeader>
+                    <CardTitle>{category.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {category.items.map((item) => (
+                        <MenuItem
+                          key={item.id}
+                          item={item as any}
+                          onClick={() => setSelectedItem(item as any)}
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </section>
           </div>
 
           <div className="space-y-4">
@@ -118,7 +174,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
                 activeTab === 'book' || activeTab === 'enquiry'
                   ? 'ring-2 ring-orange-500 shadow-sm'
                   : '',
-                 // Transient animation state (zoom pop)
+                // Transient animation state (zoom pop)
                 (animatingSection === 'book' || animatingSection === 'enquiry') ? 'animate-highlight-pop' : ''
               )}
             >
@@ -127,6 +183,13 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
           </div>
         </div>
       </div>
+      {selectedItem && (
+        <MenuItemDialog
+          item={selectedItem}
+          open={!!selectedItem}
+          onOpenChange={(open) => !open && setSelectedItem(null)}
+        />
+      )}
     </div>
   );
 }

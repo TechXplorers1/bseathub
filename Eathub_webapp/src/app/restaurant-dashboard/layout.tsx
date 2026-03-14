@@ -56,14 +56,10 @@ export default function RestaurantDashboardLayout({
           const profile = await fetchRestaurantById(restaurantId);
           if (profile && profile.name) {
             setRestaurantName(profile.name);
-            setHeaderTitle(profile.name);
           }
         } catch (error) {
           console.error("Failed to fetch restaurant profile:", error);
-          setHeaderTitle(restaurantName); // Fallback to default
         }
-      } else {
-        setHeaderTitle(restaurantName);
       }
     };
 

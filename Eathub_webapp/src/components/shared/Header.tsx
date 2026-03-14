@@ -16,7 +16,8 @@ import {
   Bell,
   Utensils,
   Store,
-  ChefHat
+  ChefHat,
+  User
 } from 'lucide-react';
 
 import { Cart } from './Cart';
@@ -339,7 +340,23 @@ export function Header({ className }: HeaderProps) {
                   </div>
                 </DropdownMenuLabel>
                 {dashboard && (
-                  <><DropdownMenuSeparator /><DropdownMenuItem asChild><Link href={dashboard.href} className="cursor-pointer w-full flex items-center py-2"><LayoutDashboard className="mr-3 h-5 w-5" />{dashboard.label}</Link></DropdownMenuItem></>
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href={dashboard.href} className="cursor-pointer w-full flex items-center py-2 text-sm">
+                        <LayoutDashboard className="mr-3 h-4 w-4" />
+                        {dashboard.label}
+                      </Link>
+                    </DropdownMenuItem>
+                    {auth.role === 'USER' && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile" className="cursor-pointer w-full flex items-center py-2 text-sm">
+                          <User className="mr-3 h-4 w-4" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                  </>
                 )}
                 <DropdownMenuSeparator /><DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer py-2"><LogOut className="mr-3 h-5 w-5" />Log out</DropdownMenuItem>
               </DropdownMenuContent>

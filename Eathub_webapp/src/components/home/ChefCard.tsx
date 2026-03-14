@@ -16,7 +16,12 @@ interface ChefCardProps {
 export function ChefCard({ chef }: ChefCardProps) {
 
     return (
-        <Link href={`/restaurant/${chef.slug || chef.id}?chef=${encodeURIComponent(chef.name)}`} className="flex">
+        <Link
+            href={`/restaurant/${chef.slug || chef.id}?chef=${encodeURIComponent(chef.name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex"
+        >
             <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col group relative">
                 <div className="relative h-96 w-full">
                     <Image

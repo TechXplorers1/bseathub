@@ -40,16 +40,17 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isCategory = pathname?.startsWith('/category');
   const isRestaurantsList = pathname === '/restaurants';
   const isHomeFoodList = pathname === '/home-food';
+  const isChefsList = pathname === '/chefs';
 
   // where to HIDE sidebar (individual detail pages)
-  const isRestaurantDetail = pathname?.startsWith('/restaurants/');
+  const isRestaurantDetail = pathname?.startsWith('/restaurant/');
   const isHomeFoodDetail = pathname?.startsWith('/home-food/');
 
   // final rule:
-  // - show on home, category, restaurants list, home-food list
+  // - show on home, category, restaurants list, home-food list, chefs list
   // - hide on individual restaurant + home food pages
   const showSidebar =
-    (isHome || isCategory || isRestaurantsList || isHomeFoodList) &&
+    (isHome || isCategory || isRestaurantsList || isHomeFoodList || isChefsList) &&
     !isRestaurantDetail &&
     !isHomeFoodDetail;
 

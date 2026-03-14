@@ -26,6 +26,12 @@ export async function getMenu(providerId: string, type: 'restaurant' | 'home-foo
     return await response.json();
 }
 
+export async function fetchGroupedMenu(providerId: string, type: 'restaurant' | 'home-food') {
+    const response = await fetch(`${BASE_URL}/menu/provider/${providerId}/grouped?type=${type}`);
+    if (!response.ok) throw new Error('Failed to fetch grouped menu');
+    return await response.json();
+}
+
 export async function registerPartner(payload: { type: string; data: any }) {
     const response = await fetch(`${AUTH_URL}/partner/register`, {
         method: 'POST',
@@ -191,6 +197,12 @@ export const deleteChefService = async (serviceId: string) => {
     if (!res.ok) throw new Error("Failed to delete service");
 };
 
+export const fetchGroupedChefServices = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/chefs/${id}/services/grouped`);
+    if (!res.ok) throw new Error("Failed to fetch grouped chef services");
+    return res.json();
+};
+
 /* ================= SLUG BASED FETCHING ================= */
 
 export const fetchRestaurantBySlug = async (slug: string) => {
@@ -230,3 +242,51 @@ export const fetchChefById = async (id: string) => {
     if (!res.ok) throw new Error("Chef not found");
     return res.json();
 };
+
+export const updateProfile = async (payload: any) => {
+    // Assuming backend endpoint for general user profile update
+    const res = await fetch(`${BASE_URL}/users/profile`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Failed to update profile");
+    }
+    return res.json();
+};
+
+export const fetchUserProfile = async () => {
+    const res = await fetch(`${BASE_URL}/users/profile`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+    });
+    if (!res.ok) throw new Error("Failed to fetch profile");
+    return res.json();
+};
+
+/* ================= RESTAURANT PROFILE SETTINGS ================= */
+
+export const fetchRestaurantProfile = async (restaurantId: string) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/profile`);
+    if (!res.ok) throw new Error("Failed to fetch restaurant profile");
+    return res.json();
+};
+
+export const updateRestaurantProfile = async (restaurantId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update restaurant profile");
+    }
+    return res.json();
+};

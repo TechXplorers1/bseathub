@@ -55,7 +55,6 @@ export default function HomeFoodDashboardLayout({
           const profile = await fetchHomeFoodById(homeFoodId);
           if (profile && profile.name) {
             setKitchenName(profile.name);
-            setHeaderTitle(profile.name);
           }
         } catch (error) {
           console.error("Failed to fetch homefood profile:", error);
@@ -63,13 +62,11 @@ export default function HomeFoodDashboardLayout({
           const storedName = localStorage.getItem('userName');
           const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
           setKitchenName(finalName);
-          setHeaderTitle(finalName);
         }
       } else {
         const storedName = localStorage.getItem('userName');
         const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
         setKitchenName(finalName);
-        setHeaderTitle(finalName);
       }
     };
 

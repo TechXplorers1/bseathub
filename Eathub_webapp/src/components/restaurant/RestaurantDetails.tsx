@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import type { MenuItem as MenuItemType, Restaurant } from '@/lib/types';
+import type { MenuItem as MenuItemType, Restaurant, MenuCategory } from '@/lib/types';
 import { MenuNav } from './MenuNav';
 import { MenuItem } from './MenuItem';
 import { MenuItemDialog } from './MenuItemDialog';
+import { fetchGroupedMenu } from '@/services/api';
 import { BookingForm } from '../chef/BookingForm';
 import { ChefGallery } from '../chef/ChefGallery';
 import { ChefCuisineSpecialties } from '../chef/ChefCuisineSpecialties';
@@ -78,6 +79,25 @@ export function RestaurantDetails({
   const [categoryFilter, setCategoryFilter] =
     React.useState<CategoryFilterKey>('all');
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [menu, setMenu] = React.useState<MenuCategory[]>(restaurant.menu || []);
+  const [loadingMenu, setLoadingMenu] = React.useState(false);
+
+  React.useEffect(() => {
+    async function loadMenu() {
+      if (restaurant.id && (menu.length === 0 || restaurant.type === 'home-food')) {
+        setLoadingMenu(true);
+        try {
+          const grouped = await fetchGroupedMenu(restaurant.id, restaurant.type === 'home-food' ? 'home-food' : 'restaurant');
+          setMenu(grouped);
+        } catch (error) {
+          console.error("Failed to fetch grouped menu:", error);
+        } finally {
+          setLoadingMenu(false);
+        }
+      }
+    }
+    loadMenu();
+  }, [restaurant.id, restaurant.type]);
 
   // NEW: hero observer state + ref
   const heroRef = React.useRef<HTMLElement | null>(null);
@@ -111,10 +131,10 @@ export function RestaurantDetails({
   // Only keep categories that actually have items
   const nonEmptyMenu = React.useMemo(
     () =>
-      (restaurant.menu ?? []).filter(
+      (menu ?? []).filter(
         (category) => category.items && category.items.length > 0
       ),
-    [restaurant.menu]
+    [menu]
   );
 
   // Which filters are actually available for this restaurant

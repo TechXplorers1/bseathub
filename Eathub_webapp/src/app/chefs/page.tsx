@@ -1,53 +1,58 @@
 
-
 'use client';
 
-import { useState } from 'react';
-import { allHomeFoods } from '@/lib/data';
+import { useEffect, useState } from 'react';
+import { fetchChefs } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { ChefCard } from '@/components/home/ChefCard';
+import type { Chef } from '@/lib/types';
+import { Loader2 } from 'lucide-react';
 
 type Preference = 'all' | 'veg' | 'non-veg' | 'veg & non-veg';
 
-const chefs = allHomeFoods.map(food => {
-    const hasVeg = food.menu.some(cat => !cat.title.includes('(Non-Veg)') && cat.items.length > 0);
-    const hasNonVeg = food.menu.some(cat => cat.title.includes('(Non-Veg)'));
-    let preference: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg' = 'Veg';
-    if (hasVeg && hasNonVeg) {
-        preference = 'Veg & Non-Veg';
-    } else if (hasNonVeg && !hasVeg) {
-        preference = 'Non-Veg';
-    }
-
-    return {
-        name: food.name.split("'s")[0],
-        specialty: food.cuisine,
-        avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
-        restaurantName: food.name,
-        restaurantImageId: food.imageId,
-        slug: food.slug,
-        bio: `The heart and soul behind ${food.name}, bringing authentic ${food.cuisine} flavors to your table.`,
-        preference: preference,
-        categories: food.categories,
-        rating: food.rating,
-        reviews: food.reviews,
-    };
-});
-
-// Create a unique list of chefs based on their name
-const uniqueChefs = chefs.reduce((acc, current) => {
-    if (!acc.find(item => item.name === current.name)) {
-        acc.push(current);
-    }
-    return acc;
-}, [] as typeof chefs);
-
-
 export default function ChefsPage() {
+  const [chefs, setChefs] = useState<Chef[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Preference>('all');
-  
-  const filteredChefs = uniqueChefs.filter(chef => {
+
+  useEffect(() => {
+    const loadChefs = async () => {
+      try {
+        const data = await fetchChefs();
+        setChefs(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadChefs();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground animate-pulse">Finding culinary experts...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center p-8 bg-red-50 rounded-2xl border border-red-100 max-w-md">
+          <p className="text-red-600 font-semibold mb-2">Failed to load chefs</p>
+          <p className="text-red-500/70 text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredChefs = chefs.filter(chef => {
     if (filter === 'all') return true;
+    if (!chef.preference) return false;
     if (filter === 'veg') return chef.preference === 'Veg';
     if (filter === 'non-veg') return chef.preference === 'Non-Veg';
     if (filter === 'veg & non-veg') return chef.preference === 'Veg & Non-Veg';
@@ -55,21 +60,31 @@ export default function ChefsPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Book a Private Chef</h1>
-        <div className="flex items-center gap-2">
-            <Button variant={filter === 'all' ? 'default' : 'outline'} className="rounded-full" onClick={() => setFilter('all')}>All</Button>
-            <Button variant={filter === 'veg' ? 'default' : 'outline'} className="rounded-full" onClick={() => setFilter('veg')}>Veg</Button>
-            <Button variant={filter === 'non-veg' ? 'default' : 'outline'} className="rounded-full" onClick={() => setFilter('non-veg')}>Non-Veg</Button>
-            <Button variant={filter === 'veg & non-veg' ? 'default' : 'outline'} className="rounded-full" onClick={() => setFilter('veg & non-veg')}>Veg & Non-Veg</Button>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight mb-2">Book a Private Chef</h1>
+          <p className="text-muted-foreground">Hire professional chefs for your special occasions</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 p-1 bg-muted/50 rounded-2xl">
+          <Button variant={filter === 'all' ? 'default' : 'ghost'} size="sm" className="rounded-xl px-4" onClick={() => setFilter('all')}>All</Button>
+          <Button variant={filter === 'veg' ? 'default' : 'ghost'} size="sm" className="rounded-xl px-4" onClick={() => setFilter('veg')}>Veg</Button>
+          <Button variant={filter === 'non-veg' ? 'default' : 'ghost'} size="sm" className="rounded-xl px-4" onClick={() => setFilter('non-veg')}>Non-Veg</Button>
+          <Button variant={filter === 'veg & non-veg' ? 'default' : 'ghost'} size="sm" className="rounded-xl px-4" onClick={() => setFilter('veg & non-veg')}>Veg & Non-Veg</Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filteredChefs.map((chef) => (
-            <ChefCard key={chef.name} chef={chef} />
-        ))}
-      </div>
+
+      {filteredChefs.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {filteredChefs.map((chef) => (
+            <ChefCard key={chef.id || chef.name} chef={chef} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-20 bg-muted/30 rounded-3xl border-2 border-dashed border-muted">
+          <p className="text-muted-foreground">No chefs matching your filter were found.</p>
+        </div>
+      )}
     </div>
   );
 }

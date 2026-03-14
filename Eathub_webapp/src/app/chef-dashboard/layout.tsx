@@ -55,14 +55,10 @@ export default function ChefDashboardLayout({
           const profile = await fetchChefById(chefId);
           if (profile && profile.name) {
             setChefName(profile.name);
-            setHeaderTitle(profile.name);
           }
         } catch (error) {
           console.error("Failed to fetch chef profile:", error);
-          setHeaderTitle(chefName); // Fallback to default
         }
-      } else {
-        setHeaderTitle(chefName);
       }
     };
 

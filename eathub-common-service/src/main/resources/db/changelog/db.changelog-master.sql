@@ -268,3 +268,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
 -- changeset eathub:1.0.2
 -- Fix image truncation error by changing image_id to TEXT
 ALTER TABLE menu_items ALTER COLUMN image_id TYPE TEXT;
+
+-- changeset eathub:1.0.3
+-- Add category column to chef_services for categorization
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS category VARCHAR(100);

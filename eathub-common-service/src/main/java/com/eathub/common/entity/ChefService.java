@@ -26,6 +26,8 @@ public class ChefService {
 
     @Column(name = "base_price")
     private String basePrice;
-    
+
+    private String category;
+
     private String status;
 }

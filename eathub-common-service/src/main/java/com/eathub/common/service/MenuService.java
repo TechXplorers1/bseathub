@@ -101,6 +101,26 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
+    public List<com.eathub.common.dto.MenuCategoryDTO> getGroupedMenu(String providerId, String type) {
+        List<MenuItem> items;
+        if ("restaurant".equalsIgnoreCase(type)) {
+            items = menuItemRepository.findByRestaurantId(providerId);
+        } else {
+            items = menuItemRepository.findByHomeFood_Id(providerId);
+        }
+
+        return items.stream()
+                .collect(Collectors.groupingBy(
+                        item -> item.getCategory() != null ? item.getCategory().getTitle() : "Uncategorized",
+                        Collectors.mapping(this::mapToDTO, Collectors.toList())))
+                .entrySet().stream()
+                .map(entry -> com.eathub.common.dto.MenuCategoryDTO.builder()
+                        .title(entry.getKey())
+                        .items(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     // ================= UPDATE =================
 
     public MenuItemDTO update(String id, MenuItemRequestDTO dto) {

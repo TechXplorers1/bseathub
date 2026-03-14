@@ -63,6 +63,9 @@ private User owner;
     @Column(name = "image_id")
     private String imageId;
 
+    @Column(name = "cover_image_id", columnDefinition = "TEXT")
+    private String coverImageId;
+
     public void setCuisineType(String cuisineType) {
         this.cuisine = cuisineType;
     }

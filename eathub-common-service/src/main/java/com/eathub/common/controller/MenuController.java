@@ -17,10 +17,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/menu")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:9004") 
+@CrossOrigin(origins = "http://localhost:9004")
 public class MenuController {
 
     private final MenuService menuService;
+
+    @GetMapping("/provider/{providerId}/grouped")
+    public ResponseEntity<List<com.eathub.common.dto.MenuCategoryDTO>> getGroupedMenu(
+            @PathVariable String providerId,
+            @RequestParam String type) {
+        return ResponseEntity.ok(menuService.getGroupedMenu(providerId, type));
+    }
 
     @PostMapping("/import")
     public ResponseEntity<String> importBulkMenu(@RequestBody List<MenuCategory> categories) {
@@ -31,8 +38,7 @@ public class MenuController {
     @GetMapping("/restaurant/{restaurantId}/category/{title}")
     public ResponseEntity<List<MenuItemDTO>> getItemsByCategory(
             @PathVariable String restaurantId,
-            @PathVariable String title
-    ) {
+            @PathVariable String title) {
         try {
             List<MenuItemDTO> items = menuService.getItemsByCategory(restaurantId, title);
 
@@ -49,8 +55,7 @@ public class MenuController {
 
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<List<MenuItemDTO>> getItemsByRestaurant(
-            @PathVariable String restaurantId
-    ) {
+            @PathVariable String restaurantId) {
         try {
             return ResponseEntity.ok(menuService.getItemsByRestaurant(restaurantId));
         } catch (Exception e) {
@@ -61,24 +66,23 @@ public class MenuController {
 
     @PutMapping("/{id}")
     public MenuItemDTO update(
-        @PathVariable String id,
-        @RequestBody MenuItemRequestDTO dto
-    ){
+            @PathVariable String id,
+            @RequestBody MenuItemRequestDTO dto) {
         return menuService.update(id, dto);
     }
 
     @PatchMapping("/{id}/featured")
-    public void updateFeatured(@PathVariable String id, @RequestBody Map<String, Boolean> body){
+    public void updateFeatured(@PathVariable String id, @RequestBody Map<String, Boolean> body) {
         menuService.updateFeatured(id, body.get("isSpecial"));
     }
 
     @PatchMapping("/{id}/status")
-    public void updateStatus(@PathVariable String id, @RequestBody Map<String, String> body){
+    public void updateStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
         menuService.updateStatus(id, body.get("status"));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id){
+    public void delete(@PathVariable String id) {
         menuService.delete(id);
     }
 }

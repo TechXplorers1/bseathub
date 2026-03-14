@@ -1,6 +1,7 @@
 package com.eathub.common.controller;
 
 import com.eathub.common.dto.RestaurantCreateRequestDTO;
+import com.eathub.common.dto.RestaurantProfileUpdateDTO;
 import com.eathub.common.dto.RestaurantResponseDTO;
 import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.service.RestaurantService;
@@ -69,5 +70,20 @@ public class RestaurantController {
         return ResponseEntity.ok(
                 restaurantService.getRestaurantById(restaurantId)
         );
+    }
+
+    /** GET /restaurants/{id}/profile — returns full profile for settings form pre-fill */
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<RestaurantResponseDTO> getProfile(
+            @PathVariable String id) {
+        return ResponseEntity.ok(restaurantService.getProfile(id));
+    }
+
+    /** PUT /restaurants/{id}/profile — saves name, bio, images, address, and bank details */
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<RestaurantResponseDTO> updateProfile(
+            @PathVariable String id,
+            @RequestBody RestaurantProfileUpdateDTO dto) {
+        return ResponseEntity.ok(restaurantService.updateProfile(id, dto));
     }
 }

@@ -43,6 +43,11 @@ public class ChefController {
         return service.getChefServices(chefId);
     }
 
+    @GetMapping("/{chefId}/services/grouped")
+    public List<com.eathub.common.dto.MenuCategoryDTO> getGroupedServices(@PathVariable String chefId) {
+        return service.getGroupedChefServices(chefId);
+    }
+
     @PostMapping("/{chefId}/services")
     public ChefServiceResponseDTO addService(@PathVariable String chefId, @RequestBody ChefServiceRequestDTO request) {
         return service.addService(chefId, request);

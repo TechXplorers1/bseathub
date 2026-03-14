@@ -63,6 +63,33 @@ public class ChefManagementService {
                 .collect(Collectors.toList());
     }
 
+    public List<com.eathub.common.dto.MenuCategoryDTO> getGroupedChefServices(String chefId) {
+        List<com.eathub.common.entity.ChefService> services = chefServiceRepository.findByChef_Id(chefId);
+
+        return services.stream()
+                .collect(Collectors.groupingBy(
+                        s -> s.getCategory() != null ? s.getCategory() : "General",
+                        Collectors.mapping(s -> {
+                            // Map ChefService to MenuItemDTO for frontend compatibility
+                            return com.eathub.common.dto.MenuItemDTO.builder()
+                                    .id(s.getId())
+                                    .name(s.getName())
+                                    .description(s.getDescription())
+                                    .price(Double.parseDouble(s.getBasePrice().replaceAll("[^0-9.]", ""))) // Price is
+                                                                                                           // price in
+                                                                                                           // MenuItemDTO
+                                    .category(s.getCategory())
+                                    .status(s.getStatus())
+                                    .build();
+                        }, Collectors.toList())))
+                .entrySet().stream()
+                .map(entry -> com.eathub.common.dto.MenuCategoryDTO.builder()
+                        .title(entry.getKey())
+                        .items(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     public ChefServiceResponseDTO addService(String chefId, ChefServiceRequestDTO dto) {
         Chef chef = chefRepository.findById(chefId)
                 .orElseThrow(() -> new RuntimeException("Chef not found"));
@@ -71,6 +98,7 @@ public class ChefManagementService {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .basePrice(dto.getBasePrice())
+                .category(dto.getCategory())
                 .status(dto.getStatus() != null ? dto.getStatus() : "Active")
                 .chef(chef)
                 .build();
@@ -85,6 +113,7 @@ public class ChefManagementService {
         service.setName(dto.getName());
         service.setDescription(dto.getDescription());
         service.setBasePrice(dto.getBasePrice());
+        service.setCategory(dto.getCategory());
         service.setStatus(dto.getStatus());
 
         return mapToServiceDTO(chefServiceRepository.save(service));
@@ -102,6 +131,7 @@ public class ChefManagementService {
                 .name(service.getName())
                 .description(service.getDescription())
                 .basePrice(service.getBasePrice())
+                .category(service.getCategory())
                 .status(service.getStatus())
                 .build();
     }

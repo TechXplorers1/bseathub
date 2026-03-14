@@ -14,5 +14,6 @@ public class ChefServiceResponseDTO {
     private String name;
     private String description;
     private String basePrice;
+    private String category;
     private String status;
 }

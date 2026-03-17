@@ -289,4 +289,30 @@ export const updateRestaurantProfile = async (restaurantId: string, payload: any
         throw new Error(err || "Failed to update restaurant profile");
     }
     return res.json();
-};
+};
+
+export const updateRestaurantAddress = async (restaurantId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/address`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update restaurant address");
+    }
+    return res.json();
+};
+
+export const updateRestaurantLegal = async (restaurantId: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/legal`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update restaurant legal details");
+    }
+    return res.json();
+};

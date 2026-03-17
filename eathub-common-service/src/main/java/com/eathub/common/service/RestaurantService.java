@@ -21,12 +21,13 @@ import java.util.stream.Collectors;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantAddressRepository addressRepository;
+    private final RestaurantLegalProfileRepository legalProfileRepository;
     private final UserRepository userRepository;
     private final MenuCategoryRepository menuCategoryRepository;
     private final MenuItemRepository menuItemRepository;
-    private final RestaurantAddressRepository addressRepository;
-    private final RestaurantLegalProfileRepository legalProfileRepository;
 
+    // ── Fetch all ──────────────────────────────────────────────────────────
     public List<RestaurantResponseDTO> getAllRestaurants() {
         return restaurantRepository.findAll()
                 .stream()
@@ -34,6 +35,7 @@ public class RestaurantService {
                 .collect(Collectors.toList());
     }
 
+    // ── Fetch by slug ─────────────────────────────────────────────────────
     public RestaurantResponseDTO getRestaurantBySlug(String slug) {
         return restaurantRepository.findBySlug(slug)
                 .map(this::mapToResponseDTO)
@@ -41,41 +43,70 @@ public class RestaurantService {
                 .orElseThrow(() -> new RuntimeException("Restaurant not found with slug or ID: " + slug));
     }
 
-    /** Returns the full profile (including address + legal) for settings form pre-fill. */
+    // ── Fetch by ID ───────────────────────────────────────────────────────
+    public RestaurantResponseDTO getRestaurantById(String id) {
+        return restaurantRepository.findById(id)
+                .map(this::mapToResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+    }
+
+    /** Returns the full profile for settings form pre-fill. */
     public RestaurantResponseDTO getProfile(String restaurantId) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
         return mapToResponseDTO(restaurant);
     }
 
-    /** Upserts core info, address, and legal profile in a single transaction. */
+    /** SECTION 1: Update Core Profile (Name, Description, Cuisine, Images) */
     @Transactional
     public RestaurantResponseDTO updateProfile(String restaurantId, RestaurantProfileUpdateDTO dto) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+        Restaurant r = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
 
-        // ── Core restaurant fields ─────────────────────────────────────────
-        if (dto.getName() != null && !dto.getName().isBlank()) restaurant.setName(dto.getName());
-        if (dto.getDescription() != null)  restaurant.setDescription(dto.getDescription());
-        if (dto.getCuisineType() != null)  restaurant.setCuisineType(dto.getCuisineType());
-        if (dto.getImageId() != null)      restaurant.setImageId(dto.getImageId());
-        if (dto.getCoverImageId() != null) restaurant.setCoverImageId(dto.getCoverImageId());
-        restaurantRepository.save(restaurant);
+        if (dto.getName() != null && !dto.getName().isBlank()) r.setName(dto.getName());
+        if (dto.getDescription() != null)  r.setDescription(dto.getDescription());
+        if (dto.getCuisineType() != null)  r.setCuisineType(dto.getCuisineType());
+        if (dto.getImageId() != null)      r.setImageId(dto.getImageId());
+        if (dto.getCoverImageId() != null) r.setCoverImageId(dto.getCoverImageId());
 
-        // ── Address (upsert) ───────────────────────────────────────────────
-        RestaurantAddress address = addressRepository.findByRestaurant_Id(restaurantId)
-                .orElseGet(() -> { RestaurantAddress a = new RestaurantAddress(); a.setRestaurant(restaurant); return a; });
-        if (dto.getAddressLine1() != null) address.setAddressLine1(dto.getAddressLine1());
-        if (dto.getAddressLine2() != null) address.setAddressLine2(dto.getAddressLine2());
-        if (dto.getCity() != null)         address.setCity(dto.getCity());
-        if (dto.getState() != null)        address.setState(dto.getState());
-        if (dto.getPostalCode() != null)   address.setPostalCode(dto.getPostalCode());
-        if (dto.getCountry() != null)      address.setCountry(dto.getCountry());
-        addressRepository.save(address);
+        return mapToResponseDTO(restaurantRepository.save(r));
+    }
 
-        // ── Legal / Banking (upsert) ───────────────────────────────────────
-        RestaurantLegalProfile legal = legalProfileRepository.findByRestaurant_Id(restaurantId)
-                .orElseGet(() -> { RestaurantLegalProfile l = new RestaurantLegalProfile(); l.setRestaurant(restaurant); return l; });
+    /** SECTION 2: Update Address (Separate Table) */
+    @Transactional
+    public RestaurantResponseDTO updateAddress(String restaurantId, RestaurantProfileUpdateDTO dto) {
+        Restaurant r = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
+
+        RestaurantAddress addr = r.getAddress();
+        if (addr == null) {
+            addr = new RestaurantAddress();
+            r.setAddress(addr);
+        }
+
+        if (dto.getAddressLine1() != null) addr.setAddressLine1(dto.getAddressLine1());
+        if (dto.getAddressLine2() != null) addr.setAddressLine2(dto.getAddressLine2());
+        if (dto.getCity() != null)         addr.setCity(dto.getCity());
+        if (dto.getState() != null)        addr.setState(dto.getState());
+        if (dto.getPostalCode() != null)   addr.setPostalCode(dto.getPostalCode());
+        if (dto.getCountry() != null)      addr.setCountry(dto.getCountry());
+
+        addressRepository.save(addr);
+        return mapToResponseDTO(restaurantRepository.save(r));
+    }
+
+    /** SECTION 3: Update Legal / Banking (Separate Table) */
+    @Transactional
+    public RestaurantResponseDTO updateLegalProfile(String restaurantId, RestaurantProfileUpdateDTO dto) {
+        Restaurant r = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
+
+        RestaurantLegalProfile legal = r.getLegalProfile();
+        if (legal == null) {
+            legal = new RestaurantLegalProfile();
+            r.setLegalProfile(legal);
+        }
+
         if (dto.getLegalBusinessName() != null)     legal.setLegalBusinessName(dto.getLegalBusinessName());
         if (dto.getGstNumber() != null)             legal.setGstNumber(dto.getGstNumber());
         if (dto.getPanNumber() != null)             legal.setPanNumber(dto.getPanNumber());
@@ -85,11 +116,12 @@ public class RestaurantService {
         if (dto.getBankAccountNumber() != null)     legal.setBankAccountNumber(dto.getBankAccountNumber());
         if (dto.getBankIFSC() != null)              legal.setBankIFSC(dto.getBankIFSC());
         if (dto.getBankName() != null)              legal.setBankName(dto.getBankName());
-        legalProfileRepository.save(legal);
 
-        return getProfile(restaurantId);
+        legalProfileRepository.save(legal);
+        return mapToResponseDTO(restaurantRepository.save(r));
     }
 
+    // ── Register (partner onboarding) ─────────────────────────────────────
     @Transactional
     public RestaurantResponseDTO registerRestaurant(RestaurantCreateRequestDTO dto) {
         User owner = userRepository.findById(dto.getOwnerId())
@@ -103,65 +135,63 @@ public class RestaurantService {
                     return userRepository.saveAndFlush(newUser);
                 });
 
-        Restaurant restaurant = new Restaurant();
-        restaurant.setName(dto.getName());
-        restaurant.setDescription(dto.getDescription());
-        restaurant.setCuisineType(dto.getCuisineType());
-        restaurant.setSlug(dto.getSlug());
-        restaurant.setOwner(owner);
-        restaurant.setType(dto.getRestaurantType() != null ? dto.getRestaurantType() : "General");
-        restaurant.setRating(4.0);
-        restaurant.setReviewsCount(0);
-        restaurant.setIsOpen(true);
-        restaurant.setOperationalStatus("OPEN");
+        Restaurant r = new Restaurant();
+        r.setName(dto.getName());
+        r.setDescription(dto.getDescription());
+        r.setCuisineType(dto.getCuisineType());
+        r.setSlug(dto.getSlug());
+        r.setOwner(owner);
+        r.setType(dto.getRestaurantType() != null ? dto.getRestaurantType() : "General");
+        r.setRating(4.0);
+        r.setReviewsCount(0);
+        r.setIsOpen(true);
+        r.setOperationalStatus("OPEN");
 
-        RestaurantAddress address = RestaurantAddress.builder()
-                .restaurant(restaurant)
-                .addressLine1(dto.getAddressLine1())
-                .city(dto.getCity())
-                .state(dto.getState())
-                .postalCode(dto.getPincode())
-                .country("India")
-                .build();
-        restaurant.setAddress(address);
+        // Set Address
+        RestaurantAddress addr = new RestaurantAddress();
+        addr.setAddressLine1(dto.getAddressLine1());
+        addr.setCity(dto.getCity());
+        addr.setState(dto.getState());
+        addr.setPostalCode(dto.getPincode());
+        addr.setCountry("India");
+        r.setAddress(addr);
 
-        RestaurantLegalProfile legal = RestaurantLegalProfile.builder()
-                .restaurant(restaurant)
-                .gstNumber(dto.getGstNumber())
-                .bankAccountNumber(dto.getBankAccountNumber())
-                .legalBusinessName(dto.getName())
-                .build();
-        restaurant.setLegalProfile(legal);
+        // Set Legal
+        RestaurantLegalProfile legal = new RestaurantLegalProfile();
+        legal.setGstNumber(dto.getGstNumber());
+        legal.setBankAccountNumber(dto.getBankAccountNumber());
+        legal.setLegalBusinessName(dto.getName());
+        r.setLegalProfile(legal);
 
-        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
-        return mapToResponseDTO(savedRestaurant);
+        return mapToResponseDTO(restaurantRepository.save(r));
     }
 
-    private RestaurantResponseDTO mapToResponseDTO(Restaurant restaurant) {
+    // ── Map entity → DTO (flattens for frontend) ──────────────────────────
+    private RestaurantResponseDTO mapToResponseDTO(Restaurant r) {
         RestaurantResponseDTO dto = new RestaurantResponseDTO();
-        dto.setId(restaurant.getId());
-        dto.setName(restaurant.getName());
-        dto.setDescription(restaurant.getDescription());
-        dto.setCuisineType(restaurant.getCuisine());
-        dto.setSlug(restaurant.getSlug());
-        dto.setRating(restaurant.getRating());
-        dto.setReviewsCount(restaurant.getReviewsCount());
-        dto.setIsOpen(restaurant.getIsOpen());
-        dto.setImageId(restaurant.getImageId());
-        dto.setCoverImageId(restaurant.getCoverImageId());
+        dto.setId(r.getId());
+        dto.setName(r.getName());
+        dto.setDescription(r.getDescription());
+        dto.setCuisineType(r.getCuisine());
+        dto.setSlug(r.getSlug());
+        dto.setRating(r.getRating());
+        dto.setReviewsCount(r.getReviewsCount());
+        dto.setIsOpen(r.getIsOpen());
+        dto.setImageId(r.getImageId());
+        dto.setCoverImageId(r.getCoverImageId());
 
-        // Address
-        addressRepository.findByRestaurant_Id(restaurant.getId()).ifPresent(addr -> {
+        RestaurantAddress addr = r.getAddress();
+        if (addr != null) {
             dto.setAddressLine1(addr.getAddressLine1());
             dto.setAddressLine2(addr.getAddressLine2());
             dto.setCity(addr.getCity());
             dto.setState(addr.getState());
             dto.setPostalCode(addr.getPostalCode());
             dto.setCountry(addr.getCountry());
-        });
+        }
 
-        // Legal / Banking
-        legalProfileRepository.findByRestaurant_Id(restaurant.getId()).ifPresent(legal -> {
+        RestaurantLegalProfile legal = r.getLegalProfile();
+        if (legal != null) {
             dto.setLegalBusinessName(legal.getLegalBusinessName());
             dto.setGstNumber(legal.getGstNumber());
             dto.setPanNumber(legal.getPanNumber());
@@ -171,17 +201,16 @@ public class RestaurantService {
             dto.setBankAccountNumber(legal.getBankAccountNumber());
             dto.setBankIFSC(legal.getBankIFSC());
             dto.setBankName(legal.getBankName());
-        });
-
+        }
         return dto;
     }
 
     @Transactional
-    public void addDish(String restaurant_Id, MenuItemRequestDTO dto) {
+    public void addDish(String restaurantId, MenuItemRequestDTO dto) {
         try {
-            Restaurant restaurant = restaurantRepository.findById(restaurant_Id)
+            Restaurant restaurant = restaurantRepository.findById(restaurantId)
                     .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Restaurant ID " + restaurant_Id + " not found"));
+                            HttpStatus.NOT_FOUND, "Restaurant ID " + restaurantId + " not found"));
 
             MenuCategory category;
             if (dto.getCategoryId() != null && !dto.getCategoryId().isEmpty()) {
@@ -189,7 +218,7 @@ public class RestaurantService {
                         .orElseThrow(() -> new RuntimeException("Category ID " + dto.getCategoryId() + " missing"));
             } else if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
                 category = menuCategoryRepository
-                        .findByRestaurant_IdAndTitleIgnoreCase(restaurant_Id, dto.getCategoryName())
+                        .findByRestaurant_IdAndTitleIgnoreCase(restaurantId, dto.getCategoryName())
                         .orElseGet(() -> {
                             MenuCategory newCat = MenuCategory.builder()
                                     .title(dto.getCategoryName())
@@ -213,18 +242,9 @@ public class RestaurantService {
                     .build();
 
             menuItemRepository.save(newItem);
-            System.out.println(" SUCCESS: Data saved to database for: " + dto.getName());
-
         } catch (Exception e) {
-            System.err.println(" BACKEND ERROR: " + e.getMessage());
             throw e;
         }
-    }
-
-    public RestaurantResponseDTO getRestaurantById(String id) {
-        return restaurantRepository.findById(id)
-                .map(this::mapToResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
     }
 
     public java.util.Map<String, Object> getDashboardOverview(String id) {

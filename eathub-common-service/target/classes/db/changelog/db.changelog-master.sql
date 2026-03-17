@@ -272,3 +272,15 @@ ALTER TABLE menu_items ALTER COLUMN image_id TYPE TEXT;
 -- changeset eathub:1.0.3
 -- Add category column to chef_services for categorization
 ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS category VARCHAR(100);
+
+-- changeset eathub:1.0.4
+-- Flatten core fields only: description + images as TEXT
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_id TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cover_image_id TEXT;
+
+-- Handle cases where Hibernate ddl-auto:update might have created these as VARCHAR(255)
+ALTER TABLE restaurants ALTER COLUMN description TYPE TEXT;
+ALTER TABLE restaurants ALTER COLUMN image_id TYPE TEXT;
+ALTER TABLE restaurants ALTER COLUMN cover_image_id TYPE TEXT;
+

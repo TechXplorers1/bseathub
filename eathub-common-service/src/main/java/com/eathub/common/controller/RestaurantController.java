@@ -79,11 +79,27 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.getProfile(id));
     }
 
-    /** PUT /restaurants/{id}/profile — saves name, bio, images, address, and bank details */
+    /** PUT /restaurants/{id}/profile — saves name, bio, images ONLY */
     @PutMapping("/{id}/profile")
     public ResponseEntity<RestaurantResponseDTO> updateProfile(
             @PathVariable String id,
             @RequestBody RestaurantProfileUpdateDTO dto) {
         return ResponseEntity.ok(restaurantService.updateProfile(id, dto));
+    }
+
+    /** PUT /restaurants/{id}/address — saves address details in separate table */
+    @PutMapping("/{id}/address")
+    public ResponseEntity<RestaurantResponseDTO> updateAddress(
+            @PathVariable String id,
+            @RequestBody RestaurantProfileUpdateDTO dto) {
+        return ResponseEntity.ok(restaurantService.updateAddress(id, dto));
+    }
+
+    /** PUT /restaurants/{id}/legal — saves bank and legal details in separate table */
+    @PutMapping("/{id}/legal")
+    public ResponseEntity<RestaurantResponseDTO> updateLegal(
+            @PathVariable String id,
+            @RequestBody RestaurantProfileUpdateDTO dto) {
+        return ResponseEntity.ok(restaurantService.updateLegalProfile(id, dto));
     }
 }

@@ -16,6 +16,7 @@ public class RestaurantProfileUpdateDTO {
     private String name;
     private String description;
     private String cuisineType;
+    private Boolean isOpen;
 
     /** Base64 data-URL or an external image URL for the profile logo. */
     private String imageId;

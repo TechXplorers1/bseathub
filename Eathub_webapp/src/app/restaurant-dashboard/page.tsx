@@ -32,7 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 export default function RestaurantDashboardPage() {
-  const [displayName, setDisplayName] = useState('Restaurant');
+  const [displayName, setDisplayName] = useState('User');
 
   useEffect(() => {
     // ✅ FIX 1 — Use same key as Login

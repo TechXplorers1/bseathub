@@ -28,7 +28,7 @@ import { useHeader } from '@/context/HeaderProvider';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import {
@@ -78,20 +78,58 @@ export function Header({ className }: HeaderProps) {
     email: string | null;
     role: string | null;
     token: string | null;
-  }>({ email: null, role: null, token: null });
+    avatarUrl: string | null;
+  }>({ email: null, role: null, token: null, avatarUrl: null });
+
+  const [chefData, setChefData] = useState<any>(null);
 
   useEffect(() => {
     const loadAuth = () => {
       const email = localStorage.getItem('userEmail');
       const role = localStorage.getItem('userRole');
       const token = localStorage.getItem('token');
-      setAuth({ email, role, token });
+      const avatarUrl = localStorage.getItem('userAvatar');
+      
+      setAuth({ email, role, token, avatarUrl });
       setIsLoading(false);
+
+      // 1. If role is CHEF, fetch chef-specific data
+      if (role === 'CHEF') {
+        const chefId = localStorage.getItem('chefId');
+        if (chefId) {
+          fetch(`http://localhost:8081/api/v1/chefs/${chefId}`)
+            .then(res => res.json())
+            .then(data => setChefData(data))
+            .catch(err => console.error("Header fetch chef error:", err));
+        }
+      } else {
+        setChefData(null);
+      }
+
+      // 2. For ANY logged-in role, if avatar is missing in local storage, try fetching from profile
+      if (token && !avatarUrl) {
+        fetch('http://localhost:8081/api/v1/users/profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.avatarUrl) {
+                try {
+                    localStorage.setItem('userAvatar', data.avatarUrl);
+                } catch (e) {
+                    console.warn("Storage quota exceeded, could not save avatar.");
+                }
+                setAuth(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
+            }
+        })
+        .catch(err => console.error("Header profile sync error:", err));
+      }
     };
 
     loadAuth();
     window.addEventListener('storage', loadAuth);
     window.addEventListener('auth-change', loadAuth);
+    window.addEventListener('chef-profile-updated', loadAuth);
 
     const fetchChefs = async () => {
       try {
@@ -125,7 +163,7 @@ export function Header({ className }: HeaderProps) {
 
   const handleLogout = () => {
     localStorage.clear();
-    setAuth({ email: null, role: null, token: null });
+    setAuth({ email: null, role: null, token: null, avatarUrl: null });
     window.dispatchEvent(new Event('auth-change'));
     router.push('/');
     router.refresh();
@@ -328,8 +366,15 @@ export function Header({ className }: HeaderProps) {
           ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
-                  <Avatar className="h-10 w-10"><AvatarFallback className="bg-primary text-primary-foreground text-sm">{auth.email ? auth.email[0].toUpperCase() : 'U'}</AvatarFallback></Avatar>
+                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 border border-border overflow-hidden">
+                  <Avatar className="h-full w-full object-cover">
+                    {(chefData?.avatarUrl || auth.avatarUrl) ? (
+                        <AvatarImage src={chefData?.avatarUrl || auth.avatarUrl || undefined} alt={chefData?.name || auth.email || ''} className="object-cover" />
+                    ) : null}
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm flex items-center justify-center">
+                      {auth.email ? auth.email[0].toUpperCase() : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">

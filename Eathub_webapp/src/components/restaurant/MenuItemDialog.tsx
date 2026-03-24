@@ -14,6 +14,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface MenuItemDialogProps {
   item: MenuItem & {
@@ -60,9 +62,24 @@ export function MenuItemDialog({
           {/* Details side */}
           <div className="p-6 flex flex-col bg-white">
             <DialogHeader>
-              <DialogTitle className="text-2xl mb-1">
-                {item.name}
-              </DialogTitle>
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-2xl">
+                  {item.name}
+                </DialogTitle>
+                {item.itemType && (
+                    <Badge variant="outline" className={cn(
+                        "text-[10px] h-5",
+                        item.itemType === 'Veg' ? "border-green-500 text-green-700" : "border-red-500 text-red-700"
+                    )}>
+                        {item.itemType}
+                    </Badge>
+                )}
+                {item.isNegotiable && (
+                    <Badge variant="secondary" className="text-[10px] h-5 bg-blue-100 text-blue-700 hover:bg-blue-100">
+                        Negotiable
+                    </Badge>
+                )}
+              </div>
 
               {/* Restaurant name */}
               {item.restaurantName && (
@@ -101,10 +118,10 @@ export function MenuItemDialog({
             <div className="flex-grow" />
 
             <DialogFooter className="mt-6 sm:justify-between items-center">
-              <div className="text-2xl font-bold">
-                <span>${item.price.toFixed(2)}</span>
+              <div className="text-2xl font-bold text-primary">
+                <span>₹ {item.price}</span>
               </div>
-              <Button size="lg" onClick={handleAddToCart}>
+              <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8">
                 Add To Cart
               </Button>
             </DialogFooter>

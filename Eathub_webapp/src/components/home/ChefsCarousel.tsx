@@ -57,11 +57,9 @@ export function ChefsCarousel() {
         <div className="py-8">
             <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
                 <h2 className="text-2xl font-bold">Book a Private Chef</h2>
-                {chefs.length > INITIAL_VISIBLE_COUNT && (
-                    <Link href="/chefs" className={cn(buttonVariants({ variant: 'ghost' }))}>
-                        See all <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                )}
+                <Link href="/chefs" className={cn(buttonVariants({ variant: 'ghost' }))}>
+                    See all <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {visibleChefs.map((chef) => (

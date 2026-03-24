@@ -84,6 +84,8 @@ export default function LoginPage() {
       localStorage.setItem('token', response.token);
       localStorage.setItem('userRole', response.role);
       localStorage.setItem('userEmail', response.email);
+      localStorage.setItem('userName', response.name); // Store name for dashboard greeting
+      localStorage.setItem('userAvatar', response.avatarUrl); // Store avatar for header
       localStorage.setItem('eathubLoggedIn', 'true');
 
       if (response.providerId) {

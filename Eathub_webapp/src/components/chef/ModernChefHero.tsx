@@ -38,35 +38,40 @@ export function ModernChefHero({ restaurant, chefName, activeTab, onTabChange }:
         <CardContent className="p-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-center">
             <div className="md:col-span-3">
-              <h1 className="text-2xl font-bold tracking-tight">Chef {chefName}</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Chef {chefName}</h1>
               <p className="mt-1 text-sm text-muted-foreground flex items-center gap-2">
-                <span>{restaurant.cuisine}</span>
+                <span className="font-medium text-primary">{restaurant.specialty || restaurant.cuisine}</span>
                 <span className="text-gray-300">·</span>
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                <span>{restaurant.rating} ({restaurant.reviews} reviews)</span>
+                <span className="font-medium">{restaurant.rating}</span>
+                <span className="text-muted-foreground">({restaurant.reviews} reviews)</span>
               </p>
-              <div className="mt-2 flex flex-wrap gap-1">
+              <div className="mt-3 flex flex-wrap gap-2 items-center">
                 {restaurant.categories.slice(0, 3).map(category => (
-                  <Badge key={category} variant="secondary">{category}</Badge>
+                  <Badge key={category} variant="secondary" className="px-3 py-1 font-normal">{category}</Badge>
                 ))}
-                <Badge variant="outline">Vegetarian-friendly</Badge>
+                {restaurant.preference && (
+                  <Badge variant="outline" className="px-3 py-1 border-primary/30 text-primary">{restaurant.preference}</Badge>
+                )}
+                <Badge variant="outline" className="px-3 py-1 text-green-600 border-green-200 bg-green-50">Verified Expert</Badge>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" onClick={handleScrollToBooking}>Book this Chef</Button>
-                <Button size="sm" variant="outline" onClick={handleScrollToSignature}>Signature Dishes</Button>
-                <Button size="sm" variant="ghost">Send Enquiry</Button>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button size="lg" className="rounded-xl px-6" onClick={handleScrollToBooking}>Book Now</Button>
+                <Button size="lg" variant="outline" className="rounded-xl px-6" onClick={handleScrollToSignature}>Signature Dishes</Button>
+                <Button size="lg" variant="ghost" className="rounded-xl flex items-center gap-2">
+                  Send Enquiry
+                </Button>
               </div>
             </div>
 
-            <div className="relative w-full h-40 md:h-full md:w-auto rounded-lg overflow-hidden order-first md:order-last">
+            <div className="relative w-full aspect-square md:w-32 md:h-32 rounded-2xl overflow-hidden order-first md:order-last border-4 border-background shadow-xl">
               <Image
-                src={chefAvatar}
+                src={restaurant.imageId}
                 alt={chefName}
-                width={150}
-                height={150}
+                fill
                 className="object-cover"
               />
-              <Badge className="absolute top-1 right-1 text-xs px-1 py-0.5">Top Rated</Badge>
+              <Badge className="absolute bottom-1 right-1 text-[10px] px-1 py-0 bg-primary/90">TOP RATED</Badge>
             </div>
           </div>
         </CardContent>

@@ -24,10 +24,6 @@ interface ModernChefPageProps {
 }
 
 export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
-  const signatureDishes = allHomeFoods
-    .flatMap((r) => r.menu.flatMap((c) => c.items))
-    .slice(0, 5);
-
   // activeTab controls the persistent orange ring
   const [activeTab, setActiveTab] = useState<ChefTab>('book');
   // animatingSection controls the temporary zoom "pop" animation
@@ -37,6 +33,16 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
   const [services, setServices] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // 👉 Dynamic Signature Dishes from Chef Services
+  const allChefServices = services.flatMap(s => s.items);
+  const explicitSignatures = allChefServices.filter(item => item.isSignature);
+  
+  const signatureDishes = explicitSignatures.length > 0
+    ? explicitSignatures.slice(0, 5)
+    : allChefServices.length > 0
+      ? allChefServices.slice(0, 5)
+      : allHomeFoods.flatMap((r) => r.menu.flatMap((c) => c.items)).slice(0, 5);
 
   useEffect(() => {
     const loadServices = async () => {
@@ -114,7 +120,13 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
         {/* MAIN CONTENT */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
           <div className="lg:col-span-2 space-y-4">
-            <AboutCard chefName={chefName} />
+            <AboutCard 
+              chefName={chefName} 
+              bio={restaurant.bio}
+              experience={restaurant.experience}
+              specialty={restaurant.specialty}
+              city={restaurant.city}
+            />
             <SpecialtiesCard categories={restaurant.categories} />
 
             {/* SIGNATURE DISHES SECTION */}
@@ -162,7 +174,10 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
               rating={restaurant.rating}
               reviewCount={restaurant.reviews}
             />
-            <QuickInfoCard />
+            <QuickInfoCard 
+              workingHours={restaurant.workingHours} 
+              preference={restaurant.preference}
+            />
 
             {/* BOOK / ENQUIRY SECTION */}
             <section

@@ -6,6 +6,7 @@ import { getImageById } from '@/lib/placeholder-images';
 import { Plus } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { cn } from '@/lib/utils';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -36,14 +37,31 @@ export function MenuItem({ item, onClick }: MenuItemProps) {
 
           {/* TEXT RIGHT */}
           <div className="flex-1">
-            <h3 className="font-semibold text-base group-hover:text-primary">{item.name}</h3>
-            {item.type && (
-              <Badge variant="outline" className="mt-1">
-                {item.type === 'home-food' ? 'Home Food' : 'Restaurant'}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-base group-hover:text-primary">{item.name}</h3>
+              {item.itemType && (
+                <div className={cn(
+                  "h-2 w-2 rounded-full",
+                  item.itemType === 'Veg' ? "bg-green-500" : "bg-red-500"
+                )} />
+              )}
+            </div>
+            
+            <div className="flex gap-2 mt-1 flex-wrap">
+              {item.itemType && (
+                <Badge variant="outline" className="text-[10px] h-5">
+                  {item.itemType}
+                </Badge>
+              )}
+              {item.isNegotiable && (
+                <Badge variant="secondary" className="text-[10px] h-5 bg-blue-100 text-blue-700 hover:bg-blue-100">
+                  Negotiable
+                </Badge>
+              )}
+            </div>
+            
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
-            <p className="font-medium mt-2">${item.price.toFixed(2)}</p>
+            <p className="font-bold mt-2 text-primary">₹ {item.price}</p>
           </div>
 
         </div>

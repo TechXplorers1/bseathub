@@ -29,8 +29,11 @@ import {
   updateRestaurantAddress,
   updateRestaurantLegal
 } from '@/services/api';
+import { compressImage } from '@/lib/image-utils';
 
 // ─── Types ──────────────────────────────────────────────────────────────
+export type DayAvailability = { day: string; isOpen: boolean; openTime: string; closeTime: string };
+
 interface ProfileForm {
   name: string;
   description: string;
@@ -38,6 +41,8 @@ interface ProfileForm {
   imageId: string | null;
   coverImageId: string | null;
   isOpen: boolean;
+  workingHours: DayAvailability[];
+  restaurantType: string;
   // address
   addressLine1: string;
   addressLine2: string;
@@ -57,9 +62,37 @@ interface ProfileForm {
   bankName: string;
 }
 
+const restaurantTypes = [
+  "General",
+  "Fine Dining",
+  "Casual Dining",
+  "Family Restaurant",
+  "Fast Food",
+  "Cafe",
+  "Bakery",
+  "Dessert Shop",
+  "Food Truck",
+  "Cloud Kitchen",
+  "Takeaway Only",
+  "Bar",
+  "Pub",
+  "Lounge",
+  "Nightlife",
+  "Buffet",
+  "Catering Service",
+  "Home Kitchen",
+  "Multi-Cuisine"
+];
+
+const defaultHours: DayAvailability[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => ({
+  day, isOpen: true, openTime: '11:00', closeTime: '22:00'
+}));
+
 const EMPTY_FORM: ProfileForm = {
   name: '', description: '', cuisineType: '',
   imageId: null, coverImageId: null, isOpen: true,
+  workingHours: defaultHours,
+  restaurantType: 'General',
   addressLine1: '', addressLine2: '', city: '', state: '', postalCode: '', country: 'India',
   legalBusinessName: '', gstNumber: '', panNumber: '', fssaiLicenseNumber: '',
   businessType: '', bankAccountHolderName: '', bankAccountNumber: '', bankIFSC: '', bankName: '',
@@ -89,6 +122,16 @@ export default function SettingsPage() {
           imageId: data.imageId ?? null,
           coverImageId: data.coverImageId ?? null,
           isOpen: data.isOpen ?? true,
+          restaurantType: data.restaurantType ?? 'General',
+          workingHours: (() => {
+            try {
+              if (!data.workingHours) return defaultHours;
+              const parsed = typeof data.workingHours === 'string' ? JSON.parse(data.workingHours) : data.workingHours;
+              return Array.isArray(parsed) ? parsed : defaultHours;
+            } catch (e) {
+              return defaultHours;
+            }
+          })(),
           addressLine1: data.addressLine1 ?? '',
           addressLine2: data.addressLine2 ?? '',
           city: data.city ?? '',
@@ -114,14 +157,26 @@ export default function SettingsPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => setForm(f => ({ ...f, [key]: e.target.value }));
 
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    key: 'imageId' | 'coverImageId'
-  ) => {
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setForm(f => ({ ...f, [key]: reader.result as string }));
+    reader.onload = async () => {
+      const compressed = await compressImage(reader.result as string);
+      setForm(prev => ({ ...prev, imageId: compressed }));
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const compressed = await compressImage(reader.result as string, 1200, 400); // Larger for cover
+      setForm(prev => ({ ...prev, coverImageId: compressed }));
+    };
     reader.readAsDataURL(file);
     e.target.value = '';
   };
@@ -132,29 +187,31 @@ export default function SettingsPage() {
   };
 
   // ── Sectioned Save Handlers ───────────────────────────────────────────
-  // 🔥 SINGLE API CALL — CORE PROFILE
   const handleSaveProfile = async () => {
     if (!restaurantId) return;
-
     setSavingSection('profile');
-
     try {
+      // Send core profile data including images
       const payload = {
         name: form.name,
         description: form.description,
         cuisineType: form.cuisineType,
-        imageId: typeof form.imageId === "string" && form.imageId.startsWith("data:")
-          ? "test"   // prevent large base64 crash
-          : form.imageId,
-        coverImageId: typeof form.coverImageId === "string" && form.coverImageId.startsWith("data:")
-          ? "test"
-          : form.coverImageId,
+        restaurantType: form.restaurantType,
+        imageId: form.imageId,
+        coverImageId: form.coverImageId,
       };
-
-      console.log("PROFILE PAYLOAD:", payload);
-
       await updateRestaurantProfile(restaurantId, payload);
-      showToast('success', 'Profile saved!');
+      
+      if (form.imageId) {
+        try {
+            localStorage.setItem('userAvatar', form.imageId);
+            window.dispatchEvent(new Event('auth-change'));
+        } catch (e) {
+            console.warn("Storage quota exceeded, header icon might not update instantly.");
+        }
+      }
+      
+      showToast('success', 'Profile core info saved!');
     } catch (err: any) {
       showToast('error', err.message || 'Failed to save profile.');
     } finally {
@@ -164,9 +221,7 @@ export default function SettingsPage() {
 
   const handleSaveAddress = async () => {
     if (!restaurantId) return;
-
     setSavingSection('address');
-
     try {
       const payload = {
         addressLine1: form.addressLine1,
@@ -176,11 +231,8 @@ export default function SettingsPage() {
         postalCode: form.postalCode,
         country: form.country,
       };
-
-      console.log("ADDRESS PAYLOAD:", payload);
-
-      await updateRestaurantProfile(restaurantId, payload);
-      showToast('success', 'Address updated!');
+      await updateRestaurantAddress(restaurantId, payload);
+      showToast('success', 'Address details updated!');
     } catch (err: any) {
       showToast('error', err.message || 'Failed to save address.');
     } finally {
@@ -190,11 +242,10 @@ export default function SettingsPage() {
 
   const handleSaveLegal = async () => {
     if (!restaurantId) return;
-
     setSavingSection('legal');
-
     try {
       const payload = {
+        legalBusinessName: form.legalBusinessName,
         gstNumber: form.gstNumber,
         panNumber: form.panNumber,
         fssaiLicenseNumber: form.fssaiLicenseNumber,
@@ -204,10 +255,7 @@ export default function SettingsPage() {
         bankIFSC: form.bankIFSC,
         bankName: form.bankName,
       };
-
-      console.log("LEGAL PAYLOAD:", payload);
-
-      await updateRestaurantProfile(restaurantId, payload);
+      await updateRestaurantLegal(restaurantId, payload);
       showToast('success', 'Bank & Legal details saved!');
     } catch (err: any) {
       showToast('error', err.message || 'Failed to save bank details.');
@@ -218,17 +266,13 @@ export default function SettingsPage() {
 
   const handleSaveAvailability = async () => {
     if (!restaurantId) return;
-
     setSavingSection('availability');
-
     try {
-      const payload = {
+      // Re-using profile endpoint for isOpen toggle as it's a core field
+      await updateRestaurantProfile(restaurantId, {
         isOpen: form.isOpen,
-      };
-
-      console.log("AVAILABILITY PAYLOAD:", payload);
-
-      await updateRestaurantProfile(restaurantId, payload);
+        workingHours: JSON.stringify(form.workingHours)
+      });
       showToast('success', 'Availability updated!');
     } catch (err: any) {
       showToast('error', err.message || 'Failed to save hours.');
@@ -272,7 +316,7 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label>Cover Photo</Label>
                 <input ref={coverInputRef} type="file" accept="image/*" className="hidden"
-                  onChange={e => handleImageChange(e, 'coverImageId')} />
+                  onChange={handleCoverImageChange} />
                 <div className="relative w-full rounded-xl border-2 border-dashed bg-muted/40 cursor-pointer overflow-hidden"
                   style={{ aspectRatio: '4/1' }} onClick={() => !form.coverImageId && coverInputRef.current?.click()}>
                   {form.coverImageId ? (
@@ -293,12 +337,13 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center gap-5">
-                <input ref={profileInputRef} type="file" accept="image/*" className="hidden" onChange={e => handleImageChange(e, 'imageId')} />
+                <input ref={profileInputRef} type="file" accept="image/*" className="hidden" 
+                  onChange={handleProfileImageChange} />
                 <div className="relative h-20 w-20 rounded-full border-2 border-dashed overflow-hidden cursor-pointer"
                   onClick={() => profileInputRef.current?.click()}>
                   {form.imageId ? <img src={form.imageId} alt="Profile" className="h-full w-full object-cover" /> : <UserCircle2 className="h-full w-full opacity-30" />}
                 </div>
-                <Button size="sm" variant="outline" onClick={() => profileInputRef.current?.click()}>Upload Logo</Button>
+                <Button size="sm" variant="outline" onClick={() => profileInputRef.current?.click()}>Upload Brand Logo</Button>
               </div>
 
               <Separator />
@@ -311,9 +356,30 @@ export default function SettingsPage() {
                 <Label>Bio</Label>
                 <Textarea value={form.description} onChange={setField('description')} rows={3} />
               </div>
-              <div className="space-y-2">
-                <Label>Cuisine</Label>
-                <Input value={form.cuisineType} onChange={setField('cuisineType')} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Cuisine</Label>
+                  <Input value={form.cuisineType} onChange={setField('cuisineType')} placeholder="e.g. Italian, Chinese" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Restaurant Type</Label>
+                  <Select
+                    value={form.restaurantType}
+                    onValueChange={(val) => setForm(f => ({ ...f, restaurantType: val }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {restaurantTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
             <CardFooter>
@@ -331,30 +397,61 @@ export default function SettingsPage() {
               <CardDescription>Set the hours you are open for orders.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                <div key={day} className="flex items-center justify-between p-3 rounded-lg border">
-                  <span className="font-medium text-sm">{day}</span>
+              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+                <div className="space-y-0.5">
+                  <Label>Currently Accepting Orders</Label>
+                  <p className="text-xs text-muted-foreground">Turn this off to temporarily close your restaurant globally.</p>
+                </div>
+                <Switch
+                  checked={form.isOpen}
+                  onCheckedChange={(c) => setForm(f => ({ ...f, isOpen: c }))}
+                />
+              </div>
+              <Separator />
+              {form.workingHours.map((wh, index) => (
+                <div key={wh.day} className="flex items-center justify-between p-3 rounded-lg border">
+                  <span className="font-medium text-sm w-24">{wh.day}</span>
                   <div className="flex items-center gap-4">
                     <Switch
-                      checked={day === 'Sunday' ? !form.isOpen : true}
-                      onCheckedChange={(checked) => day === 'Sunday' && setForm(f => ({ ...f, isOpen: !checked }))}
+                      checked={wh.isOpen}
+                      onCheckedChange={(checked) => {
+                        const updated = [...form.workingHours];
+                        updated[index].isOpen = checked;
+                        setForm(f => ({ ...f, workingHours: updated }));
+                      }}
                     />
-                    <span className="text-xs w-12 text-muted-foreground">{day === 'Sunday' ? (form.isOpen ? 'Open' : 'Closed') : 'Open'}</span>
-                    <Select defaultValue="11:00">
+                    <span className="text-xs w-12 text-muted-foreground">{wh.isOpen ? 'Open' : 'Closed'}</span>
+                    <Select
+                      value={wh.openTime}
+                      onValueChange={(val) => {
+                        const updated = [...form.workingHours];
+                        updated[index].openTime = val;
+                        setForm(f => ({ ...f, workingHours: updated }));
+                      }}
+                    >
                       <SelectTrigger className="h-8 w-[90px] text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="10:00">10:00 AM</SelectItem>
-                        <SelectItem value="11:00">11:00 AM</SelectItem>
-                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        {Array.from({ length: 24 }).map((_, i) => {
+                          const hourStr = i.toString().padStart(2, '0') + ':00';
+                          return <SelectItem key={hourStr} value={hourStr}>{hourStr}</SelectItem>;
+                        })}
                       </SelectContent>
                     </Select>
                     <span className="text-xs text-muted-foreground">to</span>
-                    <Select defaultValue="22:00">
+                    <Select
+                      value={wh.closeTime}
+                      onValueChange={(val) => {
+                        const updated = [...form.workingHours];
+                        updated[index].closeTime = val;
+                        setForm(f => ({ ...f, workingHours: updated }));
+                      }}
+                    >
                       <SelectTrigger className="h-8 w-[90px] text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="21:00">09:00 PM</SelectItem>
-                        <SelectItem value="22:00">10:00 PM</SelectItem>
-                        <SelectItem value="23:00">11:00 PM</SelectItem>
+                        {Array.from({ length: 24 }).map((_, i) => {
+                          const hourStr = i.toString().padStart(2, '0') + ':00';
+                          return <SelectItem key={hourStr} value={hourStr}>{hourStr}</SelectItem>;
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
@@ -377,8 +474,12 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Address Line 1</Label>
+                <Label>House No.</Label>
                 <Input value={form.addressLine1} onChange={setField('addressLine1')} />
+              </div>
+              <div className="space-y-2">
+                <Label>Street Name</Label>
+                <Input value={form.addressLine2} onChange={setField('addressLine2')} placeholder="Suite, floor, etc. (Optional)" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

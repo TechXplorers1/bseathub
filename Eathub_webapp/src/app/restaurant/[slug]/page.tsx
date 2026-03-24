@@ -40,6 +40,13 @@ export default async function RestaurantPage({ params, searchParams }: PageProps
             services: ['delivery'],
             menu: [],
             type: 'restaurant',
+            // Pass through chef specific fields
+            bio: chef.bio,
+            experience: chef.experience,
+            specialty: chef.specialty,
+            workingHours: chef.workingHours,
+            preference: chef.preference,
+            city: chef.city,
           } as any;
         }
       } catch (chefErr) {

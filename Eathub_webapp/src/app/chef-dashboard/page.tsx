@@ -34,13 +34,21 @@ import Link from 'next/link';
 import { useEffect, useState } from "react";
 
 export default function ChefDashboardPage() {
-  const [roleName, setRoleName] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
+    const name = localStorage.getItem("userName");
     const role = localStorage.getItem("userRole");
-    setRoleName(
-      role ? role.charAt(0) + role.slice(1).toLowerCase() : "Chef"
-    );
+    if (name) {
+      setDisplayName(name);
+    } else if (role) {
+      // Fallback if name is not stored
+      setDisplayName(
+        role.charAt(0) + role.slice(1).toLowerCase()
+      );
+    } else {
+      setDisplayName("Chef"); // Default if neither is found
+    }
   }, []);
 
   return (
@@ -48,7 +56,7 @@ export default function ChefDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, {roleName}!
+            Welcome back, {displayName}!
           </h1>
           <p className="text-muted-foreground">
             Here's what's cooking in your dashboard.

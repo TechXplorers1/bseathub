@@ -7,6 +7,7 @@ import { getImageById } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { MenuItemDialog } from '../restaurant/MenuItemDialog';
 import { useState } from 'react';
+import { Badge } from '../ui/badge';
 
 interface SignatureDishesProps {
     items: MenuItemType[];
@@ -15,9 +16,21 @@ interface SignatureDishesProps {
 export function SignatureDishes({ items }: SignatureDishesProps) {
     const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);
 
-    if (!items || items.length < 5) return null;
+    if (!items || items.length === 0) return null;
     
-    const [dish1, dish2, dish3, dish4, dish5] = items;
+    // Fill up to 5 items with placeholders if needed to keep the grid layout consistent
+    const displayItems = [...items];
+    while (displayItems.length < 5) {
+        displayItems.push({
+            id: `placeholder-${displayItems.length}`,
+            name: 'Specialty Dish',
+            description: 'A culinary masterpiece prepared by our expert chef.',
+            price: 0,
+            imageId: 'food-1'
+        });
+    }
+
+    const [dish1, dish2, dish3, dish4, dish5] = displayItems;
 
     const handleItemClick = (item: MenuItemType) => {
         setSelectedItem(item);
@@ -25,21 +38,24 @@ export function SignatureDishes({ items }: SignatureDishesProps) {
 
 
     const renderImageWithOverlay = (dish: MenuItemType, className?: string) => {
-        const image = getImageById(dish.imageId);
-        if (!image) return null;
+        // Handle both placeholder IDs and direct URLs/Base64
+        const placeholder = getImageById(dish.imageId);
+        const imageSrc = placeholder ? placeholder.imageUrl : (dish.imageId || '/placeholder-food.jpg');
         
         return (
-            <div key={dish.id} className={cn("overflow-hidden relative group rounded-lg cursor-pointer", className)} onClick={() => handleItemClick(dish)}>
+            <div key={dish.id} className={cn("overflow-hidden relative group rounded-lg cursor-pointer bg-muted", className)} onClick={() => handleItemClick(dish)}>
                 <Image
-                    src={image.imageUrl}
+                    src={imageSrc}
                     alt={dish.name}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    data-ai-hint={image.imageHint}
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/60 transition-colors flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100">
-                    <h3 className="font-bold text-white text-lg">{dish.name}</h3>
-                    <p className="text-white/90 text-sm line-clamp-2">{dish.description}</p>
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/70 transition-colors flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100">
+                    <div className="mb-1">
+                        <Badge className="bg-primary hover:bg-primary border-none text-[10px] h-4">SIGNATURE</Badge>
+                    </div>
+                    <h3 className="font-bold text-white text-lg leading-tight">{dish.name}</h3>
+                    <p className="text-white/80 text-xs line-clamp-2 mt-1">{dish.description}</p>
                 </div>
             </div>
         );

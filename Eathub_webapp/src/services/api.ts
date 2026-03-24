@@ -316,3 +316,88 @@ export const updateRestaurantLegal = async (restaurantId: string, payload: any) 
     }
     return res.json();
 };
+
+/* ================= HOME FOOD PROFILE SETTINGS ================= */
+
+export const fetchHomeFoodProfile = async (id: string) => {
+    const res = await fetch(`${BASE_URL}/home-food/${id}`);
+    if (!res.ok) throw new Error("Failed to fetch home food profile");
+    return res.json();
+};
+
+export const updateHomeFoodProfile = async (id: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/home-food/${id}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update home food profile");
+    }
+    return res.json();
+};
+
+export const updateHomeFoodAddress = async (id: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/home-food/${id}/address`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update home food address");
+    }
+    return res.json();
+};
+
+export const updateHomeFoodLegal = async (id: string, payload: any) => {
+    const res = await fetch(`${BASE_URL}/home-food/${id}/legal`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || "Failed to update home food legal details");
+    }
+    return res.json();
+};
+
+/* ================= CHEF PROFILE SETTINGS ================= */
+
+export const fetchChefProfile = async (id: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/chefs/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch chef profile');
+    return response.json();
+};
+
+export const updateChefProfile = async (id: string, data: any): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/chefs/${id}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update chef profile');
+    return response.json();
+};
+
+export const updateChefAddress = async (id: string, data: any): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/chefs/${id}/address`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update chef address');
+    return response.json();
+};
+
+export const updateChefLegal = async (id: string, data: any): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/chefs/${id}/legal`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update chef legal/bank details');
+    return response.json();
+};

@@ -20,6 +20,13 @@ export interface Restaurant {
   type: RestaurantType;
   isOpen?: boolean;
   owner?: { id: string };
+  // Dynamic Profile Fields
+  bio?: string;
+  experience?: string;
+  specialty?: string;
+  workingHours?: string;
+  preference?: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
+  city?: string;
 }
 
 export interface MenuCategory {
@@ -34,7 +41,11 @@ export interface MenuItem {
   description: string;
   price: number;
   imageId: PlaceholderImageIds;
-  type?: RestaurantType;
+  category?: string;
+  type?: RestaurantType | 'chef-service';
+  itemType?: 'Veg' | 'Non-Veg' | 'Vegan' | 'Other';
+  isSignature?: boolean;
+  isNegotiable?: boolean;
   restaurantName?: string;
 }
 
@@ -65,4 +76,8 @@ export interface Chef {
   restaurantName?: string;
   restaurantImageId?: string;
   categories?: string[];
+  experience?: string;
+  workingHours?: string;
+  city?: string;
+  isActive?: boolean;
 }

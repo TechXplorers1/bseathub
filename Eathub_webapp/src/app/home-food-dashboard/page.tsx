@@ -32,7 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 export default function HomeFoodDashboardPage() {
-  const [userName, setUserName] = useState('Maria');
+  const [userName, setUserName] = useState('User');
 
   useEffect(() => {
     const name = localStorage.getItem('userName');

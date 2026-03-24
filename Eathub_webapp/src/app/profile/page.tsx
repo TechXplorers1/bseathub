@@ -15,7 +15,8 @@ import {
     Search,
     Save,
     Loader2,
-    ArrowLeft
+    ArrowLeft,
+    Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,10 +44,10 @@ export default function ProfilePage() {
         houseNumber: '',
         street: '',
         area: '',
-        province: '',
-        county: '',
+        city: '',
         state: '',
-        country: 'India'
+        country: '',
+        avatarUrl: ''
     });
 
     const [countrySearch, setCountrySearch] = useState('');
@@ -82,11 +83,17 @@ export default function ProfilePage() {
                     houseNumber: data.houseNumber || '',
                     street: data.street || '',
                     area: data.area || '',
-                    province: data.province || '',
-                    county: data.county || '',
+                    city: data.city || '',
                     state: data.state || '',
-                    country: data.country || 'India'
+                    country: data.country || '',
+                    avatarUrl: data.avatarUrl || ''
                 });
+
+                // Keep avatar in sync with local storage for header updates
+                if (data.avatarUrl) {
+                    localStorage.setItem('userAvatar', data.avatarUrl);
+                    window.dispatchEvent(new Event('auth-change'));
+                }
             } catch (error) {
                 console.error("Error loading profile:", error);
                 // If fetch fails, try to populate from localStorage or just keep empty
@@ -112,6 +119,15 @@ export default function ProfilePage() {
                 name: `${form.firstName} ${form.lastName}`,
                 mobileNumber: `${form.countryCode}${form.mobile}`
             });
+
+            const fullName = `${form.firstName} ${form.lastName}`;
+            localStorage.setItem('userName', fullName);
+
+            if (form.avatarUrl) {
+                localStorage.setItem('userAvatar', form.avatarUrl);
+                window.dispatchEvent(new Event('auth-change'));
+            }
+
             toast({
                 title: "Profile Updated",
                 description: "Your details have been successfully saved.",
@@ -160,9 +176,31 @@ export default function ProfilePage() {
                     {/* Summary Card */}
                     <Card className="md:col-span-1 h-fit">
                         <CardHeader className="text-center pb-2">
-                            <div className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                                <User size={48} className="text-primary" />
-                            </div>
+                            <label className="mx-auto w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4 overflow-hidden relative group cursor-pointer border border-border">
+                                {form.avatarUrl ? (
+                                    <img src={form.avatarUrl} alt="Avatar" className="w-full h-full object-cover group-hover:opacity-50 transition-opacity" />
+                                ) : (
+                                    <User size={48} className="text-primary group-hover:opacity-50 transition-opacity" />
+                                )}
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                                    <Camera className="text-white w-6 h-6" />
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setForm(prev => ({ ...prev, avatarUrl: reader.result as string }));
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            </label>
                             <CardTitle>{form.firstName} {form.lastName}</CardTitle>
                             <CardDescription>{form.email}</CardDescription>
                         </CardHeader>
@@ -174,7 +212,7 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="flex items-start gap-2 text-muted-foreground">
                                     <MapPin size={14} className="mt-0.5 shrink-0" />
-                                    <span>{form.houseNumber}, {form.street}, {form.area}, {form.city || form.county}, {form.state}, {form.country}</span>
+                                    <span>{form.houseNumber}, {form.street}, {form.area}, {form.city}, {form.state}, {form.country}</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -263,43 +301,46 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>House / Flat Number</Label>
+                                    <Label>Address Line 1 (House, Apt, Building)</Label>
                                     <div className="relative">
                                         <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="houseNumber" value={form.houseNumber} onChange={handleChange} placeholder="Flat 402, A-Block" className="pl-10" required />
+                                        <Input name="houseNumber" value={form.houseNumber} onChange={handleChange} placeholder="Apt 4B / 123 Main St" className="pl-10" required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Street / Landmark</Label>
+                                    <Label>Address Line 2 (Street, Sector, Area)</Label>
                                     <div className="relative">
                                         <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="street" value={form.street} onChange={handleChange} placeholder="MG Road, Near Central Mall" className="pl-10" required />
+                                        <Input name="street" value={form.street} onChange={handleChange} placeholder="Downtown / Sector 4" className="pl-10" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Area / Locality</Label>
+                                    <Label>Landmark / Locality</Label>
                                     <div className="relative">
                                         <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="area" value={form.area} onChange={handleChange} placeholder="Hauz Khas" className="pl-10" required />
+                                        <Input name="area" value={form.area} onChange={handleChange} placeholder="Near Central Park" className="pl-10" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>City / County</Label>
+                                    <Label>Town / City</Label>
                                     <div className="relative">
                                         <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="county" value={form.county} onChange={handleChange} placeholder="New Delhi" className="pl-10" required />
+                                        <Input name="city" value={form.city} onChange={handleChange} placeholder="New York" className="pl-10" required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>State / Province</Label>
+                                    <Label>State / Province / Region</Label>
                                     <div className="relative">
-                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="state" value={form.state} onChange={handleChange} placeholder="Delhi" className="pl-10" required />
+                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                        <Input name="state" value={form.state} onChange={handleChange} placeholder="NY" className="pl-10" required />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Country</Label>
-                                    <Input name="country" value={form.country} disabled className="bg-muted cursor-not-allowed" />
+                                    <div className="relative">
+                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                        <Input name="country" value={form.country} onChange={handleChange} placeholder="United States" className="pl-10" required />
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

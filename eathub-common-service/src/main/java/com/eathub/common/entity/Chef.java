@@ -29,8 +29,22 @@ public class Chef {
 
     private Double rating;
     private Integer reviewsCount;
+    @Column(columnDefinition = "TEXT")
     private String avatarUrl;
     private String experience;
+
+    // Removed redundant field
+    
+    @Column(columnDefinition = "TEXT")
+    private String workingHours;
+    
+    private Boolean isActive;
+
+    @OneToOne(mappedBy = "chef", cascade = CascadeType.ALL)
+    private ChefAddress address;
+
+    @OneToOne(mappedBy = "chef", cascade = CascadeType.ALL)
+    private ChefLegalProfile legalProfile;
 
     @OneToMany(mappedBy = "chef", cascade = CascadeType.ALL)
     private Set<ChefService> services;

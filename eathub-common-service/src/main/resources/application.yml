@@ -10,22 +10,26 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 50MB
+      max-request-size: 50MB
 
   jpa:
     hibernate:
-      # Change from 'validate' to 'update' to allow automatic sync
       ddl-auto: update 
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 25
+          fetch_size: 50
+        order_updates: true
+        order_inserts: true
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.sql
     enabled: true
+    clear-checksums: true
     # This ensures Liquibase doesn't crash if you manually edited the DB
     parameters:
       placeholder: value 

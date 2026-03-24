@@ -13,7 +13,28 @@ public class ChefResponseDTO {
     private Double rating;
     private Integer reviews;
     private String slug;
-    // Fields required by your frontend ChefCard.tsx
     private String specialty;
-    private String preference; // Veg, Non-Veg, or Veg & Non-Veg
+    private String preference;
+    private Boolean isActive;
+    private String workingHours;
+
+    // Expand address fields
+    private String addressLine1;
+    private String addressLine2;
+    private String city;
+    private String state;
+    private String postalCode;
+    private String country;
+
+    // Expand legal fields
+    private String legalBusinessName;
+    private String gstNumber;
+    private String panNumber;
+    private String bankAccountHolderName;
+    private String bankAccountNumber;
+    private String bankIFSC;
+    private String bankName;
+
+    private String foodSafetyCertUrl;
+    private String culinaryDiplomaUrl;
 }

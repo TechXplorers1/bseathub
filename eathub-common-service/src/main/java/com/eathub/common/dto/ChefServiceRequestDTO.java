@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 public class ChefServiceRequestDTO {
     private String name;
     private String description;
-    private String basePrice;
+    private Double basePrice;
     private String category;
+    private String itemType;
+    private Boolean isSignature = false;
+    private Boolean isNegotiable = false;
+    private String imageId;
     private String status;
 }

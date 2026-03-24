@@ -16,7 +16,11 @@ public class RestaurantProfileUpdateDTO {
     private String name;
     private String description;
     private String cuisineType;
+    private String restaurantType;
     private Boolean isOpen;
+
+    /** JSON string representing daily opening/closing hours */
+    private String workingHours;
 
     /** Base64 data-URL or an external image URL for the profile logo. */
     private String imageId;

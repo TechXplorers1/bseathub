@@ -38,8 +38,24 @@ public class HomeFoodProvider {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @Column(name = "image_id")
+    @Column(name = "image_id", columnDefinition = "TEXT")
     private String imageId;
+
+    @Column(name = "cover_image_id", columnDefinition = "TEXT")
+    private String coverImageId;
+
+    @Column(name = "working_hours", columnDefinition = "TEXT")
+    private String workingHours;
+
+    @Column(name = "operational_status")
+    private String operationalStatus;
+
+    // Relationships
+    @OneToOne(mappedBy = "homeFoodProvider", cascade = CascadeType.ALL)
+    private HomeFoodAddress address;
+
+    @OneToOne(mappedBy = "homeFoodProvider", cascade = CascadeType.ALL)
+    private HomeFoodLegalProfile legalProfile;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

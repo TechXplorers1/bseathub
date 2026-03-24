@@ -264,7 +264,8 @@ CREATE TABLE IF NOT EXISTS reviews (
 
 -- changeset eathub:1.0.1
 -- Add password support for internal authentication
-ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);  
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password VARCHAR(255);
+
 -- changeset eathub:1.0.2
 -- Fix image truncation error by changing image_id to TEXT
 ALTER TABLE menu_items ALTER COLUMN image_id TYPE TEXT;
@@ -273,14 +274,156 @@ ALTER TABLE menu_items ALTER COLUMN image_id TYPE TEXT;
 -- Add category column to chef_services for categorization
 ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS category VARCHAR(100);
 
--- changeset eathub:1.0.4
+-- changeset eathub:1.0.4 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
 -- Flatten core fields only: description + images as TEXT
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS image_id TEXT;
 ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS cover_image_id TEXT;
-
--- Handle cases where Hibernate ddl-auto:update might have created these as VARCHAR(255)
 ALTER TABLE restaurants ALTER COLUMN description TYPE TEXT;
 ALTER TABLE restaurants ALTER COLUMN image_id TYPE TEXT;
 ALTER TABLE restaurants ALTER COLUMN cover_image_id TYPE TEXT;
 
+-- changeset eathub:1.0.5
+-- Add join columns for @OneToOne relationships
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS address_id VARCHAR(36);
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS legal_profile_id VARCHAR(36);
+
+-- changeset eathub:1.0.6
+-- Add working_hours to restaurants
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS working_hours TEXT;
+
+-- changeset eathub:1.0.7
+-- Add restaurant_type to restaurants
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS restaurant_type VARCHAR(255);
+
+-- changeset eathub:1.0.8
+-- Ensure operational_status exists to store OPEN/CLOSED state
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS operational_status VARCHAR(50) DEFAULT 'OPEN';
+
+-- changeset eathub:1.0.9 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Expand Home Food Provider schema
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS cover_image_id TEXT;
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS working_hours TEXT;
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS operational_status VARCHAR(50) DEFAULT 'OPEN';
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS address_id VARCHAR(36);
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS legal_profile_id VARCHAR(36);
+ALTER TABLE home_food_addresses ADD COLUMN IF NOT EXISTS address_line2 VARCHAR(255);
+ALTER TABLE home_food_addresses ADD COLUMN IF NOT EXISTS country VARCHAR(100) DEFAULT 'India';
+
+CREATE TABLE IF NOT EXISTS home_food_legal_profiles (
+    id VARCHAR(36) PRIMARY KEY,
+    home_food_id VARCHAR(36) NOT NULL UNIQUE,
+    legal_business_name VARCHAR(255),
+    gst_number VARCHAR(50),
+    pan_number VARCHAR(50),
+    fssai_license_number VARCHAR(100),
+    business_type VARCHAR(100),
+    bank_account_holder_name VARCHAR(255),
+    bank_account_number VARCHAR(100),
+    bank_ifsc VARCHAR(50),
+    bank_name VARCHAR(255),
+    CONSTRAINT fk_legal_profile_home_food FOREIGN KEY (home_food_id) REFERENCES home_food_providers(id)
+);
+
+-- changeset eathub:1.1.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Expand Chef schema
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS specialties TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS working_hours TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS experience VARCHAR(100);
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS address_id VARCHAR(36);
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS legal_profile_id VARCHAR(36);
+
+CREATE TABLE IF NOT EXISTS chef_addresses (
+    id VARCHAR(36) PRIMARY KEY,
+    chef_id VARCHAR(36) NOT NULL UNIQUE,
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    country VARCHAR(100) DEFAULT 'India',
+    postal_code VARCHAR(20),
+    CONSTRAINT fk_chef_address_chef FOREIGN KEY (chef_id) REFERENCES chefs(id)
+);
+
+CREATE TABLE IF NOT EXISTS chef_legal_profiles (
+    id VARCHAR(36) PRIMARY KEY,
+    chef_id VARCHAR(36) NOT NULL UNIQUE,
+    legal_business_name VARCHAR(255),
+    gst_number VARCHAR(50),
+    pan_number VARCHAR(50),
+    fssai_license_number VARCHAR(100),
+    bank_account_holder_name VARCHAR(255),
+    bank_account_number VARCHAR(100),
+    bank_ifsc VARCHAR(50),
+    bank_name VARCHAR(255),
+    CONSTRAINT fk_legal_profile_chef FOREIGN KEY (chef_id) REFERENCES chefs(id)
+);
+
+-- changeset eathub:1.1.2
+-- Add missing columns to chefs and chef_services
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS experience VARCHAR(100);
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS base_price VARCHAR(50);
+
+-- changeset eathub:1.1.3
+-- Explicitly change avatar_url to TEXT for Postgres to support large Base64 data
+ALTER TABLE chefs ALTER COLUMN avatar_url TYPE TEXT;
+
+-- changeset eathub:1.1.4
+-- Remove redundant columns for clean schema
+ALTER TABLE chefs DROP COLUMN IF EXISTS specialties;
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS bankifsc;
+
+-- changeset eathub:1.1.5
+-- Add document storage columns to chef_legal_profiles
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS pan_document_url TEXT;
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS gst_document_url TEXT;
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS fssai_document_url TEXT;
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS culinary_diploma_url TEXT;
+
+-- changeset eathub:1.1.6 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Cleanup unused document and legal columns
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS pan_document_url;
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS gst_document_url;
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS fssai_document_url;
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS fssai_license_number;
+ALTER TABLE chef_legal_profiles DROP COLUMN IF EXISTS bankifsc;
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS food_safety_cert_url TEXT;
+
+-- changeset eathub:1.1.7 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Create users_profile table for user-specific profile and address details
+CREATE TABLE IF NOT EXISTS users_profile (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL UNIQUE,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    house_number VARCHAR(255),
+    street VARCHAR(255),
+    area VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    country VARCHAR(100) DEFAULT 'India',
+    CONSTRAINT fk_users_profile_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- changeset eathub:1.1.8
+-- Fix profile save 500 error by changing users avatar_url to TEXT
+ALTER TABLE users ALTER COLUMN avatar_url TYPE TEXT;
+
+-- changeset eathub:1.1.9
+-- Add menu and signature dish support to chef_services
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS item_type VARCHAR(50);
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS is_signature BOOLEAN DEFAULT FALSE;
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS is_negotiable BOOLEAN DEFAULT FALSE;
+ALTER TABLE chef_services ADD COLUMN IF NOT EXISTS image_id TEXT;
+
+-- Move non-numeric base_price values to is_negotiable flag and set price to 0
+-- This prevents the cast failure: "We will negotiate with the client 1 to 1"
+UPDATE chef_services 
+SET is_negotiable = TRUE, base_price = '0' 
+WHERE base_price IS NOT NULL AND base_price !~ '^([0-9]+[.]?[0-9]*|[.][0-9]+)$';
+
+-- Convert base_price to FLOAT for numeric operations
+ALTER TABLE chef_services ALTER COLUMN base_price TYPE FLOAT USING base_price::double precision;

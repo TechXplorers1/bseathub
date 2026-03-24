@@ -1,10 +1,6 @@
 package com.eathub.common.controller;
 
-import com.eathub.common.dto.ChefRequestDTO;
-import com.eathub.common.dto.ChefResponseDTO;
-import com.eathub.common.dto.ChefServiceRequestDTO;
-import com.eathub.common.dto.ChefServiceResponseDTO;
-import com.eathub.common.entity.Chef;
+import com.eathub.common.dto.*;
 import com.eathub.common.repository.ChefRepository;
 import com.eathub.common.service.ChefManagementService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/chefs")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:9004")
+@CrossOrigin(origins = "http://localhost:3000") // Adjusted to standard Next.js port
 public class ChefController {
 
     private final ChefManagementService service;
@@ -34,6 +30,28 @@ public class ChefController {
     @GetMapping("/slug/{slug}")
     public ChefResponseDTO getBySlug(@PathVariable String slug) {
         return service.getChefBySlug(slug);
+    }
+
+    @GetMapping("/{id}")
+    public ChefResponseDTO getById(@PathVariable String id) {
+        return service.getChefById(id);
+    }
+
+    // ================= CHEF PROFILE UPDATES =================
+
+    @PutMapping("/{id}/profile")
+    public ChefResponseDTO updateProfile(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
+        return service.updateProfile(id, dto);
+    }
+
+    @PutMapping("/{id}/address")
+    public ChefResponseDTO updateAddress(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
+        return service.updateAddress(id, dto);
+    }
+
+    @PutMapping("/{id}/legal")
+    public ChefResponseDTO updateLegal(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
+        return service.updateLegal(id, dto);
     }
 
     // ================= CHEF SERVICES =================

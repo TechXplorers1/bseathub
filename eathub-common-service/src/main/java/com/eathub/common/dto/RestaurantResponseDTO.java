@@ -10,10 +10,12 @@ public class RestaurantResponseDTO {
     private String name;
     private String description;
     private String cuisineType;
+    private String restaurantType;
     private String slug;
     private Double rating;
     private Integer reviewsCount;
     private Boolean isOpen;
+    private String workingHours;
 
     // ── Images ────────────────────────────────────────────
     private String imageId;

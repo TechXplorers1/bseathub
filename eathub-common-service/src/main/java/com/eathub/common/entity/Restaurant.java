@@ -25,7 +25,7 @@ public class Restaurant {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    // ── Core ──────────────────────────────────────────────────────────────
+    // Core 
     private String name;
 
     @Column(unique = true)
@@ -45,6 +45,9 @@ public class Restaurant {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "working_hours", columnDefinition = "TEXT")
+    private String workingHours;
+
     @Column(name = "image_id", columnDefinition = "TEXT")
     private String imageId;
 
@@ -52,8 +55,7 @@ public class Restaurant {
     private String coverImageId;
 
     // ── Relationships (Reverted to 3-Table Structure) ───────────────────────
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @OneToOne(mappedBy = "restaurant", cascade = CascadeType.ALL)
     private RestaurantAddress address;
 
     @OneToOne(cascade = CascadeType.ALL)

@@ -1,31 +1,35 @@
 package com.eathub.common.service;
 
-import com.eathub.common.dto.ChefRequestDTO;
-import com.eathub.common.dto.ChefResponseDTO;
-import com.eathub.common.dto.ChefServiceRequestDTO;
-import com.eathub.common.dto.ChefServiceResponseDTO;
+import com.eathub.common.dto.*;
 import com.eathub.common.entity.Chef;
+import com.eathub.common.entity.ChefAddress;
+import com.eathub.common.entity.ChefLegalProfile;
 import com.eathub.common.entity.User;
-import com.eathub.common.repository.ChefRepository;
-import com.eathub.common.repository.ChefServiceRepository;
-import com.eathub.common.repository.UserRepository;
+import com.eathub.common.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChefManagementService {
 
     private final ChefRepository chefRepository;
     private final UserRepository userRepository;
     private final ChefServiceRepository chefServiceRepository;
+    private final ChefAddressRepository chefAddressRepository;
+    private final ChefLegalProfileRepository chefLegalProfileRepository;
 
     // ================= CHEF PROFILE =================
 
     public List<ChefResponseDTO> getAllChefs() {
-        return chefRepository.findAll().stream()
+        return chefRepository.findAllWithDetails().stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -34,12 +38,19 @@ public class ChefManagementService {
         return chefRepository.findBySlug(slug)
                 .map(this::mapToDTO)
                 .or(() -> chefRepository.findById(slug).map(this::mapToDTO))
-                .orElseThrow(() -> new RuntimeException("Chef not found with slug or ID: " + slug));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Chef not found with slug or ID: " + slug));
+    }
+
+    public ChefResponseDTO getChefById(String id) {
+        return chefRepository.findById(id)
+                .map(this::mapToDTO)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found with id: " + id));
     }
 
     public ChefResponseDTO registerChef(ChefRequestDTO dto) {
         User owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Chef chef = Chef.builder()
                 .name(dto.getName())
@@ -49,10 +60,95 @@ public class ChefManagementService {
                 .slug(dto.getSlug())
                 .rating(5.0)
                 .reviewsCount(0)
+                .isActive(true)
                 .owner(owner)
                 .build();
 
         return mapToDTO(chefRepository.save(chef));
+    }
+
+    @Transactional
+    public ChefResponseDTO updateProfile(String id, ChefProfileUpdateDTO dto) {
+        Chef chef = chefRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
+
+        if (dto.getName() != null)
+            chef.setName(dto.getName());
+        if (dto.getBio() != null)
+            chef.setBio(dto.getBio());
+        if (dto.getExperience() != null)
+            chef.setExperience(dto.getExperience());
+        if (dto.getSpecialty() != null)
+            chef.setSpecialty(dto.getSpecialty());
+        if (dto.getAvatarUrl() != null) {
+            chef.setAvatarUrl(dto.getAvatarUrl());
+            if (chef.getOwner() != null) {
+                chef.getOwner().setAvatarUrl(dto.getAvatarUrl());
+                userRepository.save(chef.getOwner());
+            }
+        }
+        if (dto.getWorkingHours() != null)
+            chef.setWorkingHours(dto.getWorkingHours());
+        if (dto.getIsActive() != null)
+            chef.setIsActive(dto.getIsActive());
+
+        return mapToDTO(chefRepository.save(chef));
+    }
+
+    @Transactional
+    public ChefResponseDTO updateAddress(String id, ChefProfileUpdateDTO dto) {
+        Chef chef = chefRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
+
+        ChefAddress address = chefAddressRepository.findByChef_Id(id)
+                .orElseGet(() -> ChefAddress.builder().chef(chef).build());
+
+        if (dto.getAddressLine1() != null)
+            address.setAddressLine1(dto.getAddressLine1());
+        if (dto.getAddressLine2() != null)
+            address.setAddressLine2(dto.getAddressLine2());
+        if (dto.getCity() != null)
+            address.setCity(dto.getCity());
+        if (dto.getState() != null)
+            address.setState(dto.getState());
+        if (dto.getPostalCode() != null)
+            address.setPostalCode(dto.getPostalCode());
+        if (dto.getCountry() != null)
+            address.setCountry(dto.getCountry());
+
+        chefAddressRepository.save(address);
+        return mapToDTO(chef);
+    }
+
+    @Transactional
+    public ChefResponseDTO updateLegal(String id, ChefProfileUpdateDTO dto) {
+        Chef chef = chefRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
+
+        ChefLegalProfile legal = chefLegalProfileRepository.findByChef_Id(id)
+                .orElseGet(() -> ChefLegalProfile.builder().chef(chef).build());
+
+        if (dto.getLegalBusinessName() != null)
+            legal.setLegalBusinessName(dto.getLegalBusinessName());
+        if (dto.getGstNumber() != null)
+            legal.setGstNumber(dto.getGstNumber());
+        if (dto.getPanNumber() != null)
+            legal.setPanNumber(dto.getPanNumber());
+        if (dto.getBankAccountHolderName() != null)
+            legal.setBankAccountHolderName(dto.getBankAccountHolderName());
+        if (dto.getBankAccountNumber() != null)
+            legal.setBankAccountNumber(dto.getBankAccountNumber());
+        if (dto.getBankIFSC() != null)
+            legal.setBankIFSC(dto.getBankIFSC());
+        if (dto.getBankName() != null)
+            legal.setBankName(dto.getBankName());
+        if (dto.getFoodSafetyCertUrl() != null)
+            legal.setFoodSafetyCertUrl(dto.getFoodSafetyCertUrl());
+        if (dto.getCulinaryDiplomaUrl() != null)
+            legal.setCulinaryDiplomaUrl(dto.getCulinaryDiplomaUrl());
+
+        chefLegalProfileRepository.save(legal);
+        return mapToDTO(chef);
     }
 
     // ================= CHEF SERVICES =================
@@ -70,14 +166,11 @@ public class ChefManagementService {
                 .collect(Collectors.groupingBy(
                         s -> s.getCategory() != null ? s.getCategory() : "General",
                         Collectors.mapping(s -> {
-                            // Map ChefService to MenuItemDTO for frontend compatibility
                             return com.eathub.common.dto.MenuItemDTO.builder()
                                     .id(s.getId())
                                     .name(s.getName())
                                     .description(s.getDescription())
-                                    .price(Double.parseDouble(s.getBasePrice().replaceAll("[^0-9.]", ""))) // Price is
-                                                                                                           // price in
-                                                                                                           // MenuItemDTO
+                                    .price(s.getBasePrice() != null ? s.getBasePrice() : 0.0)
                                     .category(s.getCategory())
                                     .status(s.getStatus())
                                     .build();
@@ -90,15 +183,20 @@ public class ChefManagementService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ChefServiceResponseDTO addService(String chefId, ChefServiceRequestDTO dto) {
         Chef chef = chefRepository.findById(chefId)
-                .orElseThrow(() -> new RuntimeException("Chef not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
 
         com.eathub.common.entity.ChefService service = com.eathub.common.entity.ChefService.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .basePrice(dto.getBasePrice())
                 .category(dto.getCategory())
+                .itemType(dto.getItemType())
+                .isSignature(dto.getIsSignature() != null ? dto.getIsSignature() : false)
+                .isNegotiable(dto.getIsNegotiable() != null ? dto.getIsNegotiable() : false)
+                .imageId(dto.getImageId())
                 .status(dto.getStatus() != null ? dto.getStatus() : "Active")
                 .chef(chef)
                 .build();
@@ -106,19 +204,27 @@ public class ChefManagementService {
         return mapToServiceDTO(chefServiceRepository.save(service));
     }
 
+    @Transactional
     public ChefServiceResponseDTO updateService(String serviceId, ChefServiceRequestDTO dto) {
         com.eathub.common.entity.ChefService service = chefServiceRepository.findById(serviceId)
-                .orElseThrow(() -> new RuntimeException("Service not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Service not found"));
 
         service.setName(dto.getName());
         service.setDescription(dto.getDescription());
         service.setBasePrice(dto.getBasePrice());
         service.setCategory(dto.getCategory());
+        service.setItemType(dto.getItemType());
+        if (dto.getIsSignature() != null)
+            service.setIsSignature(dto.getIsSignature());
+        if (dto.getIsNegotiable() != null)
+            service.setIsNegotiable(dto.getIsNegotiable());
+        service.setImageId(dto.getImageId());
         service.setStatus(dto.getStatus());
 
         return mapToServiceDTO(chefServiceRepository.save(service));
     }
 
+    @Transactional
     public void deleteService(String serviceId) {
         chefServiceRepository.deleteById(serviceId);
     }
@@ -132,11 +238,15 @@ public class ChefManagementService {
                 .description(service.getDescription())
                 .basePrice(service.getBasePrice())
                 .category(service.getCategory())
+                .itemType(service.getItemType())
+                .isSignature(service.getIsSignature())
+                .isNegotiable(service.getIsNegotiable())
+                .imageId(service.getImageId())
                 .status(service.getStatus())
                 .build();
     }
 
-    private ChefResponseDTO mapToDTO(Chef chef) {
+    public ChefResponseDTO mapToDTO(Chef chef) {
         ChefResponseDTO dto = new ChefResponseDTO();
         dto.setId(chef.getId());
         dto.setName(chef.getName());
@@ -146,9 +256,32 @@ public class ChefManagementService {
         dto.setRating(chef.getRating());
         dto.setReviews(chef.getReviewsCount());
         dto.setSlug(chef.getSlug());
+        if (dto.getSpecialty() == null)
+            dto.setSpecialty(chef.getSpecialty() != null ? chef.getSpecialty() : "General");
+        dto.setIsActive(chef.getIsActive());
+        dto.setWorkingHours(chef.getWorkingHours());
 
-        // Fix: These should eventually come from the database
-        dto.setSpecialty("General");
+        if (chef.getAddress() != null) {
+            dto.setAddressLine1(chef.getAddress().getAddressLine1());
+            dto.setAddressLine2(chef.getAddress().getAddressLine2());
+            dto.setCity(chef.getAddress().getCity());
+            dto.setState(chef.getAddress().getState());
+            dto.setPostalCode(chef.getAddress().getPostalCode());
+            dto.setCountry(chef.getAddress().getCountry());
+        }
+
+        if (chef.getLegalProfile() != null) {
+            dto.setLegalBusinessName(chef.getLegalProfile().getLegalBusinessName());
+            dto.setGstNumber(chef.getLegalProfile().getGstNumber());
+            dto.setPanNumber(chef.getLegalProfile().getPanNumber());
+            dto.setBankAccountHolderName(chef.getLegalProfile().getBankAccountHolderName());
+            dto.setBankAccountNumber(chef.getLegalProfile().getBankAccountNumber());
+            dto.setBankIFSC(chef.getLegalProfile().getBankIFSC());
+            dto.setBankName(chef.getLegalProfile().getBankName());
+            dto.setFoodSafetyCertUrl(chef.getLegalProfile().getFoodSafetyCertUrl());
+            dto.setCulinaryDiplomaUrl(chef.getLegalProfile().getCulinaryDiplomaUrl());
+        }
+
         dto.setPreference("Veg & Non-Veg");
         return dto;
     }

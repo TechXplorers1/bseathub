@@ -25,9 +25,23 @@ public class ChefService {
     private String description;
 
     @Column(name = "base_price")
-    private String basePrice;
+    private Double basePrice;
 
     private String category;
+
+    @Column(name = "item_type")
+    private String itemType;
+
+    @Builder.Default
+    @Column(name = "is_signature")
+    private Boolean isSignature = false;
+
+    @Builder.Default
+    @Column(name = "is_negotiable")
+    private Boolean isNegotiable = false;
+
+    @Column(name = "image_id", columnDefinition = "TEXT")
+    private String imageId;
 
     private String status;
 }

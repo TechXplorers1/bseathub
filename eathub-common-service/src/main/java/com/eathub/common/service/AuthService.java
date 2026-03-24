@@ -85,7 +85,7 @@ public class AuthService {
         }
 
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
-                providerIdResult);
+                providerIdResult, savedUser.getName(), savedUser.getAvatarUrl());
     }
 
     private String generateSlug(String name) {
@@ -117,7 +117,9 @@ public class AuthService {
                 jwtService.generateToken(user),
                 user.getEmail(),
                 user.getRole().name(),
-                providerId);
+                providerId,
+                user.getName(),
+                user.getAvatarUrl());
     }
 
     // Add these methods inside AuthService class
@@ -130,10 +132,11 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(UserRole.USER)
+                .avatarUrl(null) // Initialize as null for new users
                 .build();
         User savedUser = userRepository.save(user);
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
-                null);
+                null, savedUser.getName(), savedUser.getAvatarUrl());
     }
 
     // Instead of calling jwtService, just use the email passed from your request

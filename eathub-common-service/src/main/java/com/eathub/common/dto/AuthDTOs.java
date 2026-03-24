@@ -40,5 +40,7 @@ public class AuthDTOs {
         private String email;
         private String role;
         private String providerId;
+        private String name;
+        private String avatarUrl;
     }
 }

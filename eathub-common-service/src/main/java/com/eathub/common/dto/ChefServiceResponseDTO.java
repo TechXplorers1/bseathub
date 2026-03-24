@@ -13,7 +13,11 @@ public class ChefServiceResponseDTO {
     private String id;
     private String name;
     private String description;
-    private String basePrice;
+    private Double basePrice;
     private String category;
+    private String itemType;
+    private Boolean isSignature;
+    private Boolean isNegotiable;
+    private String imageId;
     private String status;
 }

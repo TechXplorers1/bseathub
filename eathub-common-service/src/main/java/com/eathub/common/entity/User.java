@@ -22,6 +22,11 @@ public class User {
 
     private String name;
 
+    private String phone;
+
+    @Column(columnDefinition = "TEXT")
+    private String avatarUrl;
+
     @Column(nullable = false)
     private String password;
 

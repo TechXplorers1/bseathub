@@ -6,13 +6,6 @@ import { fetchRestaurants } from '@/services/api';
 import type { Restaurant } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
-const categories = [
-  "Breakfast", "Fast Food", "Burgers", "Coffee", "Pizza", "Halal", "Chicken",
-  "Bubble Tea", "Indian", "Desserts", "Mexican", "Greek", "Healthy",
-  "Sandwiches", "Noodle", "Italian", "Japanese", "American", "Salads",
-  "Vietnamese", "Thai", "Vegan", "Steakhouse", "BBQ", "Mediterranean", "Bakery"
-];
-
 export default function RestaurantsPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +18,9 @@ export default function RestaurantsPage() {
         // Normalize backend data to frontend Restaurant interface
         const normalized = data.map((item: any) => ({
           ...item,
-          cuisine: item.cuisine || item.cuisineType || "Multi-cuisine",
-          reviews: item.reviews || item.reviewsCount || 0,
-          categories: item.categories || [item.cuisine || item.cuisineType || "General"],
+          cuisine: item.cuisineType || item.cuisine || "Multi-cuisine",
+          reviews: item.reviewsCount ?? item.reviews ?? 0,
+          categories: item.restaurantType ? [item.restaurantType] : (item.categories || ["General"]),
           type: 'restaurant' as const
         }));
         setRestaurants(normalized);
@@ -60,12 +53,20 @@ export default function RestaurantsPage() {
     );
   }
 
+  // Dynamically derive categories from fetched data to ensure all restaurants are shown
+  const dynamicCategories = Array.from(new Set(
+    restaurants.flatMap(r => [
+      r.cuisine,
+      ...(r.categories || [])
+    ].filter(Boolean))
+  )).sort();
+
   const restaurantsByCategory: { [category: string]: Restaurant[] } = {};
 
-  categories.forEach(category => {
+  dynamicCategories.forEach(category => {
     const filtered = restaurants.filter(restaurant =>
-      restaurant.categories?.some(cat => cat.toLowerCase().includes(category.toLowerCase())) ||
-      restaurant.cuisine?.toLowerCase().includes(category.toLowerCase())
+      restaurant.categories?.some(cat => cat.toLowerCase() === category.toLowerCase()) ||
+      restaurant.cuisine?.toLowerCase() === category.toLowerCase()
     );
     if (filtered.length > 0) {
       restaurantsByCategory[category] = filtered;

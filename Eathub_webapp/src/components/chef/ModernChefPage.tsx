@@ -33,6 +33,8 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
   const [services, setServices] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
+
 
   // 👉 Dynamic Signature Dishes from Chef Services
   const allChefServices = services.flatMap(s => s.items);
@@ -46,27 +48,24 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
   useEffect(() => {
     const loadServices = async () => {
-      // Assuming restaurant.id is the chef profile ID here if chefName is present
-      // or we need to find the actual chef ID. 
-      // For now, let's assume restaurant might contain it or we need another fetch.
-      // Based on client-page.tsx, restaurant is passed down.
-      if (restaurant.id) {
+      if (restaurant.id && !hasFetched) {
         setLoading(true);
         try {
-          // If restaurant.id is actually the restaurant ID but we need chef ID,
-          // we might need to fetch chef by slug first.
-          // But looking at the backend, chef has its own ID.
           const grouped = await fetchGroupedChefServices(restaurant.id);
-          setServices(grouped);
+          if (grouped && Array.isArray(grouped)) {
+            setServices(grouped);
+          }
+          setHasFetched(true);
         } catch (err) {
-          console.error("Failed to load chef services:", err);
+          // console.error("Failed to load chef services:", err);
+          setHasFetched(true);
         } finally {
           setLoading(false);
         }
       }
     };
     loadServices();
-  }, [restaurant.id]);
+  }, [restaurant.id, hasFetched]);
 
   const signatureRef = useRef<HTMLDivElement | null>(null);
   const bookingRef = useRef<HTMLDivElement | null>(null);
@@ -131,6 +130,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
             {/* SIGNATURE DISHES SECTION */}
             <section
+              id="signature-dishes"
               ref={signatureRef}
               // Added 'contain-paint' to optimize rendering during animation
               className={cn(
@@ -181,6 +181,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
             {/* BOOK / ENQUIRY SECTION */}
             <section
+              id="book-chef"
               ref={bookingRef}
               // Added 'contain-paint' to optimize rendering during animation
               className={cn(

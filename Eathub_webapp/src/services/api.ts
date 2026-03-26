@@ -49,7 +49,7 @@ export async function registerPartner(payload: { type: string; data: any }) {
     return await response.json();
 }
 
-export const addDishToRestaurant = async (restaurantId: string, payload: any) => {
+export const addDishToRestaurant = async (restaurantId: string, payload: any): Promise<any> => {
     const res = await fetch(`${BASE_URL}/restaurants/${restaurantId}/menu-items`, {
         method: 'POST',
         headers: {
@@ -61,7 +61,7 @@ export const addDishToRestaurant = async (restaurantId: string, payload: any) =>
         const error = await res.json();
         throw new Error(error.message || "Failed to add dish");
     }
-    return res.text();
+    return res.json();
 };
 
 export const login = async (credentials: any) => {
@@ -80,7 +80,7 @@ export const fetchItemsByRestaurant = async (restaurantId: string) => {
     return res.json();
 };
 
-export const updateMenuItem = async (menuItemId: string, payload: any) => {
+export const updateMenuItem = async (menuItemId: string, payload: any): Promise<any> => {
     const res = await fetch(`${BASE_URL}/menu/${menuItemId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -123,7 +123,7 @@ export const updateStatus = async (id: string, status: string) => {
     if (!res.ok) throw new Error("Failed to update status");
 };
 
-export const addHomeFoodDish = async (providerId: string, payload: any) => {
+export const addHomeFoodDish = async (providerId: string, payload: any): Promise<any> => {
     const url = `${BASE_URL}/home-food/${providerId}/menu-items`;
     const res = await fetch(
         url,
@@ -141,7 +141,7 @@ export const addHomeFoodDish = async (providerId: string, payload: any) => {
         throw new Error(error || "Failed to add dish");
     }
 
-    return res;
+    return res.json();
 };
 
 export const fetchHomeFoodMenu = async (providerId: string) => {

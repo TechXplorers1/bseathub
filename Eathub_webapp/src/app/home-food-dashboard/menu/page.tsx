@@ -137,7 +137,7 @@ export default function MenuPage() {
   const handleToggleSpecial = async (id: string, currentStatus: boolean) => {
     try {
       await toggleFeatured(id, !currentStatus);
-      await refreshMenu();
+      setMenuItems(prev => prev.map(item => item.id === id ? { ...item, isSpecial: !currentStatus } : item));
       toast({ title: `Marked as ${!currentStatus ? 'Special' : 'Regular'}` });
     } catch (error: any) {
       toast({ title: "Update Failed", description: error.message, variant: "destructive" });
@@ -148,7 +148,7 @@ export default function MenuPage() {
     const newStatus = currentStatus === 'Available' ? 'Out of Stock' : 'Available';
     try {
       await updateStatus(id, newStatus);
-      await refreshMenu();
+      setMenuItems(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));
       toast({ title: `Status updated to ${newStatus}` });
     } catch (error: any) {
       toast({ title: "Update Failed", description: error.message, variant: "destructive" });
@@ -159,7 +159,7 @@ export default function MenuPage() {
     if (!confirm("Are you sure you want to delete this dish?")) return;
     try {
       await deleteMenuItem(id);
-      await refreshMenu();
+      setMenuItems(prev => prev.filter(item => item.id !== id));
       toast({ title: "Dish Deleted" });
     } catch (error: any) {
       toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
@@ -172,7 +172,7 @@ export default function MenuPage() {
   };
 
   const handleSaveDish = async (formData: any) => {
-    console.log("DEBUG: handleSaveDish triggered with ProviderID:", providerId);
+
     if (!providerId) {
       toast({ title: "Error", description: "Provider ID not found. Please log in again.", variant: "destructive" });
       return;
@@ -189,26 +189,34 @@ export default function MenuPage() {
         imageUrl: formData.imageUrl      // Matches field 'imageUrl' in AddDishDialog
       };
 
-      console.log("DEBUG: Prepared Payload:", payload);
+
 
       if (editingDish) {
-        console.log("DEBUG: Updating existing dish:", editingDish.id);
-        await updateMenuItem(editingDish.id, payload);
+        const updated = await updateMenuItem(editingDish.id, payload);
+        const mappedUpdated = {
+          ...updated,
+          imageUrl: updated.imageId || "/placeholder-dish.jpg",
+          categoryName: updated.category,
+          isSpecial: updated.isSpecial ?? false,
+          status: updated.status || 'Available',
+        };
+        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? mappedUpdated : i));
         toast({ title: "Dish Updated!" });
       } else {
-        console.log("DEBUG: Adding new dish via addHomeFoodDish");
-        const response = await addHomeFoodDish(providerId, payload);
-        if (!response.ok) {
-          const error = await response.text();
-          console.error("DEBUG: Save Failed at API:", error);
-          throw new Error(error || "Failed to save dish");
-        }
+        const added = await addHomeFoodDish(providerId, payload);
+        const mappedAdded = {
+          ...added,
+          imageUrl: added.imageId || "/placeholder-dish.jpg",
+          categoryName: added.category,
+          isSpecial: added.isSpecial ?? false,
+          status: added.status || 'Available',
+        };
+        setMenuItems(prev => [...prev, mappedAdded]);
         toast({ title: "Dish Added!" });
       }
 
       setIsAddDishDialogOpen(false);
       setEditingDish(null);
-      await refreshMenu();
 
     } catch (err: any) {
       console.error("Save Failed:", err);

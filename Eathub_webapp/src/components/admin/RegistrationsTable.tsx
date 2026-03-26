@@ -35,7 +35,7 @@ export function RegistrationsTable({ registrations: initialRegistrations }: Regi
   const handleRegistration = (id: string, approved: boolean) => {
     setRegistrations(registrations.filter(r => r.id !== id));
     // Here you would typically call an API to update the backend
-    console.log(`Registration ${id} ${approved ? 'approved' : 'rejected'}`);
+
   };
 
   const filteredRegistrations = registrations.filter(reg =>

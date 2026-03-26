@@ -5,6 +5,7 @@ import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Star } from 'lucide-react';
+import { getDisplayImage } from '@/lib/image-utils';
 import type { Restaurant } from '@/lib/types';
 
 interface ModernChefHeroProps {
@@ -16,17 +17,17 @@ interface ModernChefHeroProps {
 
 export function ModernChefHero({ restaurant, chefName, activeTab, onTabChange }: ModernChefHeroProps) {
 
-  const chefAvatar = `https://i.pravatar.cc/150?u=${restaurant.id}`;
+  const chefAvatar = getDisplayImage(restaurant.avatarUrl || restaurant.imageId, 'chef-1');
 
   const handleScrollToSignature = () => {
-    const section = document.getElementById('Signature Dishes');
+    const section = document.getElementById('signature-dishes');
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const handleScrollToBooking = () => {
-    const section = document.getElementById('Book a Chef');
+    const section = document.getElementById('book-chef');
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
@@ -66,7 +67,7 @@ export function ModernChefHero({ restaurant, chefName, activeTab, onTabChange }:
 
             <div className="relative w-full aspect-square md:w-32 md:h-32 rounded-2xl overflow-hidden order-first md:order-last border-4 border-background shadow-xl">
               <Image
-                src={restaurant.imageId}
+                src={chefAvatar}
                 alt={chefName}
                 fill
                 className="object-cover"

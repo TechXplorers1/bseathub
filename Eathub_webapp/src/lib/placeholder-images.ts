@@ -1,6 +1,7 @@
 import data from './placeholder-images.json';
 
 export type ImagePlaceholder = (typeof data.placeholderImages)[number];
+export type PlaceholderImageIds = ImagePlaceholder['id'];
 
 export const placeholderImages: ImagePlaceholder[] = data.placeholderImages;
 

@@ -30,6 +30,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { getImageById } from '@/lib/placeholder-images';
 
 import { AddServiceDialog } from '@/components/dashboard/chef/AddServiceDialog';
 import {
@@ -97,21 +99,21 @@ export default function ServicesPage() {
 
       setIsSaving(true);
 
+      setIsAddDialogOpen(false);
+      setEditingService(null);
+
       if (editingService) {
-        await updateChefService(editingService.id, formData);
+        const updated = await updateChefService(editingService.id, formData);
+        setServices(prev => prev.map(s => s.id === updated.id ? updated : s));
       } else {
-        await addChefService(chefId, formData);
+        const added = await addChefService(chefId, formData);
+        setServices(prev => [...prev, added]);
       }
 
       toast({
         title: "Success",
         description: "Service saved successfully"
       });
-
-      setIsAddDialogOpen(false);
-      setEditingService(null);
-
-      refreshServices();
 
     } catch (err: any) {
 
@@ -130,8 +132,8 @@ export default function ServicesPage() {
     if (!confirm("Are you sure you want to delete this service?")) return;
     try {
       await deleteChefService(id);
+      setServices(prev => prev.filter(s => s.id !== id));
       toast({ title: "Deleted", description: "Service removed successfully" });
-      refreshServices();
     } catch (err: any) {
       toast({
         title: "Error",
@@ -144,8 +146,8 @@ export default function ServicesPage() {
   const toggleStatus = async (service: any) => {
     try {
       const newStatus = service.status === 'Active' ? 'Inactive' : 'Active';
-      await updateChefService(service.id, { ...service, status: newStatus });
-      refreshServices();
+      const updated = await updateChefService(service.id, { ...service, status: newStatus });
+      setServices(prev => prev.map(s => s.id === updated.id ? updated : s));
     } catch (err: any) {
       toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
     }
@@ -170,7 +172,7 @@ export default function ServicesPage() {
     let mode: 'service' | 'menu' | 'signature' = 'menu';
     if (service.isSignature) mode = 'signature';
     else if (service.category === 'Service') mode = 'service';
-    
+
     setFormMode(mode);
     setEditingService(service);
     setIsAddDialogOpen(true);
@@ -184,7 +186,7 @@ export default function ServicesPage() {
           <p className="text-muted-foreground">Manage your culinary offerings, signature dishes, and professional services.</p>
         </div>
         <div className="flex gap-2">
-           <Button variant="outline" size="sm" onClick={() => handleAddClick('service')}>
+          <Button variant="outline" size="sm" onClick={() => handleAddClick('service')}>
             <ConciergeBell className="mr-2 h-4 w-4" /> Add Service
           </Button>
           <Button onClick={() => handleAddClick('menu')}>
@@ -231,7 +233,7 @@ export default function ServicesPage() {
                     <TableBody>
                       {categorizedServices[activeTab as keyof typeof categorizedServices].length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={activeTab === 'services' ? 5 : 7} className="text-center py-12">
+                          <TableCell colSpan={activeTab === 'services' ? 6 : 7} className="text-center py-12">
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
                               <Utensils className="h-8 w-8 opacity-20" />
                               <p>No {activeTab === 'all' ? 'items' : activeTab} found.</p>
@@ -244,6 +246,22 @@ export default function ServicesPage() {
                       ) : (
                         categorizedServices[activeTab as keyof typeof categorizedServices].map((service) => (
                           <TableRow key={service.id} className="group transition-colors hover:bg-muted/50">
+                            <TableCell>
+                              <div className="relative h-12 w-12 rounded-lg overflow-hidden border bg-muted flex-shrink-0">
+                                {(() => {
+                                  const placeholder = getImageById(service.imageId);
+                                  const src = placeholder ? placeholder.imageUrl : (service.imageId || '/placeholder-food.jpg');
+                                  return (
+                                    <Image
+                                      src={src}
+                                      alt={service.name}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  );
+                                })()}
+                              </div>
+                            </TableCell>
                             <TableCell>
                               <div className="space-y-1">
                                 <div className="font-semibold">{service.name}</div>
@@ -261,7 +279,7 @@ export default function ServicesPage() {
                                 </div>
                               </div>
                             </TableCell>
-                            
+
                             {activeTab === 'services' ? (
                               <TableCell className="max-w-[300px] truncate text-muted-foreground">
                                 {service.description}
@@ -289,7 +307,7 @@ export default function ServicesPage() {
                             )}
 
                             <TableCell className="font-medium text-primary">
-                              ₹ {service.basePrice ? service.basePrice : "0"}
+                              $ {service.basePrice ? service.basePrice : "0"}
                             </TableCell>
 
                             <TableCell>

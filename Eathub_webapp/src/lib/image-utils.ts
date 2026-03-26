@@ -1,39 +1,23 @@
+import { getImageById, PlaceholderImageIds } from './placeholder-images';
+
 /**
- * Resizes and compresses a Base64 image string to fit within maxWidth/maxHeight.
- * This prevents "localStorage" quota errors (5MB limit) and improves API speed.
+ * Returns a displayable image URL.
+ * If the input is a valid placeholder ID, it returns the placeholder image URL.
+ * Otherwise, it returns the input as is (assuming it's a URL or Base64).
+ * Falls back to a default restaurant placeholder if input is empty.
  */
-export async function compressImage(base64Str: string, maxWidth = 800, maxHeight = 800): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = base64Str;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
+export function getDisplayImage(idOrUrl: string | PlaceholderImageIds | undefined | null, fallbackId: PlaceholderImageIds = 'restaurant-1'): string {
+  if (!idOrUrl) {
+    const fallback = getImageById(fallbackId);
+    return fallback?.imageUrl || '';
+  }
 
-      // Maintain aspect ratio
-      if (width > height) {
-        if (width > maxWidth) {
-          height *= maxWidth / width;
-          width = maxWidth;
-        }
-      } else {
-        if (height > maxHeight) {
-          width *= maxHeight / height;
-          height = maxHeight;
-        }
-      }
+  // Check if it's a placeholder ID
+  const placeholder = getImageById(idOrUrl as any);
+  if (placeholder) {
+    return placeholder.imageUrl;
+  }
 
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, width, height);
-      }
-      
-      // Use JPEG with 0.7 quality to significantly reduce file size (18MB -> ~50KB)
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
-    };
-    img.onerror = () => resolve(base64Str); // Fallback to original if error
-  });
+  // Assume it's a URL or Base64 string
+  return idOrUrl as string;
 }

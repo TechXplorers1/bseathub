@@ -4,7 +4,8 @@ import * as React from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Camera, FolderOpen } from 'lucide-react';
+import { Camera, FolderOpen, Image as ImageIcon, X } from 'lucide-react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -88,6 +89,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
       status: 'Available',
     },
   });
+  const [imagePreview, setImagePreview] = React.useState<string | null>(defaultValues?.imageUrl || null);
 
   React.useEffect(() => {
     if (defaultValues) {
@@ -97,7 +99,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
 
   // Inside AddDishDialog.tsx
   const handleFormSubmit = async (data: DishFormValues) => {
-    console.log("Submitting form with data:", data);
+
     try {
       // This calls the function passed from page.tsx
       await onAddDish(data);
@@ -116,6 +118,32 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
       });
     }
   };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: "Please select an image smaller than 1MB.",
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        form.setValue('imageUrl', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const removeImage = () => {
+    setImagePreview(null);
+    form.setValue('imageUrl', '');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -132,7 +160,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
           <form
             onSubmit={form.handleSubmit(handleFormSubmit, (errors) => {
               // If the button "does nothing," check your Inspect > Console!
-              console.log(" Form Validation Failed:", errors);
+
               toast({
                 variant: "destructive",
                 title: "Check Form Fields",
@@ -202,30 +230,78 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
 
                 {/* 3. Image Upload */}
                 <div className="space-y-3">
-                  <FormLabel className="font-semibold">Dish Image</FormLabel>
-                  <div className="flex gap-3">
-                    <input type="file" accept="image/*" className="hidden" ref={fileInputRef} />
-                    <input type="file" accept="image/*" capture="environment" className="hidden" ref={cameraInputRef} />
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 gap-2 h-20 border-dashed"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <FolderOpen className="h-5 w-5" />
-                      <span className="text-xs sm:text-sm">Upload Folder</span>
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 gap-2 h-20 border-dashed"
-                      onClick={() => cameraInputRef.current?.click()}
-                    >
-                      <Camera className="h-5 w-5" />
-                      <span className="text-xs sm:text-sm">Live Photo</span>
-                    </Button>
+                  <FormLabel className="font-semibold text-orange-600">Dish Image</FormLabel>
+                  <div className="flex flex-col gap-4">
+                    {imagePreview ? (
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden border-2 border-orange-100 shadow-inner group">
+                        <Image
+                          src={imagePreview}
+                          alt="Dish preview"
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="rounded-full bg-white/90 hover:bg-white"
+                            onClick={() => fileInputRef.current?.click()}
+                          >
+                            Change
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="rounded-full"
+                            onClick={removeImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-3">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          ref={fileInputRef}
+                          onChange={handleFileChange}
+                        />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          className="hidden"
+                          ref={cameraInputRef}
+                          onChange={handleFileChange}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex-1 gap-2 h-20 border-dashed border-2 hover:border-orange-300 hover:bg-orange-50/50 transition-all duration-200"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <FolderOpen className="h-5 w-5 text-orange-500" />
+                            <span className="text-xs font-medium">Upload Image</span>
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex-1 gap-2 h-20 border-dashed border-2 hover:border-orange-300 hover:bg-orange-50/50 transition-all duration-200"
+                          onClick={() => cameraInputRef.current?.click()}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <Camera className="h-5 w-5 text-orange-500" />
+                            <span className="text-xs font-medium">Take Photo</span>
+                          </div>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 

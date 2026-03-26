@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 import type { Restaurant } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useState } from 'react';
@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils';
 
 export function ChefHero({ restaurant, chefName }: { restaurant: Restaurant, chefName: string }) {
   const [isFavorited, setIsFavorited] = useState(false);
-  const image = getImageById(restaurant.imageId);
-  const chefAvatar = `https://i.pravatar.cc/150?u=${restaurant.id}`;
+  const coverImage = getDisplayImage(restaurant.coverImageId, 'restaurant-1');
+  const chefAvatar = getDisplayImage(restaurant.avatarUrl || restaurant.imageId, 'chef-1');
 
   const toggleFavorite = () => {
     setIsFavorited(!isFavorited);
@@ -19,13 +19,12 @@ export function ChefHero({ restaurant, chefName }: { restaurant: Restaurant, che
 
   return (
     <div className="relative h-48 w-full">
-      {image && (
+      {coverImage && (
         <Image
-          src={image.imageUrl}
+          src={coverImage}
           alt={restaurant.name}
           fill
-          objectFit="cover"
-          data-ai-hint={image.imageHint}
+          className="object-cover"
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />

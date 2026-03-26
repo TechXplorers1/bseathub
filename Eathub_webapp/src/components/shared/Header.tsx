@@ -26,7 +26,7 @@ import { useCart } from '@/context/CartProvider';
 import { useLocation } from '@/context/LocationProvider';
 import { useHeader } from '@/context/HeaderProvider';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Label } from '@/components/ui/label';
@@ -49,8 +49,7 @@ import {
   DropdownMenuLabel,
 } from '../ui/dropdown-menu';
 
-// Import data for search
-import { allRestaurants, allHomeFoods } from '@/lib/data';
+import { useRestaurants } from '@/context/RestaurantProvider';
 import type { Chef } from '@/lib/types';
 
 interface HeaderProps {
@@ -174,6 +173,10 @@ export function Header({ className }: HeaderProps) {
     setIsLocationOpen(false);
   };
 
+  const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData } = useRestaurants();
+
+  const pathname = usePathname();
+
   // --- Unified Search Logic Fix ---
   const searchResults = useMemo(() => {
     if (!searchQuery.trim() || searchQuery.length < 2) return null;
@@ -181,14 +184,14 @@ export function Header({ className }: HeaderProps) {
     const query = searchQuery.toLowerCase();
 
     // 1. Search Restaurants & Homefoods
-    const vendors = [...allRestaurants, ...allHomeFoods].filter(v => {
+    let vendors = [...allRestaurantsData, ...allHomeFoodsData].filter(v => {
       const nameMatch = v.name?.toLowerCase().includes(query);
       const typeMatch = v.type?.toLowerCase().includes(query);
 
       // FIX: Handle cuisine whether it is a string or an array
       let cuisineMatch = false;
       if (Array.isArray(v.cuisine)) {
-        cuisineMatch = v.cuisine.some(c => c.toLowerCase().includes(query));
+        cuisineMatch = v.cuisine.some((c: string) => c.toLowerCase().includes(query));
       } else if (typeof v.cuisine === 'string') {
         cuisineMatch = v.cuisine.toLowerCase().includes(query);
       }
@@ -196,22 +199,43 @@ export function Header({ className }: HeaderProps) {
       return nameMatch || typeMatch || cuisineMatch;
     });
 
+    // Context-aware filtering for vendors
+    if (pathname.includes('/restaurants')) {
+      vendors = vendors.sort((a, b) => (a.type === 'restaurant' ? -1 : 1));
+    } else if (pathname.includes('/home-food')) {
+      vendors = vendors.sort((a, b) => (a.type === 'home-food' ? -1 : 1));
+    }
+
     // 2. Search Menu Items
-    const items = [...allRestaurants, ...allHomeFoods].flatMap(v =>
-      v.menu?.flatMap(cat =>
-        cat.items?.filter(item => item.name?.toLowerCase().includes(query))
-          .map(item => ({ ...item, vendorName: v.name, vendorSlug: v.slug }))
+    const items = [...allRestaurantsData, ...allHomeFoodsData].flatMap(v =>
+      v.menu?.flatMap((cat: any) =>
+        cat.items?.filter((item: any) => item.name?.toLowerCase().includes(query))
+          .map((item: any) => ({ ...item, vendorName: v.name, vendorSlug: v.slug }))
       ) || []
     );
 
     // 3. Search Chefs
-    const foundChefs = chefs.filter(c =>
+    let foundChefs = chefs.filter(c =>
       c.name?.toLowerCase().includes(query) ||
       c.specialty?.toLowerCase().includes(query)
     );
 
-    return { vendors, items, chefs: foundChefs };
-  }, [searchQuery, chefs]);
+    // Context-aware: If we are on /chefs, maybe prioritize them? (Though they have their own section)
+
+    // 4. Search Categories
+    const categoriesSet = new Set<string>();
+    const foundCategories: any[] = [];
+    [...allRestaurantsData, ...allHomeFoodsData].forEach(v => {
+        v.menu?.forEach((cat: any) => {
+            if (cat.title?.toLowerCase().includes(query) && !categoriesSet.has(cat.title.toLowerCase())) {
+                categoriesSet.add(cat.title.toLowerCase());
+                foundCategories.push({ title: cat.title, type: v.type, vendorSlug: v.slug });
+            }
+        });
+    });
+
+    return { vendors, items, chefs: foundChefs, categories: foundCategories };
+  }, [searchQuery, chefs, allRestaurantsData, allHomeFoodsData, pathname]);
 
   const dashboard = (() => {
     if (!auth.role) return null;
@@ -291,6 +315,25 @@ export function Header({ className }: HeaderProps) {
                 </div>
               )}
 
+              {/* CATEGORY: MENU CATEGORIES */}
+              {searchResults.categories && searchResults.categories.length > 0 && (
+                <div className="mb-3 border-t pt-2">
+                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase">
+                    <LayoutDashboard className="mr-2 h-3 w-3" /> Categories
+                  </div>
+                  {searchResults.categories.slice(0, 5).map((cat: any, idx: number) => (
+                    <button
+                      key={`cat-${idx}`}
+                      onClick={() => { router.push(`/restaurant/${cat.vendorSlug}`); setIsSearchFocused(false); }}
+                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg"
+                    >
+                      <p className="text-sm font-medium">{cat.title}</p>
+                      <p className="text-[11px] text-muted-foreground capitalize">Browse in {cat.type}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* CATEGORY: VENDORS */}
               {searchResults.vendors.length > 0 && (
                 <div className="mb-3 border-t pt-2">
@@ -306,7 +349,7 @@ export function Header({ className }: HeaderProps) {
                     >
                       <div className="flex justify-between items-center">
                         <p className="text-sm font-medium">{v.name}</p>
-                        <Badge variant="outline" className="text-[10px] h-4">{v.type}</Badge>
+                        <Badge variant="outline" className="text-[10px] h-4 text-primary bg-primary/5">{v.type === 'restaurant' ? 'Restaurant' : 'Home Kitchen'}</Badge>
                       </div>
                     </Link>
                   ))}

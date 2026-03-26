@@ -114,22 +114,40 @@ export default function MenuPage() {
         imageUrl: formData.imageUrl || ""
       };
 
-      console.log("Payload:", payload);
+
 
       // ✅ EDIT MODE
       if (editingItem) {
-        await api.updateMenuItem(editingItem.id, payload);
+        const updated = await api.updateMenuItem(editingItem.id, payload) as any;
+        // Map backend DTO field names if necessary (category vs categoryName)
+        const mappedUpdated = {
+          ...updated,
+          category: updated.category, // assuming update endpoint returns DTO with 'category' field for title
+          categoryName: updated.category,
+          isSpecial: updated.isSpecial ?? false,
+          status: updated.status || "Available",
+          imageUrl: updated.imageId || "/placeholder-food.jpg"
+        };
+        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? mappedUpdated : i));
         toast({ title: "Dish updated successfully" });
       }
       // ✅ ADD MODE
       else {
-        await addDishToRestaurant(restaurantId, payload, "restaurant");
+        const added = await addDishToRestaurant(restaurantId, payload, "restaurant") as any;
+        const mappedAdded = {
+          ...added,
+          category: added.category,
+          categoryName: added.category,
+          isSpecial: added.isSpecial ?? false,
+          status: added.status || "Available",
+          imageUrl: added.imageId || "/placeholder-food.jpg"
+        };
+        setMenuItems(prev => [...prev, mappedAdded]);
         toast({ title: "Dish added successfully" });
       }
 
       setEditingItem(null);
       setIsAddDishDialogOpen(false);
-      await refreshMenu();
 
     } catch (e) {
       console.error("SAVE DISH ERROR:", e);
@@ -158,8 +176,14 @@ export default function MenuPage() {
     );
   };
   const handleDelete = async (id: string) => {
-    await api.deleteMenuItem(id);
-    await refreshMenu();
+    if (!confirm("Are you sure you want to delete this dish?")) return;
+    try {
+      await api.deleteMenuItem(id);
+      setMenuItems(prev => prev.filter(i => i.id !== id));
+      toast({ title: "Deleted", description: "Dish removed successfully" });
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to delete dish", variant: "destructive" });
+    }
   };
 
   if (loading && !menuItems.length) {
@@ -209,7 +233,7 @@ export default function MenuPage() {
                         alt={item.name}
                         className="aspect-square rounded-md object-cover"
                         height="64"
-                        src={item.imageId ? `/api/images/${item.imageId}` : `https://picsum.photos/seed/${item.id}/64/64`}
+                        src={(item as any).imageUrl || (item as any).imageId || `https://picsum.photos/seed/${item.id}/64/64`}
                         width="64"
                       />
                     </TableCell>

@@ -39,6 +39,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getImageById } from '@/lib/placeholder-images';
 
 const CATEGORIES = [
     "Main Course", "Appetizer", "Dessert", "Beverage", "Breakfast",
@@ -110,7 +111,8 @@ export function AddServiceDialog({
                 status: initialData.status || 'Active',
                 imageId: initialData.imageId || 'food-1',
             });
-            setImagePreview(initialData.imageId && initialData.imageId.startsWith('data:') ? initialData.imageId : null);
+            const resolvedImage = initialData.imageId ? (getImageById(initialData.imageId)?.imageUrl || (initialData.imageId.startsWith('data:') ? initialData.imageId : null)) : null;
+            setImagePreview(resolvedImage);
         } else if (!initialData && isOpen) {
             form.reset({
                 name: '',
@@ -157,7 +159,7 @@ export function AddServiceDialog({
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx?.drawImage(img, 0, 0, width, height);
-                    
+
                     // Compress to 0.7 quality
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                     resolve(dataUrl);

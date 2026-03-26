@@ -10,6 +10,7 @@ public class ChefResponseDTO {
     private String bio;
     private String experience;
     private String avatarUrl;
+    private String coverImageId;
     private Double rating;
     private Integer reviews;
     private String slug;

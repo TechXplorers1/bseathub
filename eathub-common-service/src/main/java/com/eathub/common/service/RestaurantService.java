@@ -234,7 +234,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void addDish(String restaurantId, MenuItemRequestDTO dto) {
+    public com.eathub.common.dto.MenuItemDTO addDish(String restaurantId, MenuItemRequestDTO dto) {
         try {
             Restaurant restaurant = restaurantRepository.findById(restaurantId)
                     .orElseThrow(() -> new ResponseStatusException(
@@ -269,10 +269,23 @@ public class RestaurantService {
                     .imageId(dto.getImageUrl())
                     .build();
 
-            menuItemRepository.save(newItem);
+            return mapToMenuItemDTO(menuItemRepository.save(newItem));
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    private com.eathub.common.dto.MenuItemDTO mapToMenuItemDTO(MenuItem item) {
+        return com.eathub.common.dto.MenuItemDTO.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .price(item.getPrice())
+                .status(item.getStatus())
+                .isSpecial(item.getIsSpecial())
+                .imageId(item.getImageId())
+                .category(item.getCategory() != null ? item.getCategory().getTitle() : "General")
+                .build();
     }
 
     public java.util.Map<String, Object> getDashboardOverview(String id) {

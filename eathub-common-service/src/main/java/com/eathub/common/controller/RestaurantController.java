@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/restaurants")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:9004"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
@@ -55,12 +55,11 @@ public class RestaurantController {
     }
 
     @PostMapping("/{restaurantId}/menu-items")
-    public ResponseEntity<String> addMenuItem(
+    public ResponseEntity<com.eathub.common.dto.MenuItemDTO> addMenuItem(
             @PathVariable String restaurantId,
             @RequestBody MenuItemRequestDTO request) {
 
-        restaurantService.addDish(restaurantId, request);
-        return ResponseEntity.ok("Dish added successfully");
+        return ResponseEntity.ok(restaurantService.addDish(restaurantId, request));
     }
 
     @GetMapping("/id/{restaurantId}")

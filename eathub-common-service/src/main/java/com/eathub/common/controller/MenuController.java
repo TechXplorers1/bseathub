@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/menu")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:9004")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MenuController {
 
     private final MenuService menuService;
@@ -48,7 +48,7 @@ public class MenuController {
 
             return ResponseEntity.ok(items);
         } catch (Exception e) {
-            System.out.println("Error in getItemsByCategory API: " + e.getMessage());
+            // System.out.println("Error in getItemsByCategory API: " + e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
     }
@@ -59,7 +59,7 @@ public class MenuController {
         try {
             return ResponseEntity.ok(menuService.getItemsByRestaurant(restaurantId));
         } catch (Exception e) {
-            System.out.println("Error getItemsByRestaurant: " + e.getMessage());
+            // System.out.println("Error getItemsByRestaurant: " + e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
     }

@@ -89,6 +89,8 @@ public class ChefManagementService {
         }
         if (dto.getWorkingHours() != null)
             chef.setWorkingHours(dto.getWorkingHours());
+        if (dto.getCoverImageId() != null)
+            chef.setCoverImageId(dto.getCoverImageId());
         if (dto.getIsActive() != null)
             chef.setIsActive(dto.getIsActive());
 
@@ -173,6 +175,7 @@ public class ChefManagementService {
                                     .price(s.getBasePrice() != null ? s.getBasePrice() : 0.0)
                                     .category(s.getCategory())
                                     .status(s.getStatus())
+                                    .imageId(s.getImageId())
                                     .build();
                         }, Collectors.toList())))
                 .entrySet().stream()
@@ -253,6 +256,7 @@ public class ChefManagementService {
         dto.setBio(chef.getBio());
         dto.setExperience(chef.getExperience());
         dto.setAvatarUrl(chef.getAvatarUrl());
+        dto.setCoverImageId(chef.getCoverImageId());
         dto.setRating(chef.getRating());
         dto.setReviews(chef.getReviewsCount());
         dto.setSlug(chef.getSlug());

@@ -427,3 +427,6 @@ WHERE base_price IS NOT NULL AND base_price !~ '^([0-9]+[.]?[0-9]*|[.][0-9]+)$';
 
 -- Convert base_price to FLOAT for numeric operations
 ALTER TABLE chef_services ALTER COLUMN base_price TYPE FLOAT USING base_price::double precision;
+-- changeset eathub:1.2.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add cover_image_id to chefs table
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS cover_image_id TEXT;

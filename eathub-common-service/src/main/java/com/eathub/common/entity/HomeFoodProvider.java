@@ -27,6 +27,12 @@ public class HomeFoodProvider {
     @Column(name = "food_type")
     private String foodType;
 
+    @Column(name = "delivery_availability")
+    private String deliveryAvailability;
+
+    @Column(name = "specialty_dishes", columnDefinition = "TEXT")
+    private String specialtyDishes;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

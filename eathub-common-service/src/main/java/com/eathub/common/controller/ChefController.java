@@ -50,7 +50,7 @@ public class ChefController {
     }
 
     @PutMapping("/{id}/legal")
-    public ChefResponseDTO updateLegal(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
+    public ChefResponseDTO updateLegal(@PathVariable String  id, @RequestBody ChefProfileUpdateDTO dto) {
         return service.updateLegal(id, dto);
     }
 

@@ -32,6 +32,15 @@ public class HomeFoodLegalProfile {
     @Column(name = "fssai_license_number")
     private String fssaiLicenseNumber;
 
+    @Column(name = "id_proof_type")
+    private String idProofType;
+
+    @Column(name = "id_proof_number")
+    private String idProofNumber;
+
+    @Column(name = "hygiene_verified")
+    private Boolean hygieneVerified;
+
     @Column(name = "business_type")
     private String businessType;
 

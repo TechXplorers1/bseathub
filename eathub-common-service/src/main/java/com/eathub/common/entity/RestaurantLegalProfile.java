@@ -67,6 +67,9 @@ public class RestaurantLegalProfile {
     @Column(name = "kyc_status")
     private String kycStatus;
 
+    @Column(name = "fssai_document_url", columnDefinition = "TEXT")
+    private String fssaiDocumentUrl;
+
     @Column(name = "verified_at")
     private LocalDateTime verifiedAt;
 }

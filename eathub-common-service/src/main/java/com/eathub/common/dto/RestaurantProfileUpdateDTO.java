@@ -17,7 +17,12 @@ public class RestaurantProfileUpdateDTO {
     private String description;
     private String cuisineType;
     private String restaurantType;
+    private String businessModel;
     private Boolean isOpen;
+    
+    // ── Owner ─────────────────────────────────────────────────────────────
+    private String ownerName;
+    private String mobileNumber;
 
     /** JSON string representing daily opening/closing hours */
     private String workingHours;
@@ -47,4 +52,7 @@ public class RestaurantProfileUpdateDTO {
     private String bankAccountNumber;
     private String bankIFSC;
     private String bankName;
+
+    private String fssaiExpiryDate;
+    private String fssaiDocumentUrl;
 }

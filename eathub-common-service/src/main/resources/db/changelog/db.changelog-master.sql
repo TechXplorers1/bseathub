@@ -430,3 +430,35 @@ ALTER TABLE chef_services ALTER COLUMN base_price TYPE FLOAT USING base_price::d
 -- changeset eathub:1.2.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
 -- Add cover_image_id to chefs table
 ALTER TABLE chefs ADD COLUMN IF NOT EXISTS cover_image_id TEXT;
+
+-- changeset eathub:1.3.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add missing columns for partner registration
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS business_model TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS delivery_radius DOUBLE PRECISION DEFAULT 5.0;
+
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS work_type TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS social_links TEXT;
+
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_type TEXT;
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_number TEXT;
+
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS delivery_availability TEXT;
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS specialty_dishes TEXT;
+
+ALTER TABLE home_food_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_type TEXT;
+ALTER TABLE home_food_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_number TEXT;
+ALTER TABLE home_food_legal_profiles ADD COLUMN IF NOT EXISTS hygiene_verified BOOLEAN DEFAULT FALSE;
+
+-- changeset eathub:1.4.1 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add OTP table for email verification
+CREATE TABLE IF NOT EXISTS otps (
+    id VARCHAR(36) PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+    expiry_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- changeset eathub:1.5.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add FSSAI document storage to restaurant legal profiles
+ALTER TABLE restaurant_legal_profiles ADD COLUMN IF NOT EXISTS fssai_document_url TEXT;

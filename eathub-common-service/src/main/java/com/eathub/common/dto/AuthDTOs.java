@@ -10,10 +10,19 @@ public class AuthDTOs {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RegisterRequest { // Added static
+    public static class RegisterRequest {
         private String name;
         private String email;
         private String password;
+        private String firstName;
+        private String lastName;
+        private String mobileNumber;
+        private String houseNumber;
+        private String street;
+        private String area;
+        private String city;
+        private String state;
+        private String country;
     }
 
     @Data

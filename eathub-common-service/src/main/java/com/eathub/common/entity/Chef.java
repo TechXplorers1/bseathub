@@ -37,8 +37,15 @@ public class Chef {
 
     private String experience;
 
-    // Removed redundant field
-    
+    @Column(name = "base_price")
+    private Double basePrice;
+
+    @Column(name = "work_type")
+    private String workType;
+
+    @Column(name = "social_links")
+    private String socialLinks;
+
     @Column(columnDefinition = "TEXT")
     private String workingHours;
     

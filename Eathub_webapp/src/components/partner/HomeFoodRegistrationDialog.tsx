@@ -217,8 +217,10 @@ export function HomeFoodRegistrationDialog({
 
   // Example for HomeFoodRegistrationDialog.tsx
   const handleFinalSubmit = async (data: StepThreeValues) => {
+    const step1Values = formStep1.getValues();
     const allData = {
-      ...formStep1.getValues(),
+      ...step1Values,
+      contactNumber: `${step1Values.phoneCountryCode} ${step1Values.contactNumber}`,
       ...formStep2.getValues(),
       ...data,
     };

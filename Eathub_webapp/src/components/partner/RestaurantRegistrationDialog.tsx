@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +22,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Eye, EyeOff, Upload, Clock, Phone, User, Building, Landmark, FileText, CheckCircle2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -31,35 +31,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Progress } from '@/components/ui/progress';
-import { Eye, EyeOff } from 'lucide-react';
-import { parsePhoneNumber } from 'libphonenumber-js';
-import { countries } from 'countries-list';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 // === HELPER FOR SSR SAFETY ===
 const isBrowser = typeof window !== 'undefined';
 
 // === SCHEMAS ===
-const stepOneSchema = z.object({
-  restaurantName: z.string().min(2, 'Restaurant name is required.').max(100, 'Name too long.'),
-  ownerName: z.string().min(2, 'Owner/Manager name is required.').max(100),
-  countryCode: z.string().min(1, 'Country code is required.'),
-  contactNumber: z.string()
-    .min(1, 'Phone number is required.')
-    .refine(
-      (val) => {
-        if (!val) return false;
-        try {
-          const phoneNumber = parsePhoneNumber(`+${val}`);
-          return phoneNumber ? (phoneNumber.isValid() && phoneNumber.isPossible()) : false;
-        } catch {
-          return false;
-        }
-      },
-      { message: 'Please enter a valid phone number.' }
-    ),
+const registrationSchema = z.object({
   email: z.string().email('Please enter a valid email address.'),
   password: z
     .string()
@@ -70,109 +50,31 @@ const stepOneSchema = z.object({
     .refine((val) => /\d/.test(val), { message: 'Must contain at least one number.' })
     .refine((val) => /[^A-Za-z0-9]/.test(val), { message: 'Must contain at least one special character.' }),
   confirmPassword: z.string(),
+  // New Fields
+  ownerName: z.string().min(2, 'Owner name is required.'),
+  mobileNumber: z.string().min(10, 'Valid mobile number is required.'),
+  restaurantName: z.string().min(2, 'Restaurant name is required.'),
+  restaurantType: z.string().min(1, 'Please select a restaurant type.'),
+  operationHoursOpen: z.string().min(1, 'Opening time is required.'),
+  operationHoursClose: z.string().min(1, 'Closing time is required.'),
+  businessModel: z.enum(['dine-only', 'delivery-only', 'both']),
+  legalBusinessName: z.string().min(2, 'Legal business name is required.'),
+  businessType: z.string().min(1, 'Please select a business type.'),
+  fssaiLicenseNumber: z.string().min(14, 'FSSAI license number must be 14 digits.').max(14),
+  fssaiExpiryDate: z.string().min(1, 'FSSAI expiry date is required.'),
+  bankName: z.string().min(2, 'Bank name is required.'),
+  fssaiDocument: z.string().optional(), // Base64
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
 });
 
-const stepTwoSchema = z.object({
-  country: z.string().min(1, 'Country is required.'),
-  state: z.string().min(2, 'State/Province is required.').max(100),
-  city: z.string().min(2, 'City is required.').max(100),
-  street: z.string().min(5, 'Street address is required.').max(200),
-  pincode: z.string()
-    .min(1, 'Pincode/ZIP is required.')
-    .max(10)
-    .regex(/^[a-zA-Z0-9\s-]+$/, 'Invalid postal code format.'),
-  restaurantType: z.string({ required_error: 'Please select a restaurant type.' }),
-  businessModel: z.enum(['dine-in', 'delivery', 'both'], {
-    required_error: 'Please select a business model.',
-  }),
-  deliveryRadius: z.coerce.number().min(0, 'Delivery radius must be 0 or more.').default(5),
-  operatingHours: z.object({
-    open: z.string().min(1, 'Open time is required'),
-    close: z.string().min(1, 'Close time is required'),
-  }).refine((data) => data.open < data.close, {
-    message: 'Open time must be before close time.',
-    path: ['close'],
-  }),
+const otpSchema = z.object({
+  otp: z.string().length(6, 'OTP must be 6 digits.'),
 });
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const ACCEPTED_DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
-
-const fileSchema = z.custom<File>((val) => {
-  return isBrowser ? val instanceof File : true;
-}, "File is required");
-
-const stepThreeSchema = z.object({
-  // Legal Profile
-  legalBusinessName: z.string().min(2, 'Legal business name is required.'),
-  gstNumber: z.string().regex(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/, 'Invalid GST number format.').optional().or(z.literal('')),
-  panNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, 'Invalid PAN format.'),
-  fssaiLicenseNumber: z.string().min(14, 'FSSAI License must be 14 digits.').max(14),
-  fssaiExpiryDate: z.string().min(1, 'FSSAI Expiry date is required.'),
-  businessType: z.enum(['sole-proprietorship', 'partnership', 'pvt-ltd', 'llp', 'other'], {
-    required_error: 'Please select a business type.',
-  }),
-
-  // Bank Account Details
-  bankAccountHolderName: z.string().min(2, 'Account holder name is required.'),
-  bankAccountNumber: z.string().min(9, 'Invalid account number.').max(18),
-  bankIFSC: z.string().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, 'Invalid IFSC code.'),
-  bankName: z.string().min(2, 'Bank name is required.'),
-});
-
-const stepFourSchema = z.object({
-  logo: fileSchema
-    .optional()
-    .refine((file) => !file || file.size <= MAX_FILE_SIZE, {
-      message: 'Logo must be less than 5MB.',
-    })
-    .refine((file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), {
-      message: 'Logo must be JPG, PNG, or WebP.',
-    }),
-  restaurantPhotos: z
-    .array(fileSchema)
-    .optional()
-    .refine((files) => !files || files.length <= 5, {
-      message: 'You can upload up to 5 photos.',
-    })
-    .refine((files) => {
-      if (!files) return true;
-      return files.every((file) => file.size <= MAX_FILE_SIZE);
-    }, {
-      message: 'Each photo must be less than 5MB.',
-    })
-    .refine((files) => {
-      if (!files) return true;
-      return files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type));
-    }, {
-      message: 'Photos must be JPG, PNG, or WebP.',
-    }),
-  foodLicense: fileSchema
-    .optional()
-    .refine((file) => !file || file.size <= MAX_FILE_SIZE * 2, {
-      message: 'License must be less than 10MB.',
-    })
-    .refine((file) => !file || ACCEPTED_DOC_TYPES.includes(file.type), {
-      message: 'License must be PDF, JPG, or PNG.',
-    }),
-  menu: fileSchema
-    .optional()
-    .refine((file) => !file || file.size <= MAX_FILE_SIZE * 2, {
-      message: 'Menu must be less than 10MB.',
-    })
-    .refine((file) => !file || ACCEPTED_DOC_TYPES.includes(file.type), {
-      message: 'Menu must be PDF, JPG, or PNG.',
-    }),
-});
-
-type StepOneValues = z.infer<typeof stepOneSchema>;
-type StepTwoValues = z.infer<typeof stepTwoSchema>;
-type StepThreeValues = z.infer<typeof stepThreeSchema>;
-type StepFourValues = z.infer<typeof stepFourSchema>;
+type RegistrationValues = z.infer<typeof registrationSchema>;
+type OtpValues = z.infer<typeof otpSchema>;
 
 interface RestaurantRegistrationDialogProps {
   isOpen: boolean;
@@ -187,720 +89,600 @@ export function RestaurantRegistrationDialog({
 }: RestaurantRegistrationDialogProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const [step, setStep] = React.useState(1);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [isOtpSent, setIsOtpSent] = React.useState(false);
+  const [isOtpDialogOpen, setIsOtpDialogOpen] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const formStep1 = useForm<StepOneValues>({
-    resolver: zodResolver(stepOneSchema),
+  const form = useForm<RegistrationValues>({
+    resolver: zodResolver(registrationSchema),
     defaultValues: {
-      countryCode: '91',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      ownerName: '',
+      mobileNumber: '',
+      restaurantName: '',
+      restaurantType: '',
+      operationHoursOpen: '09:00',
+      operationHoursClose: '22:00',
+      businessModel: 'both',
+      legalBusinessName: '',
+      businessType: '',
+      fssaiLicenseNumber: '',
+      fssaiExpiryDate: '',
+      bankName: '',
+      fssaiDocument: '',
     },
   });
-  const formStep2 = useForm<StepTwoValues>({
-    resolver: zodResolver(stepTwoSchema),
-    defaultValues: {
-      country: 'IN',
-      deliveryRadius: 5,
-      operatingHours: { open: '09:00', close: '22:00' },
-    },
-  });
-  const formStep3 = useForm<StepThreeValues>({
-    resolver: zodResolver(stepThreeSchema),
-  });
-  const formStep4 = useForm<StepFourValues>({
-    resolver: zodResolver(stepFourSchema),
-  });
 
-  const handleNext = async () => {
-    let isValid = false;
-    if (step === 1) {
-      isValid = await formStep1.trigger();
-    } else if (step === 2) {
-      isValid = await formStep2.trigger();
-    } else if (step === 3) {
-      isValid = await formStep3.trigger();
+  const otpForm = useForm<OtpValues>({
+    resolver: zodResolver(otpSchema),
+    defaultValues: {
+      otp: '',
     }
+  });
 
-    if (isValid) {
-      setStep((prev) => prev + 1);
+  const handleSendOtp = async () => {
+    const isValid = await form.trigger();
+    if (!isValid) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('http://localhost:8081/api/v1/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.getValues().email }),
+      });
+
+      if (response.ok) {
+        setIsOtpSent(true);
+        setIsOtpDialogOpen(true);
+        toast({
+          title: 'OTP Sent',
+          description: 'Please check your email for the verification code.',
+        });
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send OTP');
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleBack = () => setStep((prev) => prev - 1);
+  const handleVerifyOtp = async (otpData: OtpValues) => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('http://localhost:8081/api/v1/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: form.getValues().email,
+          otp: otpData.otp,
+        }),
+      });
 
-  const handleFinalSubmit = () => {
+      if (response.ok) {
+        setIsOtpDialogOpen(false);
+        handleFinalSubmit();
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Invalid OTP');
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Verification Failed',
+        description: error.message,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFinalSubmit = async () => {
+    const data = form.getValues();
     const allData = {
-      ...formStep1.getValues(),
-      ...formStep2.getValues(),
-      ...formStep3.getValues(),
-      ...formStep4.getValues(),
+      email: data.email,
+      password: data.password,
+      fullName: data.ownerName,
+      contactNumber: data.mobileNumber,
+      restaurantName: data.restaurantName,
+      restaurantType: data.restaurantType,
+      operatingHours: {
+        open: data.operationHoursOpen,
+        close: data.operationHoursClose,
+      },
+      businessModel: data.businessModel,
+      legalBusinessName: data.legalBusinessName,
+      businessType: data.businessType,
+      fssaiLicenseNumber: data.fssaiLicenseNumber,
+      fssaiExpiryDate: data.fssaiExpiryDate,
+      bankName: data.bankName,
+      fssaiDocument: data.fssaiDocument,
     };
-    onSubmit(allData, 'Restaurant');
-    toast({
-      title: 'Registration Submitted!',
-      description: 'Redirecting to your restaurant dashboard...',
-    });
-    onOpenChange(false);
 
-    router.push('/restaurant-dashboard');
+    onSubmit(allData, 'Restaurant');
+
+    // The parent's onSubmit handles the API call to register
+    // but ideally we should wait for it or handle success here.
+    // For now, following existing pattern.
+
+    toast({
+      title: 'Registration Successful!',
+      description: 'Welcome to Eat Hub! Redirecting to home...',
+    });
+
+    onOpenChange(false);
+    router.push('/');
 
     setTimeout(() => {
-      formStep1.reset();
-      formStep2.reset();
-      formStep3.reset();
-      formStep4.reset();
-      setStep(1);
-      setShowPassword(false);
-      setShowConfirmPassword(false);
+      form.reset();
+      otpForm.reset();
+      setIsOtpSent(false);
     }, 500);
   };
 
-  const progressValue = (step / 4) * 100;
-
-  // Country options (sorted by name)
-  const countryOptions = countries
-    ? Object.entries(countries)
-      .map(([code, data]) => ({
-        code,
-        name: data.name,
-        phone: Array.isArray(data.phone) ? data.phone[0].toString() : String(data.phone),
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name))
-    : [];
+  const handleGoogleSignIn = () => {
+    toast({
+      title: 'Google Sign-in',
+      description: 'Redirecting to Google...',
+    });
+    // Placeholder for Google OAuth logic
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Restaurant Registration</DialogTitle>
-          <DialogDescription>
-            Join our platform and showcase your restaurant to a wider audience.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6">
+            <DialogTitle className="text-2xl text-center">Restaurant Registration</DialogTitle>
+            <DialogDescription className="text-center">
+              Enter your details to register as a restaurant partner.
+            </DialogDescription>
+          </DialogHeader>
 
-        <Progress value={progressValue} className="w-full my-4" />
-
-        {/* STEP 1: Basic Info */}
-        {step === 1 && (
-          <Form {...formStep1}>
-            <form className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={formStep1.control}
-                  name="restaurantName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Restaurant Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., The Spice Garden" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formStep1.control}
-                  name="ownerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Owner/Manager Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., John Doe" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Phone with Country Code */}
-                <div className="md:col-span-2">
-                  <FormItem>
-                    <FormLabel>Contact Number</FormLabel>
-                    <div className="flex gap-2">
-                      <FormField
-                        control={formStep1.control}
-                        name="countryCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value} // This needs to match the value in SelectItem
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-[140px]">
-                                  <SelectValue placeholder="Code">
-                                    {/* Display custom logic if needed, otherwise SelectValue handles it based on value match */}
-                                    {field.value ? `+${field.value}` : "Code"}
-                                  </SelectValue>
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {countryOptions.map((country) => (
-                                  // The value here is "91", "1", etc.
-                                  <SelectItem key={country.code} value={country.phone}>
-                                    {country.name} (+{country.phone})
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={formStep1.control}
-                        name="contactNumber"
-                        render={({ field }) => (
-                          <FormItem className="flex-grow">
+          <ScrollArea className="flex-1 px-6">
+            <Form {...form}>
+              <form className="space-y-6 pb-6">
+                {/* --- Section: Account & Owner --- */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
+                    <User size={20} />
+                    <span>Account & Owner Details</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="email" placeholder="owner@example.com" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="ownerName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Owner Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Full Name" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <div className="relative">
                             <FormControl>
                               <Input
                                 {...field}
-                                type="tel"
-                                placeholder="Enter phone number"
-                                className="flex-grow"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="••••••••"
+                                disabled={isSubmitting}
                               />
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </FormItem>
-                </div>
-
-                <FormField
-                  control={formStep1.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="email" placeholder="you@example.com" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Password with Toggle */}
-                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <div className="relative">
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder="••••••••"
+                                disabled={isSubmitting}
+                              />
+                            </FormControl>
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
-                    control={formStep1.control}
-                    name="password"
+                    control={form.control}
+                    name="mobileNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type={showPassword ? 'text' : 'password'}
-                              placeholder="••••••••"
-                            />
-                          </FormControl>
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep1.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <div className="relative">
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type={showConfirmPassword ? 'text' : 'password'}
-                              placeholder="••••••••"
-                            />
-                          </FormControl>
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          >
-                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-            </form>
-          </Form>
-        )}
-
-        {/* STEP 2: Location & Business */}
-        {step === 2 && (
-          <Form {...formStep2}>
-            <form className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={formStep2.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormLabel>Mobile Number</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                            <Input {...field} className="pl-10" placeholder="10-digit number" disabled={isSubmitting} />
+                          </div>
                         </FormControl>
-                        <SelectContent>
-                          {countryOptions.map((country) => (
-                            <SelectItem key={country.code} value={country.code}>
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formStep2.control}
-                  name="state"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>State / Province</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., Maharashtra, California" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formStep2.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., Mumbai, Los Angeles" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formStep2.control}
-                  name="pincode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pincode / ZIP</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g., 400001, 90210" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <FormField
-                control={formStep2.control}
-                name="street"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Street Address</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Building name, street, area, landmark..."
-                        className="min-h-[80px]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <Separator />
 
-              <FormField
-                control={formStep2.control}
-                name="restaurantType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Restaurant Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="multi-cuisine">Multi-cuisine</SelectItem>
-                        <SelectItem value="fine-dining">Fine Dining</SelectItem>
-                        <SelectItem value="cafe">Café</SelectItem>
-                        <SelectItem value="bakery">Bakery</SelectItem>
-                        <SelectItem value="biryani">Biryani</SelectItem>
-                        <SelectItem value="fast-food">Fast Food</SelectItem>
-                        <SelectItem value="street-food">Street Food</SelectItem>
-                        <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={formStep2.control}
-                name="operatingHours"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Operating Hours</FormLabel>
-                    <div className="flex items-center gap-4">
-                      <Input
-                        type="time"
-                        {...formStep2.register('operatingHours.open')}
-                        className="w-[120px]"
-                      />
-                      <span>to</span>
-                      <Input
-                        type="time"
-                        {...formStep2.register('operatingHours.close')}
-                        className="w-[120px]"
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={formStep2.control}
-                name="businessModel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Model</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        className="flex gap-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="dine-in" id="dine-in" />
-                          </FormControl>
-                          <FormLabel htmlFor="dine-in" className="font-normal">
-                            Dine-in Only
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="delivery" id="delivery" />
-                          </FormControl>
-                          <FormLabel htmlFor="delivery" className="font-normal">
-                            Delivery Only
-                          </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="both" id="both" />
-                          </FormControl>
-                          <FormLabel htmlFor="both" className="font-normal">
-                            Both
-                          </FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={formStep2.control}
-                name="deliveryRadius"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Maximum Delivery Radius (km)</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} placeholder="e.g. 10" />
-                    </FormControl>
-                    <p className="text-xs text-muted-foreground">How far are you willing to deliver?</p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        )}
-
-        {/* STEP 3: Legal & Banking */}
-        {step === 3 && (
-          <Form {...formStep3}>
-            <form className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Business Legal Profile</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* --- Section: Restaurant Info --- */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
+                    <Building size={20} />
+                    <span>Restaurant Information</span>
+                  </div>
                   <FormField
-                    control={formStep3.control}
+                    control={form.control}
+                    name="restaurantName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Restaurant Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Restaurant Brand Name" disabled={isSubmitting} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="restaurantType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Restaurant Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Fine Dining">Fine Dining</SelectItem>
+                              <SelectItem value="Cafe">Cafe</SelectItem>
+                              <SelectItem value="Fast Food">Fast Food</SelectItem>
+                              <SelectItem value="Bakery">Bakery</SelectItem>
+                              <SelectItem value="Cloud Kitchen">Cloud Kitchen</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="businessModel"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Model</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select model" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="dine-only">Dine-only</SelectItem>
+                              <SelectItem value="delivery-only">Delivery-only</SelectItem>
+                              <SelectItem value="both">Both (Dine-in & Delivery)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="operationHoursOpen"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Opening Time</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="time" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="operationHoursClose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Closing Time</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="time" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* --- Section: Legal & Banking --- */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
+                    <Landmark size={20} />
+                    <span>Legal & Banking</span>
+                  </div>
+                  <FormField
+                    control={form.control}
                     name="legalBusinessName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Legal Business Name</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="as per PAN/GST" />
+                          <Input {...field} placeholder="Registered Name" disabled={isSubmitting} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={formStep3.control}
-                    name="businessType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Business Type</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="businessType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Business Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Sole Proprietor">Sole Proprietor</SelectItem>
+                              <SelectItem value="Partnership">Partnership</SelectItem>
+                              <SelectItem value="Private Limited">Private Limited</SelectItem>
+                              <SelectItem value="LLP">LLP</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="bankName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Bank Name</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
+                            <Input {...field} placeholder="HDFC, SBI, etc." disabled={isSubmitting} />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="sole-proprietorship">Sole Proprietorship</SelectItem>
-                            <SelectItem value="partnership">Partnership</SelectItem>
-                            <SelectItem value="pvt-ltd">Private Limited</SelectItem>
-                            <SelectItem value="llp">LLP</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="fssaiLicenseNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>FSSAI License No.</FormLabel>
+                          <FormControl>
+                            <Input {...field} maxLength={14} placeholder="14-digit number" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fssaiExpiryDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>FSSAI Expiry</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="date" disabled={isSubmitting} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
                   <FormField
-                    control={formStep3.control}
-                    name="panNumber"
+                    control={form.control}
+                    name="fssaiDocument"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>PAN Number</FormLabel>
+                        <FormLabel>Food License Document</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="ABCDE1234F" className="uppercase" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="gstNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>GST Number (Optional)</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="22AAAAA0000A1Z5" className="uppercase" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="fssaiLicenseNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>FSSAI License Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="14-digit number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="fssaiExpiryDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>FSSAI Expiry Date</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="date" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4 pt-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Bank Account for Payouts</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={formStep3.control}
-                    name="bankAccountHolderName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Holder Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Name as per Bank" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="bankName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bank Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="e.g. HDFC Bank" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="bankAccountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter account number" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={formStep3.control}
-                    name="bankIFSC"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>IFSC Code</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="HDFC0001234" className="uppercase" />
+                          <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-orange-500 transition-colors">
+                            <input
+                              type="file"
+                              className="hidden"
+                              id="fssai-upload"
+                              accept="image/*,.pdf"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => {
+                                    field.onChange(reader.result as string);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                            <label htmlFor="fssai-upload" className="cursor-pointer flex flex-col items-center gap-2">
+                              {field.value ? (
+                                <>
+                                  <CheckCircle2 className="text-green-500" size={32} />
+                                  <span className="text-sm font-medium">Document Uploaded</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="text-muted-foreground" size={32} />
+                                  <span className="text-sm">Click to upload license</span>
+                                </>
+                              )}
+                            </label>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
+
+                <div className="space-y-4 pt-4">
+                  <Button
+                    type="button"
+                    className="w-full bg-orange-600 hover:bg-orange-700 h-11 text-lg"
+                    onClick={handleSendOtp}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Processing...' : 'Verify Email & Register'}
+                  </Button>
+
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-11"
+                    onClick={handleGoogleSignIn}
+                    disabled={isSubmitting}
+                  >
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                    Google Sign-in
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* OTP Verification Dialog */}
+      <Dialog open={isOtpDialogOpen} onOpenChange={setIsOtpDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Verify Your Email</DialogTitle>
+            <DialogDescription>
+              Enter the 6-digit code sent to {form.getValues().email}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...otpForm}>
+            <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
+              <FormField
+                control={otpForm.control}
+                name="otp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="000000"
+                        className="text-center text-2xl tracking-[1em] h-14"
+                        maxLength={6}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
+                {isSubmitting ? 'Verifying...' : 'Verify & Register'}
+              </Button>
             </form>
           </Form>
-        )}
-
-        {/* STEP 4: Documents */}
-        {step === 4 && (
-          <Form {...formStep4}>
-            <form onSubmit={formStep4.handleSubmit(handleFinalSubmit)} className="space-y-4">
-              <FormField
-                control={formStep4.control}
-                name="logo"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormLabel>Upload Logo (PNG, JPG, WebP ≤ 5MB)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...fieldProps}
-                        type="file"
-                        accept={ACCEPTED_IMAGE_TYPES.join(',')}
-                        onChange={(e) => e.target.files && onChange(e.target.files[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formStep4.control}
-                name="restaurantPhotos"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormLabel>Upload Restaurant Photos (up to 5, ≤ 5MB each)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...fieldProps}
-                        type="file"
-                        accept={ACCEPTED_IMAGE_TYPES.join(',')}
-                        multiple
-                        onChange={(e) => e.target.files && onChange(Array.from(e.target.files))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formStep4.control}
-                name="foodLicense"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormLabel>Food License / FSSAI (PDF, JPG, PNG ≤ 10MB)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...fieldProps}
-                        type="file"
-                        accept={ACCEPTED_DOC_TYPES.join(',')}
-                        onChange={(e) => e.target.files && onChange(e.target.files[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formStep4.control}
-                name="menu"
-                render={({ field: { value, onChange, ...fieldProps } }) => (
-                  <FormItem>
-                    <FormLabel>Upload Menu (PDF, JPG, PNG ≤ 10MB)</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...fieldProps}
-                        type="file"
-                        accept={ACCEPTED_DOC_TYPES.join(',')}
-                        onChange={(e) => e.target.files && onChange(e.target.files[0])}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        )}
-
-        <DialogFooter className="pt-4">
-          {step > 1 && (
-            <Button variant="outline" onClick={handleBack}>
-              Back
-            </Button>
-          )}
-          <div className="flex-grow"></div>
-          {step < 4 && <Button onClick={handleNext}>Next</Button>}
-          {step === 4 && (
-            <Button onClick={formStep4.handleSubmit(handleFinalSubmit)}>
-              Submit Application
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

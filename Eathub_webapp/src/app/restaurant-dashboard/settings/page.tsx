@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Camera, ImagePlus, X, UserCircle2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Camera, ImagePlus, X, UserCircle2, CheckCircle2, AlertCircle, Loader2, FileText, Upload } from 'lucide-react';
 import {
   fetchRestaurantProfile,
   updateRestaurantProfile,
@@ -60,6 +60,11 @@ interface ProfileForm {
   bankAccountNumber: string;
   bankIFSC: string;
   bankName: string;
+  ownerName: string;
+  mobileNumber: string;
+  businessModel: string;
+  fssaiExpiryDate: string;
+  fssaiDocumentUrl: string | null;
 }
 
 const restaurantTypes = [
@@ -96,6 +101,7 @@ const EMPTY_FORM: ProfileForm = {
   addressLine1: '', addressLine2: '', city: '', state: '', postalCode: '', country: 'India',
   legalBusinessName: '', gstNumber: '', panNumber: '', fssaiLicenseNumber: '',
   businessType: '', bankAccountHolderName: '', bankAccountNumber: '', bankIFSC: '', bankName: '',
+  ownerName: '', mobileNumber: '', businessModel: 'both', fssaiExpiryDate: '', fssaiDocumentUrl: null,
 };
 
 export default function SettingsPage() {
@@ -147,6 +153,11 @@ export default function SettingsPage() {
           bankAccountNumber: data.bankAccountNumber ?? '',
           bankIFSC: data.bankIFSC ?? '',
           bankName: data.bankName ?? '',
+          ownerName: data.ownerName ?? '',
+          mobileNumber: data.mobileNumber ?? '',
+          businessModel: data.businessModel ?? 'both',
+          fssaiExpiryDate: data.fssaiExpiryDate ?? '',
+          fssaiDocumentUrl: data.fssaiDocumentUrl ?? null,
         });
       })
       .catch(() => { })
@@ -197,20 +208,23 @@ export default function SettingsPage() {
         description: form.description,
         cuisineType: form.cuisineType,
         restaurantType: form.restaurantType,
+        businessModel: form.businessModel,
+        ownerName: form.ownerName,
+        mobileNumber: form.mobileNumber,
         imageId: form.imageId,
         coverImageId: form.coverImageId,
       };
       await updateRestaurantProfile(restaurantId, payload);
-      
+
       if (form.imageId) {
         try {
-            localStorage.setItem('userAvatar', form.imageId);
-            window.dispatchEvent(new Event('auth-change'));
+          localStorage.setItem('userAvatar', form.imageId);
+          window.dispatchEvent(new Event('auth-change'));
         } catch (e) {
-            console.warn("Storage quota exceeded, header icon might not update instantly.");
+          console.warn("Storage quota exceeded, header icon might not update instantly.");
         }
       }
-      
+
       showToast('success', 'Profile core info saved!');
     } catch (err: any) {
       showToast('error', err.message || 'Failed to save profile.');
@@ -254,6 +268,8 @@ export default function SettingsPage() {
         bankAccountNumber: form.bankAccountNumber,
         bankIFSC: form.bankIFSC,
         bankName: form.bankName,
+        fssaiExpiryDate: form.fssaiExpiryDate,
+        fssaiDocumentUrl: form.fssaiDocumentUrl,
       };
       await updateRestaurantLegal(restaurantId, payload);
       showToast('success', 'Bank & Legal details saved!');
@@ -337,7 +353,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center gap-5">
-                <input ref={profileInputRef} type="file" accept="image/*" className="hidden" 
+                <input ref={profileInputRef} type="file" accept="image/*" className="hidden"
                   onChange={handleProfileImageChange} />
                 <div className="relative h-20 w-20 rounded-full border-2 border-dashed overflow-hidden cursor-pointer"
                   onClick={() => profileInputRef.current?.click()}>
@@ -356,12 +372,12 @@ export default function SettingsPage() {
                 <Label>Bio</Label>
                 <Textarea value={form.description} onChange={setField('description')} rows={3} />
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Cuisine</Label>
                   <Input value={form.cuisineType} onChange={setField('cuisineType')} placeholder="e.g. Italian, Chinese" />
                 </div>
-
                 <div className="space-y-2">
                   <Label>Restaurant Type</Label>
                   <Select
@@ -380,6 +396,34 @@ export default function SettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Owner Name</Label>
+                  <Input value={form.ownerName} onChange={setField('ownerName')} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mobile Number</Label>
+                  <Input value={form.mobileNumber} onChange={setField('mobileNumber')} placeholder="10-digit number" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Business Model</Label>
+                <Select
+                  value={form.businessModel}
+                  onValueChange={(val) => setForm(f => ({ ...f, businessModel: val }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dine-only">Dine-only</SelectItem>
+                    <SelectItem value="delivery-only">Delivery-only</SelectItem>
+                    <SelectItem value="both">Both (Dine-in & Delivery)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
             <CardFooter>
@@ -520,17 +564,9 @@ export default function SettingsPage() {
               <CardDescription>Separate record for banking.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>GST Number</Label>
-                <Input value={form.gstNumber} onChange={setField('gstNumber')} />
-              </div>
-              <div className="space-y-2">
-                <Label>PAN Number</Label>
-                <Input value={form.panNumber} onChange={setField('panNumber')} />
-              </div>
               <Separator />
               <div className="space-y-2">
-                <Label>Account Holder</Label>
+                <Label>Account Holder Name</Label>
                 <Input value={form.bankAccountHolderName} onChange={setField('bankAccountHolderName')} />
               </div>
               <div className="space-y-2">
@@ -538,8 +574,61 @@ export default function SettingsPage() {
                 <Input value={form.bankAccountNumber} onChange={setField('bankAccountNumber')} type="password" />
               </div>
               <div className="space-y-2">
+                <Label>Bank Name</Label>
+                <Input value={form.bankName} onChange={setField('bankName')} />
+              </div>
+              <div className="space-y-2">
                 <Label>IFSC</Label>
                 <Input value={form.bankIFSC} onChange={setField('bankIFSC')} />
+              </div>
+              <Separator />
+              <div className="space-y-2">
+                <Label>FSSAI Expiry Date</Label>
+                <Input type="date" value={form.fssaiExpiryDate} onChange={setField('fssaiExpiryDate')} />
+              </div>
+              <div className="space-y-2">
+                <Label>Food License Document</Label>
+                <div className="flex flex-col gap-2">
+                  {form.fssaiDocumentUrl ? (
+                    <div className="relative group rounded-lg overflow-hidden border aspect-video bg-muted/20">
+                      {form.fssaiDocumentUrl && (form.fssaiDocumentUrl.startsWith('data:image') || form.fssaiDocumentUrl.startsWith('http')) ? (
+                        <img src={form.fssaiDocumentUrl} alt="FSSAI License" className="w-full h-full object-contain" />
+                      ) : (
+                        <div className="flex items-center justify-center h-full gap-2">
+                          <FileText className="h-8 w-8 text-orange-600" />
+                          <span className="text-sm font-medium">License File Uploaded</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button size="sm" variant="secondary" onClick={() => document.getElementById('fssai-upload')?.click()}>Change</Button>
+                        <Button size="sm" variant="destructive" onClick={() => setForm(f => ({ ...f, fssaiDocumentUrl: null }))}>Remove</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button variant="outline" className="w-full border-dashed py-8 flex flex-col gap-2" onClick={() => document.getElementById('fssai-upload')?.click()}>
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                      <span>Upload FSSAI Document</span>
+                    </Button>
+                  )}
+                  <input
+                    id="fssai-upload"
+                    type="file"
+                    className="hidden"
+                    accept="image/*,.pdf"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                          const result = reader.result as string;
+                          setForm(prev => ({ ...prev, fssaiDocumentUrl: result }));
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  <p className="text-[10px] text-muted-foreground text-center">Images or PDFs up to 5MB are supported.</p>
+                </div>
               </div>
             </CardContent>
             <CardFooter>

@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import type { MenuItem as MenuItemType } from '@/lib/types';
-import { getImageById } from '@/lib/placeholder-images';
 import { Plus } from 'lucide-react';
+import { getDisplayImage } from '@/lib/image-utils';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
@@ -14,7 +14,7 @@ interface MenuItemProps {
 }
 
 export function MenuItem({ item, onClick }: MenuItemProps) {
-  const image = getImageById(item.imageId);
+  const displayImage = getDisplayImage(item.imageId, 'food-1');
 
   return (
     <Card className="overflow-hidden cursor-pointer group flex flex-col" onClick={onClick}>
@@ -22,18 +22,14 @@ export function MenuItem({ item, onClick }: MenuItemProps) {
         <div className="flex justify-between items-start p-4 flex-1">
 
           {/* IMAGE LEFT */}
-          {image && (
-            <div className="relative h-24 w-24 rounded-md overflow-hidden flex-shrink-0 mr-4">
-              <Image
-                src={image.imageUrl}
-                alt={item.name}
-                fill
-                objectFit="cover"
-                className="rounded-md"
-                data-ai-hint={image.imageHint}
-              />
-            </div>
-          )}
+          <div className="relative h-24 w-24 rounded-md overflow-hidden flex-shrink-0 mr-4">
+            <Image
+              src={displayImage}
+              alt={item.name}
+              fill
+              className="object-cover rounded-md"
+            />
+          </div>
 
           {/* TEXT RIGHT */}
           <div className="flex-1">

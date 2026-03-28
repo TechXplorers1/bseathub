@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,14 +78,27 @@ public class RestaurantService {
         }
         if (dto.getCoverImageId() != null)
             r.setCoverImageId(dto.getCoverImageId());
-        
+
         if (dto.getIsOpen() != null) {
             r.setIsOpen(dto.getIsOpen());
             r.setOperationalStatus(dto.getIsOpen() ? "OPEN" : "CLOSED");
         }
-            
+
         if (dto.getWorkingHours() != null)
             r.setWorkingHours(dto.getWorkingHours());
+
+        if (dto.getBusinessModel() != null)
+            r.setBusinessModel(dto.getBusinessModel());
+
+        // Update Owner details if provided
+        User owner = r.getOwner();
+        if (owner != null) {
+            if (dto.getOwnerName() != null && !dto.getOwnerName().isBlank())
+                owner.setName(dto.getOwnerName());
+            if (dto.getMobileNumber() != null && !dto.getMobileNumber().isBlank())
+                owner.setPhone(dto.getMobileNumber());
+            userRepository.save(owner);
+        }
 
         return mapToResponseDTO(restaurantRepository.save(r));
     }
@@ -141,7 +156,20 @@ public class RestaurantService {
         legal.setBankIFSC(dto.getBankIFSC());
         legal.setBankName(dto.getBankName());
 
-        legalProfileRepository.save(legal);
+        if (dto.getFssaiExpiryDate() != null && !dto.getFssaiExpiryDate().isBlank()) {
+            legal.setFssaiExpiryDate(LocalDate.parse(dto.getFssaiExpiryDate()));
+        }
+        if (dto.getFssaiDocumentUrl() != null) {
+            legal.setFssaiDocumentUrl(dto.getFssaiDocumentUrl());
+        }
+
+        try {
+            legalProfileRepository.save(legal);
+        } catch (Exception e) {
+            System.err.println("CRITICAL: Failed to save legal profile for restaurant " + restaurantId + ". Error: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
         return mapToResponseDTO(r);
     }
 
@@ -207,6 +235,13 @@ public class RestaurantService {
         dto.setWorkingHours(r.getWorkingHours());
         dto.setImageId(r.getImageId());
         dto.setCoverImageId(r.getCoverImageId());
+        dto.setBusinessModel(r.getBusinessModel());
+
+        User owner = r.getOwner();
+        if (owner != null) {
+            dto.setOwnerName(owner.getName());
+            dto.setMobileNumber(owner.getPhone());
+        }
 
         RestaurantAddress addr = r.getAddress();
         if (addr != null) {
@@ -229,12 +264,16 @@ public class RestaurantService {
             dto.setBankAccountNumber(legal.getBankAccountNumber());
             dto.setBankIFSC(legal.getBankIFSC());
             dto.setBankName(legal.getBankName());
+            if (legal.getFssaiExpiryDate() != null) {
+                dto.setFssaiExpiryDate(legal.getFssaiExpiryDate().toString());
+            }
+            dto.setFssaiDocumentUrl(legal.getFssaiDocumentUrl());
         }
         return dto;
     }
 
     @Transactional
-    public void addDish(String restaurantId, MenuItemRequestDTO dto) {
+    public com.eathub.common.dto.MenuItemDTO addDish(String restaurantId, MenuItemRequestDTO dto) {
         try {
             Restaurant restaurant = restaurantRepository.findById(restaurantId)
                     .orElseThrow(() -> new ResponseStatusException(
@@ -269,10 +308,23 @@ public class RestaurantService {
                     .imageId(dto.getImageUrl())
                     .build();
 
-            menuItemRepository.save(newItem);
+            return mapToMenuItemDTO(menuItemRepository.save(newItem));
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    private com.eathub.common.dto.MenuItemDTO mapToMenuItemDTO(MenuItem item) {
+        return com.eathub.common.dto.MenuItemDTO.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .price(item.getPrice())
+                .status(item.getStatus())
+                .isSpecial(item.getIsSpecial())
+                .imageId(item.getImageId())
+                .category(item.getCategory() != null ? item.getCategory().getTitle() : "General")
+                .build();
     }
 
     public java.util.Map<String, Object> getDashboardOverview(String id) {

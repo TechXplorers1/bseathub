@@ -40,6 +40,13 @@ public class Restaurant {
     private Integer avgDeliveryTime;
     private Double baseDeliveryFee;
     private Boolean isOpen;
+    
+    @Column(name = "business_model")
+    private String businessModel;
+
+    @Column(name = "delivery_radius")
+    private Double deliveryRadius;
+
     private String operationalStatus;
 
     @Column(columnDefinition = "TEXT")

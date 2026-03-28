@@ -31,10 +31,21 @@ public class Chef {
     private Integer reviewsCount;
     @Column(columnDefinition = "TEXT")
     private String avatarUrl;
+
+    @Column(name = "cover_image_id", columnDefinition = "TEXT")
+    private String coverImageId;
+
     private String experience;
 
-    // Removed redundant field
-    
+    @Column(name = "base_price")
+    private Double basePrice;
+
+    @Column(name = "work_type")
+    private String workType;
+
+    @Column(name = "social_links")
+    private String socialLinks;
+
     @Column(columnDefinition = "TEXT")
     private String workingHours;
     

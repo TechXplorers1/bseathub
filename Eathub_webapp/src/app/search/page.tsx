@@ -5,27 +5,18 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { RestaurantCard } from '@/components/home/RestaurantCard';
 import { ChefCard } from '@/components/home/ChefCard';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
+import { useRestaurants } from '@/context/RestaurantProvider';
 import type { Restaurant } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const chefs = allHomeFoods.map(food => ({
-    name: food.name.split("'s")[0],
-    specialty: food.cuisine,
-    avatarUrl: `https://i.pravatar.cc/150?u=${food.id}`,
-    slug: food.slug
-}));
-
-const uniqueChefs = chefs.reduce((acc, current) => {
-    if (!acc.find(item => item.name === current.name)) {
-        acc.push(current);
-    }
-    return acc;
-}, [] as typeof chefs);
-
 function SearchResults() {
+    const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData, loading } = useRestaurants();
     const searchParams = useSearchParams();
     const query = searchParams.get('q') || '';
+
+    if (loading) {
+        return <div className="flex justify-center mt-12"><p className="animate-pulse">Searching...</p></div>;
+    }
 
     if (!query) {
         return <p className="text-center text-muted-foreground mt-12">Please enter a search term.</p>;
@@ -33,19 +24,34 @@ function SearchResults() {
 
     const lowercasedQuery = query.toLowerCase();
 
-    const filteredRestaurants = allRestaurants.filter(restaurant =>
+    const filteredRestaurants = allRestaurantsData.filter((restaurant: Restaurant) =>
         restaurant.name.toLowerCase().includes(lowercasedQuery) ||
-        restaurant.cuisine.toLowerCase().includes(lowercasedQuery) ||
-        restaurant.categories.some(cat => cat.toLowerCase().includes(lowercasedQuery))
+        restaurant.cuisine?.toLowerCase().includes(lowercasedQuery) ||
+        restaurant.categories?.some((cat: string) => cat.toLowerCase().includes(lowercasedQuery))
     );
 
-    const filteredHomeFoods = allHomeFoods.filter(restaurant =>
+    const filteredHomeFoods = allHomeFoodsData.filter((restaurant: Restaurant) =>
         restaurant.name.toLowerCase().includes(lowercasedQuery) ||
-        restaurant.cuisine.toLowerCase().includes(lowercasedQuery) ||
-        restaurant.categories.some(cat => cat.toLowerCase().includes(lowercasedQuery))
+        restaurant.cuisine?.toLowerCase().includes(lowercasedQuery) ||
+        restaurant.categories?.some((cat: string) => cat.toLowerCase().includes(lowercasedQuery))
     );
 
-    const filteredChefs = uniqueChefs.filter(chef =>
+    // Derive Chefs from Home Food providers
+    const chefs = allHomeFoodsData.map((food: Restaurant) => ({
+        name: food.name.split("'s")[0],
+        specialty: food.cuisine || "Home-made",
+        avatarUrl: food.imageId ? food.imageId : `https://i.pravatar.cc/150?u=${food.id}`,
+        slug: food.slug
+    }));
+
+    const uniqueChefs = chefs.reduce((acc: any[], current: any) => {
+        if (!acc.find((item: any) => item.name === current.name)) {
+            acc.push(current);
+        }
+        return acc;
+    }, [] as typeof chefs);
+
+    const filteredChefs = uniqueChefs.filter((chef: any) =>
         chef.name.toLowerCase().includes(lowercasedQuery) ||
         chef.specialty.toLowerCase().includes(lowercasedQuery)
     );

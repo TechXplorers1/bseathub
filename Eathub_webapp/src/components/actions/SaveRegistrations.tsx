@@ -38,7 +38,7 @@ export const registerUser = async (data: any, userType: string) => {
       email: data.email
     });
 
-    console.log("User registered successfully:", uid);
+
     return { success: true };
 
   } catch (error: any) {

@@ -15,6 +15,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final RestaurantRepository restaurantRepository;
     private final ChefRepository chefRepository;
     private final HomeFoodProviderRepository homeFoodRepository;
@@ -31,28 +32,40 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
-        // --- FIX: Logic to capture the correct Name for the User table ---
         String displayName;
         UserRole targetRole;
 
         if ("Restaurant".equalsIgnoreCase(type)) {
             targetRole = UserRole.RESTAURANT;
-            displayName = (String) data.get("restaurantName"); // Use restaurant name
+            displayName = (String) data.get("restaurantName");
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = email.split("@")[0] + "'s Kitchen";
+            }
         } else if ("Home Food".equalsIgnoreCase(type)) {
             targetRole = UserRole.HOMEFOOD;
-            displayName = (String) data.get("kitchenName"); // Use kitchen name
+            displayName = (String) data.get("kitchenName");
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = (String) data.get("fullName");
+            }
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = email.split("@")[0] + "'s Home Food";
+            }
         } else if ("Chef".equalsIgnoreCase(type)) {
             targetRole = UserRole.CHEF;
-            displayName = (String) data.get("fullName"); // Use chef name
+            displayName = (String) data.get("fullName");
+            if (displayName == null || displayName.isEmpty()) {
+                displayName = email.split("@")[0];
+            }
         } else {
             targetRole = UserRole.USER;
-            displayName = (String) data.getOrDefault("fullName", "Partner");
+            displayName = (String) data.getOrDefault("fullName", email.split("@")[0]);
         }
 
-        // Create User with the correct Name
+        // Create User
         User user = User.builder()
                 .name(displayName)
                 .email(email)
+                .phone((String) data.get("contactNumber"))
                 .password(passwordEncoder.encode((String) data.get("password")))
                 .role(targetRole)
                 .build();
@@ -65,23 +78,156 @@ public class AuthService {
             res.setOwner(savedUser);
             res.setName(displayName);
             res.setSlug(generateSlug(displayName));
-            res.setCuisineType((String) data.get("cuisineType"));
+            res.setType((String) data.getOrDefault("restaurantType", "Multi-cuisine"));
+            res.setCuisineType((String) data.getOrDefault("cuisineType", "Various"));
+            res.setBusinessModel((String) data.getOrDefault("businessModel", "delivery"));
+            Object radius = data.get("deliveryRadius");
+            if (radius != null) {
+                res.setDeliveryRadius(Double.valueOf(radius.toString()));
+            } else {
+                res.setDeliveryRadius(5.0);
+            }
             res.setIsOpen(true);
-            providerIdResult = restaurantRepository.save(res).getId();
+            
+            // Hours
+            Map<String, String> hours = (Map<String, String>) data.get("operatingHours");
+            if (hours != null) {
+                res.setWorkingHours(hours.get("open") + " - " + hours.get("close"));
+            } else {
+                res.setWorkingHours("09:00 - 22:00");
+            }
+
+            Restaurant savedRes = restaurantRepository.save(res);
+            providerIdResult = savedRes.getId();
+
+            // Address (only if some address info is provided)
+            if (data.containsKey("city") || data.containsKey("street")) {
+                RestaurantAddress addr = RestaurantAddress.builder()
+                    .restaurant(savedRes)
+                    .country((String) data.getOrDefault("country", "India"))
+                    .state((String) data.get("state"))
+                    .city((String) data.get("city"))
+                    .postalCode((String) data.get("pincode"))
+                    .addressLine1((String) data.get("street"))
+                    .build();
+                savedRes.setAddress(addr);
+            }
+
+            // Legal Profile (only if legal info is provided)
+            if (data.containsKey("panNumber") || data.containsKey("bankAccountNumber") || 
+                data.containsKey("fssaiLicenseNumber") || data.containsKey("legalBusinessName")) {
+                RestaurantLegalProfile lp = RestaurantLegalProfile.builder()
+                    .restaurant(savedRes)
+                    .legalBusinessName((String) data.get("legalBusinessName"))
+                    .gstNumber((String) data.get("gstNumber"))
+                    .panNumber((String) data.get("panNumber"))
+                    .fssaiLicenseNumber((String) data.get("fssaiLicenseNumber"))
+                    .fssaiDocumentUrl((String) data.get("fssaiDocument"))
+                    .businessType((String) data.get("businessType"))
+                    .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                    .bankAccountNumber((String) data.get("bankAccountNumber"))
+                    .bankIFSC((String) data.get("bankIFSC"))
+                    .bankName((String) data.get("bankName"))
+                    .build();
+                
+                String fssaiExpiry = (String) data.get("fssaiExpiryDate");
+                if (fssaiExpiry != null && !fssaiExpiry.isEmpty()) {
+                    lp.setFssaiExpiryDate(java.time.LocalDate.parse(fssaiExpiry));
+                }
+                savedRes.setLegalProfile(lp);
+            }
+            restaurantRepository.save(savedRes);
+
         } else if (targetRole == UserRole.HOMEFOOD) {
             HomeFoodProvider hfp = new HomeFoodProvider();
             hfp.setOwner(savedUser);
             hfp.setBrandName(displayName);
             hfp.setSlug(generateSlug(displayName));
             hfp.setIsActive(true);
-            providerIdResult = homeFoodRepository.save(hfp).getId();
+            
+            Object cuisineTypes = data.get("cuisineTypes");
+            if (cuisineTypes instanceof java.util.List) {
+                hfp.setFoodType(String.join(", ", (java.util.List<String>) cuisineTypes));
+            }
+            hfp.setSpecialtyDishes((String) data.get("specialtyDishes"));
+            hfp.setDeliveryAvailability((String) data.get("deliveryAvailability"));
+
+            HomeFoodProvider savedHfp = homeFoodRepository.save(hfp);
+            providerIdResult = savedHfp.getId();
+
+            // Address
+            HomeFoodAddress addr = HomeFoodAddress.builder()
+                .homeFoodProvider(savedHfp)
+                .country((String) data.get("country"))
+                .state((String) data.get("state"))
+                .city((String) data.get("city"))
+                .postalCode((String) data.get("postalCode"))
+                .addressLine1((String) data.get("street"))
+                .build();
+            savedHfp.setAddress(addr);
+
+            // Legal
+            HomeFoodLegalProfile lp = HomeFoodLegalProfile.builder()
+                .homeFoodProvider(savedHfp)
+                .idProofType((String) data.get("idProofType"))
+                .idProofNumber((String) data.get("idProofNumber"))
+                .hygieneVerified((Boolean) data.get("hygieneVerified"))
+                .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                .bankAccountNumber((String) data.get("bankAccountNumber"))
+                .bankIFSC((String) data.get("bankIFSC"))
+                .bankName((String) data.get("bankName"))
+                .build();
+            savedHfp.setLegalProfile(lp);
+            homeFoodRepository.save(savedHfp);
+
         } else if (targetRole == UserRole.CHEF) {
             Chef chef = new Chef();
             chef.setOwner(savedUser);
             chef.setName(displayName);
             chef.setSlug(generateSlug(displayName));
-            chef.setSpecialty((String) data.get("specialty"));
-            providerIdResult = chefRepository.save(chef).getId();
+            chef.setExperience((String) data.get("experience"));
+            chef.setIsActive(true);
+            
+            Object specialtyCuisines = data.get("specialtyCuisines");
+            if (specialtyCuisines instanceof java.util.List) {
+                chef.setSpecialty(String.join(", ", (java.util.List<String>) specialtyCuisines));
+            }
+            
+            Object workType = data.get("workType");
+            if (workType instanceof java.util.List) {
+                chef.setWorkType(String.join(", ", (java.util.List<String>) workType));
+            }
+
+            Object basePrice = data.get("basePrice");
+            if (basePrice != null) {
+                chef.setBasePrice(Double.valueOf(basePrice.toString()));
+            }
+
+            chef.setWorkingHours(data.get("availabilityStartTime") + " - " + data.get("availabilityEndTime"));
+            chef.setSocialLinks((String) data.get("socialLinks"));
+
+            Chef savedChef = chefRepository.save(chef);
+            providerIdResult = savedChef.getId();
+
+            // Address
+            ChefAddress addr = ChefAddress.builder()
+                .chef(savedChef)
+                .city((String) data.get("currentCity"))
+                .build();
+            savedChef.setAddress(addr);
+
+            // Legal
+            ChefLegalProfile lp = ChefLegalProfile.builder()
+                .chef(savedChef)
+                .idProofType((String) data.get("idProofType"))
+                .idProofNumber((String) data.get("idProofNumber"))
+                .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                .bankAccountNumber((String) data.get("bankAccountNumber"))
+                .bankIFSC((String) data.get("bankIFSC"))
+                .bankName((String) data.get("bankName"))
+                .build();
+            savedChef.setLegalProfile(lp);
+            chefRepository.save(savedChef);
         }
 
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
@@ -101,7 +247,6 @@ public class AuthService {
 
         String providerId = null;
 
-        // Fetch the specific ID for the dashboard based on role
         if (user.getRole() == UserRole.RESTAURANT) {
             providerId = restaurantRepository.findByOwnerId(user.getId())
                     .map(Restaurant::getId).orElse(null);
@@ -122,7 +267,7 @@ public class AuthService {
                 user.getAvatarUrl());
     }
 
-    // Add these methods inside AuthService class
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");
@@ -130,19 +275,34 @@ public class AuthService {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
+                .phone(request.getMobileNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(UserRole.USER)
-                .avatarUrl(null) // Initialize as null for new users
+                .avatarUrl(null)
                 .build();
+        
         User savedUser = userRepository.save(user);
+
+        UserProfile profile = UserProfile.builder()
+                .user(savedUser)
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .houseNumber(request.getHouseNumber())
+                .street(request.getStreet())
+                .area(request.getArea())
+                .city(request.getCity())
+                .state(request.getState())
+                .country(request.getCountry())
+                .build();
+        
+        userProfileRepository.save(profile);
+
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
                 null, savedUser.getName(), savedUser.getAvatarUrl());
     }
 
-    // Instead of calling jwtService, just use the email passed from your request
     public User getCurrentUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
-
 }

@@ -23,7 +23,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 
-type CategoryFilterKey = 'all' | 'starters' | 'main' | 'desserts' | 'beverages';
+type CategoryFilterKey = string; // Now dynamic
 
 const getSectionId = (title: string) =>
   title
@@ -32,38 +32,11 @@ const getSectionId = (title: string) =>
     .replace(/(^-|-$)/g, '');
 
 function filterMenuByCategory(
-  menu: Restaurant['menu'],
+  menu: MenuCategory[],
   filter: CategoryFilterKey
 ) {
   if (filter === 'all') return menu;
-
-  const contains = (title: string, ...keywords: string[]) => {
-    const lower = title.toLowerCase();
-    return keywords.some((k) => lower.includes(k));
-  };
-
-  return menu.filter((category) => {
-    const title = category.title || '';
-    switch (filter) {
-      case 'starters':
-        return contains(title, 'starter', 'appetiser', 'appetizer');
-      case 'main':
-        return contains(title, 'main course', 'main dish');
-      case 'desserts':
-        return contains(title, 'dessert', 'sweet');
-      case 'beverages':
-        return contains(
-          title,
-          'beverage',
-          'drink',
-          'mocktail',
-          'shake',
-          'juice'
-        );
-      default:
-        return true;
-    }
-  });
+  return menu.filter((category) => category.title === filter);
 }
 
 export function RestaurantDetails({
@@ -81,23 +54,33 @@ export function RestaurantDetails({
   const [searchTerm, setSearchTerm] = React.useState('');
   const [menu, setMenu] = React.useState<MenuCategory[]>(restaurant.menu || []);
   const [loadingMenu, setLoadingMenu] = React.useState(false);
+  const [hasFetchedMenu, setHasFetchedMenu] = React.useState(false);
+
 
   React.useEffect(() => {
     async function loadMenu() {
-      if (restaurant.id && (menu.length === 0 || restaurant.type === 'home-food')) {
+      // Fetch only once if id is available
+      if (restaurant.id && !hasFetchedMenu) {
         setLoadingMenu(true);
         try {
-          const grouped = await fetchGroupedMenu(restaurant.id, restaurant.type === 'home-food' ? 'home-food' : 'restaurant');
-          setMenu(grouped);
+          // Normalize type (lowercase for API), fallback to restaurant if unknown
+          const normalizedType = restaurant.type?.toLowerCase();
+          const providerType = (normalizedType === 'home-food' || normalizedType === 'homefood') ? 'home-food' : 'restaurant';
+          const grouped = await fetchGroupedMenu(restaurant.id, providerType as any);
+          if (grouped && Array.isArray(grouped)) {
+            setMenu(grouped);
+          }
+          setHasFetchedMenu(true);
         } catch (error) {
-          console.error("Failed to fetch grouped menu:", error);
+          // console.error("Failed to fetch grouped menu:", error);
+          setHasFetchedMenu(true); // Don't retry infinitely on error
         } finally {
           setLoadingMenu(false);
         }
       }
     }
     loadMenu();
-  }, [restaurant.id, restaurant.type]);
+  }, [restaurant.id, restaurant.type, hasFetchedMenu]);
 
   // NEW: hero observer state + ref
   const heroRef = React.useRef<HTMLElement | null>(null);
@@ -140,18 +123,9 @@ export function RestaurantDetails({
   // Which filters are actually available for this restaurant
   const availableFilterKeys: CategoryFilterKey[] = React.useMemo(() => {
     const keys: CategoryFilterKey[] = ['all'];
-    if (filterMenuByCategory(nonEmptyMenu, 'starters').length > 0) {
-      keys.push('starters');
-    }
-    if (filterMenuByCategory(nonEmptyMenu, 'main').length > 0) {
-      keys.push('main');
-    }
-    if (filterMenuByCategory(nonEmptyMenu, 'desserts').length > 0) {
-      keys.push('desserts');
-    }
-    if (filterMenuByCategory(nonEmptyMenu, 'beverages').length > 0) {
-      keys.push('beverages');
-    }
+    nonEmptyMenu.forEach(cat => {
+      if (cat.title) keys.push(cat.title);
+    });
     return keys;
   }, [nonEmptyMenu]);
 
@@ -184,13 +158,12 @@ export function RestaurantDetails({
   const visibleItems = filteredMenu.flatMap((category) => category.items);
   const featuredItems = visibleItems.slice(0, 3);
 
-  const filterButtons = ([
-    { key: 'all', label: 'All' },
-    { key: 'starters', label: 'Starters' },
-    { key: 'main', label: 'Main course' },
-    { key: 'desserts', label: 'Desserts' },
-    { key: 'beverages', label: 'Beverages' },
-  ] as const).filter((btn) => availableFilterKeys.includes(btn.key as CategoryFilterKey));
+  const filterButtons = React.useMemo(() => {
+    return availableFilterKeys.map(key => ({
+      key,
+      label: key === 'all' ? 'All' : key
+    }));
+  }, [availableFilterKeys]);
 
   const scrollStyle = `
     .no-scrollbar {

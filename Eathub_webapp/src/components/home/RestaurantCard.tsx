@@ -4,14 +4,14 @@ import type { Restaurant } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Star, Bike, ShoppingBag } from 'lucide-react';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
 }
 
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  const image = getImageById(restaurant.imageId);
+  const displayImage = getDisplayImage(restaurant.coverImageId || restaurant.imageId, 'restaurant-1');
   // Safe check for services array
   const services = restaurant.services || [];
 
@@ -25,7 +25,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
       <Card className="overflow-hidden transition-all hover:shadow-xl w-full flex flex-col border-muted/60">
         <div className="relative h-48 w-full overflow-hidden">
           <Image
-            src={image?.imageUrl || '/placeholder-food.jpg'}
+            src={displayImage}
             alt={restaurant.name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"

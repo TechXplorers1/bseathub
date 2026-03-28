@@ -15,7 +15,7 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/v1/discovery")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:9004")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DiscoveryController {
 
     private final MenuItemRepository menuItemRepository;

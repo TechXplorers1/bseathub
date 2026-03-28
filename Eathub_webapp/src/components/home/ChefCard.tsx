@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, ArrowRight, ChefHat } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { getDisplayImage } from '@/lib/image-utils';
 import type { Chef, Restaurant } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,7 @@ interface ChefCardProps {
 }
 
 export function ChefCard({ chef }: ChefCardProps) {
+    const displayImage = getDisplayImage(chef.avatarUrl, 'chef-1');
 
     return (
         <Link
@@ -25,11 +27,10 @@ export function ChefCard({ chef }: ChefCardProps) {
             <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col group relative">
                 <div className="relative h-96 w-full">
                     <Image
-                        src={chef.avatarUrl}
+                        src={displayImage}
                         alt={chef.name}
                         fill
                         className="object-cover"
-                        data-ai-hint="chef portrait"
                     />
                     <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-1.5 rounded-full">
                         <ChefHat className="h-5 w-5 text-primary" />

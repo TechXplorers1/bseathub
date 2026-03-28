@@ -22,6 +22,13 @@ public class ChefLegalProfile {
     private String legalBusinessName;
     private String gstNumber;
     private String panNumber;
+
+    @Column(name = "id_proof_type")
+    private String idProofType;
+
+    @Column(name = "id_proof_number")
+    private String idProofNumber;
+
     private String bankAccountHolderName;
     private String bankAccountNumber;
     private String bankIFSC;

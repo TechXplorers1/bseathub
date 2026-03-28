@@ -6,14 +6,6 @@ import { fetchHomeFoods } from '@/services/api';
 import type { Restaurant } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
-const categories = [
-  "Breakfast", "Fast Food", "Burgers", "Coffee", "Pizza", "Halal", "Chicken",
-  "Bubble Tea", "Indian", "Desserts", "Mexican", "Greek", "Healthy",
-  "Sandwiches", "Noodle", "Italian", "Chinese", "BBQ", "Korean", "Soup",
-  "Bakery", "Thai", "Comfort Food", "Pasta", "Dumplings", "Tacos", "Bowls",
-  "Curry", "American", "Spicy", "Bread", "Mediterranean", "Homemade"
-];
-
 export default function HomeFoodPage() {
   const [homeFoods, setHomeFoods] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,9 +18,10 @@ export default function HomeFoodPage() {
         // Normalize backend data
         const normalized = data.map((item: any) => ({
           ...item,
-          cuisine: item.cuisine || item.foodType || "Home Cooked",
-          reviews: item.reviews || item.reviewsCount || 0,
-          categories: item.categories || ["Homemade"],
+          cuisine: item.foodType || item.cuisine || "Home Cooked",
+          reviews: item.reviews ?? 0,
+          categories: item.foodType ? [item.foodType] : (item.categories || ["Homemade"]),
+          isOpen: item.isActive ?? true,
           type: 'home-food' as const
         }));
         setHomeFoods(normalized);
@@ -61,11 +54,20 @@ export default function HomeFoodPage() {
     );
   }
 
+  // Dynamically derive categories from fetched data to ensure all kitchens are shown
+  const dynamicCategories = Array.from(new Set(
+    homeFoods.flatMap(r => [
+      r.cuisine,
+      ...(r.categories || [])
+    ].filter(Boolean))
+  )).sort();
+
   const homeFoodsByCategory: { [category: string]: Restaurant[] } = {};
 
-  categories.forEach(category => {
+  dynamicCategories.forEach(category => {
     const filtered = homeFoods.filter(restaurant =>
-      restaurant.categories?.some(cat => cat.toLowerCase().includes(category.toLowerCase()))
+      restaurant.categories?.some(cat => cat.toLowerCase() === category.toLowerCase()) ||
+      restaurant.cuisine?.toLowerCase() === category.toLowerCase()
     );
     if (filtered.length > 0) {
       homeFoodsByCategory[category] = filtered;

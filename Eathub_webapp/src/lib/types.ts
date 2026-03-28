@@ -8,7 +8,9 @@ export interface Restaurant {
   id: string;
   name: string;
   slug: string;
-  imageId: PlaceholderImageIds;
+  imageId: string | PlaceholderImageIds;
+  coverImageId?: string;
+  avatarUrl?: string;
   cuisine: string;
   rating: number;
   reviews: number;
@@ -22,6 +24,7 @@ export interface Restaurant {
   owner?: { id: string };
   // Dynamic Profile Fields
   bio?: string;
+  description?: string;
   experience?: string;
   specialty?: string;
   workingHours?: string;

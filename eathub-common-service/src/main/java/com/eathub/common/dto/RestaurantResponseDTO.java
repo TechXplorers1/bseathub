@@ -16,6 +16,11 @@ public class RestaurantResponseDTO {
     private Integer reviewsCount;
     private Boolean isOpen;
     private String workingHours;
+    private String businessModel;
+
+    // ── Owner ─────────────────────────────────────────────
+    private String ownerName;
+    private String mobileNumber;
 
     // ── Images ────────────────────────────────────────────
     private String imageId;
@@ -39,4 +44,6 @@ public class RestaurantResponseDTO {
     private String bankAccountNumber;
     private String bankIFSC;
     private String bankName;
+    private String fssaiExpiryDate;
+    private String fssaiDocumentUrl;
 }

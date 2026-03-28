@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 import type { Restaurant } from '@/lib/types';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -11,8 +11,8 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [animatedQuote, setAnimatedQuote] = useState('');
 
-  const image = getImageById(restaurant.imageId);
-  const logo = getImageById('restaurant-3');
+  const coverImage = getDisplayImage(restaurant.coverImageId, 'restaurant-1');
+  const logoImage = getDisplayImage(restaurant.imageId, 'restaurant-3');
 
   const toggleFavorite = () => {
     setIsFavorited((prev) => !prev);
@@ -33,13 +33,12 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
 
   return (
     <div className="relative w-full h-[40vh] min-h-[220px] sm:h-[48vh] ">
-      {image && (
+      {coverImage && (
         <Image
-          src={image.imageUrl}
+          src={coverImage}
           alt={restaurant.name}
           fill
           className="object-cover "
-          data-ai-hint={image.imageHint}
           priority
         />
       )}
@@ -87,16 +86,15 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
       </div>
 
       {/* LOGO SQUARE (Changed from Circle) */}
-      {logo && (
+      {logoImage && (
         // CHANGED: rounded-full -> rounded-xl
         <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-white overflow-hidden z-30 shadow-md">
           <Image
-            src={logo.imageUrl}
+            src={logoImage}
             alt={`${restaurant.name} logo`}
             width={80}
             height={80}
             className="object-cover"
-            data-ai-hint={logo.imageHint}
           />
         </div>
       )}

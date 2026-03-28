@@ -23,7 +23,7 @@ interface RestaurantContextType {
     providerId: string,
     dishData: any,
     type: 'restaurant' | 'home-food'
-  ) => Promise<void>;
+  ) => Promise<any>;
 
 }
 
@@ -63,14 +63,15 @@ export function RestaurantProvider({
         restaurantsData.map((item: any) => ({
           ...item,
           type: 'restaurant',
+          cuisine: item.cuisineType || item.cuisine || "Multi-cuisine",
+          categories: item.restaurantType ? [item.restaurantType] : (item.categories || ["General"]),
           deliveryTime: item.avgDeliveryTime ?? 30,
           deliveryFee: item.baseDeliveryFee ?? 0,
-          reviews: item.reviewsCount ?? 0,
+          reviews: item.reviewsCount ?? item.reviews ?? 0,
           services: item.services ?? ['delivery', 'pickup'],
           menu: item.menuCategories?.map((cat: any) => ({
             id: cat.id,
             title: cat.title,
-
             items: cat.items ?? []
           })) ?? []
         }));
@@ -79,10 +80,13 @@ export function RestaurantProvider({
         homeFoodData.map((item: any) => ({
           ...item,
           type: 'home-food',
+          cuisine: item.foodType || "Home-made",
+          categories: item.foodType ? [item.foodType] : ["Home Food"],
+          reviews: item.reviews ?? 0,
+          isOpen: item.isActive ?? true,
           menu: item.menuCategories?.map((cat: any) => ({
             id: cat.id,
             title: cat.title,
-
             items: cat.items ?? []
           })) ?? []
         }));
@@ -107,7 +111,7 @@ export function RestaurantProvider({
     providerId: string,
     dishData: any,
     type: 'restaurant' | 'home-food' = 'restaurant'
-  ) => {
+  ): Promise<any> => {
 
     if (!providerId)
       throw new Error(`Invalid ${type} ID`);
@@ -126,8 +130,10 @@ export function RestaurantProvider({
     if (!response.ok)
       throw new Error(`Failed to add dish to ${type}`);
 
-    // Re-fetch all to pick up the new menu item safely
-    await fetchAllData();
+    const newItem = await response.json();
+    // Re-fetch all in background to keep other parts of the app in sync
+    fetchAllData();
+    return newItem;
   };
 
 

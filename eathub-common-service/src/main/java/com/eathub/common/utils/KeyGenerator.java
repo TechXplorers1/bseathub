@@ -5,8 +5,7 @@ import java.util.Base64;
 
 public class KeyGenerator {
     public static void main(String[] args) {
-        String secret = Base64.getEncoder()
-                .encodeToString(Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256).getEncoded());
-        System.out.println(secret);
+        String secret = Base64.getEncoder().encodeToString(Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256).getEncoded());
+
     }
 }

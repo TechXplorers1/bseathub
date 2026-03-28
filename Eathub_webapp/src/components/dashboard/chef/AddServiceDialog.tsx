@@ -39,6 +39,8 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getImageById } from '@/lib/placeholder-images';
+import { compressImage } from '@/lib/image-utils';
 
 const CATEGORIES = [
     "Main Course", "Appetizer", "Dessert", "Beverage", "Breakfast",
@@ -110,7 +112,8 @@ export function AddServiceDialog({
                 status: initialData.status || 'Active',
                 imageId: initialData.imageId || 'food-1',
             });
-            setImagePreview(initialData.imageId && initialData.imageId.startsWith('data:') ? initialData.imageId : null);
+            const resolvedImage = initialData.imageId ? (getImageById(initialData.imageId)?.imageUrl || (initialData.imageId.startsWith('data:') ? initialData.imageId : null)) : null;
+            setImagePreview(resolvedImage);
         } else if (!initialData && isOpen) {
             form.reset({
                 name: '',
@@ -127,44 +130,6 @@ export function AddServiceDialog({
         }
     }, [initialData, isOpen, form, mode]);
 
-    const compressImage = (file: File): Promise<string> => {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target?.result as string;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 800;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx?.drawImage(img, 0, 0, width, height);
-                    
-                    // Compress to 0.7 quality
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    resolve(dataUrl);
-                };
-            };
-        });
-    };
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

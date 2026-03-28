@@ -55,11 +55,17 @@ export default async function RestaurantPage({ params, searchParams }: PageProps
     } else {
       // Try restaurant first
       try {
-        restaurant = await fetchRestaurantBySlug(slug);
+        const res = await fetchRestaurantBySlug(slug);
+        if (res) {
+          restaurant = { ...res, type: 'restaurant' };
+        }
       } catch (restErr) {
         // Then try home food
         try {
-          restaurant = await fetchHomeFoodBySlug(slug);
+          const res = await fetchHomeFoodBySlug(slug);
+          if (res) {
+            restaurant = { ...res, type: 'home-food' };
+          }
         } catch (hfErr) {
           console.warn(`Provider not found in backend (Restaurant or HomeFood) for slug: ${slug}`);
         }
@@ -71,7 +77,7 @@ export default async function RestaurantPage({ params, searchParams }: PageProps
 
   // 2. Fallback to Mock Data if backend failed
   if (!restaurant) {
-    console.log(`Falling back to mock data for slug: ${slug}`);
+
     const allMockItems = [...allRestaurants, ...allHomeFoods];
     restaurant = allMockItems.find((r) => r.slug === slug) || null;
   }

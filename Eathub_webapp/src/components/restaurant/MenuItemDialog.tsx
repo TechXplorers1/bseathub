@@ -48,15 +48,18 @@ export function MenuItemDialog({
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image side */}
           <div className="relative h-64 md:h-full min-h-[250px]">
-            {image && (
-              <Image
-                src={image.imageUrl}
-                alt={item.name}
-                fill
-                className="object-cover rounded-l-lg md:rounded-l-lg md:rounded-r-none"
-                data-ai-hint={image.imageHint}
-              />
-            )}
+            {(() => {
+              const placeholder = getImageById(item.imageId);
+              const src = placeholder ? placeholder.imageUrl : (item.imageId || '/placeholder-food.jpg');
+              return (
+                <Image
+                  src={src}
+                  alt={item.name}
+                  fill
+                  className="object-cover rounded-l-lg md:rounded-l-lg md:rounded-r-none"
+                />
+              );
+            })()}
           </div>
 
           {/* Details side */}
@@ -67,17 +70,17 @@ export function MenuItemDialog({
                   {item.name}
                 </DialogTitle>
                 {item.itemType && (
-                    <Badge variant="outline" className={cn(
-                        "text-[10px] h-5",
-                        item.itemType === 'Veg' ? "border-green-500 text-green-700" : "border-red-500 text-red-700"
-                    )}>
-                        {item.itemType}
-                    </Badge>
+                  <Badge variant="outline" className={cn(
+                    "text-[10px] h-5",
+                    item.itemType === 'Veg' ? "border-green-500 text-green-700" : "border-red-500 text-red-700"
+                  )}>
+                    {item.itemType}
+                  </Badge>
                 )}
                 {item.isNegotiable && (
-                    <Badge variant="secondary" className="text-[10px] h-5 bg-blue-100 text-blue-700 hover:bg-blue-100">
-                        Negotiable
-                    </Badge>
+                  <Badge variant="secondary" className="text-[10px] h-5 bg-blue-100 text-blue-700 hover:bg-blue-100">
+                    Negotiable
+                  </Badge>
                 )}
               </div>
 

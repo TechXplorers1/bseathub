@@ -12,6 +12,7 @@ public class ChefProfileUpdateDTO {
     private Boolean isActive;
     private String workingHours;
     private String avatarUrl;
+    private String coverImageId;
 
     // ── Address fields ──────────────────────────────────────────
     private String addressLine1;

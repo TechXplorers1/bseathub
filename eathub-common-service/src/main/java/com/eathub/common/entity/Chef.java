@@ -49,6 +49,21 @@ public class Chef {
     @Column(columnDefinition = "TEXT")
     private String workingHours;
     
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
+    @Column(name = "country_code")
+    private String countryCode;
+
+    @Column(name = "cuisines", columnDefinition = "TEXT")
+    private String cuisines;
+
+    @Column(name = "delivery_availability")
+    private String deliveryAvailability;
+
     private Boolean isActive;
 
     @OneToOne(mappedBy = "chef", cascade = CascadeType.ALL)

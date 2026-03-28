@@ -39,4 +39,7 @@ public class ChefLegalProfile {
 
     @Column(columnDefinition = "TEXT")
     private String culinaryDiplomaUrl;
+
+    @Column(name = "id_proof_url", columnDefinition = "TEXT")
+    private String idProofUrl;
 }

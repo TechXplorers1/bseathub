@@ -53,6 +53,18 @@ public class HomeFoodProvider {
     @Column(name = "working_hours", columnDefinition = "TEXT")
     private String workingHours;
 
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
+    @Column(name = "country_code")
+    private String countryCode;
+
+    @Column(name = "cuisines", columnDefinition = "TEXT")
+    private String cuisines;
+
     @Column(name = "operational_status")
     private String operationalStatus;
 

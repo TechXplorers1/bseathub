@@ -94,6 +94,32 @@ public class ChefManagementService {
         if (dto.getIsActive() != null)
             chef.setIsActive(dto.getIsActive());
 
+        // Expansion
+        if (dto.getFullName() != null) chef.setFullName(dto.getFullName());
+        if (dto.getContactNumber() != null) chef.setContactNumber(dto.getContactNumber());
+        if (dto.getCountryCode() != null) chef.setCountryCode(dto.getCountryCode());
+        if (dto.getCuisines() != null) chef.setCuisines(dto.getCuisines());
+        if (dto.getDeliveryAvailability() != null) chef.setDeliveryAvailability(dto.getDeliveryAvailability());
+        if (dto.getBasePrice() != null) chef.setBasePrice(dto.getBasePrice());
+        if (dto.getWorkType() != null) chef.setWorkType(dto.getWorkType());
+        if (dto.getSocialLinks() != null) chef.setSocialLinks(dto.getSocialLinks());
+
+        // Update city if provided
+        if (dto.getCity() != null) {
+            ChefAddress address = chefAddressRepository.findByChef_Id(id)
+                    .orElseGet(() -> ChefAddress.builder().chef(chef).build());
+            address.setCity(dto.getCity());
+            chefAddressRepository.save(address);
+        }
+
+        // Update bankName if provided
+        if (dto.getBankName() != null) {
+            ChefLegalProfile legal = chefLegalProfileRepository.findByChef_Id(id)
+                    .orElseGet(() -> ChefLegalProfile.builder().chef(chef).build());
+            legal.setBankName(dto.getBankName());
+            chefLegalProfileRepository.save(legal);
+        }
+
         return mapToDTO(chefRepository.save(chef));
     }
 
@@ -148,6 +174,11 @@ public class ChefManagementService {
             legal.setFoodSafetyCertUrl(dto.getFoodSafetyCertUrl());
         if (dto.getCulinaryDiplomaUrl() != null)
             legal.setCulinaryDiplomaUrl(dto.getCulinaryDiplomaUrl());
+
+        // Expansion
+        if (dto.getIdProofType() != null) legal.setIdProofType(dto.getIdProofType());
+        if (dto.getIdProofNumber() != null) legal.setIdProofNumber(dto.getIdProofNumber());
+        if (dto.getIdProofUrl() != null) legal.setIdProofUrl(dto.getIdProofUrl());
 
         chefLegalProfileRepository.save(legal);
         return mapToDTO(chef);
@@ -284,7 +315,20 @@ public class ChefManagementService {
             dto.setBankName(chef.getLegalProfile().getBankName());
             dto.setFoodSafetyCertUrl(chef.getLegalProfile().getFoodSafetyCertUrl());
             dto.setCulinaryDiplomaUrl(chef.getLegalProfile().getCulinaryDiplomaUrl());
+            dto.setIdProofType(chef.getLegalProfile().getIdProofType());
+            dto.setIdProofNumber(chef.getLegalProfile().getIdProofNumber());
+            dto.setIdProofUrl(chef.getLegalProfile().getIdProofUrl());
         }
+
+        // Expansion fields from Chef
+        dto.setFullName(chef.getFullName());
+        dto.setContactNumber(chef.getContactNumber());
+        dto.setCountryCode(chef.getCountryCode());
+        dto.setCuisines(chef.getCuisines());
+        dto.setDeliveryAvailability(chef.getDeliveryAvailability());
+        dto.setBasePrice(chef.getBasePrice());
+        dto.setWorkType(chef.getWorkType());
+        dto.setSocialLinks(chef.getSocialLinks());
 
         dto.setPreference("Veg & Non-Veg");
         return dto;

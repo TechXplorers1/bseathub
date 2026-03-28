@@ -77,6 +77,7 @@ export default function PartnerPage() {
                 title: "Registration Failed",
                 description: error.message || "Please check your details.",
             });
+            throw error; // Re-throw so the dialog knows registration failed
         }
     };
 

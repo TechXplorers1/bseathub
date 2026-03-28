@@ -23,20 +23,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Upload, Clock, Phone, User, Building, Landmark, FileText, CheckCircle2 } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Eye, EyeOff, User } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-
-// === HELPER FOR SSR SAFETY ===
-const isBrowser = typeof window !== 'undefined';
+import { sendOtp, verifyOtp } from '@/services/api';
 
 // === SCHEMAS ===
 const registrationSchema = z.object({
@@ -50,20 +39,6 @@ const registrationSchema = z.object({
     .refine((val) => /\d/.test(val), { message: 'Must contain at least one number.' })
     .refine((val) => /[^A-Za-z0-9]/.test(val), { message: 'Must contain at least one special character.' }),
   confirmPassword: z.string(),
-  // New Fields
-  ownerName: z.string().min(2, 'Owner name is required.'),
-  mobileNumber: z.string().min(10, 'Valid mobile number is required.'),
-  restaurantName: z.string().min(2, 'Restaurant name is required.'),
-  restaurantType: z.string().min(1, 'Please select a restaurant type.'),
-  operationHoursOpen: z.string().min(1, 'Opening time is required.'),
-  operationHoursClose: z.string().min(1, 'Closing time is required.'),
-  businessModel: z.enum(['dine-only', 'delivery-only', 'both']),
-  legalBusinessName: z.string().min(2, 'Legal business name is required.'),
-  businessType: z.string().min(1, 'Please select a business type.'),
-  fssaiLicenseNumber: z.string().min(14, 'FSSAI license number must be 14 digits.').max(14),
-  fssaiExpiryDate: z.string().min(1, 'FSSAI expiry date is required.'),
-  bankName: z.string().min(2, 'Bank name is required.'),
-  fssaiDocument: z.string().optional(), // Base64
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -79,7 +54,7 @@ type OtpValues = z.infer<typeof otpSchema>;
 interface RestaurantRegistrationDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: any, type: 'Restaurant') => void;
+  onSubmit: (data: any, type: 'Restaurant') => Promise<void> | void;
 }
 
 export function RestaurantRegistrationDialog({
@@ -101,19 +76,6 @@ export function RestaurantRegistrationDialog({
       email: '',
       password: '',
       confirmPassword: '',
-      ownerName: '',
-      mobileNumber: '',
-      restaurantName: '',
-      restaurantType: '',
-      operationHoursOpen: '09:00',
-      operationHoursClose: '22:00',
-      businessModel: 'both',
-      legalBusinessName: '',
-      businessType: '',
-      fssaiLicenseNumber: '',
-      fssaiExpiryDate: '',
-      bankName: '',
-      fssaiDocument: '',
     },
   });
 
@@ -124,29 +86,47 @@ export function RestaurantRegistrationDialog({
     }
   });
 
+  const handleFinalSubmit = async () => {
+    const data = form.getValues();
+    const allData = {
+      email: data.email,
+      password: data.password,
+    };
+
+    try {
+      await onSubmit(allData, 'Restaurant');
+
+      toast({
+        title: 'Registration Successful!',
+        description: 'Welcome to Eat Hub! Please sign in with your account.',
+      });
+
+      onOpenChange(false);
+      router.push('/login');
+
+      setTimeout(() => {
+        form.reset();
+        otpForm.reset();
+        setIsOtpSent(false);
+      }, 500);
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+    }
+  };
+
   const handleSendOtp = async () => {
     const isValid = await form.trigger();
     if (!isValid) return;
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:8081/api/v1/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.getValues().email }),
+      await sendOtp(form.getValues().email);
+      setIsOtpSent(true);
+      setIsOtpDialogOpen(true);
+      toast({
+        title: 'OTP Sent',
+        description: 'Please check your email for the verification code.',
       });
-
-      if (response.ok) {
-        setIsOtpSent(true);
-        setIsOtpDialogOpen(true);
-        toast({
-          title: 'OTP Sent',
-          description: 'Please check your email for the verification code.',
-        });
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to send OTP');
-      }
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -161,22 +141,9 @@ export function RestaurantRegistrationDialog({
   const handleVerifyOtp = async (otpData: OtpValues) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:8081/api/v1/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: form.getValues().email,
-          otp: otpData.otp,
-        }),
-      });
-
-      if (response.ok) {
-        setIsOtpDialogOpen(false);
-        handleFinalSubmit();
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Invalid OTP');
-      }
+      await verifyOtp(form.getValues().email, otpData.otp);
+      setIsOtpDialogOpen(false);
+      handleFinalSubmit();
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -188,112 +155,54 @@ export function RestaurantRegistrationDialog({
     }
   };
 
-  const handleFinalSubmit = async () => {
-    const data = form.getValues();
-    const allData = {
-      email: data.email,
-      password: data.password,
-      fullName: data.ownerName,
-      contactNumber: data.mobileNumber,
-      restaurantName: data.restaurantName,
-      restaurantType: data.restaurantType,
-      operatingHours: {
-        open: data.operationHoursOpen,
-        close: data.operationHoursClose,
-      },
-      businessModel: data.businessModel,
-      legalBusinessName: data.legalBusinessName,
-      businessType: data.businessType,
-      fssaiLicenseNumber: data.fssaiLicenseNumber,
-      fssaiExpiryDate: data.fssaiExpiryDate,
-      bankName: data.bankName,
-      fssaiDocument: data.fssaiDocument,
-    };
-
-    onSubmit(allData, 'Restaurant');
-
-    // The parent's onSubmit handles the API call to register
-    // but ideally we should wait for it or handle success here.
-    // For now, following existing pattern.
-
-    toast({
-      title: 'Registration Successful!',
-      description: 'Welcome to Eat Hub! Redirecting to home...',
-    });
-
-    onOpenChange(false);
-    router.push('/');
-
-    setTimeout(() => {
-      form.reset();
-      otpForm.reset();
-      setIsOtpSent(false);
-    }, 500);
-  };
-
   const handleGoogleSignIn = () => {
     toast({
       title: 'Google Sign-in',
       description: 'Redirecting to Google...',
     });
-    // Placeholder for Google OAuth logic
   };
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6">
-            <DialogTitle className="text-2xl text-center">Restaurant Registration</DialogTitle>
-            <DialogDescription className="text-center">
-              Enter your details to register as a restaurant partner.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0 text-foreground overflow-hidden">
+          <ScrollArea className="flex-1 w-full">
+            <div className="p-6 space-y-6 pb-12">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-center font-bold">Restaurant Registration</DialogTitle>
+                <DialogDescription className="text-center text-sm">
+                  Quick setup. Start your cloud kitchen or restaurant journey.
+                </DialogDescription>
+              </DialogHeader>
 
-          <ScrollArea className="flex-1 px-6">
-            <Form {...form}>
-              <form className="space-y-6 pb-6">
-                {/* --- Section: Account & Owner --- */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
-                    <User size={20} />
-                    <span>Account & Owner Details</span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form {...form}>
+                <form className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-orange-600 font-semibold text-sm">
+                      <User size={18} />
+                      <span>Account Details</span>
+                    </div>
+                    
                     <FormField
                       control={form.control}
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email Address</FormLabel>
+                          <FormLabel className="text-sm">Email Address</FormLabel>
                           <FormControl>
-                            <Input {...field} type="email" placeholder="owner@example.com" disabled={isSubmitting} />
+                            <Input {...field} type="email" placeholder="owner@example.com" disabled={isSubmitting} className="h-9 text-sm" />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-xs" />
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="ownerName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Owner Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Full Name" disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                     <FormField
                       control={form.control}
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel className="text-sm">Password</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input
@@ -301,6 +210,7 @@ export function RestaurantRegistrationDialog({
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 disabled={isSubmitting}
+                                className="h-9 text-sm"
                               />
                             </FormControl>
                             <button
@@ -308,19 +218,20 @@ export function RestaurantRegistrationDialog({
                               onClick={() => setShowPassword(!showPassword)}
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             >
-                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                           </div>
-                          <FormMessage />
+                          <FormMessage className="text-xs" />
                         </FormItem>
                       )}
                     />
+
                     <FormField
                       control={form.control}
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
+                          <FormLabel className="text-sm">Confirm Password</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input
@@ -328,6 +239,7 @@ export function RestaurantRegistrationDialog({
                                 type={showConfirmPassword ? 'text' : 'password'}
                                 placeholder="••••••••"
                                 disabled={isSubmitting}
+                                className="h-9 text-sm"
                               />
                             </FormControl>
                             <button
@@ -335,313 +247,65 @@ export function RestaurantRegistrationDialog({
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             >
-                              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                           </div>
-                          <FormMessage />
+                          <FormMessage className="text-xs" />
                         </FormItem>
                       )}
                     />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="mobileNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mobile Number</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                            <Input {...field} className="pl-10" placeholder="10-digit number" disabled={isSubmitting} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                </form>
+              </Form>
 
-                <Separator />
+              <div className="space-y-4 pt-2">
+                <Button
+                  type="button"
+                  className="w-full bg-orange-600 hover:bg-orange-700 h-10 text-base font-semibold"
+                  onClick={handleSendOtp}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Processing...' : 'Send OTP & Register'}
+                </Button>
 
-                {/* --- Section: Restaurant Info --- */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
-                    <Building size={20} />
-                    <span>Restaurant Information</span>
+                <div className="relative py-1">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="restaurantName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Restaurant Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Restaurant Brand Name" disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="restaurantType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Restaurant Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Fine Dining">Fine Dining</SelectItem>
-                              <SelectItem value="Cafe">Cafe</SelectItem>
-                              <SelectItem value="Fast Food">Fast Food</SelectItem>
-                              <SelectItem value="Bakery">Bakery</SelectItem>
-                              <SelectItem value="Cloud Kitchen">Cloud Kitchen</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="businessModel"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Business Model</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select model" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="dine-only">Dine-only</SelectItem>
-                              <SelectItem value="delivery-only">Delivery-only</SelectItem>
-                              <SelectItem value="both">Both (Dine-in & Delivery)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="operationHoursOpen"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Opening Time</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="time" disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="operationHoursClose"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Closing Time</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="time" disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <div className="relative flex justify-center text-[10px] uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">Or</span>
                   </div>
                 </div>
 
-                <Separator />
-
-                {/* --- Section: Legal & Banking --- */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-orange-600 font-semibold">
-                    <Landmark size={20} />
-                    <span>Legal & Banking</span>
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="legalBusinessName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Legal Business Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Registered Name" disabled={isSubmitting} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="businessType"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Business Type</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="Sole Proprietor">Sole Proprietor</SelectItem>
-                              <SelectItem value="Partnership">Partnership</SelectItem>
-                              <SelectItem value="Private Limited">Private Limited</SelectItem>
-                              <SelectItem value="LLP">LLP</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-10 text-sm font-medium shadow-sm hover:bg-muted"
+                  onClick={handleGoogleSignIn}
+                  disabled={isSubmitting}
+                >
+                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
                     />
-                    <FormField
-                      control={form.control}
-                      name="bankName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Bank Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="HDFC, SBI, etc." disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
                     />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="fssaiLicenseNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>FSSAI License No.</FormLabel>
-                          <FormControl>
-                            <Input {...field} maxLength={14} placeholder="14-digit number" disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      fill="#FBBC05"
                     />
-                    <FormField
-                      control={form.control}
-                      name="fssaiExpiryDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>FSSAI Expiry</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="date" disabled={isSubmitting} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
                     />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="fssaiDocument"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Food License Document</FormLabel>
-                        <FormControl>
-                          <div className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-orange-500 transition-colors">
-                            <input
-                              type="file"
-                              className="hidden"
-                              id="fssai-upload"
-                              accept="image/*,.pdf"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => {
-                                    field.onChange(reader.result as string);
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              }}
-                            />
-                            <label htmlFor="fssai-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                              {field.value ? (
-                                <>
-                                  <CheckCircle2 className="text-green-500" size={32} />
-                                  <span className="text-sm font-medium">Document Uploaded</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Upload className="text-muted-foreground" size={32} />
-                                  <span className="text-sm">Click to upload license</span>
-                                </>
-                              )}
-                            </label>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-4 pt-4">
-                  <Button
-                    type="button"
-                    className="w-full bg-orange-600 hover:bg-orange-700 h-11 text-lg"
-                    onClick={handleSendOtp}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? 'Processing...' : 'Verify Email & Register'}
-                  </Button>
-
-                  <div className="relative py-2">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">Or</span>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-11"
-                    onClick={handleGoogleSignIn}
-                    disabled={isSubmitting}
-                  >
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                      <path
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        fill="#4285F4"
-                      />
-                      <path
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        fill="#34A853"
-                      />
-                      <path
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        fill="#FBBC05"
-                      />
-                      <path
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        fill="#EA4335"
-                      />
-                    </svg>
-                    Google Sign-in
-                  </Button>
-                </div>
-              </form>
-            </Form>
+                  </svg>
+                  Sign up with Google
+                </Button>
+              </div>
+            </div>
           </ScrollArea>
         </DialogContent>
       </Dialog>
@@ -650,14 +314,14 @@ export function RestaurantRegistrationDialog({
       <Dialog open={isOtpDialogOpen} onOpenChange={setIsOtpDialogOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Verify Your Email</DialogTitle>
-            <DialogDescription>
-              Enter the 6-digit code sent to {form.getValues().email}
+            <DialogTitle className="text-lg font-bold">Verify Your Email</DialogTitle>
+            <DialogDescription className="text-sm">
+              We've sent a 6-digit code to <span className="font-semibold">{form.getValues().email}</span>
             </DialogDescription>
           </DialogHeader>
 
           <Form {...otpForm}>
-            <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
+            <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-6 py-2">
               <FormField
                 control={otpForm.control}
                 name="otp"
@@ -667,16 +331,17 @@ export function RestaurantRegistrationDialog({
                       <Input
                         {...field}
                         placeholder="000000"
-                        className="text-center text-2xl tracking-[1em] h-14"
+                        className="text-center text-2xl font-bold tracking-[0.5em] h-14 border-2 focus-visible:ring-orange-500"
                         maxLength={6}
                         disabled={isSubmitting}
+                        autoFocus
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-center text-xs" />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
+              <Button type="submit" className="w-full h-11 text-base bg-orange-600 hover:bg-orange-700" disabled={isSubmitting}>
                 {isSubmitting ? 'Verifying...' : 'Verify & Register'}
               </Button>
             </form>

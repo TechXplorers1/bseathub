@@ -29,7 +29,14 @@ import {
   updateHomeFoodAddress,
   updateHomeFoodLegal
 } from '@/services/api';
+import { countries } from '@/constants/countries';
 import { compressImage } from '@/lib/image-utils';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { Globe, Phone, Search, FileText, Upload, Trash2, Plus, Home } from 'lucide-react';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 export type DayAvailability = { day: string; isOpen: boolean; openTime: string; closeTime: string };
@@ -60,6 +67,16 @@ interface ProfileForm {
   bankAccountNumber: string;
   bankIFSC: string;
   bankName: string;
+  // Expansion
+  fullName: string;
+  contactNumber: string;
+  countryCode: string;
+  cuisines: string;
+  specialtyDishes: string;
+  deliveryAvailability: string;
+  idProofType: string;
+  idProofNumber: string;
+  idProofUrl: string | null;
 }
 
 const defaultHours: DayAvailability[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => ({
@@ -74,6 +91,8 @@ const EMPTY_FORM: ProfileForm = {
   addressLine1: '', addressLine2: '', city: '', state: '', postalCode: '', country: 'India',
   legalBusinessName: '', gstNumber: '', panNumber: '', fssaiLicenseNumber: '',
   businessType: '', bankAccountHolderName: '', bankAccountNumber: '', bankIFSC: '', bankName: '',
+  fullName: '', contactNumber: '', countryCode: '+91', cuisines: '', specialtyDishes: '', deliveryAvailability: 'Available',
+  idProofType: '', idProofNumber: '', idProofUrl: null
 };
 
 export default function HomeFoodSettingsPage() {
@@ -82,6 +101,9 @@ export default function HomeFoodSettingsPage() {
   const [savingSection, setSavingSection] = useState<'profile' | 'address' | 'legal' | 'availability' | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [homeFoodId, setHomeFoodId] = useState<string | null>(null);
+  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const idProofInputRef = useRef<HTMLInputElement>(null);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +147,15 @@ export default function HomeFoodSettingsPage() {
           bankAccountNumber: data.bankAccountNumber ?? '',
           bankIFSC: data.bankIFSC ?? '',
           bankName: data.bankName ?? '',
+          fullName: data.fullName ?? '',
+          contactNumber: data.contactNumber ?? '',
+          countryCode: data.countryCode ?? '+91',
+          cuisines: data.cuisines ?? '',
+          specialtyDishes: data.specialtyDishes ?? '',
+          deliveryAvailability: data.deliveryAvailability ?? 'Available',
+          idProofType: data.idProofType ?? '',
+          idProofNumber: data.idProofNumber ?? '',
+          idProofUrl: data.idProofUrl ?? null,
         });
       })
       .catch(() => { })
@@ -170,15 +201,21 @@ export default function HomeFoodSettingsPage() {
         foodType: form.foodType,
         imageId: form.imageId,
         coverImageId: form.coverImageId,
+        fullName: form.fullName,
+        contactNumber: form.contactNumber,
+        countryCode: form.countryCode,
+        cuisines: form.cuisines,
+        specialtyDishes: form.specialtyDishes,
+        deliveryAvailability: form.deliveryAvailability,
       };
       await updateHomeFoodProfile(homeFoodId, payload);
 
       if (form.imageId) {
         try {
-            localStorage.setItem('userAvatar', form.imageId);
-            window.dispatchEvent(new Event('auth-change'));
+          localStorage.setItem('userAvatar', form.imageId);
+          window.dispatchEvent(new Event('auth-change'));
         } catch (e) {
-            console.warn("Storage quota exceeded, header icon might not update instantly.");
+          console.warn("Storage quota exceeded, header icon might not update instantly.");
         }
       }
 
@@ -225,6 +262,9 @@ export default function HomeFoodSettingsPage() {
         bankAccountNumber: form.bankAccountNumber,
         bankIFSC: form.bankIFSC,
         bankName: form.bankName,
+        idProofType: form.idProofType,
+        idProofNumber: form.idProofNumber,
+        idProofUrl: form.idProofUrl,
       };
       await updateHomeFoodLegal(homeFoodId, payload);
       showToast('success', 'Bank & Legal details saved!');
@@ -318,16 +358,130 @@ export default function HomeFoodSettingsPage() {
               <Separator />
 
               <div className="space-y-2">
-                <Label>Brand Name</Label>
-                <Input value={form.name} onChange={setField('name')} />
+                <Label>Delivery Availability</Label>
+                <Select value={form.deliveryAvailability} onValueChange={(v) => setForm(f => ({ ...f, deliveryAvailability: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Delivery preference" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Available">Available for Delivery</SelectItem>
+                    <SelectItem value="Pickup Only">Pickup Only</SelectItem>
+                    <SelectItem value="Both">Both Delivery & Pickup</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Full Name</Label>
+                  <Input value={form.fullName} onChange={setField('fullName')} placeholder="Legal Full Name" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Contact Number</Label>
+                  <div className="flex gap-2">
+                    <Popover open={isCountrySelectOpen} onOpenChange={setIsCountrySelectOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-[110px] h-10 px-2 justify-between font-normal text-xs bg-background"
+                        >
+                          <span className="flex items-center gap-1 overflow-hidden">
+                            <span>{countries.find(c => c.code === form.countryCode)?.flag || '🇮🇳'}</span>
+                            <span className="truncate">{form.countryCode}</span>
+                          </span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0 shadow-2xl" align="start">
+                        <div className="flex items-center border-b px-3 py-2">
+                          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                          <input
+                            className="flex h-8 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                            placeholder="Search code..."
+                            value={countrySearch}
+                            onChange={(e) => setCountrySearch(e.target.value)}
+                          />
+                        </div>
+                        <div className="max-h-[250px] overflow-y-auto no-scrollbar py-1 text-xs">
+                          {countries.filter(c =>
+                            c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                            c.code.includes(countrySearch)
+                          ).length === 0 ? (
+                            <div className="py-4 text-center">Not found</div>
+                          ) : (
+                            countries.filter(c =>
+                              c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                              c.code.includes(countrySearch)
+                            ).map((c) => (
+                              <button
+                                key={`${c.name}-${c.code}`}
+                                type="button"
+                                className="flex w-full items-center gap-2 px-3 py-2 hover:bg-muted transition-colors text-left"
+                                onClick={() => {
+                                  setForm({ ...form, countryCode: c.code });
+                                  setIsCountrySelectOpen(false);
+                                  setCountrySearch('');
+                                }}
+                              >
+                                <span className="text-base">{c.flag}</span>
+                                <span className="flex-1 truncate">{c.name}</span>
+                                <span className="text-muted-foreground">{c.code}</span>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Input
+                      value={form.contactNumber}
+                      onChange={setField('contactNumber')}
+                      className="flex-1"
+                      placeholder="Mobile Number"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Primary Cuisine</Label>
+                  <Select value={form.cuisines} onValueChange={(v) => setForm(f => ({ ...f, cuisines: v }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select primary cuisine" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="International">International</SelectItem>
+                      <SelectItem value="Italian">Italian</SelectItem>
+                      <SelectItem value="Japanese">Japanese</SelectItem>
+                      <SelectItem value="Mexican">Mexican</SelectItem>
+                      <SelectItem value="French">French</SelectItem>
+                      <SelectItem value="Thai">Thai</SelectItem>
+                      <SelectItem value="Chinese">Chinese</SelectItem>
+                      <SelectItem value="Indian">Indian</SelectItem>
+                      <SelectItem value="Mediterranean">Mediterranean</SelectItem>
+                      <SelectItem value="Middle Eastern">Middle Eastern</SelectItem>
+                      <SelectItem value="Continental">Continental</SelectItem>
+                      <SelectItem value="Desserts">Desserts & Sweets</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Specialty Dishes</Label>
+                  <Input value={form.specialtyDishes} onChange={setField('specialtyDishes')} placeholder="e.g. Grandma's Biryani" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Food Type Tagline</Label>
+                <Input value={form.foodType} onChange={setField('foodType')} placeholder="e.g. Healthy, Homemade, Spicy" />
               </div>
               <div className="space-y-2">
-                <Label>About Us</Label>
-                <Textarea value={form.description} onChange={setField('description')} rows={3} placeholder="Describe your home kitchen and specialties..." />
-              </div>
-              <div className="space-y-2">
-                <Label>Food Type</Label>
-                <Input value={form.foodType} onChange={setField('foodType')} placeholder="e.g. South Indian, Homemade snacks" />
+                <Label>Description</Label>
+                <Textarea
+                  value={form.description}
+                  onChange={setField('description')}
+                  placeholder="Tell customers about your kitchen, your specialties, and your cooking style..."
+                  className="min-h-[100px]"
+                />
               </div>
             </CardContent>
             <CardFooter>
@@ -469,14 +623,6 @@ export default function HomeFoodSettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>GST Number (Optional)</Label>
-                <Input value={form.gstNumber} onChange={setField('gstNumber')} />
-              </div>
-              <div className="space-y-2">
-                <Label>PAN Number</Label>
-                <Input value={form.panNumber} onChange={setField('panNumber')} />
-              </div>
-              <div className="space-y-2">
                 <Label>FSSAI License No. (Optional)</Label>
                 <Input value={form.fssaiLicenseNumber} onChange={setField('fssaiLicenseNumber')} />
               </div>
@@ -493,6 +639,69 @@ export default function HomeFoodSettingsPage() {
                 <Label>IFSC</Label>
                 <Input value={form.bankIFSC} onChange={setField('bankIFSC')} />
               </div>
+              <Separator className="my-4" />
+              <CardTitle className="text-lg">Identity Verification</CardTitle>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>ID Proof Type</Label>
+                  <Select value={form.idProofType} onValueChange={(v) => setForm(f => ({ ...f, idProofType: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Select ID Type" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Passport">Passport</SelectItem>
+                      <SelectItem value="National ID">National ID</SelectItem>
+                      <SelectItem value="Driver's License">Driver's License</SelectItem>
+                      <SelectItem value="Voter ID">Voter ID</SelectItem>
+                      <SelectItem value="Aadhar Card">Aadhar Card</SelectItem>
+                      <SelectItem value="PAN Card">PAN Card</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>ID Proof Number</Label>
+                  <Input value={form.idProofNumber} onChange={setField('idProofNumber')} placeholder="Enter ID number" />
+                </div>
+                <div className="space-y-2">
+                  <Label>ID Certificate (PDF or Image)</Label>
+                  <input ref={idProofInputRef} type="file" accept="image/*,.pdf" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.type === 'application/pdf') {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setForm(f => ({ ...f, idProofUrl: reader.result as string }));
+                        };
+                        reader.readAsDataURL(file);
+                      } else {
+                        const base64 = await compressImage(file);
+                        setForm(f => ({ ...f, idProofUrl: base64 }));
+                      }
+                    }
+                  }} />
+                  <div className="flex flex-col gap-2">
+                    {form.idProofUrl ? (
+                      <div className="relative group rounded-lg overflow-hidden border aspect-video flex items-center justify-center bg-muted/30">
+                        {form.idProofUrl.toLowerCase().startsWith('data:application/pdf') || form.idProofUrl.toLowerCase().endsWith('.pdf') ? (
+                          <div className="text-center">
+                            <FileText className="w-12 h-12 text-primary mx-auto mb-2" />
+                            <span className="text-xs font-medium text-muted-foreground">PDF Document Uploaded</span>
+                          </div>
+                        ) : (
+                          <img src={form.idProofUrl} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button size="sm" variant="secondary" onClick={() => idProofInputRef.current?.click()}>Change</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button variant="outline" className="w-full border-dashed py-8" onClick={() => idProofInputRef.current?.click()}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload ID Document
+                      </Button>
+                    )}
+                    <p className="text-[10px] text-muted-foreground">Supports clear images of ID or PDF documents.</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
             <CardFooter>
               <Button onClick={handleSaveLegal} disabled={savingSection === 'legal'} variant="outline" className="w-full">
@@ -502,32 +711,58 @@ export default function HomeFoodSettingsPage() {
             </CardFooter>
           </Card>
 
-          {/* Danger Zone */}
-          <Card className="border-destructive">
+          <Card className={form.isOpen ? "border-destructive" : "border-green-500"}>
             <CardHeader>
-              <CardTitle className="text-destructive font-bold">Danger Zone</CardTitle>
+              <CardTitle className={form.isOpen ? "text-destructive font-bold" : "text-green-600 font-bold"}>
+                {form.isOpen ? "Danger Zone" : "Kitchen Deactivated"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <Button 
-                variant="destructive" 
-                className="w-full"
-                onClick={async () => {
-                  if (confirm("Are you sure you want to deactivate your kitchen? This will hide your profile from all customers.")) {
-                    try {
-                      await updateHomeFoodProfile(homeFoodId!, { isActive: false });
-                      setForm(f => ({ ...f, isActive: false }));
-                      showToast('success', 'Kitchen deactivated successfully.');
-                    } catch (err: any) {
-                      showToast('error', 'Failed to deactivate.');
-                    }
-                  }
-                }}
-              >
-                Deactivate My Kitchen
-              </Button>
-              <p className="text-xs text-muted-foreground mt-2">
-                This will temporarily hide your kitchen from the platform. You can reactivate it later.
-              </p>
+              {form.isOpen ? (
+                <>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={async () => {
+                      if (confirm("Are you sure you want to deactivate your kitchen? This will hide your profile from all customers.")) {
+                        try {
+                          await updateHomeFoodProfile(homeFoodId!, { operationalStatus: 'CLOSED' });
+                          setForm(f => ({ ...f, isOpen: false, operationalStatus: 'CLOSED' }));
+                          showToast('success', 'Kitchen deactivated successfully.');
+                        } catch (err: any) {
+                          showToast('error', 'Failed to deactivate.');
+                        }
+                      }
+                    }}
+                  >
+                    Deactivate My Kitchen
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This will temporarily hide your kitchen from the platform. You can reactivate it anytime.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="default"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    onClick={async () => {
+                      try {
+                        await updateHomeFoodProfile(homeFoodId!, { operationalStatus: 'OPEN' });
+                        setForm(f => ({ ...f, isOpen: true, operationalStatus: 'OPEN' }));
+                        showToast('success', 'Kitchen reactivated! You are now visible to customers.');
+                      } catch (err: any) {
+                        showToast('error', 'Failed to reactivate.');
+                      }
+                    }}
+                  >
+                    Activate My Kitchen
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Your kitchen is currently hidden. Click above to become visible to customers again.
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -239,13 +239,15 @@ export function Header({ className }: HeaderProps) {
 
   const dashboard = (() => {
     if (!auth.role) return null;
+    const role = auth.role.toUpperCase();
     const map: Record<string, { label: string; href: string }> = {
       USER: { label: 'User Dashboard', href: '/dashboard' },
       HOMEFOOD: { label: 'Homefood Dashboard', href: '/home-food-dashboard' },
       RESTAURANT: { label: 'Restaurant Dashboard', href: '/restaurant-dashboard' },
       CHEF: { label: 'Chef Dashboard', href: '/chef-dashboard' },
+      PARTNER: { label: 'Partner Dashboard', href: '/partner-dashboard' },
     };
-    return map[auth.role] || null;
+    return map[role] || null;
   })();
 
   const isLoggedIn = !!auth.token;

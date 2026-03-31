@@ -28,9 +28,9 @@ export function getDisplayImage(idOrUrl: string | PlaceholderImageIds | undefine
  */
 export function compressImage(
   fileOrBase64: File | string,
-  maxWidth = 800,
-  maxHeight = 800,
-  quality = 0.7
+  maxWidth = 600,
+  maxHeight = 600,
+  quality = 0.5
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const processImage = (src: string) => {

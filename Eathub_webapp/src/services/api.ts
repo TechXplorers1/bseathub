@@ -1,6 +1,6 @@
 // src/services/api.ts
-const BASE_URL = 'http://localhost:8081/api/v1';
-const AUTH_URL = `${BASE_URL}/auth`;
+export const BASE_URL = 'http://localhost:8081/api/v1';
+export const AUTH_URL = `${BASE_URL}/auth`;
 
 export const fetchRestaurants = async () => {
     const res = await fetch(`${BASE_URL}/restaurants`);

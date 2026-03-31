@@ -11,14 +11,7 @@ import {
   Phone,
   Mail,
   Lock,
-  User,
-  MapPin,
-  Home,
-  Navigation,
-  Globe,
-  Building2,
-  Map,
-  Search
+  User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,14 +19,8 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { login as apiLogin } from '@/services/api';
+import { login as apiLogin, sendOtp, verifyOtp, AUTH_URL } from '@/services/api';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover";
-import { countries } from '@/constants/countries';
 
 export default function LoginPage() {
   const [open, setOpen] = useState(true);
@@ -51,25 +38,12 @@ export default function LoginPage() {
     lastName: '',
     email: '',
     password: '',
-    mobile: '',
-    countryCode: '+91',
-    houseNumber: '',
-    street: '',
-    area: '',
-    province: '',
-    county: '',
-    state: '',
-    country: 'India'
+    mobile: ''
   });
-  const [countrySearch, setCountrySearch] = useState('');
-  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
 
-  const filteredCountries = countries.filter(c =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    c.code.includes(countrySearch)
-  );
 
-  const selectedCountry = countries.find(c => c.code === regForm.countryCode) || countries[73]; // Default to India icon if found
 
   const router = useRouter();
   const { toast } = useToast();
@@ -81,21 +55,42 @@ export default function LoginPage() {
     try {
       const response = await apiLogin({ email, password });
 
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('userRole', response.role);
-      localStorage.setItem('userEmail', response.email);
-      localStorage.setItem('userName', response.name); // Store name for dashboard greeting
-      localStorage.setItem('userAvatar', response.avatarUrl); // Store avatar for header
-      localStorage.setItem('eathubLoggedIn', 'true');
+      // Safely store user details in localStorage
+      try {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userRole', response.role);
+        localStorage.setItem('userEmail', response.email);
+        localStorage.setItem('userName', response.name);
+        localStorage.setItem('eathubLoggedIn', 'true');
 
-      if (response.providerId) {
-        if (response.role === 'RESTAURANT') {
-          localStorage.setItem('restaurantId', response.providerId);
-        } else if (response.role === 'HOMEFOOD') {
-          localStorage.setItem('homeFoodId', response.providerId);
-        } else if (response.role === 'CHEF') {
-          localStorage.setItem('chefId', response.providerId);
+        if (response.providerId) {
+          if (response.role === 'RESTAURANT') {
+            localStorage.setItem('restaurantId', response.providerId);
+          } else if (response.role === 'HOMEFOOD') {
+            localStorage.setItem('homeFoodId', response.providerId);
+          } else if (response.role === 'CHEF') {
+            localStorage.setItem('chefId', response.providerId);
+          }
         }
+
+        // Handle userAvatar separately because it can be very large (Base64)
+        if (response.avatarUrl) {
+          try {
+            // If it's a small string (like a URL or small Base64), store directly
+            if (response.avatarUrl.length < 50000) { // < 50KB
+              localStorage.setItem('userAvatar', response.avatarUrl);
+            } else {
+              // For large avatars, we skip storing it in localStorage to avoid QuotaExceededError
+              console.warn("Avatar too large for localStorage, skipping storage.");
+            }
+          } catch (e) {
+            console.error("Failed to store userAvatar in localStorage:", e);
+          }
+        }
+      } catch (storageError) {
+        console.error("LocalStorage error during login:", storageError);
+        // Ensure critical item 'token' is there if possible
+        try { localStorage.setItem('token', response.token); } catch (e) {}
       }
 
       window.dispatchEvent(new Event('auth-change'));
@@ -109,6 +104,17 @@ export default function LoginPage() {
       router.push('/');
 
     } catch (error: any) {
+      // If it's a QuotaExceededError from localStorage that leaked out
+      if (error.name === 'QuotaExceededError' || error.message?.includes('exceeded the quota')) {
+        toast({
+          variant: "destructive",
+          title: "Storage Limit Reached",
+          description: "Your browser storage is full. Some profile details might not be saved locally, but you can still login.",
+        });
+        setOpen(false);
+        router.push('/');
+        return;
+      }
       toast({
         variant: "destructive",
         title: "Login Failed",
@@ -124,33 +130,58 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Create user with 'USER' role by default for this registration button
-      const payload = {
-        ...regForm,
-        name: `${regForm.firstName} ${regForm.lastName}`,
-        role: 'USER',
-        mobileNumber: `${regForm.countryCode}${regForm.mobile}`
-      };
+      if (!otpSent) {
+        // Step 1: Send OTP
+        await sendOtp(regForm.email);
+        setOtpSent(true);
+        toast({
+          title: "OTP Sent!",
+          description: `Verification code sent to ${regForm.email}`,
+        });
+      } else {
+        // Step 2: Verify OTP
+        const verification = await verifyOtp(regForm.email, otp);
+        if (!verification.success) {
+          throw new Error(verification.message || "Invalid OTP");
+        }
 
-      const res = await fetch('http://localhost:8081/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        // Proceed to complete registration
+        const payload = {
+          name: `${regForm.firstName} ${regForm.lastName}`,
+          firstName: regForm.firstName,
+          lastName: regForm.lastName,
+          email: regForm.email,
+          password: regForm.password,
+          mobileNumber: regForm.mobile,
+          houseNumber: "",
+          street: "",
+          area: "",
+          city: "",
+          state: "",
+          country: "India"
+        };
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || 'Registration failed');
+        const res = await fetch(`${AUTH_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Registration failed');
+        }
+
+        toast({
+          title: "Registration Successful!",
+          description: "You can now log in with your account.",
+        });
+
+        setIsRegistering(false);
+        setOtpSent(false);
+        setOtp('');
+        setEmail(regForm.email); // Pre-fill login email
       }
-
-      toast({
-        title: "Registration Successful!",
-        description: "You can now log in with your account.",
-      });
-
-      setIsRegistering(false);
-      setEmail(regForm.email); // Pre-fill login email
-
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -315,126 +346,38 @@ export default function LoginPage() {
                           </button>
                         </div>
                       </div>
-                      <div className="sm:col-span-2 grid grid-cols-6 gap-2">
-                        <div className="col-span-2 space-y-1">
-                          <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Code</Label>
-                          <Popover open={isCountrySelectOpen} onOpenChange={setIsCountrySelectOpen}>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                role="combobox"
-                                className="w-full h-9 sm:h-10 px-2 justify-between font-normal text-xs bg-background"
-                              >
-                                <span className="flex items-center gap-1 overflow-hidden">
-                                  <span>{selectedCountry?.flag || '🇮🇳'}</span>
-                                  <span className="truncate">{regForm.countryCode}</span>
-                                </span>
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[220px] p-0 shadow-2xl border-primary/20" align="start">
-                              <div className="flex items-center border-b px-3 py-2">
-                                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                                <input
-                                  className="flex h-8 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
-                                  placeholder="Search country..."
-                                  value={countrySearch}
-                                  onChange={(e) => setCountrySearch(e.target.value)}
-                                />
-                              </div>
-                              <div className="max-h-[300px] overflow-y-auto no-scrollbar py-1">
-                                {filteredCountries.length === 0 ? (
-                                  <div className="py-6 text-center text-sm">No country found.</div>
-                                ) : (
-                                  filteredCountries.map((c) => (
-                                    <button
-                                      key={`${c.name}-${c.code}`}
-                                      type="button"
-                                      className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-primary/5 transition-colors text-left"
-                                      onClick={() => {
-                                        setRegForm({ ...regForm, countryCode: c.code, country: c.name });
-                                        setIsCountrySelectOpen(false);
-                                        setCountrySearch('');
-                                      }}
-                                    >
-                                      <span className="text-base">{c.flag}</span>
-                                      <span className="flex-1 truncate">{c.name}</span>
-                                      <span className="text-muted-foreground text-[10px]">{c.code}</span>
-                                    </button>
-                                  ))
-                                )}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <div className="col-span-4 space-y-1">
-                          <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Mobile Number</Label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input name="mobile" value={regForm.mobile} onChange={handleRegChange} placeholder="9876543210" className="pl-9 h-9 sm:h-10" required />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator className="bg-primary/10" />
-
-                  {/* Address Details Section */}
-                  <div>
-                    <h3 className="flex items-center gap-2 text-xs sm:text-sm font-bold text-primary uppercase tracking-wider mb-3 sm:mb-4">
-                      <MapPin size={14} className="sm:w-4 sm:h-4" /> Complete Address
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">House Number</Label>
-                        <div className="relative">
-                          <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="houseNumber" value={regForm.houseNumber} onChange={handleRegChange} placeholder="Flat 402, Block A" className="pl-9 h-9 sm:h-10" required />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Street</Label>
-                        <Input name="street" value={regForm.street} onChange={handleRegChange} placeholder="Main Road" className="h-9 sm:h-10" required />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Area / Locality</Label>
-                        <div className="relative">
-                          <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="area" value={regForm.area} onChange={handleRegChange} placeholder="Downtown" className="pl-9 h-9 sm:h-10" required />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Province</Label>
-                        <Input name="province" value={regForm.province} onChange={handleRegChange} placeholder="Central Province" className="h-9 sm:h-10" />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">County</Label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="county" value={regForm.county} onChange={handleRegChange} placeholder="Metropolitan County" className="pl-9 h-9 sm:h-10" />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">State</Label>
-                        <div className="relative">
-                          <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="state" value={regForm.state} onChange={handleRegChange} placeholder="New York" className="pl-9 h-9 sm:h-10" required />
-                        </div>
-                      </div>
                       <div className="sm:col-span-2 space-y-1">
-                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Country</Label>
+                        <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Mobile Number</Label>
                         <div className="relative">
-                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="country" value={regForm.country} onChange={handleRegChange} placeholder="USA" className="pl-9 h-9 sm:h-10" required />
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input name="mobile" value={regForm.mobile} onChange={handleRegChange} placeholder="9876543210" className="pl-9 h-9 sm:h-10" required />
                         </div>
                       </div>
+
+                      {otpSent && (
+                        <div className="sm:col-span-2 space-y-1 animate-in fade-in slide-in-from-top-1 duration-300">
+                          <Label className="text-[10px] sm:text-xs font-bold text-primary uppercase ml-1">Enter Verification Code (OTP)</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
+                            <Input
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              placeholder="123456"
+                              className="pl-9 h-10 border-primary/30 focus:border-primary"
+                              maxLength={6}
+                              required
+                            />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground ml-1">Check your email for the code.</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2 sm:space-y-3 pt-4">
                   <Button type="submit" className="w-full h-11 sm:h-12 text-base sm:text-lg font-bold shadow-xl shadow-primary/20" disabled={loading}>
-                    {loading ? 'Processing...' : 'Complete Registration'}
+                    {loading ? 'Processing...' : (otpSent ? 'Verify & Complete Registration' : 'Send OTP')}
                   </Button>
 
                   <Button

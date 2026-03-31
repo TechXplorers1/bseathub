@@ -22,9 +22,9 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, CheckCircle2, AlertCircle, Camera } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, Camera, Search, FileText, Upload } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { fetchChefProfile, updateChefProfile, updateChefLegal } from '@/services/api';
+import { fetchChefProfile, updateChefProfile, updateChefLegal, updateChefAddress } from '@/services/api';
 import { countries } from '@/constants/countries';
 import { compressImage } from '@/lib/image-utils';
 import {
@@ -32,7 +32,6 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
-import { Search, FileText, Upload, Globe } from 'lucide-react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -80,6 +79,11 @@ export default function SettingsPage() {
     idProofUrl: '',
     countryCode: '+91',
     city: '',
+    state: '',
+    country: '',
+    postalCode: '',
+    houseNumber: '',
+    streetName: '',
     basePrice: '',
     workType: 'Freelance',
     socialLinks: '',
@@ -87,7 +91,7 @@ export default function SettingsPage() {
 
   const [workingHours, setWorkingHours] = useState<WorkingHours>(DEFAULT_HOURS);
   const [loading, setLoading] = useState(true);
-  const [savingStep, setSavingStep] = useState<'profile' | 'availability' | 'legal' | 'documents' | null>(null);
+  const [savingStep, setSavingStep] = useState<'profile' | 'availability' | 'legal' | 'documents' | 'address' | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [chefId, setChefId] = useState<string | null>(null);
   const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
@@ -172,6 +176,11 @@ export default function SettingsPage() {
           basePrice: data.basePrice?.toString() ?? '',
           workType: data.workType ?? 'Freelance',
           socialLinks: data.socialLinks ?? '',
+          houseNumber: data.houseNumber ?? '',
+          streetName: data.streetName ?? '',
+          state: data.state ?? '',
+          country: data.country ?? '',
+          postalCode: data.postalCode ?? '',
         });
         if (data.workingHours) {
           try {
@@ -225,6 +234,22 @@ export default function SettingsPage() {
       }, 1000);
     } catch (err) {
       showToast('error', 'Failed to save profile');
+    } finally {
+      setSavingStep(null);
+    }
+  };
+
+  const handleSaveAddress = async () => {
+    if (!chefId) return;
+    setSavingStep('address');
+    try {
+      await updateChefAddress(chefId, form);
+      showToast('success', 'Address updated successfully');
+      setTimeout(() => {
+        window.dispatchEvent(new Event('chef-profile-updated'));
+      }, 1000);
+    } catch (err) {
+      showToast('error', 'Failed to update address');
     } finally {
       setSavingStep(null);
     }
@@ -293,8 +318,7 @@ export default function SettingsPage() {
       <h1 className="text-3xl font-bold">Profile & Settings</h1>
 
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg border ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
-          }`}>
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg border ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
           {toast.type === 'success' ? <CheckCircle2 className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
           {toast.msg}
         </div>
@@ -317,7 +341,7 @@ export default function SettingsPage() {
                 >
                   <Avatar className="h-32 w-32 border-4 border-primary/10 group-hover:opacity-80 transition-opacity">
                     <AvatarImage src={form.avatarUrl} className="object-cover" />
-                    <AvatarFallback className="text-4xl bg-muted">{form.name[0]}</AvatarFallback>
+                    <AvatarFallback className="text-4xl bg-muted">{form.name?.[0] || 'M'}</AvatarFallback>
                   </Avatar>
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="bg-black/40 rounded-full p-3 text-white">
@@ -337,13 +361,16 @@ export default function SettingsPage() {
                   onChange={handleImageUpload}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="chef-name">Full Name</Label>
                 <Input
                   id="chef-name"
+                  value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Full Name (Profile Owner)</Label>
@@ -417,15 +444,8 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Current City</Label>
-                  <Input
-                    value={form.city}
-                    onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    placeholder="e.g. New York, London"
-                  />
-                </div>
                 <div className="space-y-2">
                   <Label>Starting Price ($)</Label>
                   <Input
@@ -435,9 +455,6 @@ export default function SettingsPage() {
                     placeholder="e.g. 50"
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Work Type</Label>
                   <Select value={form.workType} onValueChange={(v) => setForm({ ...form, workType: v })}>
@@ -450,14 +467,15 @@ export default function SettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Social Links (URLs)</Label>
-                  <Input
-                    value={form.socialLinks}
-                    onChange={(e) => setForm({ ...form, socialLinks: e.target.value })}
-                    placeholder="Instagram, LinkedIn, Portfolio"
-                  />
-                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Social Links (URLs)</Label>
+                <Input
+                  value={form.socialLinks}
+                  onChange={(e) => setForm({ ...form, socialLinks: e.target.value })}
+                  placeholder="Instagram, LinkedIn, Portfolio"
+                />
               </div>
 
               <div className="space-y-2">
@@ -470,6 +488,7 @@ export default function SettingsPage() {
                   rows={4}
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="chef-specialties">Specialties</Label>
@@ -552,6 +571,77 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Address Details</CardTitle>
+              <CardDescription>
+                Provide your full location details for logistics and coordination.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>House Number / Flat</Label>
+                  <Input
+                    value={form.houseNumber}
+                    onChange={(e) => setForm({ ...form, houseNumber: e.target.value })}
+                    placeholder="e.g. #123"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Street Name</Label>
+                  <Input
+                    value={form.streetName}
+                    onChange={(e) => setForm({ ...form, streetName: e.target.value })}
+                    placeholder="e.g. Baker Street"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>City</Label>
+                  <Input
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="e.g. London"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>State / Province</Label>
+                  <Input
+                    value={form.state}
+                    onChange={(e) => setForm({ ...form, state: e.target.value })}
+                    placeholder="e.g. Greater London"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Country</Label>
+                  <Input
+                    value={form.country}
+                    onChange={(e) => setForm({ ...form, country: e.target.value })}
+                    placeholder="e.g. United Kingdom"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Postal Code</Label>
+                  <Input
+                    value={form.postalCode}
+                    onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
+                    placeholder="e.g. NW1 6XE"
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleSaveAddress} disabled={savingStep === 'address'}>
+                {savingStep === 'address' && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                Update Address
+              </Button>
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Availability</CardTitle>
               <CardDescription>
                 Set the days and times you are available for bookings.
@@ -628,6 +718,7 @@ export default function SettingsPage() {
               </Button>
             </CardFooter>
           </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Documents</CardTitle>
@@ -685,7 +776,7 @@ export default function SettingsPage() {
                             <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">PDF Identity Proof</span>
                           </div>
                         ) : (
-                          <img src={form.idProofUrl} className="w-full h-full object-cover" />
+                          <img src={form.idProofUrl} className="w-full h-full object-cover" alt="ID Proof" />
                         )}
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button
@@ -721,8 +812,12 @@ export default function SettingsPage() {
                             };
                             reader.readAsDataURL(file);
                           } else {
-                            const base64 = await compressImage(file);
-                            setForm(f => ({ ...f, idProofUrl: base64 }));
+                            const reader = new FileReader();
+                            reader.onloadend = async () => {
+                              const base64 = await compressImage(reader.result as string);
+                              setForm(f => ({ ...f, idProofUrl: base64 }));
+                            };
+                            reader.readAsDataURL(file);
                           }
                         }
                       }}

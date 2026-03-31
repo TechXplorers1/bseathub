@@ -35,4 +35,15 @@ public class HomeFoodResponseDTO {
     private String bankAccountNumber;
     private String bankIFSC;
     private String bankName;
+
+    // Expansion
+    private String fullName;
+    private String contactNumber;
+    private String countryCode;
+    private String cuisines;
+    private String specialtyDishes;
+    private String deliveryAvailability;
+    private String idProofType;
+    private String idProofNumber;
+    private String idProofUrl;
 }

@@ -38,4 +38,18 @@ public class ChefResponseDTO {
 
     private String foodSafetyCertUrl;
     private String culinaryDiplomaUrl;
+    private String idProofUrl;
+
+    // Expansion
+    private String fullName;
+    private String contactNumber;
+    private String countryCode;
+    private String cuisines;
+    private String deliveryAvailability;
+    private String idProofType;
+    private String idProofNumber;
+
+    private Double basePrice;
+    private String workType;
+    private String socialLinks;
 }

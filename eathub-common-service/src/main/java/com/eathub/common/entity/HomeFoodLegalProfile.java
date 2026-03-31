@@ -55,4 +55,13 @@ public class HomeFoodLegalProfile {
 
     @Column(name = "bank_name")
     private String bankName;
+
+    @Column(name = "hygiene_certificate_url", columnDefinition = "TEXT")
+    private String hygieneCertificateUrl;
+
+    @Column(name = "menu_url", columnDefinition = "TEXT")
+    private String menuUrl;
+
+    @Column(name = "id_proof_url", columnDefinition = "TEXT")
+    private String idProofUrl;
 }

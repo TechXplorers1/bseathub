@@ -401,3 +401,31 @@ export const updateChefLegal = async (id: string, data: any): Promise<any> => {
     if (!response.ok) throw new Error('Failed to update chef legal/bank details');
     return response.json();
 };
+
+/* ================= AUTH / OTP SERVICES ================= */
+
+export const sendOtp = async (email: string) => {
+    const res = await fetch(`${AUTH_URL}/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to send OTP');
+    }
+    return res.json();
+};
+
+export const verifyOtp = async (email: string, otp: string) => {
+    const res = await fetch(`${AUTH_URL}/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Invalid or expired OTP');
+    }
+    return res.json();
+};

@@ -31,6 +31,7 @@ public class HomeFoodService {
     public List<HomeFoodResponseDTO> getAllHomeFoods() {
         return repository.findAllWithDetails()
                 .stream()
+                .filter(p -> Boolean.TRUE.equals(p.getIsActive()))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -82,6 +83,14 @@ public class HomeFoodService {
             p.setIsActive("OPEN".equalsIgnoreCase(dto.getOperationalStatus()));
         }
 
+        // Expansion
+        if (dto.getFullName() != null) p.setFullName(dto.getFullName());
+        if (dto.getContactNumber() != null) p.setContactNumber(dto.getContactNumber());
+        if (dto.getCountryCode() != null) p.setCountryCode(dto.getCountryCode());
+        if (dto.getCuisines() != null) p.setCuisines(dto.getCuisines());
+        if (dto.getSpecialtyDishes() != null) p.setSpecialtyDishes(dto.getSpecialtyDishes());
+        if (dto.getDeliveryAvailability() != null) p.setDeliveryAvailability(dto.getDeliveryAvailability());
+
         return mapToDTO(repository.save(p));
     }
 
@@ -128,6 +137,11 @@ public class HomeFoodService {
         if (dto.getBankAccountNumber() != null) legal.setBankAccountNumber(dto.getBankAccountNumber());
         if (dto.getBankIFSC() != null) legal.setBankIFSC(dto.getBankIFSC());
         if (dto.getBankName() != null) legal.setBankName(dto.getBankName());
+
+        // Expansion
+        if (dto.getIdProofType() != null) legal.setIdProofType(dto.getIdProofType());
+        if (dto.getIdProofNumber() != null) legal.setIdProofNumber(dto.getIdProofNumber());
+        if (dto.getIdProofUrl() != null) legal.setIdProofUrl(dto.getIdProofUrl());
 
         legalProfileRepository.save(legal);
         return mapToDTO(p);
@@ -209,7 +223,19 @@ public class HomeFoodService {
             dto.setBankAccountNumber(l.getBankAccountNumber());
             dto.setBankIFSC(l.getBankIFSC());
             dto.setBankName(l.getBankName());
+            dto.setIdProofType(l.getIdProofType());
+            dto.setIdProofNumber(l.getIdProofNumber());
+            dto.setIdProofUrl(l.getIdProofUrl());
         }
+
+        // Expansion fields from Provider
+        dto.setFullName(p.getFullName());
+        dto.setContactNumber(p.getContactNumber());
+        dto.setCountryCode(p.getCountryCode());
+        dto.setCuisines(p.getCuisines());
+        dto.setSpecialtyDishes(p.getSpecialtyDishes());
+        dto.setDeliveryAvailability(p.getDeliveryAvailability());
+
         return dto;
     }
 

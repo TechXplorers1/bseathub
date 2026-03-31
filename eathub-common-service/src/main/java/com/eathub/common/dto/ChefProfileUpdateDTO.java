@@ -34,4 +34,18 @@ public class ChefProfileUpdateDTO {
 
     private String foodSafetyCertUrl;
     private String culinaryDiplomaUrl;
+
+    // ── Expansion fields ──────────────────────────────────────────
+    private String fullName;
+    private String contactNumber;
+    private String countryCode;
+    private String cuisines;
+    private String deliveryAvailability;
+    private String idProofType;
+    private String idProofNumber;
+    private String idProofUrl;
+
+    private Double basePrice;
+    private String workType;
+    private String socialLinks;
 }

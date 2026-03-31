@@ -462,3 +462,29 @@ CREATE TABLE IF NOT EXISTS otps (
 -- changeset eathub:1.5.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
 -- Add FSSAI document storage to restaurant legal profiles
 ALTER TABLE restaurant_legal_profiles ADD COLUMN IF NOT EXISTS fssai_document_url TEXT;
+
+-- changeset eathub:1.6.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Expand Home Food and Chef profiles with requested fields
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS contact_number TEXT;
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS cuisines TEXT;
+
+ALTER TABLE home_food_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_url TEXT;
+
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS contact_number TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS cuisines TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS delivery_availability TEXT;
+
+ALTER TABLE chef_legal_profiles ADD COLUMN IF NOT EXISTS id_proof_url TEXT;
+
+-- changeset eathub:1.6.1 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add country_code to Home Food and Chef for internationalization
+ALTER TABLE home_food_providers ADD COLUMN IF NOT EXISTS country_code TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS country_code TEXT;
+
+-- changeset eathub:1.6.2 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Expand Chef profile with starting price, work type, and social links
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS work_type TEXT;
+ALTER TABLE chefs ADD COLUMN IF NOT EXISTS social_links TEXT;

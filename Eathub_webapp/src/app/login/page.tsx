@@ -63,6 +63,11 @@ export default function LoginPage() {
         localStorage.setItem('userName', response.name);
         localStorage.setItem('eathubLoggedIn', 'true');
 
+        // Store userId for review submission
+        if (response.userId) {
+          localStorage.setItem('userId', response.userId);
+        }
+
         if (response.providerId) {
           if (response.role === 'RESTAURANT') {
             localStorage.setItem('restaurantId', response.providerId);

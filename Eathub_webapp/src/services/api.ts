@@ -429,3 +429,64 @@ export const verifyOtp = async (email: string, otp: string) => {
     }
     return res.json();
 };
+
+/* ================= REVIEWS ================= */
+
+export interface ReviewRequest {
+    customerId: string;
+    targetId: string;
+    targetType: 'Restaurant' | 'HomeFood' | 'Chef' | 'MenuItem';
+    rating: number;
+    comment: string;
+    orderId?: string;
+}
+
+export interface ReviewResponse {
+    id: string;
+    customerId: string;
+    customerName: string;
+    targetId: string;
+    targetType: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    orderId?: string;
+}
+
+export const submitReview = async (payload: ReviewRequest): Promise<ReviewResponse> => {
+    const res = await fetch(`${BASE_URL}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to submit review');
+    }
+    return res.json();
+};
+
+export const getReviewsForProvider = async (
+    targetId: string,
+    type: 'Restaurant' | 'HomeFood' | 'Chef'
+): Promise<ReviewResponse[]> => {
+    const res = await fetch(`${BASE_URL}/reviews/provider/${targetId}?type=${type}`);
+    if (!res.ok) throw new Error('Failed to fetch reviews');
+    return res.json();
+};
+
+export const getReviewsByCustomer = async (customerId: string): Promise<ReviewResponse[]> => {
+    const res = await fetch(`${BASE_URL}/reviews/customer/${customerId}`);
+    if (!res.ok) throw new Error('Failed to fetch customer reviews');
+    return res.json();
+};
+
+export const checkAlreadyReviewed = async (
+    customerId: string,
+    targetId: string
+): Promise<boolean> => {
+    const res = await fetch(`${BASE_URL}/reviews/check?customerId=${customerId}&targetId=${targetId}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    return data.reviewed ?? false;
+};

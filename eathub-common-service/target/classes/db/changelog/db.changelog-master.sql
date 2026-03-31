@@ -488,3 +488,19 @@ ALTER TABLE chefs ADD COLUMN IF NOT EXISTS country_code TEXT;
 ALTER TABLE chefs ADD COLUMN IF NOT EXISTS base_price DOUBLE PRECISION;
 ALTER TABLE chefs ADD COLUMN IF NOT EXISTS work_type TEXT;
 ALTER TABLE chefs ADD COLUMN IF NOT EXISTS social_links TEXT;
+
+-- changeset eathub:1.7.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Add order_id reference to reviews table so a review is tied to a specific order
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS order_id VARCHAR(36);
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS order_source_type VARCHAR(50);
+
+-- Index for fast lookup of reviews by provider
+CREATE INDEX IF NOT EXISTS idx_reviews_target ON reviews(target_id, target_type);
+
+-- Index for fast lookup of all reviews by a customer
+CREATE INDEX IF NOT EXISTS idx_reviews_customer ON reviews(customer_id);
+
+-- changeset eathub:1.8.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Drop order_status foreign key to allow flexible string statuses
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS fk_orders_status;
+ALTER TABLE order_status_history DROP CONSTRAINT IF EXISTS fk_osh_status;

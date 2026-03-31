@@ -28,6 +28,8 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String comment;
 
+    private String orderId;
+
     private LocalDateTime createdAt;
 
     @PrePersist

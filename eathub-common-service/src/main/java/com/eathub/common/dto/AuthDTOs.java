@@ -51,5 +51,6 @@ public class AuthDTOs {
         private String providerId;
         private String name;
         private String avatarUrl;
+        private String userId; // ← Added: customer's own user ID for reviews
     }
 }

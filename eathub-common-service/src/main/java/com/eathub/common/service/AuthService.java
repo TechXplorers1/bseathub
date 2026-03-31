@@ -231,7 +231,7 @@ public class AuthService {
         }
 
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
-                providerIdResult, savedUser.getName(), savedUser.getAvatarUrl());
+                providerIdResult, savedUser.getName(), savedUser.getAvatarUrl(), savedUser.getId());
     }
 
     private String generateSlug(String name) {
@@ -264,7 +264,8 @@ public class AuthService {
                 user.getRole().name(),
                 providerId,
                 user.getName(),
-                user.getAvatarUrl());
+                user.getAvatarUrl(),
+                user.getId());
     }
 
     @Transactional
@@ -298,7 +299,7 @@ public class AuthService {
         userProfileRepository.save(profile);
 
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),
-                null, savedUser.getName(), savedUser.getAvatarUrl());
+                null, savedUser.getName(), savedUser.getAvatarUrl(), savedUser.getId());
     }
 
     public User getCurrentUser(String email) {

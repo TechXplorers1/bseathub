@@ -26,7 +26,6 @@ public class MenuCategory {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-
     @ManyToOne
     @JoinColumn(name = "home_food_id")
     private HomeFoodProvider homeFoodProvider;

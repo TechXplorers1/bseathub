@@ -381,6 +381,7 @@ export function RestaurantDetails({
       {selectedItem && (
         <MenuItemDialog
           item={selectedItem}
+          restaurant={restaurant}
           open={!!selectedItem}
           onOpenChange={(open) => {
             if (!open) {

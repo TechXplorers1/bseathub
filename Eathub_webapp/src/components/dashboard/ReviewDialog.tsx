@@ -11,10 +11,16 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { submitReview, checkAlreadyReviewed, type ReviewRequest } from '@/services/api';
+import { submitReview, checkAlreadyReviewed } from '@/services/api';
+import { type ReviewRequest } from '@/lib/types';
 import { CheckCircle2, Loader2, Star, ShoppingBag, Utensils } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+
+interface OrderedItem {
+    id: string;
+    name: string;
+}
 
 interface ReviewDialogProps {
     isOpen: boolean;
@@ -22,10 +28,10 @@ interface ReviewDialogProps {
     targetId: string;
     targetType: 'Restaurant' | 'HomeFood' | 'Chef';
     providerName: string;
-    orderedItems?: string[];
+    orderedItems?: OrderedItem[];
     orderTotal?: number;
     orderDate?: string;
-    orderId?: string; // Passed down to tie multiple reviews to the same order
+    orderId?: string;
 }
 
 interface ItemReviewState {
@@ -43,7 +49,7 @@ export function ReviewDialog({
     orderedItems = [],
     orderTotal,
     orderDate,
-    orderId = 'Unknown', // Need to define this in props
+    orderId = 'Unknown',
 }: ReviewDialogProps) {
     // For single Provider review (fallback if no items)
     const [providerRating, setProviderRating] = useState(0);
@@ -78,7 +84,7 @@ export function ReviewDialog({
 
         const initialItemState: Record<string, ItemReviewState> = {};
         orderedItems.forEach(item => {
-            initialItemState[item] = { rating: 0, hover: 0, comment: '' };
+            initialItemState[item.id] = { rating: 0, hover: 0, comment: '' };
         });
         setItemReviews(initialItemState);
 
@@ -88,18 +94,16 @@ export function ReviewDialog({
             return;
         }
 
-        // We can skip checking "already reviewed" for multiple items to simplify the UI,
-        // or just let them update normally (Spring backend handles UPSERT logic based on targetId).
         setChecking(false);
     }, [isOpen, orderedItems]);
 
     const starLabels = ['Poor 😞', 'Fair 😐', 'Good 🙂', 'Great 😊', 'Excellent 🤩'];
 
-    const updateItemReview = (itemName: string, field: keyof ItemReviewState, value: any) => {
+    const updateItemReview = (itemId: string, field: keyof ItemReviewState, value: any) => {
         setItemReviews(prev => ({
             ...prev,
-            [itemName]: {
-                ...prev[itemName],
+            [itemId]: {
+                ...prev[itemId],
                 [field]: value
             }
         }));
@@ -122,16 +126,20 @@ export function ReviewDialog({
         // Submit Item-Level Reviews
         if (orderedItems.length > 0) {
             for (const item of orderedItems) {
-                const reviewState = itemReviews[item];
+                const reviewState = itemReviews[item.id];
                 if (reviewState && reviewState.rating > 0) {
                     atLeastOne = true;
+                    // For item review, targetId is the restaurant/provider,
+                    // and menuItemId is the specific item.
                     const payload: ReviewRequest = {
                         customerId,
-                        targetId: item, // Use item name as Target ID
-                        targetType: 'MenuItem',
+                        targetId, // Restaurant ID
+                        targetType, // Restaurant, HomeFood, Chef
                         rating: reviewState.rating,
                         comment: reviewState.comment.trim(),
                         orderId: orderId,
+                        menuItemId: item.id,
+                        menuItemName: item.name
                     };
                     promises.push(submitReview(payload));
                 }
@@ -226,14 +234,14 @@ export function ReviewDialog({
                             {orderedItems.length > 0 ? (
                                 // Item-Level Reviews
                                 orderedItems.map((item, idx) => {
-                                    const state = itemReviews[item] || { rating: 0, hover: 0, comment: '' };
+                                    const state = itemReviews[item.id] || { rating: 0, hover: 0, comment: '' };
                                     const activeItemRating = state.hover || state.rating;
 
                                     return (
-                                        <div key={idx} className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-3">
+                                        <div key={item.id} className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-3">
                                             <div className="flex items-center gap-2 font-bold text-slate-800">
                                                 <Utensils className="w-4 h-4 text-orange-500" />
-                                                <span>{item}</span>
+                                                <span>{item.name}</span>
                                             </div>
 
                                             {/* Stars for Item */}
@@ -243,9 +251,9 @@ export function ReviewDialog({
                                                         <button
                                                             key={star}
                                                             type="button"
-                                                            onMouseEnter={() => updateItemReview(item, 'hover', star)}
-                                                            onMouseLeave={() => updateItemReview(item, 'hover', 0)}
-                                                            onClick={() => updateItemReview(item, 'rating', star)}
+                                                            onMouseEnter={() => updateItemReview(item.id, 'hover', star)}
+                                                            onMouseLeave={() => updateItemReview(item.id, 'hover', 0)}
+                                                            onClick={() => updateItemReview(item.id, 'rating', star)}
                                                             className="transition-transform hover:scale-110 focus:outline-none"
                                                         >
                                                             <Star
@@ -270,9 +278,9 @@ export function ReviewDialog({
                                             {state.rating > 0 && (
                                                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                                     <Textarea
-                                                        placeholder={`Any comments specifically for ${item}? (optional)`}
+                                                        placeholder={`Any comments specifically for ${item.name}? (optional)`}
                                                         value={state.comment}
-                                                        onChange={(e) => updateItemReview(item, 'comment', e.target.value)}
+                                                        onChange={(e) => updateItemReview(item.id, 'comment', e.target.value)}
                                                         className="resize-none text-xs leading-relaxed bg-white border-slate-200"
                                                         rows={2}
                                                         maxLength={200}

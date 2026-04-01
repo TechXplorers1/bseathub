@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import type { MenuItem } from '@/lib/types';
+import type { MenuItem, Restaurant } from '@/lib/types';
 import { getImageById } from '@/lib/placeholder-images';
 import { useCart } from '@/context/CartProvider';
 import {
@@ -23,12 +23,14 @@ interface MenuItemDialogProps {
     rating?: number;
     recipe?: string;
   };
+  restaurant: Restaurant;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function MenuItemDialog({
   item,
+  restaurant,
   open,
   onOpenChange,
 }: MenuItemDialogProps) {
@@ -36,7 +38,15 @@ export function MenuItemDialog({
   const image = getImageById(item.imageId);
 
   const handleAddToCart = () => {
-    addToCart(item);
+    const providerType = ((restaurant.type as string) === 'home-food' || (restaurant.type as string) === 'homefood') 
+      ? 'HomeFood' 
+      : 'Restaurant';
+    
+    addToCart(item, {
+      id: restaurant.id,
+      type: providerType as 'Restaurant' | 'HomeFood',
+      name: restaurant.name
+    });
     onOpenChange(false);
   };
 

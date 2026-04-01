@@ -7,34 +7,23 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 
 const statuses = [
-    { name: 'Order Confirmed', icon: CheckCircle2, time: '8:05 PM' },
-    { name: 'Preparing', icon: CookingPot, time: '8:10 PM' },
-    { name: 'Out for Delivery', icon: Bike, time: '8:20 PM' },
-    { name: 'Delivered', icon: Home, time: '' },
+    { id: 'Pending Approval', name: 'Wait for Approval', icon: CheckCircle2 },
+    { id: 'Approved', name: 'Ready to Pay', icon: CheckCircle2 },
+    { id: 'Confirmed', name: 'Order Confirmed', icon: CheckCircle2 },
+    { id: 'Preparing', name: 'Preparing', icon: CookingPot },
+    { id: 'Out for Delivery', name: 'Out for Delivery', icon: Bike },
+    { id: 'Delivered', name: 'Delivered', icon: Home },
 ];
 
 interface OrderStatusTrackerProps {
-    /** Called once when status reaches "Delivered" */
+    currentStatusId?: string;
     onDelivered?: () => void;
 }
 
-export function OrderStatusTracker({ onDelivered }: OrderStatusTrackerProps) {
-    const [currentStatusIndex, setCurrentStatusIndex] = useState(0);
+export function OrderStatusTracker({ currentStatusId, onDelivered }: OrderStatusTrackerProps) {
+    const statusIndex = statuses.findIndex(s => s.id === currentStatusId);
+    const currentStatusIndex = statusIndex === -1 ? 0 : statusIndex;
     const [deliveredFired, setDeliveredFired] = useState(false);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentStatusIndex((prev) => {
-                if (prev < statuses.length - 1) {
-                    return prev + 1;
-                }
-                clearInterval(interval);
-                return prev;
-            });
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, []);
 
     // Fire onDelivered once when we hit the last step
     useEffect(() => {
@@ -58,35 +47,29 @@ export function OrderStatusTracker({ onDelivered }: OrderStatusTrackerProps) {
                 className="h-2.5 rounded-full transition-all duration-700"
             />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-center">
                 {statuses.map((status, index) => {
                     const isActive = index <= currentStatusIndex;
                     const isCurrent = index === currentStatusIndex;
 
                     return (
-                        <div key={status.name} className="flex flex-col items-center gap-1">
+                        <div key={status.id} className="flex flex-col items-center gap-1">
                             <div
                                 className={cn(
-                                    'flex h-14 w-14 items-center justify-center rounded-full border-2 transition-all duration-500',
+                                    'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-500',
                                     isActive
                                         ? 'bg-orange-500 border-orange-500 text-white shadow-lg shadow-orange-200'
                                         : 'bg-muted border-border text-muted-foreground'
                                 )}
                             >
-                                <status.icon className={cn('h-6 w-6', isCurrent && isActive && 'animate-bounce')} />
+                                <status.icon className={cn('h-5 w-5', isCurrent && isActive && 'animate-bounce')} />
                             </div>
                             <p className={cn(
-                                'mt-1 text-sm font-semibold transition-colors',
+                                'text-[10px] font-bold leading-tight transition-colors',
                                 isActive ? 'text-orange-600' : 'text-muted-foreground'
                             )}>
                                 {status.name}
                             </p>
-                            {isCurrent && !isDelivered && (
-                                <p className="text-xs text-muted-foreground animate-pulse">In Progress…</p>
-                            )}
-                            {isActive && status.time && (
-                                <p className="text-xs text-muted-foreground">{status.time}</p>
-                            )}
                         </div>
                     );
                 })}

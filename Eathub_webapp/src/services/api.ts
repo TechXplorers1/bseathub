@@ -150,7 +150,7 @@ export const fetchHomeFoodMenu = async (providerId: string) => {
     return res.json();
 };
 
-export const fetchHomeFoodCategories = async (providerId: string) => {
+export const fetchHomeFoodMenuCategories = async (providerId: string) => {
     const res = await fetch(`${BASE_URL}/menu/categories/home-food/${providerId}`);
     if (!res.ok) throw new Error("Failed to fetch categories");
     return res.json();
@@ -218,8 +218,6 @@ export const fetchChefBySlug = async (slug: string) => {
 };
 
 export const fetchHomeFoodBySlug = async (slug: string) => {
-    // Note: If backend home-food controller doesn't have slug endpoint yet, 
-    // it will return 404. Assuming it might be needed.
     const res = await fetch(`${BASE_URL}/home-food/slug/${slug}`);
     if (!res.ok) throw new Error("Home food provider not found");
     return res.json();
@@ -243,8 +241,7 @@ export const fetchChefById = async (id: string) => {
     return res.json();
 };
 
-export const updateProfile = async (payload: any) => {
-    // Assuming backend endpoint for general user profile update
+export const updateGenericProfile = async (payload: any) => {
     const res = await fetch(`${BASE_URL}/users/profile`, {
         method: 'PUT',
         headers: {
@@ -266,7 +263,11 @@ export const fetchUserProfile = async () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
     });
-    if (!res.ok) throw new Error("Failed to fetch profile");
+    if (!res.ok) {
+        const error = new Error("Failed to fetch profile");
+        (error as any).status = res.status;
+        throw error;
+    }
     return res.json();
 };
 
@@ -319,13 +320,13 @@ export const updateRestaurantLegal = async (restaurantId: string, payload: any) 
 
 /* ================= HOME FOOD PROFILE SETTINGS ================= */
 
-export const fetchHomeFoodProfile = async (id: string) => {
+export const fetchHomeFoodProfileDetail = async (id: string) => {
     const res = await fetch(`${BASE_URL}/home-food/${id}`);
     if (!res.ok) throw new Error("Failed to fetch home food profile");
     return res.json();
 };
 
-export const updateHomeFoodProfile = async (id: string, payload: any) => {
+export const updateHomeFoodProfileDetail = async (id: string, payload: any) => {
     const res = await fetch(`${BASE_URL}/home-food/${id}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -366,13 +367,13 @@ export const updateHomeFoodLegal = async (id: string, payload: any) => {
 
 /* ================= CHEF PROFILE SETTINGS ================= */
 
-export const fetchChefProfile = async (id: string): Promise<any> => {
+export const fetchChefProfileDetail = async (id: string): Promise<any> => {
     const response = await fetch(`${BASE_URL}/chefs/${id}`);
     if (!response.ok) throw new Error('Failed to fetch chef profile');
     return response.json();
 };
 
-export const updateChefProfile = async (id: string, data: any): Promise<any> => {
+export const updateChefProfileDetail = async (id: string, data: any): Promise<any> => {
     const response = await fetch(`${BASE_URL}/chefs/${id}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -432,26 +433,46 @@ export const verifyOtp = async (email: string, otp: string) => {
 
 /* ================= REVIEWS ================= */
 
-export interface ReviewRequest {
-    customerId: string;
-    targetId: string;
-    targetType: 'Restaurant' | 'HomeFood' | 'Chef' | 'MenuItem';
-    rating: number;
-    comment: string;
-    orderId?: string;
-}
+import type { OrderRequest, OrderResponse, ReviewRequest, ReviewResponse } from '@/lib/types';
 
-export interface ReviewResponse {
-    id: string;
-    customerId: string;
-    customerName: string;
-    targetId: string;
-    targetType: string;
-    rating: number;
-    comment: string;
-    createdAt: string;
-    orderId?: string;
-}
+export const createOrder = async (payload: OrderRequest): Promise<OrderResponse> => {
+    const res = await fetch(`${BASE_URL}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to place order");
+    }
+    return res.json();
+};
+
+export const fetchOrderById = async (orderId: string): Promise<OrderResponse> => {
+    const res = await fetch(`${BASE_URL}/orders/${orderId}`);
+    if (!res.ok) throw new Error("Failed to fetch order details");
+    return res.json();
+};
+
+export const fetchOrdersByCustomer = async (customerId: string): Promise<OrderResponse[]> => {
+    const res = await fetch(`${BASE_URL}/orders/customer/${customerId}`);
+    if (!res.ok) throw new Error("Failed to fetch customer orders");
+    return res.json();
+};
+
+export const fetchOrdersByRestaurant = async (restaurantId: string): Promise<OrderResponse[]> => {
+    const res = await fetch(`${BASE_URL}/orders/restaurant/${restaurantId}`);
+    if (!res.ok) throw new Error("Failed to fetch restaurant orders");
+    return res.json();
+};
+
+export const cancelOrder = async (orderId: string): Promise<OrderResponse> => {
+    const res = await fetch(`${BASE_URL}/orders/${orderId}/cancel`, {
+        method: 'POST',
+    });
+    if (!res.ok) throw new Error("Failed to cancel order");
+    return res.json();
+};
 
 export const submitReview = async (payload: ReviewRequest): Promise<ReviewResponse> => {
     const res = await fetch(`${BASE_URL}/reviews`, {
@@ -489,4 +510,62 @@ export const checkAlreadyReviewed = async (
     if (!res.ok) return false;
     const data = await res.json();
     return data.reviewed ?? false;
+};
+
+export const createRazorpayOrder = async (amount: number) => {
+    const res = await fetch(`${BASE_URL}/payments/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'INR' })
+    });
+    if (!res.ok) throw new Error("Failed to create Razorpay order");
+    try {
+        const text = await res.text();
+        return JSON.parse(text);
+    } catch {
+        throw new Error("Failed to parse Razorpay order response");
+    }
+};
+
+export const updateFcmToken = async (fcmToken: string): Promise<void> => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) return;
+
+    const res = await fetch(`${BASE_URL}/users/fcm-token`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ fcmToken }),
+    });
+    if (!res.ok && res.status !== 401) {
+        console.warn('Failed to update FCM token on backend');
+    }
+};
+
+export const updateOrderPaymentStatus = async (orderId: string, paymentStatus: string): Promise<OrderResponse> => {
+    const res = await fetch(`${BASE_URL}/orders/${orderId}/payment?paymentStatus=${paymentStatus}`, {
+        method: 'PATCH',
+    });
+    if (!res.ok) throw new Error("Failed to update payment status");
+    return res.json();
+};
+
+export const fetchMyOrders = async (): Promise<OrderResponse[]> => {
+    const res = await fetch(`${BASE_URL}/orders/mine`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    if (!res.ok) throw new Error("Failed to fetch my orders");
+    return res.json();
+};
+
+export const updateOrderStatus = async (orderId: string, status: string): Promise<OrderResponse> => {
+    const res = await fetch(`${BASE_URL}/orders/${orderId}/status?status=${status}`, {
+        method: 'PATCH',
+    });
+    if (!res.ok) throw new Error("Failed to update status");
+    return res.json();
 };

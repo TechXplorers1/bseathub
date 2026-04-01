@@ -104,4 +104,11 @@ public class UserService {
         
         return response;
     }
+
+    @Transactional
+    public void updateFcmToken(String token, String fcmToken) {
+        User user = getUserByToken(token);
+        user.setFcmToken(fcmToken);
+        userRepository.save(user);
+    }
 }

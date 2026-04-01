@@ -6,10 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/v1/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService userService;
@@ -24,5 +26,13 @@ public class UserController {
             @RequestHeader("Authorization") String token,
             @RequestBody UserProfileDTO dto) {
         return ResponseEntity.ok(userService.updateUserProfile(token, dto));
+    }
+
+    @PutMapping("/fcm-token")
+    public ResponseEntity<Void> updateFcmToken(
+            @RequestHeader("Authorization") String token,
+            @RequestBody Map<String, String> data) {
+        userService.updateFcmToken(token, data.get("fcmToken"));
+        return ResponseEntity.ok().build();
     }
 }

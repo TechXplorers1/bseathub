@@ -504,3 +504,15 @@ CREATE INDEX IF NOT EXISTS idx_reviews_customer ON reviews(customer_id);
 -- Drop order_status foreign key to allow flexible string statuses
 ALTER TABLE orders DROP CONSTRAINT IF EXISTS fk_orders_status;
 ALTER TABLE order_status_history DROP CONSTRAINT IF EXISTS fk_osh_status;
+
+-- changeset eathub:1.9.0 validCheckSum:ANY logicalFilePath:db/changelog/db.changelog-master.sql
+-- Order table: ensure current_status_id is a plain VARCHAR (not FK) and add performance indexes
+ALTER TABLE orders ALTER COLUMN current_status_id TYPE VARCHAR(100);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_restaurant_id ON orders(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_orders_home_food_provider_id ON orders(home_food_provider_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(current_status_id);
+CREATE INDEX IF NOT EXISTS idx_orders_placed_at ON orders(order_placed_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);

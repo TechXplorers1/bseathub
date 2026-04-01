@@ -48,14 +48,30 @@ public class ReviewController {
     }
 
     /**
-     * GET /api/v1/reviews/check?customerId=xxx&targetId=yyy
-     * Check if a customer has already reviewed a target.
+     * GET /api/v1/reviews/check?customerId=xxx&targetId=yyy&menuItemId=zzz
+     * Check if a customer has already reviewed a target/item.
      */
     @GetMapping("/check")
     public ResponseEntity<Map<String, Boolean>> hasAlreadyReviewed(
             @RequestParam String customerId,
-            @RequestParam String targetId) {
-        boolean reviewed = reviewService.hasAlreadyReviewed(customerId, targetId);
+            @RequestParam String targetId,
+            @RequestParam(required = false) String menuItemId) {
+        
+        boolean reviewed;
+        if (menuItemId != null && !menuItemId.isBlank()) {
+            reviewed = reviewService.hasAlreadyReviewed(customerId, targetId, menuItemId);
+        } else {
+            reviewed = reviewService.hasAlreadyReviewed(customerId, targetId);
+        }
         return ResponseEntity.ok(Map.of("reviewed", reviewed));
+    }
+
+    /**
+     * GET /api/v1/reviews/item/{itemId}
+     * Get reviews for a specific dish
+     */
+    @GetMapping("/item/{itemId}")
+    public ResponseEntity<List<ReviewResponse>> getReviewsByItem(@PathVariable String itemId) {
+        return ResponseEntity.ok(reviewService.getReviewsByMenuItemId(itemId));
     }
 }

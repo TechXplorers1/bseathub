@@ -1,7 +1,7 @@
 spring:
   application:
     name: eathub-common-service
-  
+
   datasource:
     url: jdbc:postgresql://192.168.29.237:5434/postgres?options=-c%20timezone=Asia/Kolkata
     username: eathub
@@ -15,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update 
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -32,7 +32,7 @@ spring:
     clear-checksums: true
     # This ensures Liquibase doesn't crash if you manually edited the DB
     parameters:
-      placeholder: value 
+      placeholder: value
 
   mail:
     host: smtp.zoho.in
@@ -43,7 +43,7 @@ spring:
       mail:
         smtp:
           auth: true
-          starttls: 
+          starttls:
             enable: true
           connectiontimeout: 5000
           timeout: 5000
@@ -56,7 +56,7 @@ server:
     include-binding-errors: always
   servlet:
     context-path: /api
-    
+
 logging:
   level:
     org.springframework.security: DEBUG
@@ -64,3 +64,7 @@ logging:
     org.springframework.web: DEBUG
     liquibase: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+razorpay:
+  key-id: rzp_test_SYC9m4DXT1gjeY
+  key-secret: doKfQtwdKfdoeSYV2oIukWU3

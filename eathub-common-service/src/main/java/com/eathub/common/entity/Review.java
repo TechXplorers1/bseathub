@@ -29,6 +29,8 @@ public class Review {
     private String comment;
 
     private String orderId;
+    private String menuItemId; // For item-specific reviews
+    private String menuItemName; // For item-specific reviews
 
     private LocalDateTime createdAt;
 

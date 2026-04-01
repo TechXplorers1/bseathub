@@ -20,6 +20,8 @@ public class ReviewDTO {
         private Double rating; // 1.0 – 5.0
         private String comment; // free-text review
         private String orderId; // To tie the review to the specific order
+        private String menuItemId; // For specific dishes
+        private String menuItemName; // Dish name
     }
 
     @Data
@@ -30,11 +32,13 @@ public class ReviewDTO {
         private String id;
         private String customerId;
         private String customerName;
-        private String targetId;
-        private String targetType;
+        private String targetId; // provider id
+        private String targetType; // "Restaurant" etc
         private Double rating;
         private String comment;
         private LocalDateTime createdAt;
         private String orderId;
+        private String menuItemId;
+        private String menuItemName;
     }
 }

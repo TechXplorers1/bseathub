@@ -42,8 +42,9 @@ public class ReviewService {
         Review review;
         String customerId = request.getCustomerId() != null ? request.getCustomerId() : "";
         String targetId   = request.getTargetId()   != null ? request.getTargetId()   : "";
+        String mId        = request.getMenuItemId(); // null for provider review
 
-        boolean alreadyReviewed = reviewRepository.existsByCustomer_IdAndTargetId(customerId, targetId);
+        boolean alreadyReviewed = reviewRepository.existsByCustomer_IdAndTargetIdAndMenuItemId(customerId, targetId, mId);
 
         if (alreadyReviewed) {
             // Update the existing review
@@ -51,7 +52,8 @@ public class ReviewService {
             review = reviewRepository
                     .findByTargetIdAndTargetTypeOrderByCreatedAtDesc(targetId, tType)
                     .stream()
-                    .filter(r -> r.getCustomer().getId().equals(customerId))
+                    .filter(r -> r.getCustomer().getId().equals(customerId) && 
+                            ( (mId == null && r.getMenuItemId() == null) || (mId != null && mId.equals(r.getMenuItemId())) ))
                     .findFirst()
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found"));
 
@@ -68,6 +70,8 @@ public class ReviewService {
                     .rating(request.getRating())
                     .comment(request.getComment())
                     .orderId(request.getOrderId())
+                    .menuItemId(request.getMenuItemId())
+                    .menuItemName(request.getMenuItemName())
                     .build();
         }
 
@@ -84,6 +88,15 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    // ── Get reviews for a specific item ───────────────────────────
+    public List<ReviewResponse> getReviewsByMenuItemId(String menuItemId) {
+        // Assuming you add a repository method for this
+        return reviewRepository.findAll().stream()
+                .filter(r -> menuItemId.equals(r.getMenuItemId()))
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     // ── Get reviews submitted by a specific customer ────────────────────────
     public List<ReviewResponse> getReviewsByCustomer(String customerId) {
         return reviewRepository
@@ -95,7 +108,11 @@ public class ReviewService {
 
     // ── Check if customer already reviewed a target ─────────────────────────
     public boolean hasAlreadyReviewed(String customerId, String targetId) {
-        return reviewRepository.existsByCustomer_IdAndTargetId(customerId, targetId);
+        return reviewRepository.existsByCustomer_IdAndTargetIdAndMenuItemId(customerId, targetId, null);
+    }
+
+    public boolean hasAlreadyReviewed(String customerId, String targetId, String menuItemId) {
+        return reviewRepository.existsByCustomer_IdAndTargetIdAndMenuItemId(customerId, targetId, menuItemId);
     }
 
     // ── Map entity → response DTO ────────────────────────────────────────────
@@ -110,6 +127,8 @@ public class ReviewService {
                 .comment(r.getComment())
                 .createdAt(r.getCreatedAt())
                 .orderId(r.getOrderId())
+                .menuItemId(r.getMenuItemId())
+                .menuItemName(r.getMenuItemName())
                 .build();
     }
 }

@@ -34,4 +34,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private UserRole role;
+
+    private String fcmToken;
 }

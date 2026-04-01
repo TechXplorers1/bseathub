@@ -13,5 +13,7 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
 
     List<Review> findByCustomer_IdOrderByCreatedAtDesc(String customerId);
 
+    boolean existsByCustomer_IdAndTargetIdAndMenuItemId(String customerId, String targetId, String menuItemId);
+
     boolean existsByCustomer_IdAndTargetId(String customerId, String targetId);
 }

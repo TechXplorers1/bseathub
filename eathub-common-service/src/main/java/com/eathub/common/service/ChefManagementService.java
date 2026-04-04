@@ -27,7 +27,6 @@ public class ChefManagementService {
     private final ChefLegalProfileRepository chefLegalProfileRepository;
 
     // ================= CHEF PROFILE =================
-
     public List<ChefResponseDTO> getAllChefs() {
         return chefRepository.findAllWithDetails().stream()
                 .map(this::mapToDTO)
@@ -39,13 +38,19 @@ public class ChefManagementService {
                 .map(this::mapToDTO)
                 .or(() -> chefRepository.findById(slug).map(this::mapToDTO))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Chef not found with slug or ID: " + slug));
+                "Chef not found with slug or ID: " + slug));
     }
 
     public ChefResponseDTO getChefById(String id) {
         return chefRepository.findById(id)
                 .map(this::mapToDTO)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found with id: " + id));
+    }
+
+    public ChefResponseDTO getChefByOwnerId(String ownerId) {
+        return chefRepository.findByOwnerId(ownerId)
+                .map(this::mapToDTO)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found for owner: " + ownerId));
     }
 
     public ChefResponseDTO registerChef(ChefRequestDTO dto) {
@@ -72,14 +77,22 @@ public class ChefManagementService {
         Chef chef = chefRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found"));
 
-        if (dto.getName() != null)
+        if (dto.getName() != null) {
             chef.setName(dto.getName());
-        if (dto.getBio() != null)
+            if (chef.getOwner() != null) {
+                chef.getOwner().setName(dto.getName());
+                userRepository.save(chef.getOwner());
+            }
+        }
+        if (dto.getBio() != null) {
             chef.setBio(dto.getBio());
-        if (dto.getExperience() != null)
+        }
+        if (dto.getExperience() != null) {
             chef.setExperience(dto.getExperience());
-        if (dto.getSpecialty() != null)
+        }
+        if (dto.getSpecialty() != null) {
             chef.setSpecialty(dto.getSpecialty());
+        }
         if (dto.getAvatarUrl() != null) {
             chef.setAvatarUrl(dto.getAvatarUrl());
             if (chef.getOwner() != null) {
@@ -87,22 +100,41 @@ public class ChefManagementService {
                 userRepository.save(chef.getOwner());
             }
         }
-        if (dto.getWorkingHours() != null)
+        if (dto.getWorkingHours() != null) {
             chef.setWorkingHours(dto.getWorkingHours());
-        if (dto.getCoverImageId() != null)
+        }
+        if (dto.getCoverImageId() != null) {
             chef.setCoverImageId(dto.getCoverImageId());
-        if (dto.getIsActive() != null)
+        }
+        if (dto.getIsActive() != null) {
             chef.setIsActive(dto.getIsActive());
+        }
 
         // Expansion
-        if (dto.getFullName() != null) chef.setFullName(dto.getFullName());
-        if (dto.getContactNumber() != null) chef.setContactNumber(dto.getContactNumber());
-        if (dto.getCountryCode() != null) chef.setCountryCode(dto.getCountryCode());
-        if (dto.getCuisines() != null) chef.setCuisines(dto.getCuisines());
-        if (dto.getDeliveryAvailability() != null) chef.setDeliveryAvailability(dto.getDeliveryAvailability());
-        if (dto.getBasePrice() != null) chef.setBasePrice(dto.getBasePrice());
-        if (dto.getWorkType() != null) chef.setWorkType(dto.getWorkType());
-        if (dto.getSocialLinks() != null) chef.setSocialLinks(dto.getSocialLinks());
+        if (dto.getFullName() != null) {
+            chef.setFullName(dto.getFullName());
+        }
+        if (dto.getContactNumber() != null) {
+            chef.setContactNumber(dto.getContactNumber());
+        }
+        if (dto.getCountryCode() != null) {
+            chef.setCountryCode(dto.getCountryCode());
+        }
+        if (dto.getCuisines() != null) {
+            chef.setCuisines(dto.getCuisines());
+        }
+        if (dto.getDeliveryAvailability() != null) {
+            chef.setDeliveryAvailability(dto.getDeliveryAvailability());
+        }
+        if (dto.getBasePrice() != null) {
+            chef.setBasePrice(dto.getBasePrice());
+        }
+        if (dto.getWorkType() != null) {
+            chef.setWorkType(dto.getWorkType());
+        }
+        if (dto.getSocialLinks() != null) {
+            chef.setSocialLinks(dto.getSocialLinks());
+        }
 
         // Update city if provided
         if (dto.getCity() != null) {
@@ -131,18 +163,33 @@ public class ChefManagementService {
         ChefAddress address = chefAddressRepository.findByChef_Id(id)
                 .orElseGet(() -> ChefAddress.builder().chef(chef).build());
 
-        if (dto.getAddressLine1() != null)
+        if (dto.getAddressLine1() != null) {
             address.setAddressLine1(dto.getAddressLine1());
-        if (dto.getAddressLine2() != null)
+        }
+        if (dto.getAddressLine2() != null) {
             address.setAddressLine2(dto.getAddressLine2());
-        if (dto.getCity() != null)
+        }
+
+        // Map houseNumber/streetName for UI compatibility if provided
+        if (dto.getHouseNumber() != null) {
+            address.setAddressLine1(dto.getHouseNumber());
+        }
+        if (dto.getStreetName() != null) {
+            address.setAddressLine2(dto.getStreetName());
+        }
+
+        if (dto.getCity() != null) {
             address.setCity(dto.getCity());
-        if (dto.getState() != null)
+        }
+        if (dto.getState() != null) {
             address.setState(dto.getState());
-        if (dto.getPostalCode() != null)
+        }
+        if (dto.getPostalCode() != null) {
             address.setPostalCode(dto.getPostalCode());
-        if (dto.getCountry() != null)
+        }
+        if (dto.getCountry() != null) {
             address.setCountry(dto.getCountry());
+        }
 
         chefAddressRepository.save(address);
         return mapToDTO(chef);
@@ -156,36 +203,50 @@ public class ChefManagementService {
         ChefLegalProfile legal = chefLegalProfileRepository.findByChef_Id(id)
                 .orElseGet(() -> ChefLegalProfile.builder().chef(chef).build());
 
-        if (dto.getLegalBusinessName() != null)
+        if (dto.getLegalBusinessName() != null) {
             legal.setLegalBusinessName(dto.getLegalBusinessName());
-        if (dto.getGstNumber() != null)
+        }
+        if (dto.getGstNumber() != null) {
             legal.setGstNumber(dto.getGstNumber());
-        if (dto.getPanNumber() != null)
+        }
+        if (dto.getPanNumber() != null) {
             legal.setPanNumber(dto.getPanNumber());
-        if (dto.getBankAccountHolderName() != null)
+        }
+        if (dto.getBankAccountHolderName() != null) {
             legal.setBankAccountHolderName(dto.getBankAccountHolderName());
-        if (dto.getBankAccountNumber() != null)
+        }
+        if (dto.getBankAccountNumber() != null) {
             legal.setBankAccountNumber(dto.getBankAccountNumber());
-        if (dto.getBankIFSC() != null)
+        }
+        if (dto.getBankIFSC() != null) {
             legal.setBankIFSC(dto.getBankIFSC());
-        if (dto.getBankName() != null)
+        }
+        if (dto.getBankName() != null) {
             legal.setBankName(dto.getBankName());
-        if (dto.getFoodSafetyCertUrl() != null)
+        }
+        if (dto.getFoodSafetyCertUrl() != null) {
             legal.setFoodSafetyCertUrl(dto.getFoodSafetyCertUrl());
-        if (dto.getCulinaryDiplomaUrl() != null)
+        }
+        if (dto.getCulinaryDiplomaUrl() != null) {
             legal.setCulinaryDiplomaUrl(dto.getCulinaryDiplomaUrl());
+        }
 
         // Expansion
-        if (dto.getIdProofType() != null) legal.setIdProofType(dto.getIdProofType());
-        if (dto.getIdProofNumber() != null) legal.setIdProofNumber(dto.getIdProofNumber());
-        if (dto.getIdProofUrl() != null) legal.setIdProofUrl(dto.getIdProofUrl());
+        if (dto.getIdProofType() != null) {
+            legal.setIdProofType(dto.getIdProofType());
+        }
+        if (dto.getIdProofNumber() != null) {
+            legal.setIdProofNumber(dto.getIdProofNumber());
+        }
+        if (dto.getIdProofUrl() != null) {
+            legal.setIdProofUrl(dto.getIdProofUrl());
+        }
 
         chefLegalProfileRepository.save(legal);
         return mapToDTO(chef);
     }
 
     // ================= CHEF SERVICES =================
-
     public List<ChefServiceResponseDTO> getChefServices(String chefId) {
         return chefServiceRepository.findByChef_Id(chefId).stream()
                 .map(this::mapToServiceDTO)
@@ -211,9 +272,9 @@ public class ChefManagementService {
                         }, Collectors.toList())))
                 .entrySet().stream()
                 .map(entry -> com.eathub.common.dto.MenuCategoryDTO.builder()
-                        .title(entry.getKey())
-                        .items(entry.getValue())
-                        .build())
+                .title(entry.getKey())
+                .items(entry.getValue())
+                .build())
                 .collect(Collectors.toList());
     }
 
@@ -248,10 +309,12 @@ public class ChefManagementService {
         service.setBasePrice(dto.getBasePrice());
         service.setCategory(dto.getCategory());
         service.setItemType(dto.getItemType());
-        if (dto.getIsSignature() != null)
+        if (dto.getIsSignature() != null) {
             service.setIsSignature(dto.getIsSignature());
-        if (dto.getIsNegotiable() != null)
+        }
+        if (dto.getIsNegotiable() != null) {
             service.setIsNegotiable(dto.getIsNegotiable());
+        }
         service.setImageId(dto.getImageId());
         service.setStatus(dto.getStatus());
 
@@ -264,7 +327,6 @@ public class ChefManagementService {
     }
 
     // ================= MAPPERS =================
-
     private ChefServiceResponseDTO mapToServiceDTO(com.eathub.common.entity.ChefService service) {
         return ChefServiceResponseDTO.builder()
                 .id(service.getId())
@@ -291,14 +353,17 @@ public class ChefManagementService {
         dto.setRating(chef.getRating());
         dto.setReviews(chef.getReviewsCount());
         dto.setSlug(chef.getSlug());
-        if (dto.getSpecialty() == null)
+        if (dto.getSpecialty() == null) {
             dto.setSpecialty(chef.getSpecialty() != null ? chef.getSpecialty() : "General");
+        }
         dto.setIsActive(chef.getIsActive());
         dto.setWorkingHours(chef.getWorkingHours());
 
         if (chef.getAddress() != null) {
             dto.setAddressLine1(chef.getAddress().getAddressLine1());
             dto.setAddressLine2(chef.getAddress().getAddressLine2());
+            dto.setHouseNumber(chef.getAddress().getAddressLine1()); // UI support
+            dto.setStreetName(chef.getAddress().getAddressLine2());  // UI support
             dto.setCity(chef.getAddress().getCity());
             dto.setState(chef.getAddress().getState());
             dto.setPostalCode(chef.getAddress().getPostalCode());

@@ -37,6 +37,13 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getReviewsForProvider(targetId, type));
     }
 
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<ReviewResponse>> getReviewsForOwner(
+            @PathVariable String ownerId,
+            @RequestParam String type) {
+        return ResponseEntity.ok(reviewService.getReviewsForOwner(ownerId, type));
+    }
+
     /**
      * GET /api/v1/reviews/customer/{customerId}
      * Get all reviews submitted by a customer.
@@ -53,14 +60,17 @@ public class ReviewController {
      */
     @GetMapping("/check")
     public ResponseEntity<Map<String, Boolean>> hasAlreadyReviewed(
-            @RequestParam String customerId,
-            @RequestParam String targetId,
-            @RequestParam(required = false) String menuItemId) {
+            @RequestParam(required = false) String customerId,
+            @RequestParam(required = false) String targetId,
+            @RequestParam(required = false) String menuItemId,
+            @RequestParam(required = false) String orderId) {
         
-        boolean reviewed;
-        if (menuItemId != null && !menuItemId.isBlank()) {
+        boolean reviewed = false;
+        if (orderId != null && !orderId.isBlank()) {
+            reviewed = reviewService.hasAlreadyReviewedByOrder(orderId);
+        } else if (menuItemId != null && !menuItemId.isBlank() && customerId != null && targetId != null) {
             reviewed = reviewService.hasAlreadyReviewed(customerId, targetId, menuItemId);
-        } else {
+        } else if (customerId != null && targetId != null) {
             reviewed = reviewService.hasAlreadyReviewed(customerId, targetId);
         }
         return ResponseEntity.ok(Map.of("reviewed", reviewed));
@@ -73,5 +83,14 @@ public class ReviewController {
     @GetMapping("/item/{itemId}")
     public ResponseEntity<List<ReviewResponse>> getReviewsByItem(@PathVariable String itemId) {
         return ResponseEntity.ok(reviewService.getReviewsByMenuItemId(itemId));
+    }
+
+    /**
+     * POST /api/v1/reviews/reply
+     * Provider replies to a review.
+     */
+    @PostMapping("/reply")
+    public ResponseEntity<ReviewResponse> addReply(@RequestBody ReplyRequest request) {
+        return ResponseEntity.ok(reviewService.addReply(request));
     }
 }

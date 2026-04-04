@@ -37,6 +37,11 @@ public class ChefController {
         return service.getChefById(id);
     }
 
+    @GetMapping("/owner/{ownerId}")
+    public ChefResponseDTO getByOwnerId(@PathVariable String ownerId) {
+        return service.getChefByOwnerId(ownerId);
+    }
+
     // ================= CHEF PROFILE UPDATES =================
 
     @PutMapping("/{id}/profile")

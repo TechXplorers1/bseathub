@@ -40,5 +40,16 @@ public class ReviewDTO {
         private String orderId;
         private String menuItemId;
         private String menuItemName;
+        private String reply;
+        private LocalDateTime repliedAt;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ReplyRequest {
+        private String reviewId;
+        private String reply;
     }
 }

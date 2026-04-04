@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private static final List<String> VALID_STATUSES = List.of(
-            "Pending Approval", "Approved", "Confirmed", "Preparing", "Out for Delivery", "Delivered", "Cancelled"
-    );
+            "Pending Approval", "Provider Confirmed", "Confirmed", "Preparing", "Preparation Completed",
+            "Out for Delivery", "Delivered", "Cancelled");
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
@@ -29,6 +29,7 @@ public class OrderService {
     private final HomeFoodProviderRepository homeFoodRepository;
     private final FirebaseService firebaseService;
     private final UserService userService;
+    private final OrderStatusHistoryRepository historyRepository;
 
     // ─── Create ─────────────────────────────────────────────────────────────
 
@@ -39,7 +40,8 @@ public class OrderService {
         }
 
         User customer = userRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found: " + request.getCustomerId()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Customer not found: " + request.getCustomerId()));
 
         Order order = Order.builder()
                 .customer(customer)
@@ -52,20 +54,22 @@ public class OrderService {
                 .discountAmount(request.getDiscountAmount())
                 .totalAmount(request.getTotalAmount())
                 .paymentMethod(request.getPaymentMethod())
-                .paymentStatus(request.getPaymentStatus() != null ? request.getPaymentStatus() : "Awaiting Payment")
+                .paymentStatus(request.getPaymentStatus() != null ? request.getPaymentStatus() : "Paid")
                 .orderNotes(request.getOrderNotes())
-                .currentStatusId("Pending Approval")
+                .currentStatusId("Confirmed")
                 .expectedDeliveryAt(LocalDateTime.now().plusMinutes(45)) // default ETA
                 .build();
 
         // ── Resolve Provider ────────────────────────────────────────────────
         if ("Restaurant".equalsIgnoreCase(request.getSourceType())) {
             Restaurant restaurant = restaurantRepository.findById(request.getSourceId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found: " + request.getSourceId()));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Restaurant not found: " + request.getSourceId()));
             order.setRestaurant(restaurant);
         } else if ("HomeFood".equalsIgnoreCase(request.getSourceType())) {
             HomeFoodProvider provider = homeFoodRepository.findById(request.getSourceId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "HomeFood provider not found: " + request.getSourceId()));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "HomeFood provider not found: " + request.getSourceId()));
             order.setHomeFoodProvider(provider);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -86,7 +90,13 @@ public class OrderService {
         order.setItems(items);
 
         Order savedOrder = orderRepository.save(order);
-        
+
+        // ── Record History ──────────────────────────────────────────────────
+        recordStatusHistory(savedOrder, "SYSTEM", "Order created");
+
+        // RE-FETCH to ensure eager items are present in the response
+        savedOrder = orderRepository.findById(savedOrder.getId()).orElse(savedOrder);
+
         // ── Send Notification to Provider ──────────────────────────────────
         try {
             User owner = null;
@@ -94,15 +104,17 @@ public class OrderService {
             if ("Restaurant".equalsIgnoreCase(savedOrder.getSourceType()) && savedOrder.getRestaurant() != null) {
                 owner = savedOrder.getRestaurant().getOwner();
                 brandName = savedOrder.getRestaurant().getName();
-            } else if ("HomeFood".equalsIgnoreCase(savedOrder.getSourceType()) && savedOrder.getHomeFoodProvider() != null) {
+            } else if ("HomeFood".equalsIgnoreCase(savedOrder.getSourceType())
+                    && savedOrder.getHomeFoodProvider() != null) {
                 owner = savedOrder.getHomeFoodProvider().getOwner();
                 brandName = savedOrder.getHomeFoodProvider().getBrandName();
             }
 
             if (owner != null && owner.getFcmToken() != null) {
                 String title = "New Order from " + savedOrder.getCustomer().getName();
-                String body = "You have a new " + savedOrder.getSourceType() + " order from " + brandName + " for ₹" + savedOrder.getTotalAmount();
-                
+                String body = "You have a new " + savedOrder.getSourceType() + " order from " + brandName + " for $"
+                        + savedOrder.getTotalAmount();
+
                 java.util.Map<String, String> data = new java.util.HashMap<>();
                 data.put("orderId", savedOrder.getId());
                 data.put("action", "NEW_ORDER");
@@ -154,22 +166,28 @@ public class OrderService {
         return orderRepository.findByHomeFoodProvider_IdOrderByOrderPlacedAtDesc(providerId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
+
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByPartner(String token) {
         User user = userService.getUserByToken(token);
-        
-        // Similarly check for restaurant...
+        System.out
+                .println("DEBUG: Fetching orders for partner user: " + user.getEmail() + " (ID: " + user.getId() + ")");
+
         Optional<Restaurant> restaurant = restaurantRepository.findByOwnerId(user.getId());
         if (restaurant.isPresent()) {
+            System.out.println("DEBUG: User is a Restaurant owner: " + restaurant.get().getName());
             return getOrdersByRestaurant(restaurant.get().getId());
         }
-        
+
         Optional<HomeFoodProvider> homefood = homeFoodRepository.findByOwnerId(user.getId());
         if (homefood.isPresent()) {
+            System.out.println("DEBUG: User is a HomeFood provider: " + homefood.get().getBrandName());
             return getOrdersByHomeFoodProvider(homefood.get().getId());
         }
-        
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No partner profile found for this user");
+
+        System.out.println("DEBUG: No partner profile (Restaurant/HomeFood) found for user ID: " + user.getId()
+                + " - returning empty orders list.");
+        return new ArrayList<>();
     }
 
     // ─── Status Update ────────────────────────────────────────────────────────
@@ -191,15 +209,19 @@ public class OrderService {
         order.setCurrentStatusId(status);
         Order updatedOrder = orderRepository.save(order);
 
-        // ── Send Notification to Customer on Approval ──────────────────────
-        if ("Approved".equals(status) && updatedOrder.getCustomer().getFcmToken() != null) {
+        // ── Record History ──────────────────────────────────────────────────
+        recordStatusHistory(updatedOrder, "PROVIDER", "Manual status update to " + status);
+
+        // ── Send Notification to Customer on Confirmation ──────────────────
+        if ("Provider Confirmed".equals(status) && updatedOrder.getCustomer().getFcmToken() != null) {
             try {
-                String title = "Order Approved! 🚀";
-                String body = "Good news! Your order from " + toResponse(updatedOrder).getSourceName() + " is approved. Please complete payment to confirm.";
-                
+                String title = "Order Confirmed by Provider! ✨";
+                String body = "Chef confirmed your order from " + toResponse(updatedOrder).getSourceName()
+                        + ". Please complete payment to start cooking!";
+
                 java.util.Map<String, String> data = new java.util.HashMap<>();
                 data.put("orderId", updatedOrder.getId());
-                data.put("action", "ORDER_APPROVED");
+                data.put("action", "ORDER_CONFIRMED");
                 data.put("total", updatedOrder.getTotalAmount().toString());
 
                 firebaseService.sendNotification(updatedOrder.getCustomer().getFcmToken(), title, body, data);
@@ -212,7 +234,7 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse cancelOrder(String orderId) {
+    public OrderResponse cancelOrder(String orderId, String reason, String cancelledBy) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found: " + orderId));
 
@@ -222,27 +244,52 @@ public class OrderService {
         if ("Cancelled".equals(order.getCurrentStatusId())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Order is already cancelled");
         }
-        if ("Out for Delivery".equals(order.getCurrentStatusId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot cancel an order that is already out for delivery");
-        }
 
         order.setCurrentStatusId("Cancelled");
-        return toResponse(orderRepository.save(order));
+        order.setCancellationReason(reason);
+        order.setCancelledBy(cancelledBy != null ? cancelledBy : "Customer");
+
+        Order savedOrder = orderRepository.save(order);
+        recordStatusHistory(savedOrder, cancelledBy != null ? cancelledBy : "SYSTEM", "Order cancelled: " + reason);
+        return toResponse(savedOrder);
     }
 
     @Transactional
     public OrderResponse updatePaymentStatus(String orderId, String paymentStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found: " + orderId));
-        
+
         order.setPaymentStatus(paymentStatus);
-        
+
         if ("Paid".equalsIgnoreCase(paymentStatus) || "Completed".equalsIgnoreCase(paymentStatus)) {
             order.setCurrentStatusId("Confirmed");
-            // Optional: Notify provider that payment is done and they can start preparing
+            // Notify Provider that payment is done!
+            try {
+                String ownerId = null;
+                if (order.getRestaurant() != null && order.getRestaurant().getOwner() != null) {
+                    ownerId = order.getRestaurant().getOwner().getId();
+                } else if (order.getHomeFoodProvider() != null && order.getHomeFoodProvider().getOwner() != null) {
+                    ownerId = order.getHomeFoodProvider().getOwner().getId();
+                }
+
+                if (ownerId != null) {
+                    userRepository.findById(ownerId).ifPresent(owner -> {
+                        if (owner.getFcmToken() != null) {
+                            String title = "New Paid Order! 💰";
+                            String body = "An order of $" + order.getTotalAmount()
+                                    + " was just paid. Please start preparation!";
+                            firebaseService.sendNotification(owner.getFcmToken(), title, body, null);
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to notify provider of payment: " + e.getMessage());
+            }
         }
-        
-        return toResponse(orderRepository.save(order));
+
+        Order savedOrder = orderRepository.save(order);
+        recordStatusHistory(savedOrder, "SYSTEM", "Payment status updated to " + paymentStatus);
+        return toResponse(savedOrder);
     }
 
     // ─── Mapper ───────────────────────────────────────────────────────────────
@@ -292,7 +339,24 @@ public class OrderService {
                 .paymentMethod(order.getPaymentMethod())
                 .paymentStatus(order.getPaymentStatus())
                 .orderNotes(order.getOrderNotes())
+                .cancellationReason(order.getCancellationReason())
+                .cancelledBy(order.getCancelledBy())
                 .items(itemResponses)
                 .build();
+    }
+
+    private void recordStatusHistory(Order order, String changedBy, String reason) {
+        try {
+            OrderStatusHistory history = OrderStatusHistory.builder()
+                    .orderId(order.getId())
+                    .statusId(order.getCurrentStatusId())
+                    .changedAt(LocalDateTime.now())
+                    .changedBy(changedBy)
+                    .reason(reason)
+                    .build();
+            historyRepository.save(history);
+        } catch (Exception e) {
+            System.err.println("Failed to record status history: " + e.getMessage());
+        }
     }
 }

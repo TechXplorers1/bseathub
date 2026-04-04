@@ -39,7 +39,8 @@ public class SecurityConfig {
                                 "/v1/users/**",
                                 "/v1/reviews/**",
                                 "/v1/orders/**",
-                                "/v1/payments/**")
+                                "/v1/payments/**",
+                                "/v1/chef-bookings/**")
                         .permitAll()
                         .anyRequest().authenticated());
 

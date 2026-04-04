@@ -33,6 +33,10 @@ public class Review {
     private String menuItemName; // For item-specific reviews
 
     private LocalDateTime createdAt;
+    
+    @Column(columnDefinition = "TEXT")
+    private String reply;
+    private LocalDateTime repliedAt;
 
     @PrePersist
     protected void onCreate() {

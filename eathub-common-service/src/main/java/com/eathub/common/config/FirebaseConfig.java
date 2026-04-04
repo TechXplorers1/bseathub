@@ -25,7 +25,8 @@ public class FirebaseConfig {
             }
         } catch (Exception e) {
             System.err.println("Firebase initialization error: " + e.getMessage());
-            // We don't throw exception or else the whole app won't start if the file is missing
+            // We don't throw exception or else the whole app won't start if the file is
+            // missing
         }
     }
 }

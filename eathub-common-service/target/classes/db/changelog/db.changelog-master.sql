@@ -516,3 +516,16 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(current_status_id);
 CREATE INDEX IF NOT EXISTS idx_orders_placed_at ON orders(order_placed_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+ 
+  -- changeset eathub:2.1.0
+  -- Make chef_bookings.service_id nullable for general inquiries
+  ALTER TABLE chef_bookings ALTER COLUMN service_id DROP NOT NULL;
+
+  -- changeset eathub:2.2.0
+  -- Add status_reason to chef_bookings for rejection messages
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS status_reason TEXT;
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS event_address TEXT;
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS notes TEXT;
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+  ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'Unpaid';

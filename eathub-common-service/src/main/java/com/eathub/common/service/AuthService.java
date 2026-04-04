@@ -88,7 +88,7 @@ public class AuthService {
                 res.setDeliveryRadius(5.0);
             }
             res.setIsOpen(true);
-            
+
             // Hours
             Map<String, String> hours = (Map<String, String>) data.get("operatingHours");
             if (hours != null) {
@@ -103,33 +103,33 @@ public class AuthService {
             // Address (only if some address info is provided)
             if (data.containsKey("city") || data.containsKey("street")) {
                 RestaurantAddress addr = RestaurantAddress.builder()
-                    .restaurant(savedRes)
-                    .country((String) data.getOrDefault("country", "India"))
-                    .state((String) data.get("state"))
-                    .city((String) data.get("city"))
-                    .postalCode((String) data.get("pincode"))
-                    .addressLine1((String) data.get("street"))
-                    .build();
+                        .restaurant(savedRes)
+                        .country((String) data.getOrDefault("country", "India"))
+                        .state((String) data.get("state"))
+                        .city((String) data.get("city"))
+                        .postalCode((String) data.get("pincode"))
+                        .addressLine1((String) data.get("street"))
+                        .build();
                 savedRes.setAddress(addr);
             }
 
             // Legal Profile (only if legal info is provided)
-            if (data.containsKey("panNumber") || data.containsKey("bankAccountNumber") || 
-                data.containsKey("fssaiLicenseNumber") || data.containsKey("legalBusinessName")) {
+            if (data.containsKey("panNumber") || data.containsKey("bankAccountNumber")
+                    || data.containsKey("fssaiLicenseNumber") || data.containsKey("legalBusinessName")) {
                 RestaurantLegalProfile lp = RestaurantLegalProfile.builder()
-                    .restaurant(savedRes)
-                    .legalBusinessName((String) data.get("legalBusinessName"))
-                    .gstNumber((String) data.get("gstNumber"))
-                    .panNumber((String) data.get("panNumber"))
-                    .fssaiLicenseNumber((String) data.get("fssaiLicenseNumber"))
-                    .fssaiDocumentUrl((String) data.get("fssaiDocument"))
-                    .businessType((String) data.get("businessType"))
-                    .bankAccountHolderName((String) data.get("bankAccountHolderName"))
-                    .bankAccountNumber((String) data.get("bankAccountNumber"))
-                    .bankIFSC((String) data.get("bankIFSC"))
-                    .bankName((String) data.get("bankName"))
-                    .build();
-                
+                        .restaurant(savedRes)
+                        .legalBusinessName((String) data.get("legalBusinessName"))
+                        .gstNumber((String) data.get("gstNumber"))
+                        .panNumber((String) data.get("panNumber"))
+                        .fssaiLicenseNumber((String) data.get("fssaiLicenseNumber"))
+                        .fssaiDocumentUrl((String) data.get("fssaiDocument"))
+                        .businessType((String) data.get("businessType"))
+                        .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                        .bankAccountNumber((String) data.get("bankAccountNumber"))
+                        .bankIFSC((String) data.get("bankIFSC"))
+                        .bankName((String) data.get("bankName"))
+                        .build();
+
                 String fssaiExpiry = (String) data.get("fssaiExpiryDate");
                 if (fssaiExpiry != null && !fssaiExpiry.isEmpty()) {
                     lp.setFssaiExpiryDate(java.time.LocalDate.parse(fssaiExpiry));
@@ -144,7 +144,7 @@ public class AuthService {
             hfp.setBrandName(displayName);
             hfp.setSlug(generateSlug(displayName));
             hfp.setIsActive(true);
-            
+
             Object cuisineTypes = data.get("cuisineTypes");
             if (cuisineTypes instanceof java.util.List) {
                 hfp.setFoodType(String.join(", ", (java.util.List<String>) cuisineTypes));
@@ -157,26 +157,26 @@ public class AuthService {
 
             // Address
             HomeFoodAddress addr = HomeFoodAddress.builder()
-                .homeFoodProvider(savedHfp)
-                .country((String) data.get("country"))
-                .state((String) data.get("state"))
-                .city((String) data.get("city"))
-                .postalCode((String) data.get("postalCode"))
-                .addressLine1((String) data.get("street"))
-                .build();
+                    .homeFoodProvider(savedHfp)
+                    .country((String) data.get("country"))
+                    .state((String) data.get("state"))
+                    .city((String) data.get("city"))
+                    .postalCode((String) data.get("postalCode"))
+                    .addressLine1((String) data.get("street"))
+                    .build();
             savedHfp.setAddress(addr);
 
             // Legal
             HomeFoodLegalProfile lp = HomeFoodLegalProfile.builder()
-                .homeFoodProvider(savedHfp)
-                .idProofType((String) data.get("idProofType"))
-                .idProofNumber((String) data.get("idProofNumber"))
-                .hygieneVerified((Boolean) data.get("hygieneVerified"))
-                .bankAccountHolderName((String) data.get("bankAccountHolderName"))
-                .bankAccountNumber((String) data.get("bankAccountNumber"))
-                .bankIFSC((String) data.get("bankIFSC"))
-                .bankName((String) data.get("bankName"))
-                .build();
+                    .homeFoodProvider(savedHfp)
+                    .idProofType((String) data.get("idProofType"))
+                    .idProofNumber((String) data.get("idProofNumber"))
+                    .hygieneVerified((Boolean) data.get("hygieneVerified"))
+                    .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                    .bankAccountNumber((String) data.get("bankAccountNumber"))
+                    .bankIFSC((String) data.get("bankIFSC"))
+                    .bankName((String) data.get("bankName"))
+                    .build();
             savedHfp.setLegalProfile(lp);
             homeFoodRepository.save(savedHfp);
 
@@ -187,12 +187,12 @@ public class AuthService {
             chef.setSlug(generateSlug(displayName));
             chef.setExperience((String) data.get("experience"));
             chef.setIsActive(true);
-            
+
             Object specialtyCuisines = data.get("specialtyCuisines");
             if (specialtyCuisines instanceof java.util.List) {
                 chef.setSpecialty(String.join(", ", (java.util.List<String>) specialtyCuisines));
             }
-            
+
             Object workType = data.get("workType");
             if (workType instanceof java.util.List) {
                 chef.setWorkType(String.join(", ", (java.util.List<String>) workType));
@@ -211,21 +211,21 @@ public class AuthService {
 
             // Address
             ChefAddress addr = ChefAddress.builder()
-                .chef(savedChef)
-                .city((String) data.get("currentCity"))
-                .build();
+                    .chef(savedChef)
+                    .city((String) data.get("currentCity"))
+                    .build();
             savedChef.setAddress(addr);
 
             // Legal
             ChefLegalProfile lp = ChefLegalProfile.builder()
-                .chef(savedChef)
-                .idProofType((String) data.get("idProofType"))
-                .idProofNumber((String) data.get("idProofNumber"))
-                .bankAccountHolderName((String) data.get("bankAccountHolderName"))
-                .bankAccountNumber((String) data.get("bankAccountNumber"))
-                .bankIFSC((String) data.get("bankIFSC"))
-                .bankName((String) data.get("bankName"))
-                .build();
+                    .chef(savedChef)
+                    .idProofType((String) data.get("idProofType"))
+                    .idProofNumber((String) data.get("idProofNumber"))
+                    .bankAccountHolderName((String) data.get("bankAccountHolderName"))
+                    .bankAccountNumber((String) data.get("bankAccountNumber"))
+                    .bankIFSC((String) data.get("bankIFSC"))
+                    .bankName((String) data.get("bankName"))
+                    .build();
             savedChef.setLegalProfile(lp);
             chefRepository.save(savedChef);
         }
@@ -235,8 +235,9 @@ public class AuthService {
     }
 
     private String generateSlug(String name) {
-        if (name == null)
+        if (name == null) {
             name = "partner";
+        }
         return name.toLowerCase().replaceAll("[^a-z0-9]", "-") + "-" + UUID.randomUUID().toString().substring(0, 5);
     }
 
@@ -281,7 +282,7 @@ public class AuthService {
                 .role(UserRole.USER)
                 .avatarUrl(null)
                 .build();
-        
+
         User savedUser = userRepository.save(user);
 
         UserProfile profile = UserProfile.builder()
@@ -295,7 +296,7 @@ public class AuthService {
                 .state(request.getState())
                 .country(request.getCountry())
                 .build();
-        
+
         userProfileRepository.save(profile);
 
         return new AuthResponse(jwtService.generateToken(savedUser), savedUser.getEmail(), savedUser.getRole().name(),

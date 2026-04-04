@@ -14,18 +14,18 @@ import java.util.List;
  *
  * Base URL (via context-path): /api/v1/orders
  *
- * POST   /                              – place a new order
- * GET    /customer/{customerId}         – customer order history
- * GET    /{orderId}                     – order detail
- * PATCH  /{orderId}/status              – update status (provider / admin)
- * POST   /{orderId}/cancel              – cancel an order
- * GET    /restaurant/{restaurantId}     – orders for a restaurant dashboard
- * GET    /home-food/{providerId}        – orders for a home food provider dashboard
+ * POST / – place a new order
+ * GET /customer/{customerId} – customer order history
+ * GET /{orderId} – order detail
+ * PATCH /{orderId}/status – update status (provider / admin)
+ * POST /{orderId}/cancel – cancel an order
+ * GET /restaurant/{restaurantId} – orders for a restaurant dashboard
+ * GET /home-food/{providerId} – orders for a home food provider dashboard
  */
 @RestController
 @RequestMapping("/v1/orders")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:9004", "http://localhost:3000"})
+@CrossOrigin(origins = { "http://localhost:9004", "http://localhost:3000" })
 public class OrderController {
 
     private final OrderService orderService;
@@ -49,8 +49,11 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/cancel")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable String orderId) {
-        return ResponseEntity.ok(orderService.cancelOrder(orderId));
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @PathVariable String orderId,
+            @RequestParam(required = false, defaultValue = "User cancelled") String reason,
+            @RequestParam(required = false) String cancelledBy) {
+        return ResponseEntity.ok(orderService.cancelOrder(orderId, reason, cancelledBy));
     }
 
     @GetMapping("/mine")

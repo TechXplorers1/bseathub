@@ -22,6 +22,8 @@ public class ChefResponseDTO {
     // Expand address fields
     private String addressLine1;
     private String addressLine2;
+    private String houseNumber;
+    private String streetName;
     private String city;
     private String state;
     private String postalCode;

@@ -16,4 +16,6 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     boolean existsByCustomer_IdAndTargetIdAndMenuItemId(String customerId, String targetId, String menuItemId);
 
     boolean existsByCustomer_IdAndTargetId(String customerId, String targetId);
+
+    boolean existsByOrderId(String orderId);
 }

@@ -78,6 +78,12 @@ public class Order {
     @Column(name = "order_notes", columnDefinition = "TEXT")
     private String orderNotes;
 
+    @Column(name = "cancellation_reason", columnDefinition = "TEXT")
+    private String cancellationReason;
+
+    @Column(name = "cancelled_by")
+    private String cancelledBy; // "Customer", "Restaurant", "HomeFood"
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<OrderItem> items;
 

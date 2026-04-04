@@ -1,7 +1,7 @@
 
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import type { MenuItem as MenuItemType } from '@/lib/types';
+import type { Restaurant, MenuItem as MenuItemType } from '@/lib/types';
 import Image from 'next/image';
 import { getImageById } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
@@ -11,25 +11,15 @@ import { Badge } from '../ui/badge';
 
 interface SignatureDishesProps {
     items: MenuItemType[];
+    restaurant?: Restaurant;
 }
 
-export function SignatureDishes({ items }: SignatureDishesProps) {
+export function SignatureDishes({ items, restaurant }: SignatureDishesProps) {
     const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);
 
     if (!items || items.length === 0) return null;
     
-    // Fill up to 5 items with placeholders if needed to keep the grid layout consistent
     const displayItems = [...items];
-    while (displayItems.length < 5) {
-        displayItems.push({
-            id: `placeholder-${displayItems.length}`,
-            name: 'Specialty Dish',
-            description: 'A culinary masterpiece prepared by our expert chef.',
-            price: 0,
-            imageId: 'food-1'
-        });
-    }
-
     const [dish1, dish2, dish3, dish4, dish5] = displayItems;
 
     const handleItemClick = (item: MenuItemType) => {
@@ -37,9 +27,16 @@ export function SignatureDishes({ items }: SignatureDishesProps) {
     };
 
 
-    const renderImageWithOverlay = (dish: MenuItemType, className?: string) => {
+    const renderImageWithOverlay = (dish: MenuItemType | undefined, className?: string) => {
+        if (!dish || !dish.id) {
+            return (
+                <div className={cn("rounded-lg bg-muted/30 border-2 border-dashed border-muted flex items-center justify-center", className)}>
+                    <span className="text-muted-foreground/30 text-[10px] font-bold uppercase tracking-widest italic">Optional Dish</span>
+                </div>
+            );
+        }
         // Handle both placeholder IDs and direct URLs/Base64
-        const placeholder = getImageById(dish.imageId);
+        const placeholder = dish.imageId ? getImageById(dish.imageId) : null;
         const imageSrc = placeholder ? placeholder.imageUrl : (dish.imageId || '/placeholder-food.jpg');
         
         return (
@@ -48,6 +45,7 @@ export function SignatureDishes({ items }: SignatureDishesProps) {
                     src={imageSrc}
                     alt={dish.name}
                     fill
+                    priority={className?.includes('col-span-2')}
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/70 transition-colors flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100">
@@ -80,6 +78,7 @@ export function SignatureDishes({ items }: SignatureDishesProps) {
      {selectedItem && (
         <MenuItemDialog
             item={selectedItem}
+            restaurant={restaurant as any}
             open={!!selectedItem}
             onOpenChange={(open) => {
                 if (!open) {

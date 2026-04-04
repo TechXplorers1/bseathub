@@ -42,7 +42,7 @@ export function MenuItem({ item, onClick }: MenuItemProps) {
                 )} />
               )}
             </div>
-            
+
             <div className="flex gap-2 mt-1 flex-wrap">
               {item.itemType && (
                 <Badge variant="outline" className="text-[10px] h-5">
@@ -55,9 +55,9 @@ export function MenuItem({ item, onClick }: MenuItemProps) {
                 </Badge>
               )}
             </div>
-            
+
             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
-            <p className="font-bold mt-2 text-primary">₹ {item.price}</p>
+            <p className="font-bold mt-2 text-primary">$ {item.price}</p>
           </div>
 
         </div>

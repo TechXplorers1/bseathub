@@ -12,7 +12,7 @@ import { DeliveryModeProvider } from '@/context/DeliveryModeProvider';
 import { RestaurantProvider } from '@/context/RestaurantProvider';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { RatingFilterProvider } from '@/context/RatingFilterProvider';
-import { FirebaseClientProvider } from '@/firebase';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 const inter = Inter({
   subsets: ['latin'],

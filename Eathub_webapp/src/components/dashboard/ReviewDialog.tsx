@@ -62,6 +62,7 @@ export function ReviewDialog({
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [reviewedItemIds, setReviewedItemIds] = useState<Set<string>>(new Set());
     const [error, setError] = useState('');
 
     const getCustomerId = () => {
@@ -94,7 +95,24 @@ export function ReviewDialog({
             return;
         }
 
-        setChecking(false);
+        const checkStatus = async () => {
+            setChecking(true);
+            const reviewed = new Set<string>();
+            try {
+                const checkPromises = orderedItems.map(async (item) => {
+                    const isReviewed = await checkAlreadyReviewed(customerId, targetId, item.id);
+                    if (isReviewed) reviewed.add(item.id);
+                });
+                await Promise.all(checkPromises);
+                setReviewedItemIds(reviewed);
+            } catch (err) {
+                console.error("Failed to check review status", err);
+            } finally {
+                setChecking(false);
+            }
+        };
+
+        checkStatus();
     }, [isOpen, orderedItems]);
 
     const starLabels = ['Poor 😞', 'Fair 😐', 'Good 🙂', 'Great 😊', 'Excellent 🤩'];
@@ -178,7 +196,11 @@ export function ReviewDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden rounded-2xl border-0 shadow-2xl max-h-[90vh] flex flex-col">
+            <DialogContent
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+                className="sm:max-w-[550px] p-0 overflow-hidden rounded-2xl border-0 shadow-2xl max-h-[90vh] flex flex-col"
+            >
 
                 {/* ── Gradient header ── */}
                 <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-rose-600 px-6 pt-6 pb-6 text-white shrink-0">
@@ -195,10 +217,10 @@ export function ReviewDialog({
 
                     {!submitted && orderTotal !== undefined && (
                         <div className="mt-4 bg-white/15 rounded-xl px-4 py-2 flex justify-between items-center border border-white/20">
-                             <div className="flex gap-2 items-center text-sm font-semibold text-white">
+                            <div className="flex gap-2 items-center text-sm font-semibold text-white">
                                 <ShoppingBag className="w-4 h-4" /> Order Total
-                             </div>
-                             <span className="font-bold text-white">₹{orderTotal.toFixed(2)}</span>
+                            </div>
+                            <span className="font-bold text-white">${orderTotal.toFixed(2)}</span>
                         </div>
                     )}
                 </div>
@@ -236,24 +258,36 @@ export function ReviewDialog({
                                 orderedItems.map((item, idx) => {
                                     const state = itemReviews[item.id] || { rating: 0, hover: 0, comment: '' };
                                     const activeItemRating = state.hover || state.rating;
+                                    const isAlreadyReviewed = reviewedItemIds.has(item.id);
 
                                     return (
-                                        <div key={item.id} className="bg-slate-50 border border-slate-100 p-4 rounded-xl space-y-3">
-                                            <div className="flex items-center gap-2 font-bold text-slate-800">
-                                                <Utensils className="w-4 h-4 text-orange-500" />
-                                                <span>{item.name}</span>
+                                        <div key={item.id} className={cn(
+                                            "border p-4 rounded-xl space-y-3 transition-opacity",
+                                            isAlreadyReviewed ? "bg-slate-50 opacity-60 border-slate-200" : "bg-slate-50 border-slate-100"
+                                        )}>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2 font-bold text-slate-800">
+                                                    <Utensils className="w-4 h-4 text-orange-500" />
+                                                    <span>{item.name}</span>
+                                                </div>
+                                                {isAlreadyReviewed && (
+                                                    <span className="text-[10px] font-black text-green-600 uppercase flex items-center gap-1">
+                                                        <CheckCircle2 className="w-3 h-3" /> Already Reviewed
+                                                    </span>
+                                                )}
                                             </div>
 
                                             {/* Stars for Item */}
-                                            <div className="flex items-center gap-3">
+                                            <div className={cn("flex items-center gap-3", isAlreadyReviewed && "pointer-events-none")}>
                                                 <div className="flex gap-1.5">
                                                     {[1, 2, 3, 4, 5].map((star) => (
                                                         <button
                                                             key={star}
                                                             type="button"
-                                                            onMouseEnter={() => updateItemReview(item.id, 'hover', star)}
-                                                            onMouseLeave={() => updateItemReview(item.id, 'hover', 0)}
-                                                            onClick={() => updateItemReview(item.id, 'rating', star)}
+                                                            disabled={isAlreadyReviewed}
+                                                            onMouseEnter={() => !isAlreadyReviewed && updateItemReview(item.id, 'hover', star)}
+                                                            onMouseLeave={() => !isAlreadyReviewed && updateItemReview(item.id, 'hover', 0)}
+                                                            onClick={() => !isAlreadyReviewed && updateItemReview(item.id, 'rating', star)}
                                                             className="transition-transform hover:scale-110 focus:outline-none"
                                                         >
                                                             <Star
@@ -268,14 +302,14 @@ export function ReviewDialog({
                                                     ))}
                                                 </div>
                                                 {activeItemRating > 0 && (
-                                                     <span className="text-xs font-semibold text-orange-600">
-                                                         {starLabels[activeItemRating - 1]}
-                                                     </span>
+                                                    <span className="text-xs font-semibold text-orange-600">
+                                                        {starLabels[activeItemRating - 1]}
+                                                    </span>
                                                 )}
                                             </div>
 
                                             {/* Optional Comment for Item */}
-                                            {state.rating > 0 && (
+                                            {!isAlreadyReviewed && state.rating > 0 && (
                                                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                                     <Textarea
                                                         placeholder={`Any comments specifically for ${item.name}? (optional)`}
@@ -293,7 +327,7 @@ export function ReviewDialog({
                             ) : (
                                 // Provider-Level Review (Fallback)
                                 <div className="space-y-4">
-                                     <div className="flex flex-col items-center gap-2">
+                                    <div className="flex flex-col items-center gap-2">
                                         <p className="text-sm font-semibold text-gray-700">Rate your overall experience</p>
                                         <div className="flex gap-2">
                                             {[1, 2, 3, 4, 5].map((star) => (

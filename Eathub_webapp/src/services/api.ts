@@ -241,7 +241,7 @@ export const fetchChefById = async (id: string) => {
     return res.json();
 };
 
-export const updateGenericProfile = async (payload: any) => {
+export const updateProfile = async (payload: any) => {
     const res = await fetch(`${BASE_URL}/users/profile`, {
         method: 'PUT',
         headers: {
@@ -320,13 +320,13 @@ export const updateRestaurantLegal = async (restaurantId: string, payload: any) 
 
 /* ================= HOME FOOD PROFILE SETTINGS ================= */
 
-export const fetchHomeFoodProfileDetail = async (id: string) => {
+export const fetchHomeFoodProfile = async (id: string) => {
     const res = await fetch(`${BASE_URL}/home-food/${id}`);
     if (!res.ok) throw new Error("Failed to fetch home food profile");
     return res.json();
 };
 
-export const updateHomeFoodProfileDetail = async (id: string, payload: any) => {
+export const updateHomeFoodProfile = async (id: string, payload: any) => {
     const res = await fetch(`${BASE_URL}/home-food/${id}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -367,13 +367,19 @@ export const updateHomeFoodLegal = async (id: string, payload: any) => {
 
 /* ================= CHEF PROFILE SETTINGS ================= */
 
-export const fetchChefProfileDetail = async (id: string): Promise<any> => {
+export const fetchChefProfile = async (id: string): Promise<any> => {
     const response = await fetch(`${BASE_URL}/chefs/${id}`);
     if (!response.ok) throw new Error('Failed to fetch chef profile');
     return response.json();
 };
 
-export const updateChefProfileDetail = async (id: string, data: any): Promise<any> => {
+export const fetchChefProfileByOwner = async (ownerId: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/chefs/owner/${ownerId}`);
+    if (!response.ok) throw new Error('Failed to fetch chef profile by owner');
+    return response.json();
+};
+
+export const updateChefProfile = async (id: string, data: any): Promise<any> => {
     const response = await fetch(`${BASE_URL}/chefs/${id}/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -433,7 +439,7 @@ export const verifyOtp = async (email: string, otp: string) => {
 
 /* ================= REVIEWS ================= */
 
-import type { OrderRequest, OrderResponse, ReviewRequest, ReviewResponse } from '@/lib/types';
+import type { OrderRequest, OrderResponse, ReviewRequest, ReviewResponse, ChefBooking } from '@/lib/types';
 
 export const createOrder = async (payload: OrderRequest): Promise<OrderResponse> => {
     const res = await fetch(`${BASE_URL}/orders`, {
@@ -445,6 +451,76 @@ export const createOrder = async (payload: OrderRequest): Promise<OrderResponse>
         const error = await res.json();
         throw new Error(error.message || "Failed to place order");
     }
+    return res.json();
+};
+
+/* ================= CHEF BOOKINGS ================= */
+
+export const fetchCustomerBookings = async (customerId: string): Promise<ChefBooking[]> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/customer/${customerId}`);
+    if (!res.ok) throw new Error("Failed to fetch customer bookings");
+    return res.json();
+};
+
+export const createChefBooking = async (payload: ChefBooking): Promise<ChefBooking> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("Failed to create chef booking");
+    return res.json();
+};
+
+export const fetchChefBookings = async (chefId: string): Promise<ChefBooking[]> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/chef/${chefId}`);
+    if (!res.ok) throw new Error("Failed to fetch chef bookings");
+    return res.json();
+};
+
+export const fetchChefBookingsByOwner = async (ownerId: string): Promise<ChefBooking[]> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/owner/${ownerId}`);
+    if (!res.ok) throw new Error("Failed to fetch chef bookings");
+    return res.json();
+};
+
+export const fetchChefEarnings = async (chefId: string): Promise<number> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/chef/${chefId}/earnings`);
+    if (!res.ok) throw new Error("Failed to fetch chef earnings");
+    const data = await res.json();
+    return data.earnings || 0;
+};
+
+export const fetchReviewsForProvider = async (targetId: string, type: 'Restaurant' | 'HomeFood' | 'Chef'): Promise<any[]> => {
+    const res = await fetch(`${BASE_URL}/reviews/provider/${targetId}?type=${type}`);
+    if (!res.ok) throw new Error("Failed to fetch reviews");
+    return res.json();
+};
+
+export const fetchChefEarningsByOwner = async (ownerId: string): Promise<number> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/owner/${ownerId}/earnings`);
+    if (!res.ok) throw new Error("Failed to fetch chef earnings");
+    const data = await res.json();
+    return data.earnings || 0;
+};
+
+export const updateBookingStatus = async (bookingId: string, status: string, reason?: string): Promise<ChefBooking> => {
+    let url = `${BASE_URL}/chef-bookings/${bookingId}/status?status=${status}`;
+    if (reason) {
+        url += `&reason=${encodeURIComponent(reason)}`;
+    }
+    const res = await fetch(url, {
+        method: 'PATCH',
+    });
+    if (!res.ok) throw new Error("Failed to update booking status");
+    return res.json();
+};
+
+export const updateBookingPaymentStatus = async (bookingId: string, paymentStatus: string): Promise<ChefBooking> => {
+    const res = await fetch(`${BASE_URL}/chef-bookings/${bookingId}/payment?paymentStatus=${paymentStatus}`, {
+        method: 'PATCH',
+    });
+    if (!res.ok) throw new Error("Failed to update booking payment status");
     return res.json();
 };
 
@@ -466,8 +542,12 @@ export const fetchOrdersByRestaurant = async (restaurantId: string): Promise<Ord
     return res.json();
 };
 
-export const cancelOrder = async (orderId: string): Promise<OrderResponse> => {
-    const res = await fetch(`${BASE_URL}/orders/${orderId}/cancel`, {
+export const cancelOrder = async (orderId: string, reason?: string, cancelledBy?: string): Promise<OrderResponse> => {
+    let url = `${BASE_URL}/orders/${orderId}/cancel?`;
+    if (reason) url += `reason=${encodeURIComponent(reason)}&`;
+    if (cancelledBy) url += `cancelledBy=${encodeURIComponent(cancelledBy)}`;
+    
+    const res = await fetch(url, {
         method: 'POST',
     });
     if (!res.ok) throw new Error("Failed to cancel order");
@@ -496,6 +576,12 @@ export const getReviewsForProvider = async (
     return res.json();
 };
 
+export const getReviewsForOwner = async (ownerId: string, type: string): Promise<ReviewResponse[]> => {
+    const res = await fetch(`${BASE_URL}/reviews/owner/${ownerId}?type=${type}`);
+    if (!res.ok) throw new Error("Failed to fetch reviews");
+    return res.json();
+};
+
 export const getReviewsByCustomer = async (customerId: string): Promise<ReviewResponse[]> => {
     const res = await fetch(`${BASE_URL}/reviews/customer/${customerId}`);
     if (!res.ok) throw new Error('Failed to fetch customer reviews');
@@ -504,9 +590,18 @@ export const getReviewsByCustomer = async (customerId: string): Promise<ReviewRe
 
 export const checkAlreadyReviewed = async (
     customerId: string,
-    targetId: string
+    targetId: string,
+    menuItemId?: string,
+    orderId?: string
 ): Promise<boolean> => {
-    const res = await fetch(`${BASE_URL}/reviews/check?customerId=${customerId}&targetId=${targetId}`);
+    let url = `${BASE_URL}/reviews/check?`;
+    if (orderId) url += `orderId=${orderId}`;
+    else {
+        url += `customerId=${customerId}&targetId=${targetId}`;
+        if (menuItemId) url += `&menuItemId=${menuItemId}`;
+    }
+    
+    const res = await fetch(url);
     if (!res.ok) return false;
     const data = await res.json();
     return data.reviewed ?? false;
@@ -567,5 +662,14 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
         method: 'PATCH',
     });
     if (!res.ok) throw new Error("Failed to update status");
+    return res.json();
+};
+export const replyToReview = async (reviewId: string, reply: string): Promise<ReviewResponse> => {
+    const res = await fetch(`${BASE_URL}/reviews/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviewId, reply }),
+    });
+    if (!res.ok) throw new Error("Failed to reply to review");
     return res.json();
 };

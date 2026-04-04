@@ -2,12 +2,11 @@
 import { useEffect, useState } from 'react';
 import {
   DollarSign,
-  Users,
-  CreditCard,
-  Activity,
   ShoppingCart,
   Star,
   Clock,
+  Loader2,
+  RefreshCcw,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -26,141 +26,205 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { StatCard } from '@/components/dashboard/home-food/StatCard';
-import { overviewStats, recentOrders } from '@/lib/home-food-dashboard-data';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { fetchMyOrders, getReviewsForProvider } from '@/services/api';
+import type { OrderResponse, ReviewResponse } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { StatCard } from '@/components/dashboard/home-food/StatCard';
 
 export default function HomeFoodDashboardPage() {
-  const [userName, setUserName] = useState('User');
+  const [displayName, setDisplayName] = useState('User');
+  const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const name = localStorage.getItem('userName');
-    if (name) setUserName(name);
+    if (name) setDisplayName(name);
+
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const [ordersData, reviewsData] = await Promise.all([
+          fetchMyOrders(),
+          getReviewsForProvider(localStorage.getItem('homeFoodId') || '', 'HomeFood').catch(() => [])
+        ]);
+        setOrders(ordersData);
+        setReviews(reviewsData);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
+  const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const pendingOrdersCount = orders.filter(o => ['Confirmed', 'Preparing', 'Preparation Completed'].includes(o.currentStatusId)).length;
+  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+
   return (
-    <>
+    <div className="space-y-8 animate-in fade-in duration-1000">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Welcome back, {userName}!</h1>
-          <p className="text-muted-foreground">Here's a quick look at your kitchen's performance.</p>
+          <h1 className="text-4xl font-black tracking-tight">
+            Kitchen Dashboard
+          </h1>
+          <p className="text-muted-foreground font-medium">
+            Welcome back, {displayName}! Your community is hungry.
+          </p>
         </div>
       </div>
+
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <StatCard
-          title="Total Revenue"
-          value={`$${overviewStats.totalRevenue.toLocaleString()}`}
+          title="Kitchen Revenue"
+          value={`${totalRevenue.toLocaleString()}`}
           icon={DollarSign}
-          description="+20.1% from last month"
+          description="Life-time earnings"
         />
         <StatCard
-          title="Total Orders"
-          value={`+${overviewStats.totalOrders}`}
+          title="Home Orders"
+          value={`${orders.length}`}
           icon={ShoppingCart}
-          description="+180.1% from last month"
+          description="Community served"
         />
         <StatCard
-          title="Pending Orders"
-          value={overviewStats.pendingOrders}
+          title="Active Pots"
+          value={`${pendingOrdersCount}`}
           icon={Clock}
-          description="Orders needing your attention"
+          description="Currently cooking"
         />
         <StatCard
-          title="Avg. Rating"
-          value={overviewStats.avgRating.toFixed(1)}
+          title="Kitchen Rating"
+          value={avgRating.toFixed(1)}
           icon={Star}
-          description="Based on 150 reviews"
+          description={`Based on ${reviews.length} notes`}
         />
       </div>
+
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHeader className="flex flex-row items-center">
-            <div className="grid gap-2">
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>
-                A summary of your most recent orders.
+        <Card className="xl:col-span-2 border-none shadow-2xl bg-card/60 backdrop-blur-md overflow-hidden">
+          <CardHeader className="flex flex-row items-center bg-muted/30 border-b border-border/50">
+            <div className="grid gap-1">
+              <CardTitle className="text-xl font-bold">Kitchen Feed</CardTitle>
+              <CardDescription className="font-medium text-muted-foreground/80">
+                Recent household orders.
               </CardDescription>
             </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
+            <Button asChild size="sm" className="ml-auto gap-2 rounded-full font-bold">
               <Link href="/home-food-dashboard/orders">
-                View All
+                Check All
               </Link>
             </Button>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="hidden sm:table-cell">Status</TableHead>
-                  <TableHead className="hidden sm:table-cell">Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="hidden h-9 w-9 sm:flex">
-                          <AvatarImage src={order.customer.avatarUrl} alt="Avatar" />
-                          <AvatarFallback>{order.customer.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{order.customer.name}</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">
-                            {order.customer.email}
+
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 gap-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <p className="text-muted-foreground font-bold animate-pulse text-sm">Organizing kitchen...</p>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="py-24 text-center">
+                <p className="text-muted-foreground font-black">No orders yet</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="font-black px-6 py-4">Neighbor</TableHead>
+                    <TableHead className="text-right font-black py-4">Total</TableHead>
+                    <TableHead className="hidden sm:table-cell font-black py-4">Status</TableHead>
+                    <TableHead className="hidden sm:table-cell text-right font-black px-6 py-4">Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {orders.slice(0, 5).map((order) => (
+                    <TableRow key={order.id} className="hover:bg-muted/30 transition-colors border-border/50">
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10 border border-primary/10 shadow-sm">
+                            <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${order.customerName}`} alt="Avatar" />
+                            <AvatarFallback>{order.customerName.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-black text-sm">{order.customerName}</div>
+                            <div className="text-[10px] font-bold text-muted-foreground uppercase">{order.id.slice(0, 8)}</div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Badge variant={order.status === 'Completed' ? 'default' : order.status === 'Cancelled' ? 'destructive' : 'secondary'}>{order.status}</Badge>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">{order.date}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      </TableCell>
+                      <TableCell className="text-right font-black text-primary">${order.totalAmount.toFixed(2)}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge
+                          variant="secondary"
+                          className="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-tight"
+                        >
+                          {order.currentStatusId}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell text-right text-xs font-bold text-muted-foreground px-6 py-4">
+                        {new Date(order.orderPlacedAt).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Feedback</CardTitle>
-            <CardDescription>
-              Latest reviews from your customers.
+
+        <Card className="border-none shadow-2xl bg-card/60 backdrop-blur-md overflow-hidden">
+          <CardHeader className="bg-muted/30 border-b border-border/50">
+            <CardTitle className="text-xl font-bold">Community Love</CardTitle>
+            <CardDescription className="font-medium text-muted-foreground/80">
+              Recent heartwarming notes.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-8">
-            <div className="flex items-start gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Avatar" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">Jane Doe</p>
-                <p className="text-sm text-muted-foreground">
-                  "The lasagna was absolutely divine! Tasted just like my grandma's."
-                </p>
+
+          <CardContent className="p-6">
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+            ) : reviews.length === 0 ? (
+              <p className="text-center text-muted-foreground py-10 font-bold">No community notes yet</p>
+            ) : (
+              <div className="grid gap-8">
+                {reviews.slice(0, 3).map(review => (
+                  <div key={review.id} className="flex items-start gap-4 animate-in slide-in-from-right duration-500">
+                    <Avatar className="h-10 w-10 shrink-0 border border-primary/10">
+                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.customerName}`} alt="Avatar" />
+                      <AvatarFallback>{review.customerName.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="grid gap-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-black leading-none">{review.customerName}</p>
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star key={i} className={cn("w-2.5 h-2.5", i < review.rating ? "fill-yellow-500 text-yellow-500" : "text-gray-200")} />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground italic line-clamp-2">
+                        "{review.comment}"
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704e" alt="Avatar" />
-                <AvatarFallback>JS</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">John Smith</p>
-                <p className="text-sm text-muted-foreground">
-                  "Delicious dumplings, will be ordering again very soon!"
-                </p>
-              </div>
-            </div>
+            )}
           </CardContent>
+          {reviews.length > 3 && (
+            <CardFooter className="bg-muted/10 border-t border-border/50 p-4">
+              <Button variant="ghost" asChild className="w-full text-xs font-bold gap-2">
+                <Link href="/home-food-dashboard/feedback">View All Community Voice</Link>
+              </Button>
+            </CardFooter>
+          )}
         </Card>
       </div>
-    </>
+    </div>
   );
 }

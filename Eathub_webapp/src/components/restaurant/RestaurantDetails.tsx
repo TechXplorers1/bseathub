@@ -22,6 +22,7 @@ import { Search, ChevronDown } from 'lucide-react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { getTodayOpeningTime } from '@/lib/hours-utils';
 
 type CategoryFilterKey = string; // Now dynamic
 
@@ -229,9 +230,15 @@ export function RestaurantDetails({
                 <ChefGallery />
               </div>
               <Separator className="my-4 md:my-5" />
-              <ReviewsSection />
+              <ReviewsSection 
+                targetId={restaurant.id}
+                type="Chef"
+              />
               <Separator className="my-4 md:my-5" />
-              <BookChef chefName={chefName} />
+              <BookChef 
+                chefName={chefName} 
+                chefId={restaurant.id}
+              />
             </div>
           </div>
         </div>
@@ -280,7 +287,7 @@ export function RestaurantDetails({
                       variant="outline"
                       className="rounded-full h-9 px-4 border-gray-200 text-black hover:border-orange-400 hover:text-orange-500 transition-colors text-xs sm:text-sm"
                     >
-                      <span>Opens 6:30 AM</span>
+                      <span>{restaurant.workingHours ? `Opens ${getTodayOpeningTime(restaurant.workingHours)}` : 'Hours not available'}</span>
                       <ChevronDown className="h-4 w-4 ml-1" />
                     </Button>
                   </div>
@@ -369,7 +376,10 @@ export function RestaurantDetails({
 
             {/* Reviews at bottom */}
             <section id="reviews">
-              <ReviewsSection />
+              <ReviewsSection 
+                targetId={restaurant.id} 
+                type={(restaurant.type?.toLowerCase() === 'home-food' || restaurant.type?.toLowerCase() === 'homefood') ? 'HomeFood' : 'Restaurant'} 
+              />
             </section>
 
             <Separator className="my-4 md:my-5" />

@@ -7,10 +7,9 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 
 const statuses = [
-    { id: 'Pending Approval', name: 'Wait for Approval', icon: CheckCircle2 },
-    { id: 'Approved', name: 'Ready to Pay', icon: CheckCircle2 },
     { id: 'Confirmed', name: 'Order Confirmed', icon: CheckCircle2 },
     { id: 'Preparing', name: 'Preparing', icon: CookingPot },
+    { id: 'Preparation Completed', name: 'Cooking Finished', icon: PartyPopper },
     { id: 'Out for Delivery', name: 'Out for Delivery', icon: Bike },
     { id: 'Delivered', name: 'Delivered', icon: Home },
 ];

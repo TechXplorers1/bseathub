@@ -12,8 +12,10 @@ export interface Restaurant {
   coverImageId?: string;
   avatarUrl?: string;
   cuisine: string;
+  cuisineType?: string;
   rating: number;
   reviews: number;
+  reviewsCount?: number;
   deliveryTime: number;
   deliveryFee: number;
   categories: string[];
@@ -22,6 +24,13 @@ export interface Restaurant {
   type: RestaurantType;
   isOpen?: boolean;
   owner?: { id: string };
+  // Address
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
   // Dynamic Profile Fields
   bio?: string;
   description?: string;
@@ -29,7 +38,8 @@ export interface Restaurant {
   specialty?: string;
   workingHours?: string;
   preference?: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
-  city?: string;
+  basePrice?: number;
+  totalEarnings?: number;
 }
 
 export interface MenuCategory {
@@ -102,6 +112,8 @@ export interface OrderResponse {
   paymentMethod: string;
   paymentStatus: string;
   orderNotes?: string;
+  cancellationReason?: string;
+  cancelledBy?: string;
   items: OrderItemResponse[];
 }
 
@@ -155,4 +167,29 @@ export interface ReviewResponse {
   comment: string;
   createdAt: string;
   orderId?: string;
+  reply?: string;
+  repliedAt?: string;
+}
+
+export interface ChefBooking {
+  id?: string;
+  customerId: string;
+  customerName?: string;
+  chefId: string;
+  chefName?: string;
+  serviceId?: string;
+  serviceName?: string;
+  eventDate: string;
+  guests: number;
+  totalAmount: number;
+  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+  paymentStatus: 'Unpaid' | 'Paid';
+  createdAt?: string;
+  eventAddress: string;
+  notes?: string;
+  statusReason?: string;
+  eventType?: string;
+  customerPhone?: string;
+  foodPreference?: string;
+  isNegotiable?: boolean;
 }

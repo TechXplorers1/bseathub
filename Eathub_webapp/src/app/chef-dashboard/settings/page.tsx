@@ -24,7 +24,13 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, CheckCircle2, AlertCircle, Camera, Search, FileText, Upload } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { fetchChefProfile, updateChefProfile, updateChefLegal, updateChefAddress } from '@/services/api';
+import { 
+  fetchChefProfile, 
+  fetchChefProfileByOwner,
+  updateChefProfile, 
+  updateChefLegal, 
+  updateChefAddress 
+} from '@/services/api';
 import { countries } from '@/constants/countries';
 import { compressImage } from '@/lib/image-utils';
 import {
@@ -131,12 +137,19 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    const id = localStorage.getItem('chefId');
-    if (!id) { setLoading(false); return; }
-    setChefId(id);
+    const cid = localStorage.getItem('chefId');
+    const uid = localStorage.getItem('userId');
+    
+    if (!cid && !uid) { setLoading(false); return; }
 
-    fetchChefProfile(id)
+    const profilePromise = cid 
+      ? fetchChefProfile(cid) 
+      : fetchChefProfileByOwner(uid!);
+
+    profilePromise
       .then(data => {
+        setChefId(data.id);
+        if (!cid) localStorage.setItem('chefId', data.id);
         // Parse experience string (e.g. "10 Years, 5 Months, 2 Days")
         let y = '0', m = '0', d = '0';
         if (data.experience) {
@@ -516,17 +529,6 @@ export default function SettingsPage() {
                       <SelectItem value="Middle Eastern">Middle Eastern</SelectItem>
                       <SelectItem value="Continental">Continental</SelectItem>
                       <SelectItem value="Desserts">Desserts & Sweets</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Delivery Availability</Label>
-                  <Select value={form.deliveryAvailability} onValueChange={(v) => setForm({ ...form, deliveryAvailability: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Available">Available for Delivery</SelectItem>
-                      <SelectItem value="Pickup Only">Pickup Only</SelectItem>
-                      <SelectItem value="Both">Both Delivery & Pickup</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

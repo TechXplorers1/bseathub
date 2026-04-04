@@ -23,9 +23,15 @@ export function RestaurantInfo({
 
   const toggleLocation = () => setShowLocation((prev) => !prev);
 
+  const fullAddress = [
+    restaurant.addressLine1,
+    restaurant.city,
+    restaurant.state
+  ].filter(Boolean).join(', ');
+
   return (
     <div className="mt-8">
-      <h1 className="text-4xl font-bold lg:mt-0">{displayName}</h1>
+      <h1 className="text-4xl font-bold lg:mt-0 tracking-tight">{displayName}</h1>
 
       <div className="mt-6 space-y-3 text-sm">
         <h2 className="text-lg font-semibold sr-only lg:not-sr-only">
@@ -33,30 +39,30 @@ export function RestaurantInfo({
         </h2>
 
         {isChefPage ? (
-          <p className="text-muted-foreground">{restaurant.cuisine}</p>
+          <p className="text-muted-foreground font-medium">{restaurant.cuisine}</p>
         ) : (
           <div className="flex items-center gap-2">
-            <Badge variant="outline">Eat Hub</Badge>
+            <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary">Eat Hub</Badge>
           </div>
         )}
 
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Star className="h-4 w-4 fill-foreground text-foreground" />
-          <span>
-            {restaurant.rating} ({restaurant.reviews > 1000 ? '1k+' : restaurant.reviews})
+        <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+          <Star className="h-4 w-4 fill-primary text-primary" />
+          <span className="text-foreground">
+            {restaurant.rating?.toFixed(1) || '0.0'} ({restaurant.reviewsCount || restaurant.reviews || 0})
           </span>
-          {!isChefPage && <span>•</span>}
-          {!isChefPage && <span>2 mi</span>}
+          {!isChefPage && <span className="opacity-40">•</span>}
+          {!isChefPage && <span className="text-foreground/60">Local Delivery</span>}
         </div>
 
         {!isChefPage && (
-          <p className="text-muted-foreground">
-             • {restaurant.cuisine}
+          <p className="text-muted-foreground font-medium">
+             • {restaurant.cuisineType || restaurant.cuisine}
           </p>
         )}
 
         {!isChefPage && (
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 text-[10px] uppercase font-black tracking-widest text-muted-foreground/50">
             <span>Service fees apply</span>
             <Info className="h-3 w-3" />
           </div>
@@ -64,13 +70,15 @@ export function RestaurantInfo({
 
         {/* LOCATION BOX */}
         {!isChefPage && showLocation && (
-          <div className="mt-1 rounded-xl border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <MapPin className="h-3 w-3 mt-[2px]" />
-              <div>
-                <p className="font-medium text-foreground text-sm">Location</p>
-                <p className="mt-0.5">
-                  {restaurant.location ?? 'Location information not available'}
+          <div className="mt-3 rounded-2xl border-2 border-primary/10 bg-primary/5 p-4 animate-in slide-in-from-top-2 duration-300">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <MapPin className="h-4 w-4 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-black uppercase tracking-widest text-[10px] text-primary/60">Location</p>
+                <p className="text-sm font-bold text-foreground leading-snug">
+                  {fullAddress || 'Location information not available'}
                 </p>
               </div>
             </div>
@@ -80,11 +88,11 @@ export function RestaurantInfo({
         {!isChefPage && (
           <Button
             variant="outline"
-            className="w-full rounded-full"
+            className="w-full rounded-2xl h-12 border-muted hover:border-primary/50 hover:bg-primary/5 transition-all mt-4 font-bold uppercase text-[11px] tracking-[0.15em]"
             onClick={toggleLocation}
             aria-expanded={showLocation}
           >
-            {showLocation ? 'See Less' : 'See More'}
+            {showLocation ? 'Conceal Address' : 'View Full Address'}
           </Button>
         )}
       </div>

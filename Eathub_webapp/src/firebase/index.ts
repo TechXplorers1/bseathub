@@ -53,7 +53,6 @@ export const rtdb = sdks.rtdb;
 export const signOut = () => auth.signOut();
 
 export * from './provider';
-export * from './client-provider';
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
 export * from './non-blocking-updates';

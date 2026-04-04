@@ -38,10 +38,10 @@ export function MenuItemDialog({
   const image = getImageById(item.imageId);
 
   const handleAddToCart = () => {
-    const providerType = ((restaurant.type as string) === 'home-food' || (restaurant.type as string) === 'homefood') 
-      ? 'HomeFood' 
+    const providerType = ((restaurant.type as string) === 'home-food' || (restaurant.type as string) === 'homefood')
+      ? 'HomeFood'
       : 'Restaurant';
-    
+
     addToCart(item, {
       id: restaurant.id,
       type: providerType as 'Restaurant' | 'HomeFood',
@@ -132,7 +132,7 @@ export function MenuItemDialog({
 
             <DialogFooter className="mt-6 sm:justify-between items-center">
               <div className="text-2xl font-bold text-primary">
-                <span>₹ {item.price}</span>
+                <span>$ {item.price}</span>
               </div>
               <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8">
                 Add To Cart

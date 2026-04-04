@@ -42,39 +42,39 @@ export function OrderDetailsDialog({ order, isOpen, onClose }: OrderDetailsDialo
               <p className="text-xs text-muted-foreground font-bold truncate max-w-[200px]">{order.deliveryAddress}</p>
             </div>
           </div>
-          
+
           <div className="space-y-3">
             <h4 className="font-black text-sm uppercase tracking-wider text-primary">Items Ordered</h4>
             <div className="space-y-3 bg-muted/10 rounded-xl p-4 border border-border/20">
               {order.items.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm items-center">
                   <div className="flex flex-col">
-                      <span className="font-bold text-foreground">{item.itemName}</span>
-                      <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{item.itemType}</span>
+                    <span className="font-bold text-foreground">{item.itemName}</span>
+                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{item.itemType}</span>
                   </div>
                   <div className="flex gap-4 items-center">
-                      <span className="bg-muted px-2 py-0.5 rounded-md text-[10px] font-black">x{item.quantity}</span>
-                      <span className="font-black text-secondary-foreground">₹{item.totalPrice.toFixed(2)}</span>
+                    <span className="bg-muted px-2 py-0.5 rounded-md text-[10px] font-black">x{item.quantity}</span>
+                    <span className="font-black text-secondary-foreground">${item.totalPrice.toFixed(2)}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          
+
           <div className="bg-primary/5 rounded-xl p-4 space-y-2 border border-primary/10">
-             <div className="flex justify-between text-xs font-bold text-muted-foreground">
-                <span>Subtotal</span>
-                <span>₹{order.subtotalAmount.toFixed(2)}</span>
-             </div>
-             <div className="flex justify-between text-xs font-bold text-muted-foreground">
-                <span>Delivery & Tax</span>
-                <span>₹{(order.deliveryFee + order.taxAmount).toFixed(2)}</span>
-             </div>
-             <Separator className="my-2 bg-primary/20" />
-             <div className="flex justify-between font-black text-lg text-primary">
-                <span>Total Earned</span>
-                <span>₹{order.totalAmount.toFixed(2)}</span>
-             </div>
+            <div className="flex justify-between text-xs font-bold text-muted-foreground">
+              <span>Subtotal</span>
+              <span>${order.subtotalAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-xs font-bold text-muted-foreground">
+              <span>Delivery & Tax</span>
+              <span>${(order.deliveryFee + order.taxAmount).toFixed(2)}</span>
+            </div>
+            <Separator className="my-2 bg-primary/20" />
+            <div className="flex justify-between font-black text-lg text-primary">
+              <span>Total Earned</span>
+              <span>${order.totalAmount.toFixed(2)}</span>
+            </div>
           </div>
         </div>
         <DialogFooter className="sm:justify-start">

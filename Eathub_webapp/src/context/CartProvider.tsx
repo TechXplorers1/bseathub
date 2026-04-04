@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { CartItem, MenuItem, OrderRequest, OrderItemRequest } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { createOrder, fetchUserProfile, createRazorpayOrder } from '@/services/api';
+import { createOrder, fetchUserProfile, createRazorpayOrder, updateOrderPaymentStatus } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { loadRazorpay } from '@/lib/razorpay';
 import { requestForToken, onMessageListener } from '@/lib/firebase';
@@ -161,7 +161,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const subtotal = cartTotal;
       const tax = subtotal * 0.05; // 5% tax
       const deliveryFee = 25.00;
-      const platformFee = 5.00;
+      const platformFee = Math.round(subtotal * 0.04); // 4% platform fee
       const discount = 0.00;
       const totalAmount = subtotal + tax + deliveryFee + platformFee - discount;
 
@@ -184,13 +184,66 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       const backendOrder = await createOrder(orderPayload);
 
-      toast({
-        title: 'Order Placed!',
-        description: `Your order from ${providerInfo.name} is pending approval from the provider.`,
-      });
+      // --- INTEGRATING RAZORPAY IMMEDIATELY AFTER CHECKOUT ---
+      try {
+          const isLoaded = await loadRazorpay();
+          if (!isLoaded) throw new Error('Razorpay SDK failed to load');
 
-      clearCart();
-      router.push(`/track-order?orderId=${backendOrder.id}`);
+          // Ensure we use the EXACT total amount from the backend order
+          const preciseTotal = backendOrder.totalAmount;
+          const rzpOrder = await createRazorpayOrder(preciseTotal);
+
+          const rzpOptions = {
+              key: "rzp_test_SYC9m4DXT1gjeY",
+              amount: rzpOrder.amount, // Use the amount directly from the created Razerpay order
+              currency: rzpOrder.currency,
+              name: 'EatHub',
+              description: `Payment for Order #${backendOrder.id.slice(0, 8)}`,
+              order_id: rzpOrder.id,
+              handler: async (response: any) => {
+                  try {
+                      await updateOrderPaymentStatus(backendOrder.id, 'Paid');
+                      toast({
+                          title: 'Payment Successful!',
+                          description: 'Your order is confirmed and sent to the kitchen.',
+                      });
+                      clearCart();
+                      router.push(`/track-order?orderId=${backendOrder.id}`);
+                  } catch (e) {
+                      console.error("Failed to update status after payment", e);
+                      clearCart();
+                      router.push(`/track-order?orderId=${backendOrder.id}`);
+                  }
+              },
+              prefill: {
+                  name: userProfile.name,
+                  email: userProfile.email,
+                  contact: userProfile.mobileNumber
+              },
+              theme: { color: '#ef4444' },
+              modal: {
+                    ondismiss: function() {
+                        toast({
+                            title: 'Order Placed (Payment Pending)',
+                            description: 'Please complete payment to start your order.',
+                        });
+                        clearCart();
+                        router.push(`/track-order?orderId=${backendOrder.id}`);
+                    }
+              }
+          };
+
+          const razorpay = new (window as any).Razorpay(rzpOptions);
+          razorpay.open();
+      } catch (rzpErr) {
+          console.error("Razorpay initiation failed", rzpErr);
+          toast({
+              title: 'Order Created',
+              description: 'Something went wrong with the payment gateway. Please check tracking.',
+          });
+          clearCart();
+          router.push(`/track-order?orderId=${backendOrder.id}`);
+      }
 
     } catch (error: any) {
       console.error('Checkout error:', error);

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { AboutCard } from './AboutCard';
 import { ModernChefHero } from './ModernChefHero';
 import { QuickInfoCard } from './QuickInfoCard';
-import { ReviewsCard } from './ReviewsCard';
+import { ReviewsSection } from '../restaurant/ReviewsSection';
 import { SignatureDishes } from './SignatureDishes';
 import { SpecialtiesCard } from './SpecialtiesCard';
 import type { Restaurant, MenuCategory, MenuItem as MenuItemType } from '@/lib/types';
@@ -36,18 +36,23 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   const [hasFetched, setHasFetched] = useState(false);
 
 
-  // 👉 Dynamic Signature Dishes from Chef Services
-  const allChefServices = services.flatMap(s => s.items);
-  const explicitSignatures = allChefServices.filter(item => item.isSignature);
-  
-  const signatureDishes = explicitSignatures.length > 0
-    ? explicitSignatures.slice(0, 5)
-    : allChefServices.length > 0
-      ? allChefServices.slice(0, 5)
-      : allHomeFoods.flatMap((r) => r.menu.flatMap((c) => c.items)).slice(0, 5);
+  // 👉 Memoize calculations to prevent re-computing on every re-render
+  const allChefServices = useRef<MenuItemType[]>([]);
+  const signatureDishes = useRef<MenuItemType[]>([]);
+
+  // Update memoized lists when services change
+  const { allServices, signatures } = useMemo(() => {
+    const flat = services.flatMap(s => s.items);
+    const explicit = flat.filter(item => item.isSignature);
+    const finalSignatures = explicit.length > 0 
+      ? explicit.slice(0, 5) 
+      : flat.slice(0, 5);
+    return { allServices: flat, signatures: finalSignatures };
+  }, [services]);
 
   useEffect(() => {
     const loadServices = async () => {
+      // Use existing services if already fetched to skip redundant loading state
       if (restaurant.id && !hasFetched) {
         setLoading(true);
         try {
@@ -57,7 +62,6 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
           }
           setHasFetched(true);
         } catch (err) {
-          // console.error("Failed to load chef services:", err);
           setHasFetched(true);
         } finally {
           setLoading(false);
@@ -90,19 +94,16 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
     });
 
     // 2. Schedule Animation Sequence
-    // We wait a bit for the smooth scroll to near completion before triggering the pop
-    const SCROLL_DURATION_ESTIMATE = 400; // ms
+    // Reduced delays for snappier feel
     const ANIMATION_DURATION = 600; // ms (must match CSS)
 
-    setTimeout(() => {
-      // Start animation
-      setAnimatingSection(tab);
+    // Trigger animation pop immediately for responsiveness
+    setAnimatingSection(tab);
 
-      // Stop animation after duration completes so it can be triggered again later
-      setTimeout(() => {
-        setAnimatingSection(null);
-      }, ANIMATION_DURATION);
-    }, SCROLL_DURATION_ESTIMATE);
+    // Stop animation after duration completes so it can be triggered again later
+    setTimeout(() => {
+      setAnimatingSection(null);
+    }, ANIMATION_DURATION);
   };
 
   return (
@@ -120,40 +121,40 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
           <div className="lg:col-span-2 space-y-4">
             <AboutCard 
-              chefName={chefName} 
+              chefName={restaurant.name || chefName} 
               bio={restaurant.bio}
               experience={restaurant.experience}
-              specialty={restaurant.specialty}
               city={restaurant.city}
             />
-            <SpecialtiesCard categories={restaurant.categories} />
+            <SpecialtiesCard specialty={restaurant.specialty} />
 
-            {/* SIGNATURE DISHES SECTION */}
             <section
               id="signature-dishes"
               ref={signatureRef}
-              // Added 'contain-paint' to optimize rendering during animation
+              style={{ contentVisibility: 'auto', containIntrinsicHeight: '500px' }}
               className={cn(
-                'scroll-mt-28 transition-all duration-300 rounded-xl contain-paint',
-                // Persistent active state (orange ring)
-                activeTab === 'signature'
-                  ? 'ring-2 ring-orange-500 shadow-sm'
-                  : '',
-                // Transient animation state (zoom pop)
+                'scroll-mt-28 transition-all duration-300 rounded-xl overflow-hidden',
+                activeTab === 'signature' ? 'ring-2 ring-orange-500 shadow-sm' : '',
                 animatingSection === 'signature' ? 'animate-highlight-pop' : ''
               )}
             >
-              <SignatureDishes items={signatureDishes} />
+              <SignatureDishes items={signatures} restaurant={restaurant} />
             </section>
 
             {/* CATEGORIZED SERVICES */}
             <section ref={servicesRef} className="space-y-4">
-              {services.map((category) => (
-                <Card key={category.title} id={category.title}>
-                  <CardHeader>
-                    <CardTitle>{category.title}</CardTitle>
+              {services.map((category, idx) => (
+                <Card 
+                  key={category.title} 
+                  id={category.title} 
+                  // Use content-visibility for large lists to speed up initial paint
+                  style={{ contentVisibility: idx > 1 ? 'auto' : 'visible', containIntrinsicHeight: idx > 1 ? '300px' : 'auto' }}
+                  className="overflow-hidden border-0 shadow-lg shadow-slate-200/50"
+                >
+                  <CardHeader className="bg-muted/10 border-b border-border/10">
+                    <CardTitle className="text-xl font-bold uppercase tracking-tight">{category.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {category.items.map((item) => (
                         <MenuItem
@@ -170,9 +171,9 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
           </div>
 
           <div className="space-y-4">
-            <ReviewsCard
-              rating={restaurant.rating}
-              reviewCount={restaurant.reviews}
+            <ReviewsSection 
+              targetId={restaurant.id} 
+              type="Chef" 
             />
             <QuickInfoCard 
               workingHours={restaurant.workingHours} 
@@ -194,7 +195,12 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
                 (animatingSection === 'book' || animatingSection === 'enquiry') ? 'animate-highlight-pop' : ''
               )}
             >
-              <BookChef chefName={chefName} />
+              <BookChef 
+                chefName={restaurant.name || chefName} 
+                chefId={restaurant.id} 
+                basePrice={restaurant.basePrice} 
+                services={services}
+              />
             </section>
           </div>
         </div>
@@ -202,6 +208,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
       {selectedItem && (
         <MenuItemDialog
           item={selectedItem}
+          restaurant={restaurant}
           open={!!selectedItem}
           onOpenChange={(open) => !open && setSelectedItem(null)}
         />

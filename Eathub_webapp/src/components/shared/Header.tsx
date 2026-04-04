@@ -403,7 +403,9 @@ export function Header({ className }: HeaderProps) {
                 {itemCount > 0 && <Badge className="absolute -top-0.5 -right-0.5 px-1.5 py-0.5 text-[10px] rounded-full">{itemCount}</Badge>}
               </Button>
             </SheetTrigger>
-            <SheetContent><SheetHeader><SheetTitle className="mb-4">Your Cart</SheetTitle></SheetHeader><Cart /></SheetContent>
+            <SheetContent className="p-0 sm:max-w-lg w-[90vw] md:w-[500px]">
+                <Cart />
+            </SheetContent>
           </Sheet>
 
           {isLoading ? (

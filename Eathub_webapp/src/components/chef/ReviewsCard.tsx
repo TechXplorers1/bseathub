@@ -25,22 +25,28 @@ export function ReviewsCard({ rating, reviewCount }: ReviewsCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {latestReviews.map((review, index) => (
-            <div key={review.id}>
-                 <div className="flex items-start gap-3">
-                    <Avatar>
-                        <AvatarImage src={review.customer.avatarUrl} />
-                        <AvatarFallback>{review.customer.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="font-semibold">{review.customer.name}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-2">"{review.comment}"</p>
+        {reviewCount === 0 ? (
+            <p className="text-sm text-muted-foreground italic text-center py-8 font-bold">No reviews yet. Be the first to book this chef!</p>
+        ) : (
+            <>
+                {latestReviews.map((review, index) => (
+                    <div key={review.id}>
+                        <div className="flex items-start gap-3">
+                            <Avatar>
+                                <AvatarImage src={review.customer.avatarUrl} />
+                                <AvatarFallback>{review.customer.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-semibold">{review.customer.name}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-2">"{review.comment}"</p>
+                            </div>
+                        </div>
+                        {index < latestReviews.length - 1 && <Separator className="mt-4" />}
                     </div>
-                 </div>
-                 {index < latestReviews.length - 1 && <Separator className="mt-4" />}
-            </div>
-        ))}
-         <Button variant="link" className="p-0 h-auto">View all {reviewCount} reviews</Button>
+                ))}
+                <Button variant="link" className="p-0 h-auto">View all {reviewCount} reviews</Button>
+            </>
+        )}
       </CardContent>
     </Card>
   );

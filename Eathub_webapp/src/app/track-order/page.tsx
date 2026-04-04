@@ -10,10 +10,9 @@ import { ReviewDialog } from '@/components/dashboard/ReviewDialog';
 import { useCart } from '@/context/CartProvider';
 import { fetchOrderById } from '@/services/api';
 import type { OrderResponse } from '@/lib/types';
-import { Loader2, CreditCard } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { loadRazorpay } from '@/lib/razorpay';
-import { createRazorpayOrder, updateOrderPaymentStatus, fetchUserProfile } from '@/services/api';
+import { createRazorpayOrder, fetchUserProfile } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 const DEMO_ORDER = {
@@ -56,51 +55,7 @@ export default function TrackOrderPage() {
         return () => clearInterval(interval);
     }, [orderId]);
 
-    const handlePayment = async () => {
-        if (!orderDetail) return;
-        
-        try {
-            const userProfile = await fetchUserProfile();
-            const isLoaded = await loadRazorpay();
-            if (!isLoaded) throw new Error('Razorpay SDK failed to load');
 
-            const rzpOrder = await createRazorpayOrder(orderDetail.totalAmount);
-
-            const options = {
-                key: "rzp_test_SYC9m4DXT1gjeY", // Use real key if possible
-                amount: Math.round(orderDetail.totalAmount * 100),
-                currency: 'INR',
-                name: 'EatHub',
-                description: `Payment for Order #${orderDetail.id.slice(0,8)}`,
-                order_id: rzpOrder.id,
-                handler: async (response: any) => {
-                    await updateOrderPaymentStatus(orderDetail.id, 'Paid');
-                    toast({
-                        title: "Payment Successful",
-                        description: "Your order is now being prepared!",
-                    });
-                    // Refresh order detail
-                    const updated = await fetchOrderById(orderDetail.id);
-                    setOrderDetail(updated);
-                },
-                prefill: {
-                    name: userProfile.name,
-                    email: userProfile.email,
-                    contact: userProfile.mobileNumber
-                },
-                theme: { color: '#ef4444' }
-            };
-
-            const razorpay = new (window as any).Razorpay(options);
-            razorpay.open();
-        } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Payment Failed',
-                description: error.message || 'Something went wrong during payment.'
-            });
-        }
-    };
 
     if (loading) {
         return (
@@ -139,10 +94,30 @@ export default function TrackOrderPage() {
                                     <p className="text-muted-foreground font-medium">From {displayRestaurantName}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-bold text-primary">Estimated Arrival</p>
-                                    <p className="text-xl font-black">25 - 35 min</p>
+                                    <p className="text-sm font-bold text-primary">
+                                        {orderDetail?.currentStatusId === 'Cancelled' ? 'Status' : 'Estimated Arrival'}
+                                    </p>
+                                    <p className={`text-xl font-black ${orderDetail?.currentStatusId === 'Cancelled' ? 'text-destructive animate-pulse' : ''}`}>
+                                        {orderDetail?.currentStatusId === 'Cancelled' ? 'Cancelled' : '25 - 35 min'}
+                                    </p>
                                 </div>
                             </div>
+                            {orderDetail?.currentStatusId === 'Cancelled' && (
+                                <div className="mt-4 p-4 rounded-xl bg-destructive/5 border border-destructive/20 animate-in zoom-in-95 duration-500">
+                                    <h3 className="text-destructive font-black uppercase text-xs tracking-widest mb-1 flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full bg-destructive animate-ping" />
+                                        Important Order Update
+                                    </h3>
+                                    <p className="text-sm font-bold text-foreground">
+                                        {orderDetail.cancelledBy || 'User'} has cancelled this order.
+                                    </p>
+                                    {orderDetail.cancellationReason && (
+                                        <p className="text-xs text-muted-foreground mt-2 italic font-medium bg-white/50 p-2 rounded-lg">
+                                            Reason: "{orderDetail.cancellationReason}"
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </CardHeader>
                         <CardContent>
                             {mapImage && (
@@ -166,26 +141,7 @@ export default function TrackOrderPage() {
                                 }}
                             />
 
-                            {orderDetail?.currentStatusId === 'Approved' && orderDetail?.paymentStatus !== 'Paid' && (
-                                <div className="mt-8 p-6 bg-primary/5 rounded-2xl border border-primary/20 flex flex-col items-center gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <CreditCard className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold">Provider Accepted Your Order!</h3>
-                                        <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-                                            Please complete the payment of <span className="font-bold text-foreground">₹{orderDetail.totalAmount.toFixed(2)}</span> to confirm your order.
-                                        </p>
-                                    </div>
-                                    <Button 
-                                        size="lg" 
-                                        className="w-full max-w-sm font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-[0.98]"
-                                        onClick={handlePayment}
-                                    >
-                                        Pay Now & Confirm
-                                    </Button>
-                                </div>
-                            )}
+
                         </CardContent>
                     </Card>
                 </div>

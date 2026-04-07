@@ -27,6 +27,8 @@ public class ReviewService {
     private final ChefRepository chefRepository;
     private final RestaurantRepository restaurantRepository;
     private final HomeFoodProviderRepository homeFoodRepository;
+    private final FirebaseService firebaseService;
+    private final NotificationHistoryService notificationHistoryService;
 
     // ── Submit a new review ─────────────────────────────────────────────────
     @Transactional
@@ -86,6 +88,37 @@ public class ReviewService {
 
         // Update Provider Rating
         updateProviderRating(targetId, request.getTargetType());
+
+        // ── Notify Provider of New Review ───────────────────────────
+        try {
+            User owner = null;
+            if ("Chef".equalsIgnoreCase(saved.getTargetType())) {
+                owner = chefRepository.findById(targetId).map(Chef::getOwner).orElse(null);
+            } else if ("Restaurant".equalsIgnoreCase(saved.getTargetType())) {
+                owner = restaurantRepository.findById(targetId).map(Restaurant::getOwner).orElse(null);
+            } else if ("HomeFood".equalsIgnoreCase(saved.getTargetType())) {
+                owner = homeFoodRepository.findById(targetId).map(HomeFoodProvider::getOwner).orElse(null);
+            }
+
+            if (owner != null && owner.getFcmToken() != null) {
+                String title = "New Review Received! ⭐";
+                String body = saved.getCustomer().getName() + " gave you a " + saved.getRating() + "-star review.";
+                
+                java.util.Map<String, String> data = new java.util.HashMap<>();
+                data.put("reviewId", saved.getId());
+                data.put("action", "NEW_REVIEW");
+
+                Notification n = notificationHistoryService.saveNotification(owner.getId(), title, body, "REVIEW", saved.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "REVIEW");
+                    data.put("referenceId", saved.getId());
+                }
+                firebaseService.sendNotification(owner.getFcmToken(), title, body, data);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to notify provider of new review: " + e.getMessage());
+        }
 
         return toResponse(saved);
     }
@@ -181,6 +214,30 @@ public class ReviewService {
         review.setReply(request.getReply());
         review.setRepliedAt(LocalDateTime.now());
         Review saved = reviewRepository.save(review);
+        
+        // ── Notify Customer of Reply ───────────────────────────────
+        try {
+            User customer = saved.getCustomer();
+            if (customer != null && customer.getFcmToken() != null) {
+                String title = "Provider Replied to your Review! 💬";
+                String body = "You received a response to your " + saved.getTargetType() + " review.";
+                
+                java.util.Map<String, String> data = new java.util.HashMap<>();
+                data.put("reviewId", saved.getId());
+                data.put("action", "REVIEW_REPLY");
+
+                Notification n = notificationHistoryService.saveNotification(customer.getId(), title, body, "REVIEW", saved.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "REVIEW");
+                    data.put("referenceId", saved.getId());
+                }
+                firebaseService.sendNotification(customer.getFcmToken(), title, body, data);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to notify customer of review reply: " + e.getMessage());
+        }
+
         return toResponse(saved);
     }
 

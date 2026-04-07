@@ -43,7 +43,6 @@ public class ChefController {
     }
 
     // ================= CHEF PROFILE UPDATES =================
-
     @PutMapping("/{id}/profile")
     public ChefResponseDTO updateProfile(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
         return service.updateProfile(id, dto);
@@ -55,12 +54,11 @@ public class ChefController {
     }
 
     @PutMapping("/{id}/legal")
-    public ChefResponseDTO updateLegal(@PathVariable String  id, @RequestBody ChefProfileUpdateDTO dto) {
+    public ChefResponseDTO updateLegal(@PathVariable String id, @RequestBody ChefProfileUpdateDTO dto) {
         return service.updateLegal(id, dto);
     }
 
     // ================= CHEF SERVICES =================
-
     @GetMapping("/{chefId}/services")
     public List<ChefServiceResponseDTO> getServices(@PathVariable String chefId) {
         return service.getChefServices(chefId);

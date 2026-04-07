@@ -30,6 +30,7 @@ public class OrderService {
     private final FirebaseService firebaseService;
     private final UserService userService;
     private final OrderStatusHistoryRepository historyRepository;
+    private final NotificationHistoryService notificationHistoryService;
 
     // ─── Create ─────────────────────────────────────────────────────────────
 
@@ -120,6 +121,12 @@ public class OrderService {
                 data.put("action", "NEW_ORDER");
                 data.put("address", savedOrder.getDeliveryAddress());
 
+                Notification n = notificationHistoryService.saveNotification(owner.getId(), title, body, "ORDER", savedOrder.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "ORDER");
+                    data.put("referenceId", savedOrder.getId());
+                }
                 firebaseService.sendNotification(owner.getFcmToken(), title, body, data);
             }
         } catch (Exception e) {
@@ -212,21 +219,54 @@ public class OrderService {
         // ── Record History ──────────────────────────────────────────────────
         recordStatusHistory(updatedOrder, "PROVIDER", "Manual status update to " + status);
 
-        // ── Send Notification to Customer on Confirmation ──────────────────
-        if ("Provider Confirmed".equals(status) && updatedOrder.getCustomer().getFcmToken() != null) {
+        // ── Send Notification to Customer on Status Change ──────────────────
+        if (updatedOrder.getCustomer().getFcmToken() != null) {
             try {
-                String title = "Order Confirmed by Provider! ✨";
-                String body = "Chef confirmed your order from " + toResponse(updatedOrder).getSourceName()
-                        + ". Please complete payment to start cooking!";
-
+                String title = "";
+                String body = "";
                 java.util.Map<String, String> data = new java.util.HashMap<>();
                 data.put("orderId", updatedOrder.getId());
-                data.put("action", "ORDER_CONFIRMED");
-                data.put("total", updatedOrder.getTotalAmount().toString());
+                data.put("status", status);
 
-                firebaseService.sendNotification(updatedOrder.getCustomer().getFcmToken(), title, body, data);
+                switch (status) {
+                    case "Provider Confirmed":
+                        title = "Order Confirmed by Provider! ✨";
+                        body = "Chef confirmed your order from " + toResponse(updatedOrder).getSourceName() + ". Please complete payment to start cooking!";
+                        data.put("action", "ORDER_CONFIRMED");
+                        break;
+                    case "Preparing":
+                        title = "Your food is being prepared! 🍳";
+                        body = "The kitchen has started cooking your delicious meal.";
+                        data.put("action", "ORDER_STATUS_UPDATE");
+                        break;
+                    case "Preparation Completed":
+                        title = "Meal is Ready! 🍱";
+                        body = "Your order has been packed and is ready for pickup/delivery.";
+                        data.put("action", "ORDER_STATUS_UPDATE");
+                        break;
+                    case "Out for Delivery":
+                        title = "Your order is on the way! 🛵";
+                        body = "The delivery partner is bringing your meal to you.";
+                        data.put("action", "ORDER_STATUS_UPDATE");
+                        break;
+                    case "Delivered":
+                        title = "Enjoy your meal! 🍴";
+                        body = "Your order was successfully delivered. Don't forget to rate your experience!";
+                        data.put("action", "ORDER_DELIVERED");
+                        break;
+                }
+
+                if (!title.isEmpty()) {
+                    Notification n = notificationHistoryService.saveNotification(updatedOrder.getCustomer().getId(), title, body, "ORDER", updatedOrder.getId());
+                    if (n != null) {
+                        data.put("id", n.getId());
+                        data.put("type", "ORDER");
+                        data.put("referenceId", updatedOrder.getId());
+                    }
+                    firebaseService.sendNotification(updatedOrder.getCustomer().getFcmToken(), title, body, data);
+                }
             } catch (Exception e) {
-                System.err.println("Failed to send approval notification: " + e.getMessage());
+                System.err.println("Failed to send status update notification: " + e.getMessage());
             }
         }
 
@@ -251,6 +291,44 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
         recordStatusHistory(savedOrder, cancelledBy != null ? cancelledBy : "SYSTEM", "Order cancelled: " + reason);
+
+        // ── Notify other party of cancellation ──────────────────────
+        try {
+            User notifyUser = null;
+            String title = "Order Cancelled 🚫";
+            String body = "An order has been cancelled: " + reason;
+
+            if ("Customer".equalsIgnoreCase(cancelledBy)) {
+                // Notify provider
+                if (savedOrder.getRestaurant() != null) {
+                    notifyUser = savedOrder.getRestaurant().getOwner();
+                } else if (savedOrder.getHomeFoodProvider() != null) {
+                    notifyUser = savedOrder.getHomeFoodProvider().getOwner();
+                }
+                body = "Customer cancelled their order: " + reason;
+            } else {
+                // Provider cancelled, notify customer
+                notifyUser = savedOrder.getCustomer();
+                body = "The provider has cancelled your order: " + reason;
+            }
+
+            if (notifyUser != null && notifyUser.getFcmToken() != null) {
+                java.util.Map<String, String> data = new java.util.HashMap<>();
+                data.put("orderId", savedOrder.getId());
+                data.put("status", "Cancelled");
+
+                Notification n = notificationHistoryService.saveNotification(notifyUser.getId(), title, body, "ORDER", savedOrder.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "ORDER");
+                    data.put("referenceId", savedOrder.getId());
+                }
+                firebaseService.sendNotification(notifyUser.getFcmToken(), title, body, data);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to notify of cancellation: " + e.getMessage());
+        }
+
         return toResponse(savedOrder);
     }
 
@@ -278,7 +356,18 @@ public class OrderService {
                             String title = "New Paid Order! 💰";
                             String body = "An order of $" + order.getTotalAmount()
                                     + " was just paid. Please start preparation!";
-                            firebaseService.sendNotification(owner.getFcmToken(), title, body, null);
+                            
+                            java.util.Map<String, String> data = new java.util.HashMap<>();
+                            data.put("orderId", order.getId());
+                            data.put("action", "PAYMENT_DONE");
+
+                            Notification n = notificationHistoryService.saveNotification(owner.getId(), title, body, "ORDER", order.getId());
+                            if (n != null) {
+                                data.put("id", n.getId());
+                                data.put("type", "ORDER");
+                                data.put("referenceId", order.getId());
+                            }
+                            firebaseService.sendNotification(owner.getFcmToken(), title, body, data);
                         }
                     });
                 }

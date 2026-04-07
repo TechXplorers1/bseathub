@@ -17,9 +17,8 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     /**
-     * POST /api/v1/reviews
-     * Submit a review after order delivery.
-     * Body: { customerId, targetId, targetType, rating, comment }
+     * POST /api/v1/reviews Submit a review after order delivery. Body: {
+     * customerId, targetId, targetType, rating, comment }
      */
     @PostMapping
     public ResponseEntity<ReviewResponse> submitReview(@RequestBody ReviewRequest request) {
@@ -27,8 +26,8 @@ public class ReviewController {
     }
 
     /**
-     * GET /api/v1/reviews/provider/{targetId}?type=Restaurant
-     * Get all reviews for a restaurant / home-food / chef.
+     * GET /api/v1/reviews/provider/{targetId}?type=Restaurant Get all reviews
+     * for a restaurant / home-food / chef.
      */
     @GetMapping("/provider/{targetId}")
     public ResponseEntity<List<ReviewResponse>> getReviewsForProvider(
@@ -45,8 +44,8 @@ public class ReviewController {
     }
 
     /**
-     * GET /api/v1/reviews/customer/{customerId}
-     * Get all reviews submitted by a customer.
+     * GET /api/v1/reviews/customer/{customerId} Get all reviews submitted by a
+     * customer.
      */
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<ReviewResponse>> getReviewsByCustomer(
@@ -64,7 +63,7 @@ public class ReviewController {
             @RequestParam(required = false) String targetId,
             @RequestParam(required = false) String menuItemId,
             @RequestParam(required = false) String orderId) {
-        
+
         boolean reviewed = false;
         if (orderId != null && !orderId.isBlank()) {
             reviewed = reviewService.hasAlreadyReviewedByOrder(orderId);
@@ -77,8 +76,7 @@ public class ReviewController {
     }
 
     /**
-     * GET /api/v1/reviews/item/{itemId}
-     * Get reviews for a specific dish
+     * GET /api/v1/reviews/item/{itemId} Get reviews for a specific dish
      */
     @GetMapping("/item/{itemId}")
     public ResponseEntity<List<ReviewResponse>> getReviewsByItem(@PathVariable String itemId) {
@@ -86,8 +84,7 @@ public class ReviewController {
     }
 
     /**
-     * POST /api/v1/reviews/reply
-     * Provider replies to a review.
+     * POST /api/v1/reviews/reply Provider replies to a review.
      */
     @PostMapping("/reply")
     public ResponseEntity<ReviewResponse> addReply(@RequestBody ReplyRequest request) {

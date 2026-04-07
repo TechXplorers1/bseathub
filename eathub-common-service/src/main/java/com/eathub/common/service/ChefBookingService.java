@@ -4,6 +4,7 @@ import com.eathub.common.dto.ChefBookingDTO;
 import com.eathub.common.entity.Chef;
 import com.eathub.common.entity.ChefBooking;
 import com.eathub.common.entity.ChefService;
+import com.eathub.common.entity.Notification;
 import com.eathub.common.entity.User;
 import com.eathub.common.repository.ChefBookingRepository;
 import com.eathub.common.repository.ChefRepository;
@@ -25,6 +26,8 @@ public class ChefBookingService {
     private final ChefRepository chefRepository;
     private final UserRepository userRepository;
     private final ChefServiceRepository chefServiceRepository;
+    private final FirebaseService firebaseService;
+    private final NotificationHistoryService notificationHistoryService;
 
     @Transactional
     public ChefBookingDTO createBooking(ChefBookingDTO dto) {
@@ -58,7 +61,32 @@ public class ChefBookingService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return toDTO(chefBookingRepository.save(booking));
+        ChefBooking savedBooking = chefBookingRepository.save(booking);
+
+        // ── Notify Chef of New Booking ───────────────────────────────
+        try {
+            User chefOwner = chef.getOwner();
+            if (chefOwner != null && chefOwner.getFcmToken() != null) {
+                String title = "New Event Booking Request! 👨‍🍳";
+                String body = customer.getName() + " wants to book you for an event on " + dto.getEventDate();
+                
+                java.util.Map<String, String> data = new java.util.HashMap<>();
+                data.put("bookingId", savedBooking.getId());
+                data.put("action", "NEW_BOOKING");
+                
+                Notification n = notificationHistoryService.saveNotification(chefOwner.getId(), title, body, "BOOKING", savedBooking.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "BOOKING");
+                    data.put("referenceId", savedBooking.getId());
+                }
+                firebaseService.sendNotification(chefOwner.getFcmToken(), title, body, data);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to notify chef of new booking: " + e.getMessage());
+        }
+
+        return toDTO(savedBooking);
     }
 
     public List<ChefBookingDTO> getChefBookings(String chefId) {
@@ -90,7 +118,44 @@ public class ChefBookingService {
             booking.setStatusReason(reason);
         }
         booking.setUpdatedAt(LocalDateTime.now());
-        return toDTO(chefBookingRepository.save(booking));
+        ChefBooking savedBooking = chefBookingRepository.save(booking);
+
+        // ── Notify Customer of Status Update ──────────────────────────
+        try {
+            User customer = savedBooking.getCustomer();
+            if (customer != null && customer.getFcmToken() != null) {
+                String title = "Chef Booking Update 🔔";
+                String body = "Your booking with " + savedBooking.getChef().getName() + " is now " + status;
+                
+                if ("Confirmed".equalsIgnoreCase(status)) {
+                    title = "Booking Confirmed! ✅";
+                    body = "Chef " + savedBooking.getChef().getName() + " has accepted your event booking.";
+                } else if ("Completed".equalsIgnoreCase(status)) {
+                    title = "Event Completed! ⭐";
+                    body = "We hope you enjoyed the culinary experience. Please leave a review!";
+                } else if ("Cancelled".equalsIgnoreCase(status)) {
+                    title = "Booking Cancelled 🚫";
+                    body = "Your booking was cancelled. Reason: " + (reason != null ? reason : "Not specified");
+                }
+
+                java.util.Map<String, String> data = new java.util.HashMap<>();
+                data.put("bookingId", savedBooking.getId());
+                data.put("status", status);
+                data.put("action", "BOOKING_UPDATE");
+                
+                Notification n = notificationHistoryService.saveNotification(customer.getId(), title, body, "BOOKING", savedBooking.getId());
+                if (n != null) {
+                    data.put("id", n.getId());
+                    data.put("type", "BOOKING");
+                    data.put("referenceId", savedBooking.getId());
+                }
+                firebaseService.sendNotification(customer.getFcmToken(), title, body, data);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to notify customer of booking update: " + e.getMessage());
+        }
+
+        return toDTO(savedBooking);
     }
 
     @Transactional

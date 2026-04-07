@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react';
 import {
   Card,
@@ -14,6 +15,9 @@ import { Star, Loader2, MessageSquare, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { replyToReview } from '@/services/api';
+import { Reply } from 'lucide-react';
 
 function ReviewStars({ rating, className }: { rating: number; className?: string }) {
     return (
@@ -36,6 +40,9 @@ function ReviewStars({ rating, className }: { rating: number; className?: string
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,6 +60,29 @@ export default function ReviewsPage() {
     };
     loadReviews();
   }, []);
+
+  const handleReply = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+    setSubmittingReply(true);
+    try {
+        const updatedReview = await replyToReview(reviewId, replyText);
+        setReviews(prev => prev.map(r => r.id === reviewId ? updatedReview : r));
+        setReplyingTo(null);
+        setReplyText('');
+        toast({
+            title: 'Message Sent',
+            description: 'The customer will see your professional response!'
+        });
+    } catch (err) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Failed to send response.'
+        });
+    } finally {
+        setSubmittingReply(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -115,11 +145,44 @@ export default function ReviewsPage() {
                     </p>
                   </div>
 
-                  <div className="mt-6 flex items-center gap-4">
-                    <Button variant="outline" size="sm" className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 px-4 hover:bg-slate-900 hover:text-white transition-all">
-                        Respond to Feedback
-                    </Button>
-                  </div>
+                  {review.reply ? (
+                    <div className="mt-6 ml-4 p-4 rounded-2xl bg-orange-50/50 border border-orange-100 relative animate-in zoom-in-95 duration-500">
+                         <div className="absolute -left-[17px] top-4 w-4 h-px bg-orange-200" />
+                         <p className="text-[10px] font-black uppercase text-orange-600 mb-1 flex items-center gap-2">
+                            <Reply className="h-3 w-3" /> Your Kitchen's Note
+                         </p>
+                         <p className="text-sm font-bold text-slate-700 italic">
+                            {review.reply}
+                         </p>
+                    </div>
+                  ) : replyingTo === review.id ? (
+                    <div className="mt-4 flex flex-col gap-2 animate-in slide-in-from-top-2 duration-300">
+                         <Input 
+                            placeholder="Add a note to your client..." 
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            className="rounded-xl border-slate-200 focus-visible:ring-orange-500 h-10 text-sm font-medium"
+                         />
+                         <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" className="rounded-full text-xs font-bold" onClick={() => setReplyingTo(null)}>Cancel</Button>
+                            <Button size="sm" className="rounded-full text-xs font-bold px-6 bg-slate-900 text-white" disabled={submittingReply} onClick={() => handleReply(review.id)}>
+                                {submittingReply ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : null}
+                                Post Note
+                            </Button>
+                         </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 flex items-center gap-4">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 px-4 hover:bg-slate-900 hover:text-white transition-all"
+                        onClick={() => setReplyingTo(review.id)}
+                      >
+                          Respond to Feedback
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
               {index < reviews.length - 1 && <Separator className="mt-10 opacity-50" />}

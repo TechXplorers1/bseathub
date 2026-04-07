@@ -13,21 +13,21 @@ import { fetchReviewsForProvider } from '@/services/api';
 import { Loader2 } from 'lucide-react';
 
 function ReviewStars({ rating, className }: { rating: number, className?: string }) {
-  return (
-    <div className={cn("flex items-center gap-0.5", className)}>
-      {Array.from({ length: 5 }, (_, i) => (
-        <Star
-          key={i}
-          className={cn(
-            "h-4 w-4",
-            i < Math.floor(rating)
-              ? "text-yellow-500 fill-yellow-500"
-              : "text-gray-300 fill-gray-300"
-          )}
-        />
-      ))}
-    </div>
-  );
+    return (
+        <div className={cn("flex items-center gap-0.5", className)}>
+            {Array.from({ length: 5 }, (_, i) => (
+                <Star
+                    key={i}
+                    className={cn(
+                        "h-4 w-4",
+                        i < Math.floor(rating)
+                            ? "text-yellow-500 fill-yellow-500"
+                            : "text-gray-300 fill-gray-300"
+                    )}
+                />
+            ))}
+        </div>
+    );
 }
 
 type Review = { customerName?: string, comment: string, rating: number, customerAvatar?: string, date?: string };
@@ -35,7 +35,7 @@ type Review = { customerName?: string, comment: string, rating: number, customer
 function ReviewCard({ review }: { review: Review }) {
     const author = review.customerName || "Anonymous User";
     const avatar = review.customerAvatar || `https://i.pravatar.cc/150?u=${author}`;
-    
+
     return (
         <Card className="w-[300px] flex-shrink-0 border-none shadow-sm bg-muted/30">
             <CardContent className="p-5">
@@ -78,7 +78,7 @@ export function ReviewsSection({ targetId, type }: { targetId: string, type: 'Re
             .then(data => {
                 setReviews(data);
             })
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => setLoading(false));
     }, [targetId, type]);
 
@@ -87,53 +87,53 @@ export function ReviewsSection({ targetId, type }: { targetId: string, type: 'Re
         fetchReviewsForProvider(targetId, type).then(setReviews);
     };
 
-    if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center p-12 space-y-4">
-                <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Gathering feedback...</p>
-            </div>
-        );
-    }
-
     return (
         <div id="Reviews" className="mt-8">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div className="space-y-1">
-                    <h2 className="text-3xl font-black uppercase tracking-tight">Customer Feed</h2>
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            <span className="text-xs font-black text-yellow-700">{averageRating}</span>
-                        </div>
-                        <span className="text-xs font-bold text-muted-foreground">Based on {reviews.length} actual reviews</span>
-                    </div>
+            {loading && (
+                <div className="flex flex-col items-center justify-center p-12 space-y-4 animate-pulse">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary/40" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Syncing recent feedback...</p>
                 </div>
-                <Button 
-                    onClick={() => setIsReviewDialogOpen(true)}
-                    className="rounded-full font-black uppercase tracking-widest text-xs px-6 h-10 shadow-lg shadow-primary/10"
-                >
-                    Write a Review
-                </Button>
-            </div>
-            
-            {reviews.length === 0 ? (
-                <div className="bg-muted/20 border border-dashed rounded-[2rem] p-10 text-center">
-                    <p className="text-sm font-bold text-muted-foreground italic mb-2">No reviews yet.</p>
-                    <p className="text-xs text-muted-foreground/60">Be the first to share your experience!</p>
-                </div>
-            ) : (
-                <ScrollArea className="w-full">
-                    <div className="flex space-x-5 pb-6">
-                        {reviews.map((review, index) => (
-                            <ReviewCard key={index} review={review} />
-                        ))}
-                    </div>
-                    <ScrollBar orientation="horizontal" className="h-1.5" />
-                </ScrollArea>
             )}
 
-            <AddReviewDialog 
+            <div className={cn("transition-all duration-300", loading ? "opacity-20 blur-sm pointer-events-none" : "opacity-100")}>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                    <div className="space-y-1">
+                        <h2 className="text-3xl font-black uppercase tracking-tight">Customer Feed</h2>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">
+                                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                <span className="text-xs font-black text-yellow-700">{averageRating}</span>
+                            </div>
+                            <span className="text-xs font-bold text-muted-foreground">Based on {reviews.length} actual reviews</span>
+                        </div>
+                    </div>
+                    <Button
+                        onClick={() => setIsReviewDialogOpen(true)}
+                        className="rounded-full font-black uppercase tracking-widest text-xs px-6 h-10 shadow-lg shadow-primary/10"
+                    >
+                        Write a Review
+                    </Button>
+                </div>
+
+                {reviews.length === 0 && !loading ? (
+                    <div className="bg-muted/20 border border-dashed rounded-[2rem] p-10 text-center">
+                        <p className="text-sm font-bold text-muted-foreground italic mb-2">No reviews yet.</p>
+                        <p className="text-xs text-muted-foreground/60">Be the first to share your experience!</p>
+                    </div>
+                ) : (
+                    <ScrollArea className="w-full">
+                        <div className="flex space-x-5 pb-6">
+                            {reviews.map((review, index) => (
+                                <ReviewCard key={index} review={review} />
+                            ))}
+                        </div>
+                        <ScrollBar orientation="horizontal" className="h-1.5" />
+                    </ScrollArea>
+                )}
+            </div>
+
+            <AddReviewDialog
                 open={isReviewDialogOpen}
                 onOpenChange={setIsReviewDialogOpen}
                 targetId={targetId}

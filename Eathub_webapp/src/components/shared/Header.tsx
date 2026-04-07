@@ -25,6 +25,7 @@ import { Notifications } from './Notifications';
 import { useCart } from '@/context/CartProvider';
 import { useLocation } from '@/context/LocationProvider';
 import { useHeader } from '@/context/HeaderProvider';
+import { useNotifications } from '@/context/NotificationProvider';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Skeleton } from '../ui/skeleton';
@@ -61,12 +62,14 @@ export function Header({ className }: HeaderProps) {
   const { itemCount } = useCart();
   const { location, setLocation } = useLocation();
   const { headerTitle, headerPath } = useHeader();
+  const { unreadCount } = useNotifications();
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [newLocation, setNewLocation] = useState(location);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Search States
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -251,7 +254,7 @@ export function Header({ className }: HeaderProps) {
   })();
 
   const isLoggedIn = !!auth.token;
-  const hasNotifications = true;
+  const hasNotifications = unreadCount > 0;
 
   return (
     <header className={cn("fixed top-0 w-full z-50 border-b bg-background shadow-md", className)}>
@@ -388,13 +391,20 @@ export function Header({ className }: HeaderProps) {
 
         {/* RIGHT NAV (CART/NOTIF/AUTH) */}
         <nav className="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-2">
-          <Sheet>
+          <Sheet open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10"><Bell className="h-6 w-6" />
-                {hasNotifications && <span className="absolute top-2.5 right-2.5 h-2.5 w-2.5 rounded-full bg-primary border-2 border-background" />}
+              <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10">
+                <Bell className="h-6 w-6" />
+                {hasNotifications && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full animate-in zoom-in border-2 border-background">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
               </Button>
             </SheetTrigger>
-            <SheetContent className="p-0"><Notifications /></SheetContent>
+            <SheetContent className="p-0">
+              <Notifications onClose={() => setIsNotificationsOpen(false)} />
+            </SheetContent>
           </Sheet>
 
           <Sheet>

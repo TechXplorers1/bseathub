@@ -18,8 +18,8 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 
 interface OrderedItem {
-    id: string;
-    name: string;
+    itemRefId: string;
+    itemName: string;
 }
 
 interface ReviewDialogProps {
@@ -65,6 +65,36 @@ export function ReviewDialog({
     const [reviewedItemIds, setReviewedItemIds] = useState<Set<string>>(new Set());
     const [error, setError] = useState('');
 
+    // PERSISTENCE RECOVERY
+    useEffect(() => {
+        if (isOpen && orderId && !submitted) {
+            const draftKey = `order-review-draft-${orderId}`;
+            const draft = sessionStorage.getItem(draftKey);
+            if (draft) {
+                try {
+                    const parsed = JSON.parse(draft);
+                    if (parsed.providerRating) setProviderRating(parsed.providerRating);
+                    if (parsed.providerComment) setProviderComment(parsed.providerComment);
+                    if (parsed.itemReviews) setItemReviews(parsed.itemReviews);
+                } catch (e) {
+                    console.error("Failed to restore complex review draft", e);
+                }
+            }
+        }
+    }, [isOpen, orderId, submitted]);
+
+    // AUTO-SAVE DRAFT
+    useEffect(() => {
+        if (isOpen && orderId && !submitted && (providerRating > 0 || Object.keys(itemReviews).length > 0)) {
+            const draftKey = `order-review-draft-${orderId}`;
+            sessionStorage.setItem(draftKey, JSON.stringify({
+                providerRating,
+                providerComment,
+                itemReviews
+            }));
+        }
+    }, [isOpen, orderId, providerRating, providerComment, itemReviews, submitted]);
+
     const getCustomerId = () => {
         if (typeof window === 'undefined') return null;
         return (
@@ -77,17 +107,24 @@ export function ReviewDialog({
     // Initialize state
     useEffect(() => {
         if (!isOpen) return;
-        setProviderRating(0);
-        setProviderHover(0);
-        setProviderComment('');
+
+        const draftKey = `order-review-draft-${orderId}`;
+        const existingDraft = sessionStorage.getItem(draftKey);
+
+        if (!existingDraft) {
+            setProviderRating(0);
+            setProviderHover(0);
+            setProviderComment('');
+            
+            const initialItemState: Record<string, ItemReviewState> = {};
+            orderedItems.forEach(item => {
+                initialItemState[item.itemRefId] = { rating: 0, hover: 0, comment: '' };
+            });
+            setItemReviews(initialItemState);
+        }
+
         setSubmitted(false);
         setError('');
-
-        const initialItemState: Record<string, ItemReviewState> = {};
-        orderedItems.forEach(item => {
-            initialItemState[item.id] = { rating: 0, hover: 0, comment: '' };
-        });
-        setItemReviews(initialItemState);
 
         const customerId = getCustomerId();
         if (!customerId) {
@@ -100,8 +137,8 @@ export function ReviewDialog({
             const reviewed = new Set<string>();
             try {
                 const checkPromises = orderedItems.map(async (item) => {
-                    const isReviewed = await checkAlreadyReviewed(customerId, targetId, item.id);
-                    if (isReviewed) reviewed.add(item.id);
+                    const isReviewed = await checkAlreadyReviewed(customerId, targetId, item.itemRefId);
+                    if (isReviewed) reviewed.add(item.itemRefId);
                 });
                 await Promise.all(checkPromises);
                 setReviewedItemIds(reviewed);
@@ -113,7 +150,14 @@ export function ReviewDialog({
         };
 
         checkStatus();
-    }, [isOpen, orderedItems]);
+    }, [isOpen, orderId, targetId]);
+
+    const allItemsAlreadyReviewed = orderedItems.length > 0 && 
+        reviewedItemIds.size === orderedItems.length;
+
+    const anyNewRatingEntered = orderedItems.length > 0 
+        ? orderedItems.some(item => !reviewedItemIds.has(item.itemRefId) && itemReviews[item.itemRefId]?.rating > 0)
+        : providerRating > 0;
 
     const starLabels = ['Poor 😞', 'Fair 😐', 'Good 🙂', 'Great 😊', 'Excellent 🤩'];
 
@@ -144,7 +188,7 @@ export function ReviewDialog({
         // Submit Item-Level Reviews
         if (orderedItems.length > 0) {
             for (const item of orderedItems) {
-                const reviewState = itemReviews[item.id];
+                const reviewState = itemReviews[item.itemRefId];
                 if (reviewState && reviewState.rating > 0) {
                     atLeastOne = true;
                     // For item review, targetId is the restaurant/provider,
@@ -156,8 +200,8 @@ export function ReviewDialog({
                         rating: reviewState.rating,
                         comment: reviewState.comment.trim(),
                         orderId: orderId,
-                        menuItemId: item.id,
-                        menuItemName: item.name
+                        menuItemId: item.itemRefId,
+                        menuItemName: item.itemName
                     };
                     promises.push(submitReview(payload));
                 }
@@ -191,6 +235,9 @@ export function ReviewDialog({
             setError(err.message || 'Something went wrong. Please try again.');
         } finally {
             setLoading(false);
+            if (!loading && submitted) {
+                sessionStorage.removeItem(`order-review-draft-${orderId}`);
+            }
         }
     };
 
@@ -256,19 +303,19 @@ export function ReviewDialog({
                             {orderedItems.length > 0 ? (
                                 // Item-Level Reviews
                                 orderedItems.map((item, idx) => {
-                                    const state = itemReviews[item.id] || { rating: 0, hover: 0, comment: '' };
+                                    const state = itemReviews[item.itemRefId] || { rating: 0, hover: 0, comment: '' };
                                     const activeItemRating = state.hover || state.rating;
-                                    const isAlreadyReviewed = reviewedItemIds.has(item.id);
+                                    const isAlreadyReviewed = reviewedItemIds.has(item.itemRefId);
 
                                     return (
-                                        <div key={item.id} className={cn(
+                                        <div key={item.itemRefId} className={cn(
                                             "border p-4 rounded-xl space-y-3 transition-opacity",
                                             isAlreadyReviewed ? "bg-slate-50 opacity-60 border-slate-200" : "bg-slate-50 border-slate-100"
                                         )}>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2 font-bold text-slate-800">
                                                     <Utensils className="w-4 h-4 text-orange-500" />
-                                                    <span>{item.name}</span>
+                                                    <span>{item.itemName}</span>
                                                 </div>
                                                 {isAlreadyReviewed && (
                                                     <span className="text-[10px] font-black text-green-600 uppercase flex items-center gap-1">
@@ -285,9 +332,9 @@ export function ReviewDialog({
                                                             key={star}
                                                             type="button"
                                                             disabled={isAlreadyReviewed}
-                                                            onMouseEnter={() => !isAlreadyReviewed && updateItemReview(item.id, 'hover', star)}
-                                                            onMouseLeave={() => !isAlreadyReviewed && updateItemReview(item.id, 'hover', 0)}
-                                                            onClick={() => !isAlreadyReviewed && updateItemReview(item.id, 'rating', star)}
+                                                            onMouseEnter={() => !isAlreadyReviewed && updateItemReview(item.itemRefId, 'hover', star)}
+                                                            onMouseLeave={() => !isAlreadyReviewed && updateItemReview(item.itemRefId, 'hover', 0)}
+                                                            onClick={() => !isAlreadyReviewed && updateItemReview(item.itemRefId, 'rating', star)}
                                                             className="transition-transform hover:scale-110 focus:outline-none"
                                                         >
                                                             <Star
@@ -312,9 +359,9 @@ export function ReviewDialog({
                                             {!isAlreadyReviewed && state.rating > 0 && (
                                                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                                     <Textarea
-                                                        placeholder={`Any comments specifically for ${item.name}? (optional)`}
+                                                        placeholder={`Any comments specifically for ${item.itemName}? (optional)`}
                                                         value={state.comment}
-                                                        onChange={(e) => updateItemReview(item.id, 'comment', e.target.value)}
+                                                        onChange={(e) => updateItemReview(item.itemRefId, 'comment', e.target.value)}
                                                         className="resize-none text-xs leading-relaxed bg-white border-slate-200"
                                                         rows={2}
                                                         maxLength={200}
@@ -379,14 +426,21 @@ export function ReviewDialog({
                         </Button>
                         <Button
                             onClick={handleSubmit}
-                            disabled={loading || (orderedItems.length > 0 ? !Object.values(itemReviews).some(r => r.rating > 0) : providerRating === 0)}
-                            className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-7 min-w-[140px] shadow-lg shadow-orange-200"
+                            disabled={loading || allItemsAlreadyReviewed || !anyNewRatingEntered}
+                            className={cn(
+                                "rounded-full px-7 min-w-[140px] shadow-lg transition-all",
+                                allItemsAlreadyReviewed 
+                                    ? "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
+                                    : "bg-orange-500 hover:bg-orange-600 text-white shadow-orange-200"
+                            )}
                         >
                             {loading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     Submitting…
                                 </>
+                            ) : allItemsAlreadyReviewed ? (
+                                'Already Reviewed ✅'
                             ) : (
                                 'Submit Reviews'
                             )}

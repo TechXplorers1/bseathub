@@ -27,6 +27,7 @@ interface OrderDetailsDialogProps {
     isOpen: boolean;
     onClose: () => void;
     onCancelOrder?: (orderId: string) => void;
+    onOpenReview?: (order: OrderResponse) => void;
 }
 
 export function OrderDetailsDialog({
@@ -34,13 +35,13 @@ export function OrderDetailsDialog({
     isOpen,
     onClose,
     onCancelOrder,
+    onOpenReview,
 }: OrderDetailsDialogProps) {
     const router = useRouter();
     const canCancel = ['Pending Approval', 'Approved', 'Confirmed'].includes(order.currentStatusId);
     const isDelivered = order.currentStatusId === 'Delivered';
     const isActive = !['Delivered', 'Cancelled'].includes(order.currentStatusId);
 
-    const [showReview, setShowReview] = useState(false);
     const [isReviewed, setIsReviewed] = useState(false);
 
     useEffect(() => {
@@ -61,7 +62,9 @@ export function OrderDetailsDialog({
 
     const handleRateNow = () => {
         onClose();
-        setTimeout(() => setShowReview(true), 150);
+        if (onOpenReview) {
+            onOpenReview(order);
+        }
     };
 
     const statusConfig: Record<string, { bg: string; text: string; border: string; dot: string }> = {
@@ -77,9 +80,12 @@ export function OrderDetailsDialog({
     const config = statusConfig[order.currentStatusId] || { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200', dot: 'bg-gray-400' };
 
     return (
-        <>
-            <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-                <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden rounded-3xl border-0 shadow-2xl bg-card">
+        <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+                <DialogContent 
+                    className="sm:max-w-[550px] p-0 overflow-hidden rounded-3xl border-0 shadow-2xl bg-card"
+                    onPointerDownOutside={(e) => e.preventDefault()}
+                    onEscapeKeyDown={(e) => e.preventDefault()}
+                >
 
                     {/* Header Section */}
                     <div className="bg-slate-900 px-8 pt-8 pb-6 text-white relative">
@@ -252,18 +258,5 @@ export function OrderDetailsDialog({
                 </DialogContent>
             </Dialog>
 
-            {/* Step 2: Review Dialog */}
-            <ReviewDialog
-                isOpen={showReview}
-                onClose={() => setShowReview(false)}
-                targetId={order.sourceId}
-                targetType={order.sourceType as any}
-                providerName={order.sourceName}
-                orderedItems={order.items.map(i => ({ id: i.itemRefId, name: i.itemName }))}
-                orderTotal={order.totalAmount}
-                orderDate={new Date(order.orderPlacedAt).toLocaleDateString()}
-                orderId={order.id}
-            />
-        </>
     );
 }

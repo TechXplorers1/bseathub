@@ -32,6 +32,29 @@ export function ReviewModal({ isOpen, onClose, targetId, targetName, targetType,
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
 
+    // PERSISTENCE RECOVERY
+    React.useEffect(() => {
+        if (isOpen && !comment && !rating) {
+            const draft = sessionStorage.getItem(`review-draft-${targetId || orderId}`);
+            if (draft) {
+                try {
+                    const parsed = JSON.parse(draft);
+                    if (parsed.rating) setRating(parsed.rating);
+                    if (parsed.comment) setComment(parsed.comment);
+                } catch (e) {
+                    console.error("Draft recovery failed", e);
+                }
+            }
+        }
+    }, [isOpen, targetId, orderId]);
+
+    // AUTO-SAVE DRAFT
+    React.useEffect(() => {
+        if (isOpen && (comment || rating)) {
+            sessionStorage.setItem(`review-draft-${targetId || orderId}`, JSON.stringify({ comment, rating }));
+        }
+    }, [comment, rating, isOpen, targetId, orderId]);
+
     const handleSubmit = async () => {
         if (rating === 0) {
             toast({ variant: 'destructive', title: 'Rating required', description: 'Please select a star rating.' });
@@ -60,12 +83,19 @@ export function ReviewModal({ isOpen, onClose, targetId, targetName, targetType,
             toast({ variant: 'destructive', title: 'Submission failed', description: error.message });
         } finally {
             setIsSubmitting(false);
+            if (!isSubmitting) {
+                sessionStorage.removeItem(`review-draft-${targetId || orderId}`);
+            }
         }
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[450px] rounded-[2.5rem] border-none shadow-2xl overflow-hidden p-8">
+        <DialogContent 
+            className="sm:max-w-[450px] rounded-[2.5rem] border-none shadow-2xl overflow-hidden p-8"
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onEscapeKeyDown={(e) => e.preventDefault()}
+        >
                 <DialogHeader>
                     <div className="w-12 h-1 bg-primary/20 rounded-full mb-6 mx-auto" />
                     <DialogTitle className="text-3xl font-black tracking-tight text-center uppercase">

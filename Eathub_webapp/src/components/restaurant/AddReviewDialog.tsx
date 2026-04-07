@@ -64,6 +64,35 @@ export function AddReviewDialog({
     },
   });
 
+  // RESTORE DRAFT ON MOUNT/OPEN
+  React.useEffect(() => {
+    if (open) {
+      const draft = sessionStorage.getItem(`review-draft-${targetId}`);
+      if (draft && !form.getValues('text')) {
+        try {
+          const parsed = JSON.parse(draft);
+          if (parsed.rating) form.setValue('rating', parsed.rating);
+          if (parsed.text) form.setValue('text', parsed.text);
+        } catch (e) {
+          console.error("Draft restoration failed", e);
+        }
+      }
+    }
+  }, [open, targetId, form]);
+
+  // AUTO-SAVE DRAFT
+  const watchedText = form.watch('text');
+  const watchedRating = form.watch('rating');
+
+  React.useEffect(() => {
+    if (open && (watchedText || watchedRating)) {
+      sessionStorage.setItem(`review-draft-${targetId}`, JSON.stringify({ 
+        text: watchedText, 
+        rating: watchedRating 
+      }));
+    }
+  }, [watchedText, watchedRating, open, targetId]);
+
   const handleFormSubmit = async (data: ReviewFormValues) => {
     const customerId = localStorage.getItem('userId') || localStorage.getItem('customerId');
     if (!customerId) {
@@ -89,6 +118,9 @@ export function AddReviewDialog({
         toast({ variant: 'destructive', title: 'Error', description: err.message || 'Failed to submit review' });
     } finally {
         setLoading(false);
+        if (!loading) {
+            sessionStorage.removeItem(`review-draft-${targetId}`);
+        }
     }
   };
   
@@ -96,7 +128,11 @@ export function AddReviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-[2rem] border-none shadow-2xl">
+      <DialogContent 
+        className="rounded-[2rem] border-none shadow-2xl"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader className="pt-4">
           <DialogTitle className="text-2xl font-black uppercase tracking-tight">Your Experience</DialogTitle>
           <DialogDescription className="font-medium text-muted-foreground">

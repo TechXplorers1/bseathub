@@ -673,3 +673,26 @@ export const replyToReview = async (reviewId: string, reply: string): Promise<Re
     if (!res.ok) throw new Error("Failed to reply to review");
     return res.json();
 };
+
+export const getNotifications = async (userId: string): Promise<any[]> => {
+    const res = await fetch(`${BASE_URL}/notifications/user/${userId}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error("Failed to fetch notifications");
+    return res.json();
+};
+
+export const markNotificationAsRead = async (id: string) => {
+    await fetch(`${BASE_URL}/notifications/mark-as-read/${id}`, { method: 'POST' });
+};
+
+
+export const markAllNotificationsAsRead = async (userId: string) => {
+    await fetch(`${BASE_URL}/notifications/mark-all-as-read/${userId}`, { method: 'POST' });
+};
+
+export const deleteNotification = async (id: string) => {
+    await fetch(`${BASE_URL}/notifications/${id}`, { method: 'DELETE' });
+};
+
+export const clearAllNotifications = async (userId: string) => {
+    await fetch(`${BASE_URL}/notifications/user/${userId}`, { method: 'DELETE' });
+};

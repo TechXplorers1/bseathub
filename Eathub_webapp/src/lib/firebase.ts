@@ -2,12 +2,14 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB_ymS3eqrmTDxnrlLeb1Dr56eQq0hSGPc",
+  authDomain: "eathub-635ea.firebaseapp.com",
+  databaseURL: "https://eathub-635ea-default-rtdb.firebaseio.com",
+  projectId: "eathub-635ea",
+  storageBucket: "eathub-635ea.firebasestorage.app",
+  messagingSenderId: "727506428128",
+  appId: "1:727506428128:web:683b279b8ac57527a9f085",
+  measurementId: "G-PP277TB8Q2"
 };
 
 // Initialize Firebase only if not already initialized
@@ -24,7 +26,7 @@ export const requestForToken = async () => {
 
     const messaging = getMessaging(app);
     const currentToken = await getToken(messaging, {
-      vapidKey: "YOUR_VAPID_KEY",
+      vapidKey: "BBnIlnz_X48mAVhRBASeCtwLz_v4vWYNJhyXWLgcgivmFY048NDLWhVI_gHXCzT5rGF0fKRSZLyUkrncmMbLlxw",
     });
 
     if (currentToken) {
@@ -43,12 +45,10 @@ export const requestForToken = async () => {
   }
 };
 
-export const onMessageListener = () => {
+export const onMessageListener = (callback: (payload: any) => void) => {
   const messaging = getMessaging(app);
-  return new Promise((resolve) => {
-    onMessage(messaging, (payload) => {
-      console.log("OnMessage payload:", payload);
-      resolve(payload);
-    });
+  return onMessage(messaging, (payload) => {
+    console.log("Real-time Message received:", payload);
+    callback(payload);
   });
 };

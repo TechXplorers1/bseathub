@@ -529,3 +529,17 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
   ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
   ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
   ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'Unpaid';
+
+  -- changeset eathub:2.3.0
+  -- Create favorites table for users to save items and providers
+  CREATE TABLE IF NOT EXISTS favorites (
+      id VARCHAR(36) PRIMARY KEY,
+      user_id VARCHAR(36) NOT NULL,
+      target_id VARCHAR(36) NOT NULL,
+      target_type VARCHAR(50) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_favorites_user FOREIGN KEY (user_id) REFERENCES users(id),
+      UNIQUE(user_id, target_id, target_type)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);

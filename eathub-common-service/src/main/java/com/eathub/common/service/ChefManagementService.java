@@ -29,27 +29,27 @@ public class ChefManagementService {
     // ================= CHEF PROFILE =================
     public List<ChefResponseDTO> getAllChefs() {
         return chefRepository.findAllWithDetails().stream()
-                .map(this::mapToDTO)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public ChefResponseDTO getChefBySlug(String slug) {
         return chefRepository.findBySlug(slug)
-                .map(this::mapToDTO)
-                .or(() -> chefRepository.findById(slug).map(this::mapToDTO))
+                .map(this::mapToResponse)
+                .or(() -> chefRepository.findById(slug).map(this::mapToResponse))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Chef not found with slug or ID: " + slug));
     }
 
     public ChefResponseDTO getChefById(String id) {
         return chefRepository.findById(id)
-                .map(this::mapToDTO)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found with id: " + id));
     }
 
     public ChefResponseDTO getChefByOwnerId(String ownerId) {
         return chefRepository.findByOwnerId(ownerId)
-                .map(this::mapToDTO)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chef not found for owner: " + ownerId));
     }
 
@@ -69,7 +69,7 @@ public class ChefManagementService {
                 .owner(owner)
                 .build();
 
-        return mapToDTO(chefRepository.save(chef));
+        return mapToResponse(chefRepository.save(chef));
     }
 
     @Transactional
@@ -152,7 +152,7 @@ public class ChefManagementService {
             chefLegalProfileRepository.save(legal);
         }
 
-        return mapToDTO(chefRepository.save(chef));
+        return mapToResponse(chefRepository.save(chef));
     }
 
     @Transactional
@@ -192,7 +192,7 @@ public class ChefManagementService {
         }
 
         chefAddressRepository.save(address);
-        return mapToDTO(chef);
+        return mapToResponse(chef);
     }
 
     @Transactional
@@ -243,7 +243,7 @@ public class ChefManagementService {
         }
 
         chefLegalProfileRepository.save(legal);
-        return mapToDTO(chef);
+        return mapToResponse(chef);
     }
 
     // ================= CHEF SERVICES =================
@@ -342,7 +342,7 @@ public class ChefManagementService {
                 .build();
     }
 
-    public ChefResponseDTO mapToDTO(Chef chef) {
+    public ChefResponseDTO mapToResponse(Chef chef) {
         ChefResponseDTO dto = new ChefResponseDTO();
         dto.setId(chef.getId());
         dto.setName(chef.getName());

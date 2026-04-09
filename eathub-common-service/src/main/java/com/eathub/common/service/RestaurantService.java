@@ -221,7 +221,7 @@ public class RestaurantService {
     }
 
     // ── Map entity → DTO (flattens for frontend) ──────────────────────────
-    private RestaurantResponseDTO mapToResponseDTO(Restaurant r) {
+    public RestaurantResponseDTO mapToResponseDTO(Restaurant r) {
         RestaurantResponseDTO dto = new RestaurantResponseDTO();
         dto.setId(r.getId());
         dto.setName(r.getName());
@@ -236,6 +236,8 @@ public class RestaurantService {
         dto.setImageId(r.getImageId());
         dto.setCoverImageId(r.getCoverImageId());
         dto.setBusinessModel(r.getBusinessModel());
+        dto.setDeliveryTime(r.getAvgDeliveryTime());
+        dto.setDeliveryFee(r.getBaseDeliveryFee());
 
         User owner = r.getOwner();
         if (owner != null) {

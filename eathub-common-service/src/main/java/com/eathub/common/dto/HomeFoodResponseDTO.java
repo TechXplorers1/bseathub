@@ -10,7 +10,10 @@ public class HomeFoodResponseDTO {
     private String foodType;
     private String slug;
     private Double rating;
+    private String cuisine;
     private Integer reviews;
+    private Integer deliveryTime;
+    private Double deliveryFee;
     private Boolean isActive;
     private String operationalStatus;
     private String workingHours;

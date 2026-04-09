@@ -202,6 +202,9 @@ public class HomeFoodService {
         dto.setWorkingHours(p.getWorkingHours());
         dto.setImageId(p.getImageId());
         dto.setCoverImageId(p.getCoverImageId());
+        dto.setCuisine(p.getCuisines());
+        dto.setDeliveryTime(p.getAvgDeliveryTime() != null ? p.getAvgDeliveryTime() : 30);
+        dto.setDeliveryFee(p.getBaseDeliveryFee() != null ? p.getBaseDeliveryFee() : 0.0);
 
         if (p.getAddress() != null) {
             HomeFoodAddress a = p.getAddress();
@@ -249,6 +252,10 @@ public class HomeFoodService {
                 .isSpecial(Boolean.TRUE.equals(item.getIsSpecial()))
                 .imageId(item.getImageId())
                 .category(item.getCategory() != null ? item.getCategory().getTitle() : "General")
+                .providerId(item.getHomeFood() != null ? item.getHomeFood().getId() : null)
+                .providerName(item.getHomeFood() != null ? item.getHomeFood().getBrandName() : null)
+                .providerType("home-food")
+                .providerSlug(item.getHomeFood() != null ? item.getHomeFood().getSlug() : null)
                 .build();
     }
 }

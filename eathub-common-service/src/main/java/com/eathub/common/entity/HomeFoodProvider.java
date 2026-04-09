@@ -44,6 +44,12 @@ public class HomeFoodProvider {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "avg_delivery_time")
+    private Integer avgDeliveryTime;
+
+    @Column(name = "base_delivery_fee")
+    private Double baseDeliveryFee;
+
     @Column(name = "image_id", columnDefinition = "TEXT")
     private String imageId;
 

@@ -17,6 +17,8 @@ public class RestaurantResponseDTO {
     private Boolean isOpen;
     private String workingHours;
     private String businessModel;
+    private Integer deliveryTime;
+    private Double deliveryFee;
 
     // ── Owner ─────────────────────────────────────────────
     private String ownerName;

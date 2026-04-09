@@ -163,8 +163,8 @@ public class MenuService {
 
     // ================= MAPPERS =================
 
-    private MenuItemDTO mapToDTO(MenuItem item) {
-        return MenuItemDTO.builder()
+    public MenuItemDTO mapToDTO(MenuItem item) {
+        MenuItemDTO dto = MenuItemDTO.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
@@ -174,6 +174,19 @@ public class MenuService {
                 .isSpecial(item.getIsSpecial())
                 .imageId(item.getImageId())
                 .build();
+
+        if (item.getRestaurant() != null) {
+            dto.setProviderId(item.getRestaurant().getId());
+            dto.setProviderName(item.getRestaurant().getName());
+            dto.setProviderType("restaurant");
+            dto.setProviderSlug(item.getRestaurant().getSlug());
+        } else if (item.getHomeFood() != null) {
+            dto.setProviderId(item.getHomeFood().getId());
+            dto.setProviderName(item.getHomeFood().getBrandName());
+            dto.setProviderType("home-food");
+            dto.setProviderSlug(item.getHomeFood().getSlug());
+        }
+        return dto;
     }
 
     private MenuResponseDTO mapToResponse(MenuItem item) {

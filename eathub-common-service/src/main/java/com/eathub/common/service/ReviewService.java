@@ -159,18 +159,21 @@ public class ReviewService {
 
     public List<ReviewResponse> getReviewsForOwner(String ownerId, String type) {
         String targetId = ownerId;
-        if ("Chef".equalsIgnoreCase(type)) {
+        if ("Chef".equalsIgnoreCase(type) || "CHEF".equalsIgnoreCase(type)) {
             Chef chef = chefRepository.findByOwnerId(ownerId)
                     .orElseThrow(() -> new RuntimeException("Chef not found for owner: " + ownerId));
             targetId = chef.getId();
-        } else if ("Restaurant".equalsIgnoreCase(type)) {
+            type = "Chef";
+        } else if ("Restaurant".equalsIgnoreCase(type) || "RESTAURANT".equalsIgnoreCase(type)) {
             Restaurant restaurant = restaurantRepository.findByOwnerId(ownerId)
                     .orElseThrow(() -> new RuntimeException("Restaurant not found for owner: " + ownerId));
             targetId = restaurant.getId();
-        } else if ("HomeFood".equalsIgnoreCase(type) || "HomeFoodProvider".equalsIgnoreCase(type)) {
+            type = "Restaurant";
+        } else if ("HomeFood".equalsIgnoreCase(type) || "HOME_FOOD".equalsIgnoreCase(type) || "HomeFoodProvider".equalsIgnoreCase(type)) {
             HomeFoodProvider hfp = homeFoodRepository.findByOwnerId(ownerId)
                     .orElseThrow(() -> new RuntimeException("HomeFood provider not found for owner: " + ownerId));
             targetId = hfp.getId();
+            type = "HomeFood";
         }
         return getReviewsForProvider(targetId, type);
     }

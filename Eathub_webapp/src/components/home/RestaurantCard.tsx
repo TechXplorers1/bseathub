@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Star, Bike, ShoppingBag } from 'lucide-react';
 import { getDisplayImage } from '@/lib/image-utils';
+import { FavoriteButton } from '@/components/shared/FavoriteButton';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -14,10 +15,12 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   const displayImage = getDisplayImage(restaurant.coverImageId || restaurant.imageId, 'restaurant-1');
   // Safe check for services array
   const services = restaurant.services || [];
+  const typePrefix = restaurant.type === 'home-food' ? 'home-food' : 'restaurant';
+  const displayName = restaurant.name || (restaurant as any).brandName || 'Provider';
 
   return (
     <Link
-      href={`/restaurant/${restaurant.slug || restaurant.id}`}
+      href={`/${typePrefix}/${restaurant.slug || restaurant.id}`}
       target="_blank"
       rel="noopener noreferrer"
       className="flex group"
@@ -26,10 +29,18 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
         <div className="relative h-48 w-full overflow-hidden">
           <Image
             src={displayImage}
-            alt={restaurant.name}
+            alt={displayName}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+          
+          <div className="absolute top-2 right-2">
+            <FavoriteButton
+              targetId={restaurant.id}
+              targetType={restaurant.type === 'home-food' ? 'HOME_FOOD' : 'RESTAURANT'}
+            />
+          </div>
+
           <div className="absolute bottom-2 right-2 flex gap-2">
             {services.includes('delivery') && (
               <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm flex items-center gap-1 shadow-sm">
@@ -49,7 +60,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
         <CardContent className="p-4 flex flex-col flex-1">
           <div className="flex-1">
             <div className="flex justify-between items-start gap-2">
-              <h3 className="font-bold text-lg leading-tight line-clamp-1">{restaurant.name}</h3>
+              <h3 className="font-bold text-lg leading-tight line-clamp-1">{displayName}</h3>
               <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0 bg-green-50 border-green-200">
                 <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
                 <span className="text-xs font-bold text-green-700">

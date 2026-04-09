@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import type { MenuItem as BaseMenuItem } from '@/lib/types';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { MenuItem } from '@/components/restaurant/MenuItem';
 import { MenuItemDialog } from '@/components/restaurant/MenuItemDialog';
 import { Separator } from '../ui/separator';
+import { useRestaurants } from '@/context/RestaurantProvider';
 
 type EnrichedMenuItem = BaseMenuItem & {
   restaurantName?: string;
@@ -13,39 +13,31 @@ type EnrichedMenuItem = BaseMenuItem & {
   recipe?: string;
 };
 
-const allItems = [...allRestaurants, ...allHomeFoods];
-
-const allEnrichedItems = allItems.flatMap((restaurant) =>
-  restaurant.menu.flatMap((category) =>
-    category.items.map((item) => ({
-      ...item,
-      type: restaurant.type,
-      restaurantName: restaurant.name,
-      // Prefer item rating, else fall back to restaurant rating
-      rating:
-        typeof (item as any).rating === 'number'
-          ? (item as any).rating
-          : restaurant.rating,
-      // Prefer a specific recipe field if present, else use description
-      recipe: (item as any).recipe ?? item.description,
-    }))
-  )
-);
-
-// Deduplicate items based on their ID to avoid duplicate keys when rendering.
-// This handles cases where the same item appears in multiple categories (e.g., "Featured" and "Main").
-const uniqueEnrichedItems = Array.from(
-  new Map(allEnrichedItems.map((item) => [item.id, item])).values()
-);
-
-const mostOrderedItems: EnrichedMenuItem[] = uniqueEnrichedItems
-  .sort(() => 0.5 - Math.random())
-  .slice(0, 9);
-
 export function MostOrdered() {
-  const [selectedItem, setSelectedItem] = useState<EnrichedMenuItem | null>(
-    null
+  const { allItems: vendors, loading: vendorsLoading } = useRestaurants();
+  const [selectedItem, setSelectedItem] = useState<EnrichedMenuItem | null>(null);
+
+  if (vendorsLoading) return null;
+
+  const allEnrichedItems = vendors.flatMap((restaurant) =>
+    (restaurant.menu || []).flatMap((category) =>
+      (category.items || []).map((item) => ({
+        ...item,
+        type: restaurant.type,
+        restaurantName: restaurant.name,
+        rating: typeof (item as any).rating === 'number' ? (item as any).rating : restaurant.rating,
+        recipe: (item as any).recipe ?? item.description,
+      }))
+    )
   );
+
+  const uniqueEnrichedItems = Array.from(
+    new Map(allEnrichedItems.map((item) => [item.id, item])).values()
+  );
+
+  const mostOrderedItems: EnrichedMenuItem[] = uniqueEnrichedItems
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 9);
 
   const handleItemClick = (item: EnrichedMenuItem) => {
     setSelectedItem(item);

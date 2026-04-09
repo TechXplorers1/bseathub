@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,7 +18,6 @@ import {
 } from '@/components/ui/table';
 import {
     Tabs,
-    TabsContent,
     TabsList,
     TabsTrigger,
 } from '@/components/ui/tabs';
@@ -37,6 +35,7 @@ import { fetchMyOrders, updateOrderStatus, cancelOrder } from '@/services/api';
 import type { OrderResponse } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { CancellationReasonDialog } from '@/components/shared/CancellationReasonDialog';
+import { useHeader } from '@/context/HeaderProvider';
 
 type OrderStatusFilter = 'All' | 'New' | 'Preparing' | 'Completed' | 'Cancelled';
 
@@ -50,6 +49,17 @@ export default function HomeFoodOrdersPage() {
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
     const { toast } = useToast();
+
+    // Connect to Global Search
+    const { searchQuery, setSearchPlaceholder, setSearchQuery } = useHeader();
+
+    useEffect(() => {
+        setSearchPlaceholder("Search kitchen orders by ID, name, total...");
+        return () => {
+            setSearchPlaceholder("Search food, restaurants, chefs...");
+            setSearchQuery('');
+        };
+    }, []);
 
     const loadOrders = async () => {
         setLoading(true);
@@ -112,6 +122,19 @@ export default function HomeFoodOrdersPage() {
     };
 
     const filteredOrders = orders.filter(order => {
+        // Apply Global Search Filter
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const matchesSearch = 
+                order.id.toLowerCase().includes(q) ||
+                order.customerName?.toLowerCase().includes(q) ||
+                order.totalAmount.toString().includes(q) ||
+                order.deliveryAddress?.toLowerCase().includes(q);
+            
+            if (!matchesSearch) return false;
+        }
+
+        // Tab Filter
         if (activeTab === 'All') return true;
         if (activeTab === 'New') return order.currentStatusId === 'Confirmed';
         if (activeTab === 'Preparing') return ['Preparing', 'Preparation Completed', 'Out for Delivery'].includes(order.currentStatusId);
@@ -159,7 +182,7 @@ export default function HomeFoodOrdersPage() {
                     <ChefHat className="h-8 w-8 text-primary" />
                     Home Kitchen Orders
                 </h1>
-                <Button onClick={loadOrders} variant="outline" size="sm" className="gap-2 rounded-full font-bold">
+                <Button onClick={loadOrders} variant="outline" size="sm" className="gap-2 rounded-full font-bold transition-all hover:border-primary active:scale-95">
                     <RefreshCcw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
                     Refresh
                 </Button>
@@ -171,15 +194,15 @@ export default function HomeFoodOrdersPage() {
                         <TabsTrigger
                             key={status}
                             value={status}
-                            className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm font-bold text-xs py-2"
+                            className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm font-bold text-xs py-2 transition-all"
                         >
                             {status}
                         </TabsTrigger>
                     ))}
                 </TabsList>
 
-                <Card className="mt-6 border-none shadow-xl bg-card/60 backdrop-blur-md overflow-hidden">
-                    <CardHeader className="border-b border-border/50 bg-muted/20">
+                <Card className="mt-6 border-none shadow-xl bg-card/60 backdrop-blur-md overflow-hidden ring-1 ring-border/30">
+                    <CardHeader className="border-b border-border/10 bg-muted/20">
                         <CardTitle className="text-xl font-bold text-primary flex items-center gap-2">Kitchen Dashboard</CardTitle>
                         <CardDescription className="font-semibold text-muted-foreground/80">
                             {loading ? "Syncing orders..." : `You have ${filteredOrders.length} active orders to manage.`}
@@ -189,11 +212,11 @@ export default function HomeFoodOrdersPage() {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20 gap-4">
                                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                                <p className="text-muted-foreground font-black animate-pulse text-sm">Loading your kitchen's queue...</p>
+                                <p className="text-muted-foreground font-black animate-pulse text-sm uppercase tracking-widest">Loading your kitchen's queue...</p>
                             </div>
                         ) : filteredOrders.length === 0 ? (
-                            <div className="py-20 text-center flex flex-col items-center gap-2">
-                                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-2">
+                            <div className="py-20 text-center flex flex-col items-center gap-3">
+                                <div className="h-16 w-16 rounded-2xl bg-muted/40 flex items-center justify-center mb-2 rotate-3 transition-transform hover:rotate-0">
                                     <ChefHat className="h-8 w-8 text-muted-foreground/50" />
                                 </div>
                                 <p className="text-muted-foreground font-black text-lg">Your kitchen is currently free.</p>
@@ -203,7 +226,7 @@ export default function HomeFoodOrdersPage() {
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="hover:bg-transparent border-border/50">
+                                        <TableRow className="hover:bg-transparent border-border/30">
                                             <TableHead className="py-4 font-black">ID & Date</TableHead>
                                             <TableHead className="py-4 font-black">Customer Details</TableHead>
                                             <TableHead className="py-4 font-black">Status</TableHead>
@@ -213,14 +236,14 @@ export default function HomeFoodOrdersPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {filteredOrders.map(order => (
-                                            <TableRow key={order.id} className="group hover:bg-muted/30 border-border/50 transition-colors">
+                                            <TableRow key={order.id} className="group hover:bg-muted/30 border-border/10 transition-colors">
                                                 <TableCell className="py-4">
-                                                    <div className="font-black text-sm uppercase">#{order.id.slice(0, 8)}</div>
+                                                    <div className="font-black text-sm uppercase tracking-tighter">#{order.id.slice(0, 8)}</div>
                                                     <div className="text-xs text-muted-foreground font-bold">{new Date(order.orderPlacedAt || '').toLocaleDateString()}</div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="font-bold">{order.customerName || 'Customer'}</div>
-                                                    <div className="text-xs text-muted-foreground font-medium truncate max-w-[200px]">
+                                                    <div className="font-bold text-sm">{order.customerName || 'Customer'}</div>
+                                                    <div className="text-[11px] text-muted-foreground font-medium truncate max-w-[180px]">
                                                         {order.deliveryAddress}
                                                     </div>
                                                 </TableCell>
@@ -228,46 +251,33 @@ export default function HomeFoodOrdersPage() {
                                                     <div className="flex items-center gap-2">
                                                         <Badge
                                                             variant={getBadgeVariant(order.currentStatusId)}
-                                                            className="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider"
+                                                            className="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-center"
                                                         >
                                                             {getStatusLabel(order)}
                                                         </Badge>
-                                                        {order.currentStatusId === 'Cancelled' && order.cancellationReason && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="h-6 w-6 rounded-full text-destructive hover:bg-destructive/10"
-                                                                onClick={() => {
-                                                                    toast({
-                                                                        title: 'Cancellation Reason',
-                                                                        description: order.cancellationReason
-                                                                    });
-                                                                }}
-                                                            >
-                                                                <MoreHorizontal className="h-4 w-4 text-xs" />
-                                                            </Button>
-                                                        )}
                                                         {order.paymentStatus === 'Paid' && (
-                                                            <span className="text-[10px] font-black text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-200 uppercase tracking-tight animate-pulse shrink-0">
+                                                            <span className="text-[9px] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200 uppercase tracking-tight shrink-0">
                                                                 PAID 💰
                                                             </span>
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-right font-black text-primary">${order.totalAmount.toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-black text-primary">₹{order.totalAmount.toFixed(2)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 transition-colors">
+                                                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 transition-colors h-8 w-8">
                                                                 <MoreHorizontal className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end" className="w-56 rounded-2xl shadow-2xl p-2 bg-card/95 backdrop-blur-md border border-border/50">
                                                             <DropdownMenuItem onClick={() => setSelectedOrder(order)} className="rounded-lg font-bold py-2.5">
-                                                                View Items & Address
+                                                                View Order Summary
                                                             </DropdownMenuItem>
+                                                            
+                                                            <div className="h-px bg-border/40 my-1 mx-2" />
 
-                                                            {(order.currentStatusId === 'Confirmed' || order.currentStatusId === 'Provider Confirmed' || order.currentStatusId === 'Pending Approval') && (order.paymentStatus === 'Paid' || order.paymentStatus === 'Awaiting Payment') && (
+                                                            {(order.currentStatusId === 'Confirmed' || order.currentStatusId === 'Provider Confirmed' || order.currentStatusId === 'Pending Approval') && (
                                                                 <DropdownMenuItem
                                                                     onClick={() => handleStatusUpdate(order.id, 'Preparing')}
                                                                     className="font-black rounded-lg text-primary py-2.5 bg-primary/5 hover:bg-primary/10 transition-colors"
@@ -304,13 +314,13 @@ export default function HomeFoodOrdersPage() {
                                                             )}
 
                                                             <DropdownMenuItem
-                                                                className="text-destructive font-bold rounded-lg py-2.5 mt-2 opacity-80 hover:opacity-100"
+                                                                className="text-destructive font-black rounded-lg py-2.5 mt-2 opacity-80 hover:opacity-100 hover:bg-red-50"
                                                                 onClick={() => {
                                                                     setOrderToCancel(order.id);
                                                                     setIsCancelDialogOpen(true);
                                                                 }}
                                                             >
-                                                                🚫 Cancel Kitchen Prep
+                                                                🚫 Cancel Order
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>

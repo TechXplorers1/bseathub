@@ -6,7 +6,32 @@ import { getImageById, PlaceholderImageIds } from './placeholder-images';
  * Otherwise, it returns the input as is (assuming it's a URL or Base64).
  * Falls back to a default restaurant placeholder if input is empty.
  */
-export function getDisplayImage(idOrUrl: string | PlaceholderImageIds | undefined | null, fallbackId: PlaceholderImageIds = 'restaurant-1'): string {
+export function getCuisinePlaceholder(cuisine: string = ''): PlaceholderImageIds {
+  const c = cuisine.toLowerCase();
+  if (c.includes('ital')) return 'restaurant-1';
+  if (c.includes('sushi') || c.includes('jap')) return 'restaurant-2';
+  if (c.includes('burg') || c.includes('amer')) return 'restaurant-3';
+  if (c.includes('mex')) return 'restaurant-4';
+  if (c.includes('ind')) return 'restaurant-5';
+  if (c.includes('salad') || c.includes('green')) return 'restaurant-6';
+  if (c.includes('viet') || c.includes('nood')) return 'restaurant-7';
+  if (c.includes('pizz')) return 'restaurant-8';
+  if (c.includes('cafe') || c.includes('coffe')) return 'restaurant-9';
+  if (c.includes('thai')) return 'restaurant-10';
+  if (c.includes('veg')) return 'restaurant-11';
+  if (c.includes('steak')) return 'restaurant-12';
+  if (c.includes('medit')) return 'restaurant-13';
+  if (c.includes('break')) return 'restaurant-14';
+  if (c.includes('ramen')) return 'restaurant-15';
+  if (c.includes('dess') || c.includes('sweet')) return 'restaurant-16';
+  
+  return 'restaurant-1'; // Default
+}
+
+export function getDisplayImage(
+  idOrUrl: string | PlaceholderImageIds | undefined | null, 
+  fallbackId: PlaceholderImageIds = 'restaurant-1'
+): string {
   if (!idOrUrl) {
     const fallback = getImageById(fallbackId);
     return fallback?.imageUrl || '';

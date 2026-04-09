@@ -17,7 +17,8 @@ import {
   Utensils,
   Store,
   ChefHat,
-  User
+  User,
+  X
 } from 'lucide-react';
 
 import { Cart } from './Cart';
@@ -33,15 +34,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -52,6 +44,7 @@ import {
 
 import { useRestaurants } from '@/context/RestaurantProvider';
 import type { Chef } from '@/lib/types';
+import { AuthSuggestionDialog } from './AuthSuggestionDialog';
 
 interface HeaderProps {
   className?: string;
@@ -60,15 +53,13 @@ interface HeaderProps {
 export function Header({ className }: HeaderProps) {
 
   const { itemCount } = useCart();
-  const { location, setLocation } = useLocation();
-  const { headerTitle, headerPath } = useHeader();
+  const { setLocation } = useLocation();
+  const { headerTitle, headerPath, searchQuery, setSearchQuery, searchPlaceholder, localItems } = useHeader();
   const { unreadCount } = useNotifications();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [newLocation, setNewLocation] = useState(location);
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   // Search States
@@ -91,11 +82,10 @@ export function Header({ className }: HeaderProps) {
       const role = localStorage.getItem('userRole');
       const token = localStorage.getItem('token');
       const avatarUrl = localStorage.getItem('userAvatar');
-      
+
       setAuth({ email, role, token, avatarUrl });
       setIsLoading(false);
 
-      // 1. If role is CHEF, fetch chef-specific data
       if (role === 'CHEF') {
         const chefId = localStorage.getItem('chefId');
         if (chefId) {
@@ -108,23 +98,22 @@ export function Header({ className }: HeaderProps) {
         setChefData(null);
       }
 
-      // 2. For ANY logged-in role, if avatar is missing in local storage, try fetching from profile
       if (token && !avatarUrl) {
         fetch('http://localhost:8081/api/v1/users/profile', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
-        .then(res => res.json())
-        .then(data => {
+          .then(res => res.json())
+          .then(data => {
             if (data.avatarUrl) {
-                try {
-                    localStorage.setItem('userAvatar', data.avatarUrl);
-                } catch (e) {
-                    console.warn("Storage quota exceeded, could not save avatar.");
-                }
-                setAuth(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
+              try {
+                localStorage.setItem('userAvatar', data.avatarUrl);
+              } catch (e) {
+                console.warn("Storage quota exceeded, could not save avatar.");
+              }
+              setAuth(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
             }
-        })
-        .catch(err => console.error("Header profile sync error:", err));
+          })
+          .catch(err => console.error("Header profile sync error:", err));
       }
     };
 
@@ -163,6 +152,11 @@ export function Header({ className }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Clear search on route change (unless going to the same provider/dashboard)
+  useEffect(() => {
+    setIsSearchFocused(false);
+  }, [pathname]);
+
   const handleLogout = () => {
     localStorage.clear();
     setAuth({ email: null, role: null, token: null, avatarUrl: null });
@@ -171,74 +165,112 @@ export function Header({ className }: HeaderProps) {
     router.refresh();
   };
 
-  const handleLocationSave = () => {
-    setLocation(newLocation);
-    setIsLocationOpen(false);
-  };
-
   const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData } = useRestaurants();
 
-  const pathname = usePathname();
-
-  // --- Unified Search Logic Fix ---
+  // --- Context-Aware Unified Search Logic ---
   const searchResults = useMemo(() => {
-    if (!searchQuery.trim() || searchQuery.length < 2) return null;
+    if (!searchQuery.trim() || searchQuery.length < 1) return null;
+
+    const isDashboard = pathname.includes('-dashboard') || (pathname.startsWith('/dashboard') && !pathname.includes('-dashboard'));
+    const isProviderPage = pathname.startsWith('/restaurant/') || pathname.startsWith('/home-food/');
+
+    if (isDashboard) return null;
 
     const query = searchQuery.toLowerCase();
 
-    // 1. Search Restaurants & Homefoods
-    let vendors = [...allRestaurantsData, ...allHomeFoodsData].filter(v => {
-      const nameMatch = v.name?.toLowerCase().includes(query);
-      const typeMatch = v.type?.toLowerCase().includes(query);
+    let vendors = [...allRestaurantsData, ...allHomeFoodsData];
+    let items: any[] = [];
 
-      // FIX: Handle cuisine whether it is a string or an array
-      let cuisineMatch = false;
-      if (Array.isArray(v.cuisine)) {
-        cuisineMatch = v.cuisine.some((c: string) => c.toLowerCase().includes(query));
-      } else if (typeof v.cuisine === 'string') {
-        cuisineMatch = v.cuisine.toLowerCase().includes(query);
-      }
-
-      return nameMatch || typeMatch || cuisineMatch;
-    });
-
-    // Context-aware filtering for vendors
-    if (pathname.includes('/restaurants')) {
-      vendors = vendors.sort((a, b) => (a.type === 'restaurant' ? -1 : 1));
-    } else if (pathname.includes('/home-food')) {
-      vendors = vendors.sort((a, b) => (a.type === 'home-food' ? -1 : 1));
+    if (isProviderPage && localItems && localItems.length > 0) {
+      items = localItems;
+    } else {
+      items = vendors.flatMap(v =>
+        v.menu?.flatMap((cat: any) =>
+          cat.items?.map((item: any) => ({
+            ...item,
+            vendorName: v.name,
+            vendorSlug: v.slug,
+            vendorType: v.type
+          }))
+        ) || []
+      );
     }
 
-    // 2. Search Menu Items
-    const items = [...allRestaurantsData, ...allHomeFoodsData].flatMap(v =>
-      v.menu?.flatMap((cat: any) =>
-        cat.items?.filter((item: any) => item.name?.toLowerCase().includes(query))
-          .map((item: any) => ({ ...item, vendorName: v.name, vendorSlug: v.slug }))
-      ) || []
+    let chefList = chefs;
+
+    if (isProviderPage) {
+      if (!localItems) {
+        const providerSlugFromUrl = pathname.split('/')[2].split('?')[0];
+        items = items.filter(i => i.vendorSlug === providerSlugFromUrl);
+      }
+      vendors = [];
+      chefList = [];
+    }
+
+    const foundVendors = vendors.filter(v => {
+      const nameMatch = v.name?.toLowerCase().includes(query);
+      let cuisineMatch = false;
+      if (Array.isArray(v.cuisine)) cuisineMatch = v.cuisine.some((c: string) => c.toLowerCase().includes(query));
+      else if (typeof v.cuisine === 'string') cuisineMatch = v.cuisine.toLowerCase().includes(query);
+      return nameMatch || cuisineMatch;
+    });
+
+    const foundItems = items.filter(i =>
+      i.name?.toLowerCase().includes(query) ||
+      i.description?.toLowerCase().includes(query)
     );
 
-    // 3. Search Chefs
-    let foundChefs = chefs.filter(c =>
+    const foundChefs = chefList.filter(c =>
       c.name?.toLowerCase().includes(query) ||
       c.specialty?.toLowerCase().includes(query)
     );
 
-    // Context-aware: If we are on /chefs, maybe prioritize them? (Though they have their own section)
-
-    // 4. Search Categories
-    const categoriesSet = new Set<string>();
     const foundCategories: any[] = [];
-    [...allRestaurantsData, ...allHomeFoodsData].forEach(v => {
+    if (!isProviderPage) {
+      const categoriesSet = new Set<string>();
+      [...allRestaurantsData, ...allHomeFoodsData].forEach(v => {
         v.menu?.forEach((cat: any) => {
-            if (cat.title?.toLowerCase().includes(query) && !categoriesSet.has(cat.title.toLowerCase())) {
-                categoriesSet.add(cat.title.toLowerCase());
-                foundCategories.push({ title: cat.title, type: v.type, vendorSlug: v.slug });
-            }
+          if (cat.title?.toLowerCase().includes(query) && !categoriesSet.has(cat.title.toLowerCase())) {
+            categoriesSet.add(cat.title.toLowerCase());
+            foundCategories.push({ title: cat.title, type: v.type, vendorSlug: v.slug });
+          }
         });
-    });
+      });
+    }
 
-    return { vendors, items, chefs: foundChefs, categories: foundCategories };
-  }, [searchQuery, chefs, allRestaurantsData, allHomeFoodsData, pathname]);
+    return { vendors: foundVendors, items: foundItems, chefs: foundChefs, categories: foundCategories };
+  }, [searchQuery, chefs, allRestaurantsData, allHomeFoodsData, pathname, localItems]);
+
+  const isLoggedIn = !!auth.token;
+  const hasNotifications = unreadCount > 0;
+
+  const navigateToProvider = (slug: string, type: string, isChef = false, chefName = '', isItem = false) => {
+    const prefix = type === 'home-food' ? 'home-food' : 'restaurant';
+    let url = `/${prefix}/${slug}`;
+    if (isChef && chefName) {
+      url += `?chef=${encodeURIComponent(chefName)}`;
+    }
+
+    const isHomepage = pathname === '/';
+    const isCurrentlyOnThisProvider = pathname.includes(slug);
+
+    if (isItem) {
+      if (isCurrentlyOnThisProvider) {
+        setIsSearchFocused(false);
+      } else {
+        router.push(url);
+        setIsSearchFocused(false);
+      }
+      return;
+    }
+
+    if (isHomepage) {
+      window.open(url, '_blank');
+    } else {
+      router.push(url);
+    }
+    setIsSearchFocused(false);
+  };
 
   const dashboard = (() => {
     if (!auth.role) return null;
@@ -253,12 +285,8 @@ export function Header({ className }: HeaderProps) {
     return map[role] || null;
   })();
 
-  const isLoggedIn = !!auth.token;
-  const hasNotifications = unreadCount > 0;
-
   return (
     <header className={cn("fixed top-0 w-full z-50 border-b bg-background shadow-md", className)}>
-
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
 
         {/* LOGO & DYNAMIC TITLE */}
@@ -267,16 +295,12 @@ export function Header({ className }: HeaderProps) {
             <button
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                if (headerPath) {
-                  router.push(headerPath);
-                }
+                if (headerPath) router.push(headerPath);
               }}
               className="flex items-center space-x-2 group hover:opacity-80 transition-all duration-300"
             >
               <Flame className="h-8 w-8 text-primary shrink-0" />
-              <span className="text-xl font-bold text-primary truncate">
-                {headerTitle}
-              </span>
+              <span className="text-xl font-bold text-primary truncate">{headerTitle}</span>
             </button>
           ) : (
             <Link href="/" className="flex items-center space-x-2">
@@ -290,31 +314,38 @@ export function Header({ className }: HeaderProps) {
         <div className="flex-1 relative max-w-md ml-4" ref={searchRef}>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
-            placeholder="Search food, restaurants, chefs..."
+            placeholder={searchPlaceholder}
             className="pl-10 rounded-full bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary/20"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
 
           {/* Search Results Dropdown */}
           {isSearchFocused && searchResults && (
             <div className="absolute top-full mt-2 w-full bg-card border rounded-xl shadow-2xl max-h-[75vh] overflow-y-auto z-[60] p-2">
-
               {/* CATEGORY: FOOD ITEMS */}
               {searchResults.items.length > 0 && (
                 <div className="mb-3">
-                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase">
+                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     <Utensils className="mr-2 h-3 w-3" /> Dishes
                   </div>
-                  {searchResults.items.slice(0, 5).map((item, idx) => (
+                  {searchResults.items.slice(0, 10).map((item, idx) => (
                     <button
                       key={`item-${idx}`}
-                      onClick={() => { router.push(`/restaurant/${item.vendorSlug}`); setIsSearchFocused(false); }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg"
+                      onClick={() => navigateToProvider(item.vendorSlug, item.vendorType || 'restaurant', false, '', true)}
+                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg transition-colors group"
                     >
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-[11px] text-muted-foreground">from {item.vendorName}</p>
+                      <p className="text-sm font-semibold group-hover:text-primary">{item.name}</p>
+                      <p className="text-[11px] text-muted-foreground">from {item.vendorName || 'this provider'}</p>
                     </button>
                   ))}
                 </div>
@@ -323,16 +354,16 @@ export function Header({ className }: HeaderProps) {
               {/* CATEGORY: MENU CATEGORIES */}
               {searchResults.categories && searchResults.categories.length > 0 && (
                 <div className="mb-3 border-t pt-2">
-                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase">
+                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     <LayoutDashboard className="mr-2 h-3 w-3" /> Categories
                   </div>
                   {searchResults.categories.slice(0, 5).map((cat: any, idx: number) => (
                     <button
                       key={`cat-${idx}`}
-                      onClick={() => { router.push(`/restaurant/${cat.vendorSlug}`); setIsSearchFocused(false); }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg"
+                      onClick={() => navigateToProvider(cat.vendorSlug, cat.type)}
+                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg transition-colors group"
                     >
-                      <p className="text-sm font-medium">{cat.title}</p>
+                      <p className="text-sm font-semibold group-hover:text-primary">{cat.title}</p>
                       <p className="text-[11px] text-muted-foreground capitalize">Browse in {cat.type}</p>
                     </button>
                   ))}
@@ -342,21 +373,20 @@ export function Header({ className }: HeaderProps) {
               {/* CATEGORY: VENDORS */}
               {searchResults.vendors.length > 0 && (
                 <div className="mb-3 border-t pt-2">
-                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase">
+                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     <Store className="mr-2 h-3 w-3" /> Places
                   </div>
                   {searchResults.vendors.slice(0, 4).map(v => (
-                    <Link
+                    <button
                       key={v.id}
-                      href={`/restaurant/${v.slug}`}
-                      onClick={() => setIsSearchFocused(false)}
-                      className="block px-3 py-2 hover:bg-muted rounded-lg"
+                      onClick={() => navigateToProvider(v.slug, v.type)}
+                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg transition-colors group"
                     >
                       <div className="flex justify-between items-center">
-                        <p className="text-sm font-medium">{v.name}</p>
-                        <Badge variant="outline" className="text-[10px] h-4 text-primary bg-primary/5">{v.type === 'restaurant' ? 'Restaurant' : 'Home Kitchen'}</Badge>
+                        <p className="text-sm font-semibold group-hover:text-primary">{v.name}</p>
+                        <Badge variant="outline" className="text-[10px] h-4 text-primary bg-primary/5 uppercase font-black">{v.type === 'restaurant' ? 'Restaurant' : 'Home Kitchen'}</Badge>
                       </div>
-                    </Link>
+                    </button>
                   ))}
                 </div>
               )}
@@ -364,38 +394,39 @@ export function Header({ className }: HeaderProps) {
               {/* CATEGORY: CHEFS */}
               {searchResults.chefs.length > 0 && (
                 <div className="border-t pt-2">
-                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase">
+                  <div className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                     <ChefHat className="mr-2 h-3 w-3" /> Private Chefs
                   </div>
                   {searchResults.chefs.slice(0, 3).map(chef => (
-                    <Link
+                    <button
                       key={chef.id}
-                      href={`/restaurant/${chef.slug}?chef=${encodeURIComponent(chef.name)}`}
-                      onClick={() => setIsSearchFocused(false)}
-                      className="block px-3 py-2 hover:bg-muted rounded-lg"
+                      onClick={() => navigateToProvider(chef.slug, 'restaurant', true, chef.name)}
+                      className="w-full text-left px-3 py-2 hover:bg-muted rounded-lg transition-colors group"
                     >
-                      <p className="text-sm font-medium">{chef.name}</p>
+                      <p className="text-sm font-semibold group-hover:text-primary">Chef {chef.name}</p>
                       <p className="text-[11px] text-muted-foreground">{chef.specialty}</p>
-                    </Link>
+                    </button>
                   ))}
                 </div>
               )}
 
-              {/* NO RESULTS */}
-              {searchResults.items.length === 0 && searchResults.vendors.length === 0 && searchResults.chefs.length === 0 && (
-                <div className="p-4 text-center text-sm text-muted-foreground">No results for "{searchQuery}"</div>
+              {/* EMPTY RESULTS */}
+              {(searchResults.items.length === 0 && searchResults.vendors.length === 0 && searchResults.chefs.length === 0 && searchResults.categories.length === 0) && (
+                <div className="p-4 text-center">
+                  <p className="text-sm text-muted-foreground">No matches for <span className="font-bold text-foreground">"{searchQuery}"</span></p>
+                </div>
               )}
             </div>
           )}
         </div>
 
-        {/* RIGHT NAV (CART/NOTIF/AUTH) */}
+        {/* RIGHT NAV */}
         <nav className="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-2">
           <Sheet open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10">
                 <Bell className="h-6 w-6" />
-                {hasNotifications && (
+                {unreadCount > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full animate-in zoom-in border-2 border-background">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </Badge>
@@ -414,7 +445,7 @@ export function Header({ className }: HeaderProps) {
               </Button>
             </SheetTrigger>
             <SheetContent className="p-0 sm:max-w-lg w-[90vw] md:w-[500px]">
-                <Cart />
+              <Cart />
             </SheetContent>
           </Sheet>
 
@@ -423,10 +454,10 @@ export function Header({ className }: HeaderProps) {
           ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 border border-border overflow-hidden">
+                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 border border-border overflow-hidden ring-2 ring-primary/10 hover:ring-primary/30 transition-all">
                   <Avatar className="h-full w-full object-cover">
                     {(chefData?.avatarUrl || auth.avatarUrl) ? (
-                        <AvatarImage src={chefData?.avatarUrl || auth.avatarUrl || undefined} alt={chefData?.name || auth.email || ''} className="object-cover" />
+                      <AvatarImage src={chefData?.avatarUrl || auth.avatarUrl || undefined} alt={chefData?.name || auth.email || ''} className="object-cover" />
                     ) : null}
                     <AvatarFallback className="bg-primary text-primary-foreground text-sm flex items-center justify-center">
                       {auth.email ? auth.email[0].toUpperCase() : 'U'}
@@ -434,40 +465,41 @@ export function Header({ className }: HeaderProps) {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-normal">
+              <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl p-1">
+                <DropdownMenuLabel className="font-normal p-3">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none truncate">{auth.email}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{auth.role?.toLowerCase()}</p>
+                    <p className="text-sm font-bold leading-none truncate">{auth.email}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">{auth.role}</p>
                   </div>
                 </DropdownMenuLabel>
                 {dashboard && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href={dashboard.href} className="cursor-pointer w-full flex items-center py-2 text-sm">
-                        <LayoutDashboard className="mr-3 h-4 w-4" />
+                      <Link href={dashboard.href} className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
+                        <LayoutDashboard className="mr-3 h-4 w-4 text-orange-500" />
                         {dashboard.label}
                       </Link>
                     </DropdownMenuItem>
                     {auth.role === 'USER' && (
                       <DropdownMenuItem asChild>
-                        <Link href="/profile" className="cursor-pointer w-full flex items-center py-2 text-sm">
-                          <User className="mr-3 h-4 w-4" />
-                          Profile
+                        <Link href="/profile" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
+                          <User className="mr-3 h-4 w-4 text-blue-500" />
+                          Profile Settings
                         </Link>
                       </DropdownMenuItem>
                     )}
                   </>
                 )}
-                <DropdownMenuSeparator /><DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer py-2"><LogOut className="mr-3 h-5 w-5" />Log out</DropdownMenuItem>
+                <DropdownMenuSeparator /><DropdownMenuItem onClick={handleLogout} className="text-destructive cursor-pointer py-2.5 px-3 text-sm rounded-lg hover:bg-red-50 font-bold"><LogOut className="mr-3 h-4 w-4" />Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="outline" size="sm" asChild className="rounded-full px-5 h-10"><Link href="/login">Sign In</Link></Button>
+            <Button variant="outline" size="sm" asChild className="rounded-full px-5 h-10 font-bold"><Link href="/login">Sign In</Link></Button>
           )}
         </nav>
       </div>
+      <AuthSuggestionDialog />
     </header>
   );
 }

@@ -14,6 +14,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { RatingFilterProvider } from '@/context/RatingFilterProvider';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { NotificationProvider } from '@/context/NotificationProvider';
+import { FavoritesProvider } from '@/context/FavoritesProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,22 +44,24 @@ export default function RootLayout({
       >
         <FirebaseClientProvider>
           <NotificationProvider>
-            <LocationProvider>
-              <DeliveryModeProvider>
-                <RestaurantProvider>
-                  <CartProvider>
-                    <HeaderProvider>
-                      <SidebarProvider>
-                        <RatingFilterProvider>
-                          <SiteLayout>{children}</SiteLayout>
-                        </RatingFilterProvider>
-                      </SidebarProvider>
-                    </HeaderProvider>
-                    <Toaster />
-                  </CartProvider>
-                </RestaurantProvider>
-              </DeliveryModeProvider>
-            </LocationProvider>
+            <FavoritesProvider>
+              <LocationProvider>
+                <DeliveryModeProvider>
+                  <RestaurantProvider>
+                    <CartProvider>
+                      <HeaderProvider>
+                        <SidebarProvider>
+                          <RatingFilterProvider>
+                            <SiteLayout>{children}</SiteLayout>
+                          </RatingFilterProvider>
+                        </SidebarProvider>
+                      </HeaderProvider>
+                      <Toaster />
+                    </CartProvider>
+                  </RestaurantProvider>
+                </DeliveryModeProvider>
+              </LocationProvider>
+            </FavoritesProvider>
           </NotificationProvider>
         </FirebaseClientProvider>
       </body>

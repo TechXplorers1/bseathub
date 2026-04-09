@@ -696,3 +696,36 @@ export const deleteNotification = async (id: string) => {
 export const clearAllNotifications = async (userId: string) => {
     await fetch(`${BASE_URL}/notifications/user/${userId}`, { method: 'DELETE' });
 };
+
+/* ================= FAVORITES ================= */
+
+export const toggleFavorite = async (targetId: string, targetType: string): Promise<boolean> => {
+    const response = await fetch(`${BASE_URL}/favorites/toggle?targetId=${targetId}&targetType=${targetType}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    if (!response.ok) throw new Error('Failed to toggle favorite');
+    return response.json();
+};
+
+export const getFavoriteIds = async (): Promise<Record<string, string[]>> => {
+    const response = await fetch(`${BASE_URL}/favorites/ids`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    if (!response.ok) throw new Error('Failed to fetch favorite IDs');
+    return response.json();
+};
+
+export const getDetailedFavorites = async (targetType: string): Promise<any[]> => {
+    const response = await fetch(`${BASE_URL}/favorites/details?targetType=${targetType}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    if (!response.ok) throw new Error('Failed to fetch detailed favorites');
+    return response.json();
+};

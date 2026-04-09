@@ -8,6 +8,7 @@ import {
   ReactNode
 } from 'react';
 import type { Restaurant } from '@/lib/types';
+import { getCuisinePlaceholder } from '@/lib/image-utils';
 
 const API_BASE = "http://localhost:8081/api/v1";
 
@@ -60,21 +61,25 @@ export function RestaurantProvider({
           : [];
 
       const mappedRestaurants =
-        restaurantsData.map((item: any) => ({
-          ...item,
-          type: 'restaurant',
-          cuisine: item.cuisineType || item.cuisine || "Multi-cuisine",
-          categories: item.restaurantType ? [item.restaurantType] : (item.categories || ["General"]),
-          deliveryTime: item.avgDeliveryTime ?? 30,
-          deliveryFee: item.baseDeliveryFee ?? 0,
-          reviews: item.reviewsCount ?? item.reviews ?? 0,
-          services: item.services ?? ['delivery', 'pickup'],
-          menu: item.menuCategories?.map((cat: any) => ({
-            id: cat.id,
-            title: cat.title,
-            items: cat.items ?? []
-          })) ?? []
-        }));
+        restaurantsData.map((item: any) => {
+          const cuisine = item.cuisineType || item.cuisine || "Multi-cuisine";
+          return {
+            ...item,
+            type: 'restaurant',
+            cuisine,
+            categories: item.restaurantType ? [item.restaurantType] : (item.categories || ["General"]),
+            deliveryTime: item.avgDeliveryTime ?? 30,
+            deliveryFee: item.baseDeliveryFee ?? 0,
+            reviews: item.reviewsCount ?? item.reviews ?? 0,
+            services: item.services ?? ['delivery', 'pickup'],
+            imageId: item.imageId || getCuisinePlaceholder(cuisine),
+            menu: item.menuCategories?.map((cat: any) => ({
+              id: cat.id,
+              title: cat.title,
+              items: cat.items ?? []
+            })) ?? []
+          };
+        });
 
       const mappedHomeFoods =
         homeFoodData.map((item: any) => ({
@@ -84,6 +89,7 @@ export function RestaurantProvider({
           categories: item.foodType ? [item.foodType] : ["Home Food"],
           reviews: item.reviews ?? 0,
           isOpen: item.isActive ?? true,
+          imageId: item.imageId || getCuisinePlaceholder(item.foodType || "Home-made"),
           menu: item.menuCategories?.map((cat: any) => ({
             id: cat.id,
             title: cat.title,
@@ -157,13 +163,16 @@ export function RestaurantProvider({
     const item = await response.json();
 
     // Map the response to our frontend Restaurant type
+    const cuisine = item.cuisineType || item.cuisine || "Multi-cuisine";
     const mapped = {
       ...item,
       type: item.type || 'restaurant',
+      cuisine,
       deliveryTime: item.avgDeliveryTime ?? 30,
       deliveryFee: item.baseDeliveryFee ?? 0,
       reviews: item.reviewsCount ?? 0,
       services: item.services ?? ['delivery', 'pickup'],
+      imageId: item.imageId || getCuisinePlaceholder(cuisine),
       menu: item.menuCategories?.map((cat: any) => ({
         id: cat.id,
         title: cat.title,

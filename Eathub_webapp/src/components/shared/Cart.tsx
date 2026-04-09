@@ -11,7 +11,7 @@ import {
     SheetFooter,
     SheetClose,
 } from '@/components/ui/sheet';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 import { Minus, Plus, Trash2, ShoppingCart, Loader2, MapPin, Home, Navigation, Map, Building2, Globe, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fetchUserProfile } from '@/services/api';
@@ -151,20 +151,18 @@ export function Cart() {
                     {step === 'cart' ? (
                         <div className="divide-y divide-border">
                             {cartItems.map((item) => {
-                                const image = getImageById(item.imageId);
+                                const imageUrl = getDisplayImage(item.imageId, 'food-1');
                                 return (
-                                    <div key={item.id} className="flex items-center space-x-4 py-4">
-                                        {image && (
+                                    <div key={item.id} className="flex py-6 border-b last:border-0 hover:bg-muted/30 transition-colors p-2 rounded-xl group">
+                                        <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl border bg-muted shadow-sm group-hover:shadow-md transition-shadow">
                                             <Image
-                                                src={image.imageUrl}
+                                                src={imageUrl}
                                                 alt={item.name}
-                                                width={64}
-                                                height={64}
-                                                className="rounded-md object-cover h-16 w-16"
-                                                data-ai-hint={image.imageHint}
+                                                fill
+                                                className="rounded-md object-cover"
                                             />
-                                        )}
-                                        <div className="flex-1 space-y-2">
+                                        </div>
+                                        <div className="flex-1 ml-4 space-y-2">
                                             <div>
                                                 <p className="font-medium leading-tight">{item.name}</p>
                                                 <p className="text-sm text-muted-foreground">

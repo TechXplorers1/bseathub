@@ -1,36 +1,31 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
 import { personalizedMealRecommendations } from '@/ai/flows/personalized-meal-recommendations';
 import { RestaurantCard } from './RestaurantCard';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { Restaurant } from '@/lib/types';
-import { Button, buttonVariants } from '../ui/button';
-import { ArrowRight, ArrowUp } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
+import { buttonVariants } from '../ui/button';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useLocation } from '@/context/LocationProvider';
 import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { useRatingFilter } from '@/context/RatingFilterProvider';
+import { useRestaurants } from '@/context/RestaurantProvider';
 
 const INITIAL_VISIBLE_COUNT = 8;
 
 export function Personalized() {
   const [recommendations, setRecommendations] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const { restaurants, homeFoods, allItems, loading: vendorsLoading } = useRestaurants();
   const { location } = useLocation();
   const { deliveryMode } = useDeliveryMode();
   const { ratingFilter } = useRatingFilter();
 
   useEffect(() => {
+    if (vendorsLoading) return;
+
     async function getRecommendations() {
       try {
         setLoading(true);
@@ -60,15 +55,13 @@ export function Personalized() {
 
         const result = await personalizedMealRecommendations(mockInput);
 
-        const allItems = [...allRestaurants, ...allHomeFoods];
-
         // This is a simplified logic. In a real app, you'd match meal names to restaurants.
         // Here we just find restaurants whose cuisine matches the recommendations.
         let recommendedItems = allItems.filter((restaurant) =>
           result.recommendations.some(recommendation =>
             restaurant.name.toLowerCase().includes(recommendation.toLowerCase()) ||
             restaurant.cuisine.toLowerCase().includes(recommendation.toLowerCase()) ||
-            restaurant.categories.some(cat => cat.toLowerCase().includes(recommendation.toLowerCase()))
+            (restaurant.categories || []).some(cat => cat.toLowerCase().includes(recommendation.toLowerCase()))
           )
         );
 
@@ -82,16 +75,16 @@ export function Personalized() {
 
           let fillItems: Restaurant[] = [];
           if (!hasHomeFood) {
-            const homeFoodToAdd = allHomeFoods
+            const homeFoodToAdd = homeFoods
               .filter(hf => !recommendedItems.find(r => r.id === hf.id))
               .slice(0, 2);
             fillItems.push(...homeFoodToAdd);
           }
 
           const popular = allItems
-            .sort((a, b) => b.rating - a.rating)
+            .sort((a, b) => (b.rating || 0) - (a.rating || 0))
             .filter(p => !recommendedItems.find(r => r.id === p.id) && !fillItems.find(f => f.id === p.id))
-            .slice(0, needed - fillItems.length);
+            .slice(0, Math.max(0, needed - fillItems.length));
 
           fillItems.push(...popular);
           recommendedItems.push(...fillItems);
@@ -106,8 +99,8 @@ export function Personalized() {
         console.error('Failed to get personalized recommendations:', error);
         // Fallback to popular restaurants on error
         const mixedItems = [
-          ...allRestaurants.sort((a, b) => b.rating - a.rating).slice(0, 4),
-          ...allHomeFoods.sort((a, b) => b.rating - a.rating).slice(0, 4)
+          ...restaurants.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 4),
+          ...homeFoods.sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 4)
         ].sort(() => Math.random() - 0.5);
 
         setRecommendations(mixedItems);
@@ -117,18 +110,18 @@ export function Personalized() {
     }
 
     getRecommendations();
-  }, []);
+  }, [vendorsLoading, allItems, restaurants, homeFoods]);
 
   const filteredRestaurants = recommendations.filter(restaurant => {
-    const deliveryModeMatch = deliveryMode === 'all' || restaurant.services.includes(deliveryMode);
-    const ratingMatch = ratingFilter === 0 || restaurant.rating >= ratingFilter;
+    const deliveryModeMatch = deliveryMode === 'all' || (restaurant.services || []).includes(deliveryMode);
+    const ratingMatch = ratingFilter === 0 || (restaurant.rating || 0) >= ratingFilter;
     return deliveryModeMatch && ratingMatch;
   });
 
   const visibleRestaurants = filteredRestaurants.slice(0, INITIAL_VISIBLE_COUNT);
 
 
-  if (loading) {
+  if (loading || vendorsLoading) {
     return (
       <div className="py-8">
         <h2 className="text-2xl font-bold mb-4">Picked from your location</h2>

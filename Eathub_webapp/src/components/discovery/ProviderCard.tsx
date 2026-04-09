@@ -1,9 +1,11 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Clock } from "lucide-react";
-import { getImageById } from "@/lib/placeholder-images";
+import { getDisplayImage } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
 interface ProviderCardProps {
@@ -20,7 +22,7 @@ interface ProviderCardProps {
 }
 
 export function ProviderCard({ provider }: ProviderCardProps) {
-    const image = getImageById(provider.imageId);
+    const imageUrl = getDisplayImage(provider.imageId, 'restaurant-1');
 
     const href =
         provider.type === "RESTAURANT"
@@ -41,18 +43,12 @@ export function ProviderCard({ provider }: ProviderCardProps) {
         <Link href={href} className="block group">
             <Card className="overflow-hidden border-muted/60 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full bg-white flex flex-col">
                 <div className="relative h-56 w-full overflow-hidden">
-                    {image ? (
-                        <Image
-                            src={image.imageUrl}
-                            alt={provider.name}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                            <span className="text-muted-foreground text-xs uppercase tracking-widest">No Image</span>
-                        </div>
-                    )}
+                    <Image
+                        src={imageUrl}
+                        alt={provider.name}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
 
                     <div className="absolute top-3 left-3 flex gap-2">
                         <Badge className={cn("text-[10px] font-bold tracking-wider px-2 py-0.5 border-none shadow-sm", config.color)}>

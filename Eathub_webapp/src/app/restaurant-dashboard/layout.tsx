@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Home,
@@ -18,8 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useHeader } from '@/context/HeaderProvider';
-import { useState } from 'react';
-import { fetchRestaurantById } from '@/services/api';
+import { fetchRestaurantById, fetchMyOrders } from '@/services/api';
 
 const navItems = [
   { href: '/restaurant-dashboard', icon: Home, label: 'Overview' },
@@ -27,7 +26,6 @@ const navItems = [
     href: '/restaurant-dashboard/orders',
     icon: ShoppingCart,
     label: 'Orders',
-    badge: '12',
   },
   { href: '/restaurant-dashboard/menu', icon: Utensils, label: 'Menu' },
   { href: '/restaurant-dashboard/feedback', icon: Star, label: 'Feedback' },
@@ -47,6 +45,7 @@ export default function RestaurantDashboardLayout({
 }) {
   const { setHeaderTitle, setHeaderPath } = useHeader();
   const [restaurantName, setRestaurantName] = useState('The Golden Spoon');
+  const [newOrdersCount, setNewOrdersCount] = useState<number>(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -63,14 +62,31 @@ export default function RestaurantDashboardLayout({
       }
     };
 
+    const fetchOrdersCount = async () => {
+      try {
+        const orders = await fetchMyOrders();
+        // Count 'Confirmed' orders (initial status)
+        const count = orders.filter(o => o.currentStatusId === 'Confirmed').length;
+        setNewOrdersCount(count);
+      } catch (err) {
+        console.warn("Failed to fetch new orders count:", err);
+      }
+    };
+
     loadProfile();
+    fetchOrdersCount();
+
+    // Set up polling for order counts
+    const interval = setInterval(fetchOrdersCount, 30000); // Poll every 30 seconds
+
     setHeaderPath('/restaurant-dashboard');
 
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
+      clearInterval(interval);
     };
-  }, [setHeaderTitle, setHeaderPath, restaurantName]);
+  }, [setHeaderTitle, setHeaderPath]);
 
   const toggleSidebar = () => {
     document
@@ -92,9 +108,9 @@ export default function RestaurantDashboardLayout({
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
-                {item.badge && (
-                  <Badge className="ml-auto flex h-6 w-6 items-center justify-center rounded-full">
-                    {item.badge}
+                {item.label === 'Orders' && newOrdersCount > 0 && (
+                  <Badge className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-black text-[10px]">
+                    {newOrdersCount}
                   </Badge>
                 )}
               </Link>
@@ -140,6 +156,11 @@ export default function RestaurantDashboardLayout({
             >
               <item.icon className="h-4 w-4" />
               {item.label}
+              {item.label === 'Orders' && newOrdersCount > 0 && (
+                <Badge className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground font-black text-[10px]">
+                  {newOrdersCount}
+                </Badge>
+              )}
             </Link>
           ))}
         </nav>

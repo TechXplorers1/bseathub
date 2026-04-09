@@ -5,11 +5,10 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Globe } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -34,9 +33,11 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card';
 import { createChefBooking } from '@/services/api';
 import { Switch } from '@/components/ui/switch';
+import { useHeader } from '@/context/HeaderProvider';
+import type { MenuCategory } from '@/lib/types';
 
 const bookingFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -53,10 +54,9 @@ const bookingFormSchema = z.object({
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
 
-import type { MenuCategory } from '@/lib/types';
-
 export function BookingForm({ chefName, chefId, basePrice = 500, services }: { chefName: string, chefId: string, basePrice?: number, services?: MenuCategory[] }) {
   const { toast } = useToast();
+  const { setIsAuthSuggestionOpen } = useHeader();
   const [loading, setLoading] = React.useState(false);
   
   const countryCodes = [
@@ -99,11 +99,7 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
 
   const onSubmit = async (data: BookingFormValues) => {
     if (!customerInfo.id) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Required',
-        description: 'Please login to book a chef.',
-      });
+      setIsAuthSuggestionOpen(true);
       return;
     }
 
@@ -114,11 +110,10 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
         chefId: chefId,
         eventDate: data.eventDate.toISOString(),
         guests: data.guests,
-        serviceId: null,
         totalAmount: data.isNegotiable ? 0 : totalPrice,
         status: 'Pending',
         paymentStatus: 'Unpaid',
-        eventAddress: 'Address will be confirmed',
+        eventAddress: 'To be confirmed',
         notes: data.message || '',
         eventType: data.eventType,
         customerPhone: `${data.countryCode} ${data.phone}`,
@@ -160,7 +155,6 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-4">
             <div className="space-y-6">
-              {/* Personal Info Group */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -190,15 +184,14 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                 />
               </div>
 
-              {/* Event Details Group */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-1">
-                  <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Country Code</FormLabel>
                    <FormField
                     control={form.control}
                     name="countryCode"
                     render={({ field }) => (
                       <FormItem>
+                        <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Country Code</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm font-semibold hover:border-primary/50 px-5">
@@ -320,8 +313,6 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                 )}
               />
 
-
-              {/* Event Type Sub-select (Always visible) */}
               <FormField
                 control={form.control}
                 name="eventType"
@@ -358,11 +349,7 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                       </FormDescription>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="data-[state=checked]:bg-primary"
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-primary" />
                     </FormControl>
                   </FormItem>
                 )}
@@ -388,9 +375,6 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
             </div>
 
             <div className="relative group p-6 rounded-[2rem] bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 overflow-hidden">
-               <div className="absolute top-0 right-0 p-8 opacity-5">
-                 <div className="w-32 h-32 bg-primary rounded-full blur-3xl" />
-               </div>
                <div className="relative flex justify-between items-end">
                 <div className="space-y-1">
                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/60">Estimated Total</p>

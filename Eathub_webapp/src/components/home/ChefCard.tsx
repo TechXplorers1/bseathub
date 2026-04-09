@@ -9,6 +9,7 @@ import { Badge } from '../ui/badge';
 import { getDisplayImage } from '@/lib/image-utils';
 import type { Chef, Restaurant } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { FavoriteButton } from '@/components/shared/FavoriteButton';
 
 interface ChefCardProps {
     chef: Chef;
@@ -32,9 +33,17 @@ export function ChefCard({ chef }: ChefCardProps) {
                         fill
                         className="object-cover"
                     />
-                    <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-1.5 rounded-full">
-                        <ChefHat className="h-5 w-5 text-primary" />
+                    
+                    <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+                        <FavoriteButton 
+                            targetId={chef.id || ''} 
+                            targetType="CHEF" 
+                        />
+                        <div className="bg-white/80 backdrop-blur-sm p-2 rounded-full flex items-center justify-center">
+                            <ChefHat className="h-5 w-5 text-primary" />
+                        </div>
                     </div>
+
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                     <CardContent className="absolute bottom-0 left-0 w-full p-4 flex flex-col justify-end text-white">
                         <div className="flex-1">

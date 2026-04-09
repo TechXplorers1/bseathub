@@ -46,15 +46,6 @@ export function RestaurantCarousel({
     <div className="py-8">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">{title}</h2>
-
-        {filteredRestaurants.length > INITIAL_VISIBLE_COUNT && (
-          <Link
-            href={href}
-            className={cn(buttonVariants({ variant: 'ghost' }))}
-          >
-            See all <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

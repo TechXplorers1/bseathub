@@ -3,15 +3,16 @@
 import * as React from 'react';
 import Image from 'next/image';
 import type { MenuItem, Restaurant } from '@/lib/types';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 import { useCart } from '@/context/CartProvider';
+import { useHeader } from '@/context/HeaderProvider';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -23,7 +24,7 @@ interface MenuItemDialogProps {
     rating?: number;
     recipe?: string;
   };
-  restaurant: Restaurant;
+  restaurant?: Restaurant;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -35,9 +36,23 @@ export function MenuItemDialog({
   onOpenChange,
 }: MenuItemDialogProps) {
   const { addToCart } = useCart();
-  const image = getImageById(item.imageId);
+  const { setIsAuthSuggestionOpen } = useHeader();
 
   const handleAddToCart = () => {
+    // Guest Mode Check
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+        setIsAuthSuggestionOpen(true);
+        // We don't necessarily need to close the current dialog, 
+        // but it might be cleaner to let the user focus on the login prompt.
+        // onOpenChange(false); 
+        return;
+    }
+
+    if (!restaurant) {
+        console.warn("No restaurant context for menu item");
+        return;
+    }
     const providerType = ((restaurant.type as string) === 'home-food' || (restaurant.type as string) === 'homefood')
       ? 'HomeFood'
       : 'Restaurant';
@@ -51,25 +66,20 @@ export function MenuItemDialog({
   };
 
   const hasRating = typeof item.rating === 'number';
+  const imageUrl = getDisplayImage(item.imageId, 'food-1');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0">
+      <DialogContent className="max-w-3xl p-0 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image side */}
-          <div className="relative h-64 md:h-full min-h-[250px]">
-            {(() => {
-              const placeholder = getImageById(item.imageId);
-              const src = placeholder ? placeholder.imageUrl : (item.imageId || '/placeholder-food.jpg');
-              return (
-                <Image
-                  src={src}
-                  alt={item.name}
-                  fill
-                  className="object-cover rounded-l-lg md:rounded-l-lg md:rounded-r-none"
-                />
-              );
-            })()}
+          <div className="relative h-64 md:h-auto min-h-[300px]">
+            <Image
+                src={imageUrl}
+                alt={item.name}
+                fill
+                className="object-cover"
+            />
           </div>
 
           {/* Details side */}
@@ -130,11 +140,11 @@ export function MenuItemDialog({
 
             <div className="flex-grow" />
 
-            <DialogFooter className="mt-6 sm:justify-between items-center">
+            <DialogFooter className="mt-6 sm:justify-between items-center gap-4">
               <div className="text-2xl font-bold text-primary">
                 <span>$ {item.price}</span>
               </div>
-              <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8">
+              <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8 whitespace-nowrap">
                 Add To Cart
               </Button>
             </DialogFooter>

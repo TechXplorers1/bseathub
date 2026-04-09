@@ -58,8 +58,13 @@ export interface MenuItem {
   type?: RestaurantType | 'chef-service';
   itemType?: 'Veg' | 'Non-Veg' | 'Vegan' | 'Other';
   isSignature?: boolean;
+  isSpecial?: boolean;
   isNegotiable?: boolean;
   restaurantName?: string;
+  providerId?: string;
+  providerName?: string;
+  providerType?: 'restaurant' | 'home-food';
+  providerSlug?: string;
 }
 
 export interface CartItem extends MenuItem {

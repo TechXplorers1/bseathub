@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Check,
   ChevronDown,
+  Heart
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -55,7 +56,9 @@ const mainCategories = [
 
 const filterButtons = [{ name: 'Eat Hub', icon: Check }];
 
-export function FilterCategories() {
+interface FilterCategoriesProps {}
+
+export function FilterCategories({}: FilterCategoriesProps) {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = React.useState(false);
   const [showRightButton, setShowRightButton] = React.useState(true);
@@ -195,6 +198,16 @@ export function FilterCategories() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Link href="/favorites">
+          <Button
+            variant="outline"
+            className="rounded-full flex-shrink-0 transition-all hover:bg-red-50"
+          >
+            <Heart className="mr-2 h-4 w-4 text-red-500" />
+            Favourites
+          </Button>
+        </Link>
 
         {filterButtons.map((button) => (
           <Button

@@ -1,6 +1,5 @@
 // app/restaurant/[slug]/page.tsx
 import { notFound } from 'next/navigation';
-import { allRestaurants, allHomeFoods } from '@/lib/data';
 import { RestaurantClientPage } from './client-page';
 import type { Restaurant } from '@/lib/types';
 import { fetchRestaurantBySlug, fetchChefBySlug, fetchHomeFoodBySlug } from '@/services/api';
@@ -59,13 +58,7 @@ export default async function RestaurantPage({ params, searchParams }: PageProps
     console.error("Critical error during backend hydration:", globalErr);
   }
 
-  // 2. Fallback to Mock Data if backend failed
-  if (!restaurant) {
-
-    const allMockItems = [...allRestaurants, ...allHomeFoods];
-    restaurant = allMockItems.find((r) => r.slug === slug) || null;
-  }
-
+  // 2. Fallback check
   if (!restaurant) {
     notFound();
   }

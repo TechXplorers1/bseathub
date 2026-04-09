@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -37,6 +36,7 @@ import { fetchMyOrders, updateOrderStatus, cancelOrder } from '@/services/api';
 import type { OrderResponse } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { CancellationReasonDialog } from '@/components/shared/CancellationReasonDialog';
+import { useHeader } from '@/context/HeaderProvider';
 
 type OrderStatusFilter = 'All' | 'New' | 'Preparing' | 'Completed' | 'Cancelled';
 
@@ -50,6 +50,17 @@ export default function OrdersPage() {
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
     const { toast } = useToast();
+    
+    // Connect to Global Search
+    const { searchQuery, setSearchPlaceholder, setSearchQuery } = useHeader();
+
+    useEffect(() => {
+        setSearchPlaceholder("Search orders by ID, customer name, total...");
+        return () => {
+            setSearchPlaceholder("Search food, restaurants, chefs...");
+            setSearchQuery('');
+        };
+    }, []);
 
     const loadOrders = async () => {
         setLoading(true);
@@ -113,6 +124,19 @@ export default function OrdersPage() {
     };
 
     const filteredOrders = orders.filter(order => {
+        // Apply Global Search Filter
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const matchesSearch = 
+                order.id.toLowerCase().includes(q) ||
+                order.customerName?.toLowerCase().includes(q) ||
+                order.totalAmount.toString().includes(q) ||
+                order.deliveryAddress?.toLowerCase().includes(q);
+            
+            if (!matchesSearch) return false;
+        }
+
+        // Apply Tab Filter
         if (activeTab === 'All') return true;
         if (activeTab === 'New') return order.currentStatusId === 'Confirmed';
         if (activeTab === 'Preparing') return ['Preparing', 'Preparation Completed', 'Out for Delivery'].includes(order.currentStatusId);
@@ -255,7 +279,7 @@ export default function OrdersPage() {
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-right font-black text-primary">${order.totalAmount.toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-black text-primary">₹{order.totalAmount.toFixed(2)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>

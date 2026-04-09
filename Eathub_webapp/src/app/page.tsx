@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { HomeFeed } from '@/components/home/HomeFeed';
 import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import { FilterCategories } from '@/components/home/FilterCategories';
 import { Banners } from '@/components/home/Banners';
 import { ChefsCarousel } from '@/components/home/ChefsCarousel';
+import { useFavorites } from '@/context/FavoritesProvider';
+import { Heart } from 'lucide-react';
 
 export default function Home() {
   const { restaurants, homeFoods, loading, allItems } = useRestaurants();
@@ -24,11 +27,6 @@ export default function Home() {
 
       <div className="mt-4 mb-6">
         <Banners />
-      </div>
-
-      {/* Debug Info: Remove this after you see the items */}
-      <div className="text-xs text-gray-400 px-4">
-        Found {allItems.length} total items. ({restaurants.length} Restaurants, {homeFoods.length} Home-food)
       </div>
 
       {homeFoods.length > 0 && (

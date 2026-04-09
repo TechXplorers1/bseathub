@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -19,17 +18,13 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useHeader } from '@/context/HeaderProvider';
-import { useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { useState } from 'react';
-import { fetchChefById } from '@/services/api';
-import { Header } from '@/components/shared/Header';
-import { Footer } from '@/components/shared/Footer';
+import { useEffect, useState } from 'react';
+import { fetchChefById, fetchChefBookingsByOwner } from '@/services/api';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
   { href: '/chef-dashboard', icon: Home, label: 'Overview' },
-  { href: '/chef-dashboard/bookings', icon: Calendar, label: 'Bookings', badge: '2' },
+  { href: '/chef-dashboard/bookings', icon: Calendar, label: 'Bookings' },
   { href: '/chef-dashboard/services', icon: Briefcase, label: 'Services' },
   { href: '/chef-dashboard/reviews', icon: Star, label: 'Reviews' },
   { href: '/chef-dashboard/earnings', icon: DollarSign, label: 'Earnings' },
@@ -49,10 +44,13 @@ export default function ChefDashboardLayout({
 }) {
   const { setHeaderTitle, setHeaderPath } = useHeader();
   const [chefName, setChefName] = useState('Chef Maria');
+  const [newBookingsCount, setNewBookingsCount] = useState<number>(0);
 
   useEffect(() => {
+    const chefId = localStorage.getItem('chefId');
+    const userId = localStorage.getItem('userId');
+
     const loadProfile = async () => {
-      const chefId = localStorage.getItem('chefId');
       if (chefId) {
         try {
           const profile = await fetchChefById(chefId);
@@ -65,13 +63,30 @@ export default function ChefDashboardLayout({
       }
     };
 
+    const fetchBookingsCount = async () => {
+      if (userId) {
+        try {
+          const bookings = await fetchChefBookingsByOwner(userId);
+          const count = bookings.filter(b => b.status === 'Pending').length;
+          setNewBookingsCount(count);
+        } catch (err) {
+          console.warn("Failed to fetch new bookings count:", err);
+        }
+      }
+    };
+
     loadProfile();
+    fetchBookingsCount();
+
+    const interval = setInterval(fetchBookingsCount, 30000);
+
     setHeaderPath('/chef-dashboard');
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
+      clearInterval(interval);
     };
-  }, [setHeaderTitle, setHeaderPath, chefName]);
+  }, [setHeaderTitle, setHeaderPath]);
 
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
@@ -93,9 +108,9 @@ export default function ChefDashboardLayout({
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
-                  {item.badge && (
-                    <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                      {item.badge}
+                  {item.label === 'Bookings' && newBookingsCount > 0 && (
+                    <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-black text-[10px]">
+                      {newBookingsCount}
                     </Badge>
                   )}
                 </Link>
@@ -148,9 +163,9 @@ export default function ChefDashboardLayout({
                     >
                       <item.icon className="h-4 w-4" />
                       {item.label}
-                      {item.badge && (
-                        <Badge className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]">
-                          {item.badge}
+                      {item.label === 'Bookings' && newBookingsCount > 0 && (
+                        <Badge className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-black text-[10px]">
+                          {newBookingsCount}
                         </Badge>
                       )}
                     </Link>
@@ -184,4 +199,3 @@ export default function ChefDashboardLayout({
     </div>
   );
 }
-

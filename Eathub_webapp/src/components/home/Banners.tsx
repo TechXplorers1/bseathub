@@ -1,71 +1,67 @@
+'use client';
+
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getImageById } from '@/lib/placeholder-images';
+import { getDisplayImage } from '@/lib/image-utils';
 
 export function Banners() {
-  const banner1Image1 = getImageById('food-21');
-  const banner1Image2 = getImageById('food-10');
-  const banner2Image = getImageById('food-16');
+  const banner1Image1 = getDisplayImage('food-21', 'food-1');
+  const banner1Image2 = getDisplayImage('food-10', 'food-2');
+  const banner2Image = getDisplayImage('food-16', 'food-3');
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
-      <Card className="overflow-hidden bg-primary text-primary-foreground">
+      <Card className="overflow-hidden bg-primary text-primary-foreground border-none shadow-xl">
         <CardContent className="flex items-center justify-between p-6">
           <div className="space-y-2">
             <h3 className="text-2xl font-bold">
               Enjoy 50% off your first order!
             </h3>
-            <p>Use code 50TREAT on delivery orders of $15+</p>
-            <Button variant="secondary" className="mt-2 text-primary">
+            <p className="opacity-90">Use code 50TREAT on delivery orders of $15+</p>
+            <Button variant="secondary" className="mt-2 text-primary rounded-full px-6">
               Learn more
             </Button>
           </div>
-          <div className="flex space-x-2">
-             {banner1Image1 && (
+          <div className="hidden sm:flex space-x-2 -mr-4 opacity-80 rotate-3">
               <Image
-                src={banner1Image1.imageUrl}
-                alt={banner1Image1.description}
+                src={banner1Image1}
+                alt="Feature Food 1"
                 width={100}
                 height={100}
-                className="rounded-lg object-cover h-24 w-24"
-                data-ai-hint={banner1Image1.imageHint}
+                className="rounded-2xl object-cover h-24 w-24 border-4 border-white/20"
               />
-            )}
-            {banner1Image2 && (
               <Image
-                src={banner1Image2.imageUrl}
-                alt={banner1Image2.description}
+                src={banner1Image2}
+                alt="Feature Food 2"
                 width={100}
                 height={100}
-                className="rounded-lg object-cover h-24 w-24"
-                data-ai-hint={banner1Image2.imageHint}
+                className="rounded-2xl object-cover h-24 w-24 border-4 border-white/20 -translate-x-4 translate-y-4"
               />
-            )}
           </div>
         </CardContent>
       </Card>
-      <Card className="overflow-hidden bg-accent text-accent-foreground">
+      
+      <Card className="overflow-hidden bg-orange-600 text-white border-none shadow-xl">
         <CardContent className="flex items-center justify-between p-6">
           <div className="space-y-2">
             <h3 className="text-xl font-bold">
-              Get unlimited $0 delivery fees on eligible Eat Hub orders*
+              Get unlimited $0 delivery fees on Eat Hub orders*
             </h3>
-            <p className="text-sm">Plus exclusive offers and savings</p>
-            <Button variant="secondary" className="mt-2 bg-white text-accent">
+            <p className="text-sm opacity-90 text-orange-50">Plus exclusive offers and savings</p>
+            <Button variant="secondary" className="mt-2 bg-white text-orange-600 hover:bg-orange-50 rounded-full px-6">
               Try it Free for 30 Days
             </Button>
           </div>
-           {banner2Image && (
-              <Image
-                src={banner2Image.imageUrl}
-                alt={banner2Image.description}
-                width={150}
-                height={150}
-                className="rounded-lg object-cover h-32 w-32"
-                data-ai-hint={banner2Image.imageHint}
-              />
-            )}
+          <div className="hidden sm:block -mr-2 opacity-90 -rotate-6">
+            <Image
+                src={banner2Image}
+                alt="Feature Food 3"
+                width={140}
+                height={140}
+                className="rounded-3xl object-cover h-32 w-32 border-4 border-white/30"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

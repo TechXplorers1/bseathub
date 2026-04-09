@@ -20,11 +20,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { fetchHomeFoodById } from '@/services/api';
+import { fetchHomeFoodById, fetchMyOrders } from '@/services/api';
 
 const navItems = [
   { href: "/home-food-dashboard", icon: Home, label: "Overview" },
-  { href: "/home-food-dashboard/orders", icon: ShoppingCart, label: "Orders", badge: "6" },
+  { href: "/home-food-dashboard/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/home-food-dashboard/menu", icon: Utensils, label: "Menu" },
   { href: "/home-food-dashboard/feedback", icon: Star, label: "Feedback" },
   { href: "/home-food-dashboard/analytics", icon: LineChart, label: "Analytics" },
@@ -43,9 +43,9 @@ export default function HomeFoodDashboardLayout({
   const { setHeaderTitle, setHeaderPath } = useHeader();
   const router = useRouter();
 
-  // Use state to manage the display name from localstorage
   const [kitchenName, setKitchenName] = useState("Maria's Kitchen");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [newOrdersCount, setNewOrdersCount] = useState<number>(0);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -58,7 +58,6 @@ export default function HomeFoodDashboardLayout({
           }
         } catch (error) {
           console.error("Failed to fetch homefood profile:", error);
-          // Fallback to name in localStorage or default
           const storedName = localStorage.getItem('userName');
           const finalName = storedName ? `${storedName}'s Kitchen` : "Maria's Kitchen";
           setKitchenName(finalName);
@@ -70,12 +69,28 @@ export default function HomeFoodDashboardLayout({
       }
     };
 
+    const fetchOrdersCount = async () => {
+      try {
+        const orders = await fetchMyOrders();
+        // Count 'Confirmed' orders (initial status)
+        const count = orders.filter(o => o.currentStatusId === 'Confirmed').length;
+        setNewOrdersCount(count);
+      } catch (err) {
+        console.warn("Failed to fetch new orders count:", err);
+      }
+    };
+
     loadProfile();
+    fetchOrdersCount();
+
+    const interval = setInterval(fetchOrdersCount, 30000);
+
     setHeaderPath('/home-food-dashboard');
 
     return () => {
       setHeaderTitle(null);
       setHeaderPath(null);
+      clearInterval(interval);
     };
   }, [setHeaderTitle, setHeaderPath]);
 
@@ -97,9 +112,9 @@ export default function HomeFoodDashboardLayout({
             >
               <item.icon className="h-4 w-4" />
               {item.label}
-              {item.badge && (
-                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                  {item.badge}
+              {item.label === 'Orders' && newOrdersCount > 0 && (
+                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground font-black text-[10px]">
+                  {newOrdersCount}
                 </Badge>
               )}
             </Link>
@@ -118,7 +133,6 @@ export default function HomeFoodDashboardLayout({
               {item.label}
             </Link>
           ))}
-          {/* Logout Button */}
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-destructive"
@@ -133,14 +147,11 @@ export default function HomeFoodDashboardLayout({
 
   return (
     <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      {/* Sidebar (Desktop) */}
       <div className="hidden border-r bg-muted/40 md:block">
         <NavContent />
       </div>
 
-      {/* Main Content Area */}
       <div className="flex flex-col min-h-screen">
-        {/* Mobile Header */}
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 md:hidden">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>

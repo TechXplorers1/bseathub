@@ -3,6 +3,7 @@ package com.eathub.common.controller;
 import com.eathub.common.dto.AuthDTOs.*;
 import com.eathub.common.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,5 +41,17 @@ public class AuthController {
     public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
         // The service should validate the token and return user details
         return ResponseEntity.ok(authService.getCurrentUser(token));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(Map.of("message", "OTP sent to your email"));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(Map.of("message", "Password reset successful"));
     }
 }

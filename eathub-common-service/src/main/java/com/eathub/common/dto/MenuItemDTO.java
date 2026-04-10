@@ -21,4 +21,14 @@ public class MenuItemDTO {
     private String providerName;
     private String providerType;
     private String providerSlug;
+
+    private Boolean isOnOffer;
+    private String offerType;
+    private Double offerValue;
+    private String offerDescription;
+    private String offerStartDate;
+    private String offerEndDate;
+    private String offerStartTime;
+    private String offerEndTime;
+    private String offerMetaData;
 }

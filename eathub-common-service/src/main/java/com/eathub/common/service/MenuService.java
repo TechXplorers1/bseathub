@@ -5,6 +5,7 @@ import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.dto.MenuResponseDTO;
 import com.eathub.common.entity.MenuCategory;
 import com.eathub.common.entity.MenuItem;
+import com.eathub.common.entity.Offer;
 import com.eathub.common.entity.Restaurant;
 import com.eathub.common.repository.HomeFoodProviderRepository;
 import com.eathub.common.repository.MenuCategoryRepository;
@@ -137,7 +138,37 @@ public class MenuService {
 
         if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
             // Attempt to find or create category logic similar to HomeFoodService
-            // For now, let's at least ensure imageId is updated
+        }
+
+        // Handle Offer Update
+        if (dto.getIsOnOffer() != null) {
+            Offer offer = item.getOffer();
+            if (offer == null) {
+                offer = Offer.builder()
+                        .menuItem(item)
+                        .isActive(dto.getIsOnOffer())
+                        .build();
+                item.setOffer(offer);
+            }
+            
+            offer.setIsActive(dto.getIsOnOffer());
+            offer.setType(dto.getOfferType());
+            offer.setValue(dto.getOfferValue());
+            offer.setDescription(dto.getOfferDescription());
+            offer.setMetaData(dto.getOfferMetaData());
+
+            try {
+                if (dto.getOfferStartDate() != null && !dto.getOfferStartDate().isEmpty())
+                    offer.setStartDate(java.time.LocalDate.parse(dto.getOfferStartDate()));
+                if (dto.getOfferEndDate() != null && !dto.getOfferEndDate().isEmpty())
+                    offer.setEndDate(java.time.LocalDate.parse(dto.getOfferEndDate()));
+                if (dto.getOfferStartTime() != null && !dto.getOfferStartTime().isEmpty())
+                    offer.setStartTime(java.time.LocalTime.parse(dto.getOfferStartTime()));
+                if (dto.getOfferEndTime() != null && !dto.getOfferEndTime().isEmpty())
+                    offer.setEndTime(java.time.LocalTime.parse(dto.getOfferEndTime()));
+            } catch (Exception e) {
+                // Ignore parse errors for now or handle gracefully
+            }
         }
 
         return mapToDTO(menuItemRepository.save(item));
@@ -174,6 +205,21 @@ public class MenuService {
                 .isSpecial(item.getIsSpecial())
                 .imageId(item.getImageId())
                 .build();
+
+        if (item.getOffer() != null) {
+            Offer offer = item.getOffer();
+            dto.setIsOnOffer(offer.getIsActive());
+            dto.setOfferType(offer.getType());
+            dto.setOfferValue(offer.getValue());
+            dto.setOfferDescription(offer.getDescription());
+            dto.setOfferStartDate(offer.getStartDate() != null ? offer.getStartDate().toString() : null);
+            dto.setOfferEndDate(offer.getEndDate() != null ? offer.getEndDate().toString() : null);
+            dto.setOfferStartTime(offer.getStartTime() != null ? offer.getStartTime().toString() : null);
+            dto.setOfferEndTime(offer.getEndTime() != null ? offer.getEndTime().toString() : null);
+            dto.setOfferMetaData(offer.getMetaData());
+        } else {
+            dto.setIsOnOffer(false);
+        }
 
         if (item.getRestaurant() != null) {
             dto.setProviderId(item.getRestaurant().getId());

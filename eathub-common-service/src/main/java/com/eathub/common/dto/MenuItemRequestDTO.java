@@ -19,4 +19,14 @@ public class MenuItemRequestDTO {
     private Boolean isSpecial;
     private String imageUrl;
     private String homeFoodId;
+
+    private Boolean isOnOffer;
+    private String offerType;
+    private Double offerValue;
+    private String offerDescription;
+    private String offerStartDate;
+    private String offerEndDate;
+    private String offerStartTime;
+    private String offerEndTime;
+    private String offerMetaData;
 }

@@ -36,17 +36,19 @@ spring:
 
   mail:
     host: smtp.zoho.in
-    port: 587
+    port: 465
     username: bharath@techxplorers.in
     password: "07072023@TxYb"
     properties:
       mail:
         smtp:
           auth: true
-          starttls:
+          ssl:
             enable: true
-          connectiontimeout: 5000
-          timeout: 5000
+          starttls:
+            enable: false
+          connectiontimeout: 10000
+          timeout: 10000
           writetimeout: 5000
 
 server:

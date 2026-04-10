@@ -43,4 +43,7 @@ public class MenuItem {
     private String imageId;
     private Boolean isSpecial;
     private String status;
+
+    @OneToOne(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Offer offer;
 }

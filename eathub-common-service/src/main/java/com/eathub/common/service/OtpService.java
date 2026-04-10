@@ -42,19 +42,23 @@ public class OtpService {
     }
 
     private void sendEmail(String to, String code) {
+        // ALWAYS log the OTP to the console for development/debugging purposes
+        System.out.println("\n==================================================");
+        System.out.println("VERIFICATION CODE FOR [" + to + "]: " + code);
+        System.out.println("==================================================\n");
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(to);
         message.setSubject("Your Eat Hub Verification Code");
-        message.setText("Your OTP for restaurant registration is: " + code + "\n\nThis code expires in 5 minutes.");
+        message.setText("Your OTP for Eat Hub verification is: " + code + "\n\nThis code expires in 5 minutes.");
         
         try {
-            System.out.println("Attempting to send OTP email to " + to + " via " + fromEmail);
             mailSender.send(message);
-            System.out.println("OTP sent successfully to " + to);
+            System.out.println("OTP successfully sent via email to " + to);
         } catch (Exception e) {
-            System.err.println("CRITICAL: Failed to send OTP to " + to + ". Error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("CRITICAL: Failed to send OTP email to " + to + ". Error: " + e.getMessage());
+            // We still throw an exception to inform the user, but the code was logged above
             throw new RuntimeException("Failed to send OTP email. Please check your SMTP configuration: " + e.getMessage());
         }
     }

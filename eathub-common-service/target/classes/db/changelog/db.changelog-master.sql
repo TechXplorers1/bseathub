@@ -543,3 +543,23 @@ CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
   );
 
   CREATE INDEX IF NOT EXISTS idx_favorites_user ON favorites(user_id);
+
+-- changeset eathub:2.4.0
+-- Create dedicated offers table
+CREATE TABLE IF NOT EXISTS offers (
+    id VARCHAR(36) PRIMARY KEY,
+    menu_item_id VARCHAR(36) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    type VARCHAR(50),
+    value DOUBLE PRECISION,
+    description TEXT,
+    start_date DATE,
+    end_date DATE,
+    start_time TIME,
+    end_time TIME,
+    meta_data TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_offers_menu_item FOREIGN KEY (menu_item_id) REFERENCES menu_items(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_offers_menu_item ON offers(menu_item_id);

@@ -28,7 +28,7 @@ public class AuthDTOs {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LoginRequest { // Added static
+    public static class LoginRequest {
         private String email;
         private String password;
     }
@@ -36,7 +36,7 @@ public class AuthDTOs {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PartnerRegistrationRequest { // Added static
+    public static class PartnerRegistrationRequest {
         private String type; 
         private Map<String, Object> data; 
     }
@@ -44,13 +44,29 @@ public class AuthDTOs {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class AuthResponse { // Added static
+    public static class AuthResponse {
         private String token;
         private String email;
         private String role;
         private String providerId;
         private String name;
         private String avatarUrl;
-        private String userId; // ← Added: customer's own user ID for reviews
+        private String userId;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ForgotPasswordRequest {
+        private String email;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResetPasswordRequest {
+        private String email;
+        private String otp;
+        private String newPassword;
     }
 }

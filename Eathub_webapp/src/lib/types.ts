@@ -65,6 +65,16 @@ export interface MenuItem {
   providerName?: string;
   providerType?: 'restaurant' | 'home-food';
   providerSlug?: string;
+  
+  isOnOffer?: boolean;
+  offerType?: string;
+  offerValue?: number;
+  offerDescription?: string;
+  offerStartDate?: string;
+  offerEndDate?: string;
+  offerStartTime?: string;
+  offerEndTime?: string;
+  offerMetaData?: string;
 }
 
 export interface CartItem extends MenuItem {

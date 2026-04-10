@@ -19,7 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { login as apiLogin, sendOtp, verifyOtp, AUTH_URL } from '@/services/api';
+import { login as apiLogin, sendOtp, verifyOtp, AUTH_URL, forgotPassword, resetPassword } from '@/services/api';
 import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
@@ -42,6 +42,17 @@ export default function LoginPage() {
   });
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState('');
+
+  // Forgot Password States
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtpSent, setForgotOtpSent] = useState(false);
+  const [resetData, setResetData] = useState({
+    otp: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
 
 
@@ -198,6 +209,65 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await forgotPassword(forgotEmail);
+      setForgotOtpSent(true);
+      toast({
+        title: "OTP Sent",
+        description: `Verification code sent to ${forgotEmail}`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (resetData.newPassword !== resetData.confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Passwords Mismatch",
+        description: "New password and confirmation do not match.",
+      });
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword({
+        email: forgotEmail,
+        otp: resetData.otp,
+        newPassword: resetData.newPassword
+      });
+      toast({
+        title: "Success",
+        description: "Password reset successful. Please login with your new password.",
+      });
+      // Reset flow
+      setIsForgotPassword(false);
+      setForgotOtpSent(false);
+      setForgotEmail('');
+      setResetData({ otp: '', newPassword: '', confirmPassword: '' });
+      setEmail(forgotEmail); // Pre-fill login
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Reset Failed",
+        description: error.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRegChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRegForm({ ...regForm, [e.target.name]: e.target.value });
   };
@@ -280,6 +350,16 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-[10px] sm:text-xs font-bold text-primary hover:underline"
+                  >
+                    Forgot Password?
+                  </button>
                 </div>
 
                 <Button type="submit" className="w-full h-10 sm:h-11 font-bold shadow-lg shadow-primary/20" disabled={loading}>
@@ -399,6 +479,122 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </DialogContent>
+
+      <Dialog open={isForgotPassword} onOpenChange={(val) => !loading && setIsForgotPassword(val)}>
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[425px] p-0 border-none shadow-2xl overflow-hidden">
+          <Card className="border-0 shadow-none">
+            <CardHeader className="bg-primary/5 pb-4 text-center">
+              <div className="flex justify-center mb-2">
+                <div className="p-2 sm:p-3 bg-primary/10 rounded-full text-primary">
+                  <Lock size={24} className="sm:w-7 sm:h-7" />
+                </div>
+              </div>
+              <DialogTitle className="text-xl sm:text-2xl font-bold">Reset Password</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">
+                {!forgotOtpSent ? 'Enter your email to receive an OTP' : 'Verify OTP and enter your new password'}
+              </DialogDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              {!forgotOtpSent ? (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-1">
+                    <Label className="text-[10px] sm:text-xs font-bold uppercase text-muted-foreground ml-1">Email Address</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="email@eathub.com"
+                        className="pl-10 h-10 sm:h-11"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full h-10 sm:h-11 font-bold" disabled={loading}>
+                    {loading ? 'Sending...' : 'Send OTP'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full text-xs"
+                    onClick={() => setIsForgotPassword(false)}
+                  >
+                    Back to Login
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="space-y-3 rounded-xl border bg-muted/30 p-4">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] sm:text-xs font-bold uppercase text-muted-foreground ml-1 text-primary">Verification Code</Label>
+                      <Input
+                        value={resetData.otp}
+                        onChange={(e) => setResetData({ ...resetData, otp: e.target.value })}
+                        placeholder="123456"
+                        className="h-10 sm:h-11 text-center font-bold tracking-[0.5em]"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] sm:text-xs font-bold uppercase text-muted-foreground ml-1">New Password</Label>
+                      <div className="relative">
+                        <Input
+                          type={showResetPassword ? 'text' : 'password'}
+                          value={resetData.newPassword}
+                          onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
+                          placeholder="••••••••"
+                          className="h-10 sm:h-11 pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowResetPassword(!showResetPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showResetPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] sm:text-xs font-bold uppercase text-muted-foreground ml-1">Confirm Password</Label>
+                      <div className="relative">
+                        <Input
+                          type={showResetPassword ? 'text' : 'password'}
+                          value={resetData.confirmPassword}
+                          onChange={(e) => setResetData({ ...resetData, confirmPassword: e.target.value })}
+                          placeholder="••••••••"
+                          className="h-10 sm:h-11 pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowResetPassword(!showResetPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showResetPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full h-10 sm:h-11 font-bold shadow-lg shadow-primary/20" disabled={loading}>
+                    {loading ? 'Resetting...' : 'Update Password'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full text-xs"
+                    onClick={() => setForgotOtpSent(false)}
+                  >
+                    Change Email
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

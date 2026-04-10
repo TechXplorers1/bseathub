@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  Percent,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +30,7 @@ const navItems = [
   },
   { href: '/restaurant-dashboard/menu', icon: Utensils, label: 'Menu' },
   { href: '/restaurant-dashboard/feedback', icon: Star, label: 'Feedback' },
+  { href: '/restaurant-dashboard/offers', icon: Percent, label: 'Offers' },
   { href: '/restaurant-dashboard/analytics', icon: LineChart, label: 'Analytics' },
 ];
 

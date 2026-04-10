@@ -23,6 +23,7 @@ import { MoreHorizontal, PlusCircle, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useState, useEffect, useCallback } from 'react';
 import { AddDishDialog, type DishFormValues } from '@/components/dashboard/restaurant/AddDishDialog';
+import { OfferDialog } from '@/components/dashboard/OfferDialog';
 
 import { useRestaurants } from '@/context/RestaurantProvider';
 import type { MenuItem as MenuItemType } from '@/lib/types';
@@ -39,34 +40,15 @@ export default function MenuPage() {
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [menuItems, setMenuItems] = useState<ExtendedMenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
-  const [restaurant, setRestaurant] = useState<any>(null);
   const [editingItem, setEditingItem] = useState<ExtendedMenuItem | null>(null);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
+  const [selectedOfferItem, setSelectedOfferItem] = useState<ExtendedMenuItem | null>(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("restaurant") || "{}");
-
-    if (!stored?.id) return;
-
-    const url = `http://localhost:8081/api/v1/menu/restaurants/${stored.id}`;
-
-    fetch(url)
-      .then(res => res.json())
-      .then((data) => {
-        const mapped = data.map((item: any) => ({
-          ...item,
-          isSpecial: item.isSpecial ?? false,
-          status: item.status || "Available",
-        }));
-
-        setMenuItems(mapped);
-      })
-      .catch(console.error);
-
-  }, []);
-  // Load the Restaurant ID on mount
-  useEffect(() => {
-    const storedId = localStorage.getItem('restaurantId');
-    if (storedId) setRestaurantId(storedId);
+    if (stored?.id) {
+       setRestaurantId(stored.id);
+    }
   }, []);
 
   // Function to refresh menu data
@@ -84,7 +66,13 @@ export default function MenuPage() {
         isSpecial: item.isSpecial ?? false,
         imageUrl: item.imageUrl || "/placeholder-food.jpg",
         description: item.description,
-        category: item.categoryName
+        offerType: item.offerType,
+        offerValue: item.offerValue,
+        offerDescription: item.offerDescription,
+        offerStartDate: item.offerStartDate,
+        offerEndDate: item.offerEndDate,
+        offerStartTime: item.offerStartTime,
+        offerEndTime: item.offerEndTime
       }));
 
       setMenuItems(mappedItems);
@@ -98,7 +86,7 @@ export default function MenuPage() {
     if (restaurantId) {
       refreshMenu();
     }
-  }, [restaurantId]);
+  }, [restaurantId, refreshMenu]);
 
   const handleAddDish = async (formData: DishFormValues) => {
     try {
@@ -114,21 +102,18 @@ export default function MenuPage() {
         imageUrl: formData.imageUrl || ""
       };
 
-
-
       // ✅ EDIT MODE
       if (editingItem) {
         const updated = await api.updateMenuItem(editingItem.id, payload) as any;
-        // Map backend DTO field names if necessary (category vs categoryName)
         const mappedUpdated = {
           ...updated,
-          category: updated.category, // assuming update endpoint returns DTO with 'category' field for title
+          category: updated.category,
           categoryName: updated.category,
           isSpecial: updated.isSpecial ?? false,
           status: updated.status || "Available",
           imageUrl: updated.imageId || "/placeholder-food.jpg"
         };
-        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? mappedUpdated : i));
+        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? { ...i, ...mappedUpdated } : i));
         toast({ title: "Dish updated successfully" });
       }
       // ✅ ADD MODE
@@ -156,25 +141,20 @@ export default function MenuPage() {
 
   const handleToggleSpecial = async (item: ExtendedMenuItem) => {
     const newValue = !item.isSpecial;
-
     await api.toggleFeatured(item.id, newValue);
-
     setMenuItems(prev =>
       prev.map(i => i.id === item.id ? { ...i, isSpecial: newValue } : i)
     );
   };
 
   const handleToggleStatus = async (item: ExtendedMenuItem) => {
-    const newStatus = item.status === 'Available'
-      ? 'Out of Stock'
-      : 'Available';
-
+    const newStatus = item.status === 'Available' ? 'Out of Stock' : 'Available';
     await api.updateStatus(item.id, newStatus);
-
     setMenuItems(prev =>
       prev.map(i => i.id === item.id ? { ...i, status: newStatus } : i)
     );
   };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this dish?")) return;
     try {
@@ -183,6 +163,50 @@ export default function MenuPage() {
       toast({ title: "Deleted", description: "Dish removed successfully" });
     } catch (err) {
       toast({ title: "Error", description: "Failed to delete dish", variant: "destructive" });
+    }
+  };
+
+  const handleSaveOffer = async (offerData: any) => {
+    if (!selectedOfferItem) return;
+    try {
+      const payload = {
+        ...selectedOfferItem,
+        isOnOffer: offerData.isOnOffer,
+        offerType: offerData.offerType,
+        offerValue: offerData.offerValue,
+        offerDescription: offerData.offerDescription,
+        offerStartDate: offerData.startDate,
+        offerEndDate: offerData.endDate,
+        offerStartTime: offerData.startTime,
+        offerEndTime: offerData.endTime,
+        offerMetaData: JSON.stringify({
+            comboItems: offerData.comboItems,
+            minOrderValue: offerData.minOrderValue,
+            buyX: offerData.buyX,
+            getY: offerData.getY,
+            planType: offerData.planType
+        })
+      };
+
+      const updated = await api.updateMenuItem(selectedOfferItem.id, payload) as any;
+      
+      setMenuItems(prev => prev.map(i => i.id === updated.id ? {
+        ...i,
+        isOnOffer: updated.isOnOffer,
+        offerType: updated.offerType,
+        offerValue: updated.offerValue,
+        offerDescription: updated.offerDescription,
+        offerStartDate: updated.offerStartDate,
+        offerEndDate: updated.offerEndDate,
+        offerStartTime: updated.offerStartTime,
+        offerEndTime: updated.offerEndTime
+      } : i));
+      
+      toast({ title: "Offer saved successfully" });
+      setIsOfferDialogOpen(false);
+      setSelectedOfferItem(null);
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to save offer", variant: "destructive" });
     }
   };
 
@@ -198,7 +222,7 @@ export default function MenuPage() {
             <div>
               <CardTitle>Menu Management</CardTitle>
               <CardDescription>
-                Add, edit, or delete your food items for {restaurant?.name || 'your restaurant'}.
+                Add, edit, or delete your food items.
               </CardDescription>
             </div>
             <Button onClick={() => setIsAddDishDialogOpen(true)}>
@@ -244,7 +268,12 @@ export default function MenuPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {item.isSpecial && <Badge variant="default">Featured</Badge>}
+                      {item.isSpecial && <Badge variant="default" className="mr-1">Featured</Badge>}
+                      {(item as any).isOnOffer && (
+                        <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                          Offer: {(item as any).offerType}
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       ${item.price.toFixed(2)}
@@ -271,6 +300,12 @@ export default function MenuPage() {
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleToggleStatus(item)}>
                             {item.status === 'Available' ? "Mark Out of Stock" : "Mark Available"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            setSelectedOfferItem(item);
+                            setIsOfferDialogOpen(true);
+                          }}>
+                            Offers
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -309,6 +344,27 @@ export default function MenuPage() {
             }
             : undefined
         }
+      />
+      <OfferDialog
+        isOpen={isOfferDialogOpen}
+        onClose={() => {
+          setIsOfferDialogOpen(false);
+          setSelectedOfferItem(null);
+        }}
+        onSave={handleSaveOffer}
+        itemName={selectedOfferItem?.name || ""}
+        allMenuItems={menuItems.map(i => ({ id: i.id, name: i.name }))}
+        initialData={selectedOfferItem ? {
+          isOnOffer: (selectedOfferItem as any).isOnOffer,
+          offerType: (selectedOfferItem as any).offerType,
+          offerValue: (selectedOfferItem as any).offerValue,
+          offerDescription: (selectedOfferItem as any).offerDescription,
+          startDate: (selectedOfferItem as any).offerStartDate,
+          endDate: (selectedOfferItem as any).offerEndDate,
+          startTime: (selectedOfferItem as any).offerStartTime,
+          endTime: (selectedOfferItem as any).offerEndTime,
+          ...(selectedOfferItem.offerMetaData ? JSON.parse(selectedOfferItem.offerMetaData) : {})
+        } : undefined}
       />
     </>
   );

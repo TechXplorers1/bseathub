@@ -66,6 +66,9 @@ export function MenuItem({ item, onClick, showProviderInfo = false }: MenuItemPr
                 {item.isSpecial && (
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-full mt-1">Featured</span>
                 )}
+                {item.isOnOffer && (
+                  <span className="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-100 px-2 py-0.5 rounded-full mt-1">Offer Active</span>
+                )}
               </div>
             </div>
 

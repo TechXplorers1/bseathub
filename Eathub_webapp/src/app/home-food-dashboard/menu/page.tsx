@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/card';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { AddDishDialog } from '@/components/dashboard/home-food/AddDishDialog';
+import { OfferDialog } from '@/components/dashboard/OfferDialog';
 import { useToast } from '@/hooks/use-toast';
 import {
   addHomeFoodDish,
@@ -52,12 +53,23 @@ export type MenuItem = {
   description?: string;
   categoryName?: string;
   category?: string;
+  isOnOffer?: boolean;
+  offerType?: string;
+  offerValue?: number;
+  offerDescription?: string;
+  offerStartDate?: string;
+  offerEndDate?: string;
+  offerStartTime?: string;
+  offerEndTime?: string;
+  offerMetaData?: string;
 };
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isAddDishDialogOpen, setIsAddDishDialogOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<MenuItem | null>(null);
+  const [isOfferDialogOpen, setIsOfferDialogOpen] = useState(false);
+  const [selectedOfferItem, setSelectedOfferItem] = useState<MenuItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -66,14 +78,11 @@ export default function MenuPage() {
 
   // Load the Provider ID on mount
   useEffect(() => {
-    // Only use homeFoodId - falling back to userId/ownerId causes 500 errors on the Home Food dashboard
     const rawId = localStorage.getItem('homeFoodId');
     const id = rawId ? rawId.trim() : null;
-
     if (id) {
       setProviderId(id);
     } else {
-      console.warn("Home Food Provider ID not found in localStorage.");
       setMenuItems(mockMenuItems);
       setIsLoading(false);
     }
@@ -90,9 +99,17 @@ export default function MenuPage() {
         const mappedItems = data.map((item: any) => ({
           ...item,
           imageUrl: item.imageId || item.imageUrl || "/placeholder-dish.jpg",
-          categoryName: item.category, // Backend DTO returns category title as "category"
+          categoryName: item.category, 
           isSpecial: item.isSpecial ?? false,
           status: item.status || 'Available',
+          isOnOffer: item.isOnOffer ?? false,
+          offerType: item.offerType,
+          offerValue: item.offerValue,
+          offerDescription: item.offerDescription,
+          offerStartDate: item.offerStartDate,
+          offerEndDate: item.offerEndDate,
+          offerStartTime: item.offerStartTime,
+          offerEndTime: item.offerEndTime
         }));
         setMenuItems(mappedItems);
       }
@@ -116,23 +133,15 @@ export default function MenuPage() {
     }
   }, [providerId, refreshMenu]);
 
-  /* ----------------------------- SEARCH LOGIC ----------------------------- */
-
   const filteredMenuItems = useMemo(() => {
     if (!searchQuery.trim()) return menuItems;
-
     const query = searchQuery.toLowerCase();
-
     return menuItems.filter((item) =>
       item.name.toLowerCase().includes(query) ||
       (item.status && item.status.toLowerCase().includes(query)) ||
       item.price.toString().includes(query)
     );
   }, [menuItems, searchQuery]);
-
-
-
-  /* ----------------------------- ACTIONS ---------------------------------- */
 
   const handleToggleSpecial = async (id: string, currentStatus: boolean) => {
     try {
@@ -172,7 +181,6 @@ export default function MenuPage() {
   };
 
   const handleSaveDish = async (formData: any) => {
-
     if (!providerId) {
       toast({ title: "Error", description: "Provider ID not found. Please log in again.", variant: "destructive" });
       return;
@@ -183,13 +191,11 @@ export default function MenuPage() {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
-        categoryName: formData.category, // Matches field 'category' in AddDishDialog
+        categoryName: formData.category,
         isSpecial: formData.isSpecial,
         status: formData.status,
-        imageUrl: formData.imageUrl      // Matches field 'imageUrl' in AddDishDialog
+        imageUrl: formData.imageUrl
       };
-
-
 
       if (editingDish) {
         const updated = await updateMenuItem(editingDish.id, payload);
@@ -200,7 +206,7 @@ export default function MenuPage() {
           isSpecial: updated.isSpecial ?? false,
           status: updated.status || 'Available',
         };
-        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? mappedUpdated : i));
+        setMenuItems(prev => prev.map(i => i.id === mappedUpdated.id ? { ...i, ...mappedUpdated } : i));
         toast({ title: "Dish Updated!" });
       } else {
         const added = await addHomeFoodDish(providerId, payload);
@@ -217,18 +223,44 @@ export default function MenuPage() {
 
       setIsAddDishDialogOpen(false);
       setEditingDish(null);
-
     } catch (err: any) {
       console.error("Save Failed:", err);
-      toast({
-        title: "Save Failed",
-        description: err.message,
-        variant: "destructive"
-      });
+      toast({ title: "Save Failed", description: err.message, variant: "destructive" });
     }
   };
 
-  /* ------------------------------------------------------------------------ */
+  const handleSaveOffer = async (offerData: any) => {
+    if (!selectedOfferItem) return;
+    try {
+      const payload = {
+        ...selectedOfferItem,
+        isOnOffer: offerData.isOnOffer,
+        offerType: offerData.offerType,
+        offerValue: offerData.offerValue,
+        offerDescription: offerData.offerDescription,
+        offerStartDate: offerData.startDate,
+        offerEndDate: offerData.endDate,
+        offerStartTime: offerData.startTime,
+        offerEndTime: offerData.endTime,
+        offerMetaData: JSON.stringify({
+            comboItems: offerData.comboItems,
+            minOrderValue: offerData.minOrderValue,
+            buyX: offerData.buyX,
+            getY: offerData.getY,
+            planType: offerData.planType
+        })
+      };
+
+      const updated = await updateMenuItem(selectedOfferItem.id, payload);
+      setMenuItems(prev => prev.map(i => i.id === updated.id ? { ...i, ...updated, imageUrl: updated.imageId || i.imageUrl } : i));
+      
+      toast({ title: "Offer saved successfully" });
+      setIsOfferDialogOpen(false);
+      setSelectedOfferItem(null);
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to save offer", variant: "destructive" });
+    }
+  };
 
   return (
     <>
@@ -243,12 +275,11 @@ export default function MenuPage() {
             </div>
 
             <div className="flex gap-3 items-center">
-              {/* SEARCH BAR */}
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search by name, status or price..."
+                  placeholder="Search..."
                   className="w-[220px] pl-8 lg:w-[300px]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -268,36 +299,23 @@ export default function MenuPage() {
             <Table className="min-w-[700px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">
-                    <span className="sr-only">Image</span>
-                  </TableHead>
+                  <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Today's Special</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Price
-                  </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Price</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      Loading menu...
-                    </TableCell>
+                    <TableCell colSpan={6} className="text-center py-8">Loading menu...</TableCell>
                   </TableRow>
                 ) : filteredMenuItems.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-center text-muted-foreground py-8"
-                    >
-                      No items found
-                    </TableCell>
+                    <TableCell colSpan={6} className="text-center py-8">No items found</TableCell>
                   </TableRow>
                 ) : (
                   filteredMenuItems.map((item) => (
@@ -317,82 +335,51 @@ export default function MenuPage() {
                         <div>
                           {item.name}
                           {item.categoryName && (
-                            <div className="text-xs text-muted-foreground font-normal">
-                              {item.categoryName}
-                            </div>
+                            <div className="text-xs text-muted-foreground font-normal">{item.categoryName}</div>
                           )}
                         </div>
                       </TableCell>
 
                       <TableCell>
-                        <Badge
-                          variant={
-                            item.status === 'Available'
-                              ? 'secondary'
-                              : 'outline'
-                          }
-                        >
-                          {item.status}
-                        </Badge>
+                        <Badge variant={item.status === 'Available' ? 'secondary' : 'outline'}>{item.status}</Badge>
                       </TableCell>
 
                       <TableCell>
-                        {item.isSpecial && (
-                          <Badge variant="default">Special</Badge>
+                        {item.isSpecial && <Badge variant="default" className="mr-1">Special</Badge>}
+                        {item.isOnOffer && (
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                                Offer: {item.offerType}
+                            </Badge>
                         )}
                       </TableCell>
 
-                      <TableCell className="hidden md:table-cell">
-                        ${item.price.toFixed(2)}
-                      </TableCell>
+                      <TableCell className="hidden md:table-cell">${item.price.toFixed(2)}</TableCell>
 
-                      <TableCell>
+                      <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
+                            <Button size="icon" variant="ghost">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>
-                              Actions
-                            </DropdownMenuLabel>
-
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => handleEdit(item)}>Edit</DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleToggleSpecial(item.id, item.isSpecial)
-                              }
-                            >
-                              {item.isSpecial
-                                ? 'Remove as Special'
-                                : 'Mark as Special'}
+                            <DropdownMenuItem onClick={() => handleToggleSpecial(item.id, item.isSpecial)}>
+                              {item.isSpecial ? 'Remove Special' : 'Mark Special'}
                             </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleToggleStatus(item.id, item.status)
-                              }
-                            >
-                              {item.status === 'Available'
-                                ? 'Mark as Out of Stock'
-                                : 'Mark as Available'}
+                            <DropdownMenuItem onClick={() => handleToggleStatus(item.id, item.status)}>
+                              {item.status === 'Available' ? 'Out of Stock' : 'Mark Available'}
                             </DropdownMenuItem>
-
+                            <DropdownMenuItem onClick={() => {
+                                setSelectedOfferItem(item);
+                                setIsOfferDialogOpen(true);
+                            }}>
+                                Offers
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
-
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDelete(item.id)}
-                            >
-                              Delete
-                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(item.id)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -410,6 +397,28 @@ export default function MenuPage() {
         onClose={() => { setIsAddDishDialogOpen(false); setEditingDish(null); }}
         onAddDish={handleSaveDish}
         initialData={editingDish}
+      />
+
+      <OfferDialog
+        isOpen={isOfferDialogOpen}
+        onClose={() => {
+          setIsOfferDialogOpen(false);
+          setSelectedOfferItem(null);
+        }}
+        onSave={handleSaveOffer}
+        itemName={selectedOfferItem?.name || ""}
+        allMenuItems={menuItems.map(i => ({ id: i.id, name: i.name }))}
+        initialData={selectedOfferItem ? {
+          isOnOffer: selectedOfferItem.isOnOffer,
+          offerType: selectedOfferItem.offerType,
+          offerValue: selectedOfferItem.offerValue,
+          offerDescription: selectedOfferItem.offerDescription,
+          startDate: selectedOfferItem.offerStartDate,
+          endDate: selectedOfferItem.offerEndDate,
+          startTime: selectedOfferItem.offerStartTime,
+          endTime: selectedOfferItem.offerEndTime,
+          ...(selectedOfferItem.offerMetaData ? JSON.parse(selectedOfferItem.offerMetaData) : {})
+        } : undefined}
       />
     </>
   );

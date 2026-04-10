@@ -16,6 +16,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Form,
   FormControl,
@@ -368,7 +369,7 @@ export function AddDishDialog({ isOpen, onClose, onAddDish, defaultValues }: Add
                     )}
                   />
                 </div>
-              </div>
+                </div>
             </ScrollArea>
 
             <DialogFooter className="p-6 border-t bg-white">

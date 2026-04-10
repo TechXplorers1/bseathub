@@ -11,6 +11,7 @@ import {
   LifeBuoy,
   LogOut,
   Menu,
+  Percent,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/home-food-dashboard/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/home-food-dashboard/menu", icon: Utensils, label: "Menu" },
   { href: "/home-food-dashboard/feedback", icon: Star, label: "Feedback" },
+  { href: "/home-food-dashboard/offers", icon: Percent, label: "Offers" },
   { href: "/home-food-dashboard/analytics", icon: LineChart, label: "Analytics" },
 ];
 

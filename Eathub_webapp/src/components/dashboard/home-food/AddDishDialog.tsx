@@ -50,7 +50,6 @@ const dishSchema = z.object({
   category: z.string().min(1, "Category required"),
   status: z.enum(['Available', 'Out of Stock', 'Sold Out']),
   isSpecial: z.boolean().default(false),
-
   image: z.any()
     .refine((files) => files?.length == 1, "Image is required.")
     .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size exceeded.`)

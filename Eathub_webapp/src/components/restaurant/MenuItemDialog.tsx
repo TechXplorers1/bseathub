@@ -141,8 +141,37 @@ export function MenuItemDialog({
             <div className="flex-grow" />
 
             <DialogFooter className="mt-6 sm:justify-between items-center gap-4">
-              <div className="text-2xl font-bold text-primary">
-                <span>$ {item.price}</span>
+              <div className="flex flex-col">
+                <div className="text-2xl font-bold text-primary">
+                  {item.isOnOffer && item.offerType === 'Percentage' ? (
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span>$ {(item.price * (1 - (item.offerValue || 0) / 100)).toFixed(2)}</span>
+                        <span className="text-sm line-through text-muted-foreground">$ {item.price}</span>
+                      </div>
+                      <Badge className="w-fit bg-red-100 text-red-600 hover:bg-red-100 border-none text-[10px] mt-1">
+                        {item.offerValue}% OFF
+                      </Badge>
+                    </div>
+                  ) : item.isOnOffer && item.offerType === 'Fixed Amount' ? (
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span>$ {(item.price - (item.offerValue || 0)).toFixed(2)}</span>
+                        <span className="text-sm line-through text-muted-foreground">$ {item.price}</span>
+                      </div>
+                      <Badge className="w-fit bg-red-100 text-red-600 hover:bg-red-100 border-none text-[10px] mt-1">
+                        $ {item.offerValue} OFF
+                      </Badge>
+                    </div>
+                  ) : (
+                    <span>$ {item.price}</span>
+                  )}
+                </div>
+                {item.isOnOffer && item.offerDescription && (
+                  <p className="text-xs text-orange-600 font-semibold mt-1 italic">
+                    ✨ {item.offerDescription}
+                  </p>
+                )}
               </div>
               <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8 whitespace-nowrap">
                 Add To Cart

@@ -437,6 +437,32 @@ export const verifyOtp = async (email: string, otp: string) => {
     return res.json();
 };
 
+export const forgotPassword = async (email: string) => {
+    const res = await fetch(`${AUTH_URL}/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to process forgot password');
+    }
+    return res.json();
+};
+
+export const resetPassword = async (payload: any) => {
+    const res = await fetch(`${AUTH_URL}/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Failed to reset password');
+    }
+    return res.json();
+};
+
 /* ================= REVIEWS ================= */
 
 import type { OrderRequest, OrderResponse, ReviewRequest, ReviewResponse, ChefBooking } from '@/lib/types';

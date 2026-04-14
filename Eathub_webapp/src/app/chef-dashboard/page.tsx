@@ -28,9 +28,9 @@ import { StatCard } from '@/components/dashboard/chef/StatCard';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { useEffect, useState } from "react";
-import { 
-  fetchChefBookingsByOwner, 
-  fetchChefEarningsByOwner, 
+import {
+  fetchChefBookingsByOwner,
+  fetchChefEarningsByOwner,
   getReviewsForOwner,
   fetchChefProfileByOwner
 } from '@/services/api';
@@ -52,7 +52,7 @@ export default function ChefDashboardPage() {
   useEffect(() => {
     const ownerId = localStorage.getItem("user-id");
     const name = localStorage.getItem("userName");
-    
+
     if (name) setDisplayName(name);
 
     if (!ownerId) {
@@ -70,14 +70,14 @@ export default function ChefDashboardPage() {
 
         // Calculate Stats
         const now = new Date();
-        const upcoming = bookingsData.filter(b => 
+        const upcoming = bookingsData.filter(b =>
           b.status === 'Accepted' && new Date(b.eventDate) >= now
         ).length;
-        
+
         const pending = bookingsData.filter(b => b.status === 'Pending').length;
-        
-        const avg = reviewsData.length > 0 
-          ? reviewsData.reduce((acc, r) => acc + r.rating, 0) / reviewsData.length 
+
+        const avg = reviewsData.length > 0
+          ? reviewsData.reduce((acc, r) => acc + r.rating, 0) / reviewsData.length
           : 0;
 
         setStats({
@@ -124,7 +124,7 @@ export default function ChefDashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Earnings"
-          value={`₹${stats.totalEarnings.toLocaleString()}`}
+          value={`${stats.totalEarnings.toLocaleString()}`}
           icon={DollarSign}
           description="Lifetime revenue"
         />
@@ -207,7 +207,7 @@ export default function ChefDashboardPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-black">
-                        ₹{booking.totalAmount?.toLocaleString() || '0'}
+                        ${booking.totalAmount?.toLocaleString() || '0'}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -215,8 +215,8 @@ export default function ChefDashboardPage() {
               </Table>
             ) : (
               <div className="flex flex-col items-center justify-center py-10 text-muted-foreground border-2 border-dashed rounded-xl">
-                 <CalendarCheck className="h-10 w-10 mb-2 opacity-20" />
-                 <p>No bookings found yet.</p>
+                <CalendarCheck className="h-10 w-10 mb-2 opacity-20" />
+                <p>No bookings found yet.</p>
               </div>
             )}
           </CardContent>
@@ -255,8 +255,8 @@ export default function ChefDashboardPage() {
               </div>
             )) : (
               <div className="flex flex-col items-center justify-center py-10 text-muted-foreground text-center">
-                 <Star className="h-10 w-10 mb-2 opacity-20" />
-                 <p className="text-sm">No reviews yet.<br/>Your rating will appear here.</p>
+                <Star className="h-10 w-10 mb-2 opacity-20" />
+                <p className="text-sm">No reviews yet.<br />Your rating will appear here.</p>
               </div>
             )}
           </CardContent>

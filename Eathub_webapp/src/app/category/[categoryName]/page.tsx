@@ -1,8 +1,11 @@
+
 "use client";
 
 import { useState, useEffect, use } from "react";
 import { ProviderCard } from "@/components/discovery/ProviderCard";
-import { Loader2, UtensilsCrossed, ChefHat, Store } from "lucide-react";
+import { MenuItem } from "@/components/restaurant/MenuItem";
+import { MenuItemDialog } from "@/components/restaurant/MenuItemDialog";
+import { Loader2, UtensilsCrossed, ChefHat, Store, Sparkles } from "lucide-react";
 
 type CategoryPageProps = {
   params: Promise<{ categoryName: string }>;
@@ -15,6 +18,8 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [restaurants, setRestaurants] = useState<any[]>([]);
   const [homeFoods, setHomeFoods] = useState<any[]>([]);
   const [chefs, setChefs] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>([]);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,13 +29,14 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         const apiUrl = `http://localhost:8081/api/v1/discovery/category/${encodeURIComponent(categoryName)}`;
         const response = await fetch(apiUrl);
 
-        if (!response.ok) throw new Error(`Failed to fetch providers`);
+        if (!response.ok) throw new Error(`Failed to fetch discovery results`);
 
         const data = await response.json();
 
         setRestaurants((data.restaurants || []).map((item: any) => ({ ...item, type: "RESTAURANT" as const })));
         setHomeFoods((data.homeFoods || []).map((item: any) => ({ ...item, type: "HOME_FOOD" as const })));
         setChefs((data.chefs || []).map((item: any) => ({ ...item, type: "CHEF" as const })));
+        setItems(data.items || []);
 
       } catch (error) {
         console.error("Discovery error:", error);
@@ -42,18 +48,22 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     fetchProviders();
   }, [categoryName]);
 
-  const hasResults = restaurants.length > 0 || homeFoods.length > 0 || chefs.length > 0;
+  const hasResults = restaurants.length > 0 || homeFoods.length > 0 || chefs.length > 0 || items.length > 0;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in duration-500">
       <header className="mb-12 text-center md:text-left">
-        <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-          <UtensilsCrossed className="h-8 w-8 text-orange-500" />
-          <h1 className="text-4xl font-extrabold tracking-tight capitalize">{categoryName}</h1>
+        <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
+          <div className="p-3 bg-orange-100 rounded-2xl">
+            <UtensilsCrossed className="h-8 w-8 text-orange-600" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight capitalize">{categoryName}</h1>
+            <p className="text-muted-foreground text-lg">
+                Discover the best {categoryName} items and places near you.
+            </p>
+          </div>
         </div>
-        <p className="text-muted-foreground text-lg">
-          Explore top {categoryName} providers from Restaurants and Home Kitchens.
-        </p>
       </header>
 
       {loading ? (
@@ -63,14 +73,36 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         </div>
       ) : hasResults ? (
         <div className="space-y-16">
+          {/* Top Items Section - Prioritized per user request */}
+          {items.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-8">
+                <Sparkles className="h-6 w-6 text-amber-500" />
+                <h2 className="text-2xl font-black uppercase tracking-tight">Delicious {categoryName} Dishes</h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-muted to-transparent" />
+                <span className="text-xs font-bold bg-amber-50 text-amber-600 px-3 py-1 rounded-full">{items.length} ITEMS</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {items.map((item) => (
+                  <MenuItem 
+                    key={item.id} 
+                    item={item} 
+                    onClick={() => setSelectedItem(item)}
+                    showProviderInfo={true}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Restaurants Section */}
           {restaurants.length > 0 && (
             <section>
               <div className="flex items-center gap-3 mb-6">
-                <Store className="h-6 w-6 text-orange-600" />
+                <Store className="h-6 w-6 text-blue-600" />
                 <h2 className="text-2xl font-bold">Top Restaurants</h2>
                 <div className="h-px flex-1 bg-muted/60" />
-                <span className="text-xs font-bold bg-orange-100 text-orange-700 px-3 py-1 rounded-full">{restaurants.length} AVAILABLE</span>
+                <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{restaurants.length} AVAILABLE</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {restaurants.map((provider) => (
@@ -124,6 +156,14 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             We couldn't find any restaurants or chefs for "{categoryName}" in your area yet.
           </p>
         </div>
+      )}
+
+      {selectedItem && (
+          <MenuItemDialog 
+            item={selectedItem}
+            open={!!selectedItem}
+            onOpenChange={(open) => !open && setSelectedItem(null)}
+          />
       )}
     </div>
   );

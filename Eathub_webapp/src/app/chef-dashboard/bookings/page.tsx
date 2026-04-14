@@ -76,9 +76,9 @@ function BookingsTable({ bookings, onStatusUpdate }: { bookings: ChefBooking[], 
                                 <span className="font-bold text-slate-600 text-xs">{booking.customerPhone || 'N/A'}</span>
                                 <Badge variant="secondary" className={cn(
                                     "w-fit font-black text-[9px] uppercase tracking-tighter px-2",
-                                    booking.foodPreference === 'Veg' ? "bg-green-100 text-green-700 hover:bg-green-100" : 
-                                    booking.foodPreference === 'Non-Veg' ? "bg-red-100 text-red-700 hover:bg-red-100" : 
-                                    "bg-orange-100 text-orange-700 hover:bg-orange-100"
+                                    booking.foodPreference === 'Veg' ? "bg-green-100 text-green-700 hover:bg-green-100" :
+                                        booking.foodPreference === 'Non-Veg' ? "bg-red-100 text-red-700 hover:bg-red-100" :
+                                            "bg-orange-100 text-orange-700 hover:bg-orange-100"
                                 )}>
                                     {booking.foodPreference || 'Both'}
                                 </Badge>
@@ -108,10 +108,10 @@ function BookingsTable({ bookings, onStatusUpdate }: { bookings: ChefBooking[], 
                             {booking.isNegotiable ? (
                                 <div className="flex flex-col items-end">
                                     <span className="font-black text-primary text-xs uppercase tracking-tighter italic">Negotiable</span>
-                                    <span className="text-[9px] font-bold text-muted-foreground/60 opacity-50 decoration-slate-400 line-through">₹{booking.totalAmount?.toFixed(2)}</span>
+                                    <span className="text-[9px] font-bold text-muted-foreground/60 opacity-50 decoration-slate-400 line-through">${booking.totalAmount?.toFixed(2)}</span>
                                 </div>
                             ) : (
-                                <span className="font-black text-slate-900">₹{booking.totalAmount?.toFixed(2)}</span>
+                                <span className="font-black text-slate-900">${booking.totalAmount?.toFixed(2)}</span>
                             )}
                         </TableCell>
                         <TableCell className="text-right">
@@ -164,7 +164,7 @@ export default function BookingsPage() {
         if (!ownerId) return;
         if (!silent) setLoading(true);
         else setRefreshing(true);
-        
+
         try {
             const data = await fetchChefBookingsByOwner(ownerId);
             setBookings(data);
@@ -200,12 +200,12 @@ export default function BookingsPage() {
         // Apply Header Search Filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            const matchesSearch = 
+            const matchesSearch =
                 booking.customerName?.toLowerCase().includes(q) ||
                 booking.id?.toLowerCase().includes(q) ||
                 booking.eventType?.toLowerCase().includes(q) ||
                 booking.serviceName?.toLowerCase().includes(q);
-            
+
             if (!matchesSearch) return false;
         }
 
@@ -254,10 +254,10 @@ export default function BookingsPage() {
                                 Showing {filteredBookings.length} {activeTab !== 'All' ? activeTab : 'total'} Results
                             </CardDescription>
                         </div>
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => loadBookings(true)} 
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadBookings(true)}
                             disabled={refreshing}
                             className="rounded-2xl border-slate-200 font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-primary transition-all gap-2 px-5 py-5 active:scale-95"
                         >

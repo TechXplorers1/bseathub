@@ -16,9 +16,9 @@ interface OfferCardProps {
   onClick?: () => void;
 }
 
-export function OfferCard({ 
-  item, 
-  discountText = '50% OFF', 
+export function OfferCard({
+  item,
+  discountText = '50% OFF',
   originalPrice,
   rating = 4.5,
   timeMins = 30,
@@ -41,7 +41,7 @@ export function OfferCard({
           fill
           className="object-cover"
         />
-        
+
         {/* Discount Badge */}
         <div className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm z-10">
           {discountText}
@@ -74,7 +74,7 @@ export function OfferCard({
         <h3 className="font-bold text-gray-900 text-[15px] leading-tight truncate mb-1">
           {item.name}
         </h3>
-        
+
         {item.providerName && (
           <p className="text-xs text-gray-500 truncate mb-3">
             {item.providerName}
@@ -85,8 +85,8 @@ export function OfferCard({
           {/* Price & Rating */}
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-black text-gray-900 text-base">₹{item.price}</span>
-              <span className="text-xs text-gray-400 line-through">₹{baseOriginalPrice}</span>
+              <span className="font-black text-gray-900 text-base">${item.price}</span>
+              <span className="text-xs text-gray-400 line-through">${baseOriginalPrice}</span>
             </div>
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
@@ -101,13 +101,13 @@ export function OfferCard({
           </div>
         </div>
       </div>
-      
+
       {/* Fallback link wrapper stretching over card */}
       {onClick ? (
-        <button 
-          className="absolute inset-0 z-30 w-full h-full opacity-0 cursor-pointer outline-none" 
-          onClick={onClick} 
-          aria-label={`View ${item.name}`} 
+        <button
+          className="absolute inset-0 z-30 w-full h-full opacity-0 cursor-pointer outline-none"
+          onClick={onClick}
+          aria-label={`View ${item.name}`}
         />
       ) : (
         <Link href={`/${item.providerType === 'home-food' ? 'home-food' : 'restaurant'}/${item.providerSlug || item.providerId}`} className="absolute inset-0 z-30 opacity-0" aria-label={`View ${item.name}`} />

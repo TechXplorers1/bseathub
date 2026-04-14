@@ -125,12 +125,12 @@ export default function HomeFoodOrdersPage() {
         // Apply Global Search Filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            const matchesSearch = 
+            const matchesSearch =
                 order.id.toLowerCase().includes(q) ||
                 order.customerName?.toLowerCase().includes(q) ||
                 order.totalAmount.toString().includes(q) ||
                 order.deliveryAddress?.toLowerCase().includes(q);
-            
+
             if (!matchesSearch) return false;
         }
 
@@ -262,7 +262,7 @@ export default function HomeFoodOrdersPage() {
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-right font-black text-primary">₹{order.totalAmount.toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-black text-primary">${order.totalAmount.toFixed(2)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
@@ -274,7 +274,7 @@ export default function HomeFoodOrdersPage() {
                                                             <DropdownMenuItem onClick={() => setSelectedOrder(order)} className="rounded-lg font-bold py-2.5">
                                                                 View Order Summary
                                                             </DropdownMenuItem>
-                                                            
+
                                                             <div className="h-px bg-border/40 my-1 mx-2" />
 
                                                             {(order.currentStatusId === 'Confirmed' || order.currentStatusId === 'Provider Confirmed' || order.currentStatusId === 'Pending Approval') && (

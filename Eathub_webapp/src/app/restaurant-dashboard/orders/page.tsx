@@ -50,7 +50,7 @@ export default function OrdersPage() {
     const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
     const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
     const { toast } = useToast();
-    
+
     // Connect to Global Search
     const { searchQuery, setSearchPlaceholder, setSearchQuery } = useHeader();
 
@@ -127,12 +127,12 @@ export default function OrdersPage() {
         // Apply Global Search Filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            const matchesSearch = 
+            const matchesSearch =
                 order.id.toLowerCase().includes(q) ||
                 order.customerName?.toLowerCase().includes(q) ||
                 order.totalAmount.toString().includes(q) ||
                 order.deliveryAddress?.toLowerCase().includes(q);
-            
+
             if (!matchesSearch) return false;
         }
 
@@ -279,7 +279,7 @@ export default function OrdersPage() {
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-right font-black text-primary">₹{order.totalAmount.toFixed(2)}</TableCell>
+                                                <TableCell className="text-right font-black text-primary">${order.totalAmount.toFixed(2)}</TableCell>
                                                 <TableCell className="text-right">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>

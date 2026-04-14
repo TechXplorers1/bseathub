@@ -116,6 +116,22 @@ export function Header({ className }: HeaderProps) {
             })
             .catch(err => console.error("Header fetch homefood error:", err));
         }
+      } else if (role === 'RESTAURANT') {
+        const restaurantId = localStorage.getItem('restaurantId');
+        if (restaurantId) {
+          fetch(`http://localhost:8081/api/v1/restaurants/id/${restaurantId}`)
+            .then(res => res.json())
+            .then(data => {
+              const picUrl = data.avatarUrl || data.imageId;
+              if (picUrl) {
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                try {
+                  localStorage.setItem('userAvatar', picUrl);
+                } catch (e) { console.warn("Avatar too large for storage"); }
+              }
+            })
+            .catch(err => console.error("Header fetch restaurant error:", err));
+        }
       } else {
         setChefData(null);
       }

@@ -53,13 +53,13 @@ export function OfferDetailsModal({
       type: providerType as 'Restaurant' | 'HomeFood',
       name: item.providerName || 'Unknown Provider',
     };
-    
+
     // Call addToCart N times or if cart takes quantity, pass it. 
     // Wait, addToCart in CartProvider adds 1 unit. We should loop, or update quantity immediately
     for (let i = 0; i < quantity; i++) {
-        addToCart(item, provider);
+      addToCart(item, provider);
     }
-    
+
     onClose();
   };
 
@@ -111,8 +111,8 @@ export function OfferDetailsModal({
 
               {/* Price Row */}
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl font-black text-gray-900">₹{item.price}</span>
-                <span className="text-sm font-semibold text-gray-400 line-through mt-1">₹{baseOriginalPrice}</span>
+                <span className="text-3xl font-black text-gray-900">${item.price}</span>
+                <span className="text-sm font-semibold text-gray-400 line-through mt-1">${baseOriginalPrice}</span>
                 <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-md mt-1">
                   {discountText}
                 </span>
@@ -162,14 +162,14 @@ export function OfferDetailsModal({
             {/* Bottom Actions Row */}
             <div className="flex items-center gap-4 mt-auto pt-2">
               <div className="flex items-center justify-between border border-gray-200 rounded-full w-32 py-2 px-2 bg-white">
-                <button 
+                <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
                 <span className="font-bold text-gray-900 w-4 text-center">{quantity}</span>
-                <button 
+                <button
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
                 >
@@ -177,11 +177,11 @@ export function OfferDetailsModal({
                 </button>
               </div>
 
-              <Button 
+              <Button
                 onClick={handleAddToCart}
                 className="flex-1 rounded-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-lg shadow-orange-500/20 text-sm"
               >
-                Add to Cart • ₹{item.price * quantity}
+                Add to Cart • ${item.price * quantity}
               </Button>
             </div>
           </div>

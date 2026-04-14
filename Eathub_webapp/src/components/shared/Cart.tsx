@@ -166,7 +166,7 @@ export function Cart() {
                                             <div>
                                                 <p className="font-medium leading-tight">{item.name}</p>
                                                 <p className="text-sm text-muted-foreground font-bold text-orange-600">
-                                                    ₹{item.price.toFixed(2)}
+                                                    ${item.price.toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="flex items-center">
@@ -310,39 +310,39 @@ export function Cart() {
                 <div className="space-y-2.5">
                     <div className="flex justify-between text-sm font-medium">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span>₹{cartTotal.toFixed(2)}</span>
+                        <span>${cartTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm font-medium">
                         <span className="text-muted-foreground">Taxes (5%)</span>
-                        <span>₹{(cartTotal * 0.05).toFixed(2)}</span>
+                        <span>${(cartTotal * 0.05).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm font-medium">
                         <span className="text-muted-foreground">Platform Fee (4%)</span>
-                        <span>₹{(cartTotal * 0.04).toFixed(2)}</span>
+                        <span>${(cartTotal * 0.04).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm font-medium">
                         <span className="text-muted-foreground">Delivery Fee</span>
-                        <span>₹25.00</span>
+                        <span>$25.00</span>
                     </div>
-                    
+
                     <div className="flex justify-between font-black text-xl pt-4 border-t-2 border-dashed border-gray-200 mt-2">
                         <span>Total Amount</span>
-                        <span className="text-orange-600">₹{(cartTotal * 1.09 + 25).toFixed(2)}</span>
+                        <span className="text-orange-600">${(cartTotal * 1.09 + 25).toFixed(2)}</span>
                     </div>
                 </div>
 
                 {/* Horizontal Action Buttons Wrapper */}
                 <div className="flex flex-row items-center gap-3 w-full">
                     {step === 'cart' && (
-                        <Button 
-                            variant="outline" 
-                            className="w-1/3 rounded-full text-red-600 hover:bg-red-50 hover:border-red-100 hover:text-red-700 h-12 font-bold shadow-sm transition-all" 
+                        <Button
+                            variant="outline"
+                            className="w-1/3 rounded-full text-red-600 hover:bg-red-50 hover:border-red-100 hover:text-red-700 h-12 font-bold shadow-sm transition-all"
                             onClick={clearCart}
                         >
                             Clear
                         </Button>
                     )}
-                    
+
                     {step === 'cart' ? (
                         <Button
                             size="lg"
@@ -369,7 +369,7 @@ export function Cart() {
                                     Placing Order...
                                 </>
                             ) : (
-                                `Confirm & Pay ₹${(cartTotal * 1.09 + 25).toFixed(2)}`
+                                `Confirm & Pay $${(cartTotal * 1.09 + 25).toFixed(2)}`
                             )}
                         </Button>
                     )}

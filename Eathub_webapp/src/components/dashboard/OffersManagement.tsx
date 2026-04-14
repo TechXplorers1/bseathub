@@ -43,6 +43,7 @@ import { OfferDialog } from './OfferDialog';
 import { useToast } from '@/hooks/use-toast';
 import * as api from '@/services/api';
 import type { MenuItem } from '@/lib/types';
+import { getDisplayImage } from '@/lib/image-utils';
 
 interface OffersManagementProps {
     providerId: string | null;
@@ -198,7 +199,7 @@ export function OffersManagement({ providerId, type }: OffersManagementProps) {
                                         <TableCell>
                                             <div className="relative h-12 w-12 rounded-xl overflow-hidden shadow-sm border border-slate-100">
                                                 <Image 
-                                                    src={item.imageUrl} 
+                                                    src={getDisplayImage(item.imageUrl, 'food-1')} 
                                                     alt={item.name} 
                                                     fill 
                                                     className="object-cover" 
@@ -236,43 +237,36 @@ export function OffersManagement({ providerId, type }: OffersManagementProps) {
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="hover:bg-white hover:shadow-sm">
-                                                        <MoreHorizontal size={16} />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48 rounded-xl p-1">
-                                                    <DropdownMenuLabel className="text-[10px] font-black uppercase text-slate-400 px-2 py-1.5 tracking-widest">Controls</DropdownMenuLabel>
-                                                    <DropdownMenuItem 
-                                                        className="rounded-lg gap-2 font-bold text-sm"
-                                                        onClick={() => {
-                                                            setSelectedItem(item);
-                                                            setIsOfferDialogOpen(true);
-                                                        }}
-                                                    >
-                                                        <Settings className="h-4 w-4 text-orange-600" />
-                                                        Modify Offer
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem 
-                                                        className="rounded-lg gap-2 font-bold text-sm text-destructive"
-                                                        onClick={async () => {
-                                                            if (!confirm('Remove this offer?')) return;
-                                                            try {
-                                                                await api.updateMenuItem(item.id, { ...item, isOnOffer: false });
-                                                                toast({ title: "Offer Removed" });
-                                                                loadData();
-                                                            } catch (e) {
-                                                                toast({ title: "Error", variant: "destructive" });
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                        End Promotion
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <div className="flex justify-end gap-2">
+                                                <Button 
+                                                    variant="outline" 
+                                                    size="sm" 
+                                                    className="hover:bg-orange-50 hover:text-orange-600 font-bold transition-colors"
+                                                    onClick={() => {
+                                                        setSelectedItem(item);
+                                                        setIsOfferDialogOpen(true);
+                                                    }}
+                                                >
+                                                    <Settings size={14} className="mr-1.5" /> Modify
+                                                </Button>
+                                                <Button 
+                                                    variant="destructive" 
+                                                    size="sm" 
+                                                    className="font-bold bg-red-100 text-red-700 hover:bg-red-200 border-none transition-colors"
+                                                    onClick={async () => {
+                                                        if (!confirm('Are you sure you want to cancel this offer?')) return;
+                                                        try {
+                                                            await api.updateMenuItem(item.id, { ...item, isOnOffer: false });
+                                                            toast({ title: "Offer Cancelled" });
+                                                            loadData();
+                                                        } catch (e) {
+                                                            toast({ title: "Error", variant: "destructive" });
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 size={14} className="mr-1.5" /> Cancel Offer
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))

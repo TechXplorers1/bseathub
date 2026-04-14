@@ -5,7 +5,12 @@ export const AUTH_URL = `${BASE_URL}/auth`;
 export const fetchRestaurants = async () => {
     const res = await fetch(`${BASE_URL}/restaurants`);
     if (!res.ok) throw new Error("Failed to fetch restaurants");
-    return res.json();
+    const data = await res.json();
+    return data.filter((item: any) =>
+        item.businessModel !== 'HOME_KITCHEN' &&
+        item.restaurantType !== 'Home Food' &&
+        item.type !== 'home-food'
+    );
 };
 
 export const fetchHomeFoods = async () => {
@@ -17,6 +22,16 @@ export const fetchHomeFoods = async () => {
 export const fetchChefs = async () => {
     const res = await fetch(`${BASE_URL}/chefs`);
     if (!res.ok) throw new Error("Failed to fetch chefs");
+    return res.json();
+};
+
+export const fetchItemsOnOffer = async (offerType?: string) => {
+    let url = `${BASE_URL}/menu/offers`;
+    if (offerType) {
+        url += `?offerType=${encodeURIComponent(offerType)}`;
+    }
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Failed to fetch offers");
     return res.json();
 };
 
@@ -71,6 +86,16 @@ export const login = async (credentials: any) => {
         body: JSON.stringify(credentials),
     });
     if (!res.ok) throw new Error("Invalid email or password");
+    return res.json();
+};
+
+export const googleLogin = async (payload: { email: string; name: string; photoUrl: string }) => {
+    const res = await fetch(`${BASE_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error("Google login failed");
     return res.json();
 };
 
@@ -572,7 +597,7 @@ export const cancelOrder = async (orderId: string, reason?: string, cancelledBy?
     let url = `${BASE_URL}/orders/${orderId}/cancel?`;
     if (reason) url += `reason=${encodeURIComponent(reason)}&`;
     if (cancelledBy) url += `cancelledBy=${encodeURIComponent(cancelledBy)}`;
-    
+
     const res = await fetch(url, {
         method: 'POST',
     });
@@ -626,7 +651,7 @@ export const checkAlreadyReviewed = async (
         url += `customerId=${customerId}&targetId=${targetId}`;
         if (menuItemId) url += `&menuItemId=${menuItemId}`;
     }
-    
+
     const res = await fetch(url);
     if (!res.ok) return false;
     const data = await res.json();

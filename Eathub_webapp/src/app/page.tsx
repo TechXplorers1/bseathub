@@ -6,6 +6,7 @@ import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import { FilterCategories } from '@/components/home/FilterCategories';
 import { Banners } from '@/components/home/Banners';
+import { OffersForYou } from '@/components/home/OffersForYou';
 import { ChefsCarousel } from '@/components/home/ChefsCarousel';
 import { useFavorites } from '@/context/FavoritesProvider';
 import { Heart } from 'lucide-react';
@@ -25,7 +26,11 @@ export default function Home() {
     <div className="flex flex-col w-full min-w-0">
       <FilterCategories />
 
-      <div className="mt-4 mb-6">
+      <div className="mt-2 mb-2">
+        <OffersForYou />
+      </div>
+
+      <div className="mb-6">
         <Banners />
       </div>
 

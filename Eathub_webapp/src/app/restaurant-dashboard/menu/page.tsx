@@ -30,6 +30,7 @@ import type { MenuItem as MenuItemType } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import * as api from "@/services/api";
 import { fetchItemsByRestaurant } from '@/services/api';
+import { getDisplayImage } from '@/lib/image-utils';
 
 type ExtendedMenuItem = MenuItemType & { isSpecial: boolean; status: 'Available' | 'Out of Stock' };
 
@@ -45,9 +46,9 @@ export default function MenuPage() {
   const [selectedOfferItem, setSelectedOfferItem] = useState<ExtendedMenuItem | null>(null);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("restaurant") || "{}");
-    if (stored?.id) {
-       setRestaurantId(stored.id);
+    const id = localStorage.getItem("restaurantId");
+    if (id) {
+       setRestaurantId(id);
     }
   }, []);
 
@@ -64,15 +65,18 @@ export default function MenuPage() {
         price: item.price,
         status: item.status ?? "Available",
         isSpecial: item.isSpecial ?? false,
-        imageUrl: item.imageUrl || "/placeholder-food.jpg",
+        imageUrl: item.imageId || item.imageUrl || "/placeholder-food.jpg",
+        imageId: item.imageId,
         description: item.description,
+        isOnOffer: item.isOnOffer,
         offerType: item.offerType,
         offerValue: item.offerValue,
         offerDescription: item.offerDescription,
         offerStartDate: item.offerStartDate,
         offerEndDate: item.offerEndDate,
         offerStartTime: item.offerStartTime,
-        offerEndTime: item.offerEndTime
+        offerEndTime: item.offerEndTime,
+        offerMetaData: item.offerMetaData
       }));
 
       setMenuItems(mappedItems);
@@ -257,7 +261,7 @@ export default function MenuPage() {
                         alt={item.name}
                         className="aspect-square rounded-md object-cover"
                         height="64"
-                        src={(item as any).imageUrl || (item as any).imageId || `https://picsum.photos/seed/${item.id}/64/64`}
+                        src={getDisplayImage((item as any).imageId || (item as any).imageUrl, 'food-1')}
                         width="64"
                       />
                     </TableCell>

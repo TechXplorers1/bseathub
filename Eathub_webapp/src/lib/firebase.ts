@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_ymS3eqrmTDxnrlLeb1Dr56eQq0hSGPc",
@@ -14,6 +15,10 @@ const firebaseConfig = {
 
 // Initialize Firebase only if not already initialized
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+// Initialize Auth
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
 export const requestForToken = async () => {
   if (typeof window === 'undefined' || !('Notification' in window)) return null;

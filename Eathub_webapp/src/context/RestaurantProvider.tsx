@@ -50,10 +50,16 @@ export function RestaurantProvider({
           fetch(`${API_BASE}/home-food`)
         ]);
 
-      const restaurantsData =
+      const rawRestaurantsData =
         restaurantsRes.ok
           ? await restaurantsRes.json()
           : [];
+
+      const restaurantsData = rawRestaurantsData.filter((item: any) => 
+        item.businessModel !== 'HOME_KITCHEN' && 
+        item.restaurantType !== 'Home Food' && 
+        item.type !== 'home-food'
+      );
 
       const homeFoodData =
         homeFoodRes.ok

@@ -7,9 +7,9 @@ export default function RestaurantOffersPage() {
     const [restaurantId, setRestaurantId] = React.useState<string | null>(null);
 
     React.useEffect(() => {
-        const stored = JSON.parse(localStorage.getItem("restaurant") || "{}");
-        if (stored?.id) {
-            setRestaurantId(stored.id);
+        const id = localStorage.getItem("restaurantId");
+        if (id) {
+            setRestaurantId(id);
         }
     }, []);
 

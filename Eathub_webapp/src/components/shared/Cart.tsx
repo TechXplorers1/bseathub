@@ -165,8 +165,8 @@ export function Cart() {
                                         <div className="flex-1 ml-4 space-y-2">
                                             <div>
                                                 <p className="font-medium leading-tight">{item.name}</p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    $ {item.price.toFixed(2)}
+                                                <p className="text-sm text-muted-foreground font-bold text-orange-600">
+                                                    ₹{item.price.toFixed(2)}
                                                 </p>
                                             </div>
                                             <div className="flex items-center">
@@ -305,47 +305,61 @@ export function Cart() {
                 </div>
             </ScrollArea>
 
-            <SheetFooter className="mt-auto flex flex-col space-y-4 p-6 bg-background border-t">
-                <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                        <span>Subtotal</span>
-                        <span>$ {cartTotal.toFixed(2)}</span>
+            <SheetFooter className="mt-auto flex-col sm:flex-col space-y-6 sm:space-x-0 p-6 bg-background border-t">
+                {/* Summary Lines */}
+                <div className="space-y-2.5">
+                    <div className="flex justify-between text-sm font-medium">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span>₹{cartTotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Taxes (5%)</span>
-                        <span>$ {(cartTotal * 0.05).toFixed(2)}</span>
+                    <div className="flex justify-between text-sm font-medium">
+                        <span className="text-muted-foreground">Taxes (5%)</span>
+                        <span>₹{(cartTotal * 0.05).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Platform Fee (4%)</span>
-                        <span>$ {(cartTotal * 0.04).toFixed(2)}</span>
+                    <div className="flex justify-between text-sm font-medium">
+                        <span className="text-muted-foreground">Platform Fee (4%)</span>
+                        <span>₹{(cartTotal * 0.04).toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>Delivery Fee</span>
-                        <span>$ 25.00</span>
+                    <div className="flex justify-between text-sm font-medium">
+                        <span className="text-muted-foreground">Delivery Fee</span>
+                        <span>₹25.00</span>
                     </div>
-                    <div className="flex justify-between font-bold text-xl pt-4 border-t-2 border-dashed mt-2">
+                    
+                    <div className="flex justify-between font-black text-xl pt-4 border-t-2 border-dashed border-gray-200 mt-2">
                         <span>Total Amount</span>
-                        <span>$ {(cartTotal * 1.09 + 25).toFixed(2)}</span>
+                        <span className="text-orange-600">₹{(cartTotal * 1.09 + 25).toFixed(2)}</span>
                     </div>
                 </div>
-                <div className="flex flex-col space-y-2">
+
+                {/* Horizontal Action Buttons Wrapper */}
+                <div className="flex flex-row items-center gap-3 w-full">
+                    {step === 'cart' && (
+                        <Button 
+                            variant="outline" 
+                            className="w-1/3 rounded-full text-red-600 hover:bg-red-50 hover:border-red-100 hover:text-red-700 h-12 font-bold shadow-sm transition-all" 
+                            onClick={clearCart}
+                        >
+                            Clear
+                        </Button>
+                    )}
+                    
                     {step === 'cart' ? (
                         <Button
                             size="lg"
-                            className="w-full rounded-full h-12 text-base font-bold"
+                            className="flex-1 rounded-full h-12 text-base font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 transition-all"
                             onClick={goToAddressStep}
                             disabled={loadingProfile}
                         >
                             {loadingProfile ? (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             ) : (
-                                'Check out'
+                                'Proceed to Checkout'
                             )}
                         </Button>
                     ) : (
                         <Button
                             size="lg"
-                            className="w-full rounded-full h-12 text-base font-bold shadow-lg shadow-primary/20"
+                            className="w-full rounded-full h-12 text-base font-bold bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 transition-all"
                             onClick={handleCheckout}
                             disabled={isCheckingOut || (step === 'address' && !isAddressValid())}
                         >
@@ -355,12 +369,9 @@ export function Cart() {
                                     Placing Order...
                                 </>
                             ) : (
-                                `Confirm & Pay $ ${(cartTotal * 1.09 + 25).toFixed(2)}`
+                                `Confirm & Pay ₹${(cartTotal * 1.09 + 25).toFixed(2)}`
                             )}
                         </Button>
-                    )}
-                    {step === 'cart' && (
-                        <Button variant="ghost" className="w-full text-destructive hover:text-destructive h-10" onClick={clearCart}>Clear Cart</Button>
                     )}
                 </div>
             </SheetFooter>

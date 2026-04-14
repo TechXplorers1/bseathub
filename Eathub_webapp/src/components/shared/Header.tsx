@@ -67,23 +67,25 @@ export function Header({ className }: HeaderProps) {
   const [chefs, setChefs] = useState<Chef[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const [auth, setAuth] = useState<{
+    const [auth, setAuth] = useState<{
     email: string | null;
+    name: string | null;
     role: string | null;
     token: string | null;
     avatarUrl: string | null;
-  }>({ email: null, role: null, token: null, avatarUrl: null });
+  }>({ email: null, name: null, role: null, token: null, avatarUrl: null });
 
   const [chefData, setChefData] = useState<any>(null);
 
   useEffect(() => {
     const loadAuth = () => {
       const email = localStorage.getItem('userEmail');
+      const name = localStorage.getItem('userName');
       const role = localStorage.getItem('userRole');
       const token = localStorage.getItem('token');
       const avatarUrl = localStorage.getItem('userAvatar');
 
-      setAuth({ email, role, token, avatarUrl });
+      setAuth({ email, name, role, token, avatarUrl });
       setIsLoading(false);
 
       if (role === 'CHEF') {
@@ -159,7 +161,7 @@ export function Header({ className }: HeaderProps) {
 
   const handleLogout = () => {
     localStorage.clear();
-    setAuth({ email: null, role: null, token: null, avatarUrl: null });
+    setAuth({ email: null, name: null, role: null, token: null, avatarUrl: null });
     window.dispatchEvent(new Event('auth-change'));
     router.push('/');
     router.refresh();
@@ -460,7 +462,7 @@ export function Header({ className }: HeaderProps) {
                       <AvatarImage src={chefData?.avatarUrl || auth.avatarUrl || undefined} alt={chefData?.name || auth.email || ''} className="object-cover" />
                     ) : null}
                     <AvatarFallback className="bg-primary text-primary-foreground text-sm flex items-center justify-center">
-                      {auth.email ? auth.email[0].toUpperCase() : 'U'}
+                      {(auth.name || auth.email || 'U')[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -468,7 +470,7 @@ export function Header({ className }: HeaderProps) {
               <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl p-1">
                 <DropdownMenuLabel className="font-normal p-3">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-bold leading-none truncate">{auth.email}</p>
+                    <p className="text-sm font-bold leading-none truncate">{auth.name || auth.email}</p>
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">{auth.role}</p>
                   </div>
                 </DropdownMenuLabel>

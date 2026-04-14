@@ -15,6 +15,7 @@ const API_BASE = "http://localhost:8081/api/v1";
 interface RestaurantContextType {
   restaurants: Restaurant[];
   homeFoods: Restaurant[];
+  chefs: any[];
   allItems: Restaurant[];
   loading: boolean;
   getRestaurantById: (id: string) => Restaurant | undefined;
@@ -25,46 +26,53 @@ interface RestaurantContextType {
     dishData: any,
     type: 'restaurant' | 'home-food'
   ) => Promise<any>;
-
+  refreshAll: () => Promise<void>;
 }
 
 const RestaurantContext =
   createContext<RestaurantContextType | undefined>(undefined);
 
+// Simple global cache to persist between page navigations without re-renders
+let cachedData: { restaurants: Restaurant[], homeFoods: Restaurant[], chefs: any[] } | null = null;
+
 export function RestaurantProvider({
   children
 }: { children: ReactNode }) {
 
-  const [allItems, setAllItems] =
-    useState<Restaurant[]>([]);
-
+  const [allItems, setAllItems] = useState<Restaurant[]>([]);
+  const [chefs, setChefs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAllData = async () => {
+  const fetchAllData = async (forceUpdate = false) => {
+    // If not a forced update and we have cached data, use it immediately
+    if (!forceUpdate && cachedData) {
+      setAllItems([...cachedData.restaurants, ...cachedData.homeFoods]);
+      setChefs(cachedData.chefs);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const [restaurantsRes, homeFoodRes] =
+      const [restaurantsRes, homeFoodRes, chefsRes] =
         await Promise.all([
           fetch(`${API_BASE}/restaurants`),
-          fetch(`${API_BASE}/home-food`)
+          fetch(`${API_BASE}/home-food`),
+          fetch(`${API_BASE}/chefs`)
         ]);
 
-      const rawRestaurantsData =
-        restaurantsRes.ok
-          ? await restaurantsRes.json()
-          : [];
+      const [rawRestaurantsData, homeFoodData, rawChefsData] = await Promise.all([
+        restaurantsRes.ok ? restaurantsRes.json() : [],
+        homeFoodRes.ok ? homeFoodRes.json() : [],
+        chefsRes.ok ? chefsRes.json() : []
+      ]);
 
       const restaurantsData = rawRestaurantsData.filter((item: any) => 
         item.businessModel !== 'HOME_KITCHEN' && 
         item.restaurantType !== 'Home Food' && 
         item.type !== 'home-food'
       );
-
-      const homeFoodData =
-        homeFoodRes.ok
-          ? await homeFoodRes.json()
-          : [];
 
       const mappedRestaurants =
         restaurantsData.map((item: any) => {
@@ -103,10 +111,15 @@ export function RestaurantProvider({
           })) ?? []
         }));
 
-      setAllItems([
-        ...mappedRestaurants,
-        ...mappedHomeFoods
-      ]);
+      setAllItems([...mappedRestaurants, ...mappedHomeFoods]);
+      setChefs(rawChefsData);
+      
+      // Update global cache
+      cachedData = {
+        restaurants: mappedRestaurants,
+        homeFoods: mappedHomeFoods,
+        chefs: rawChefsData
+      };
 
     } catch (error) {
       console.error("Fetch error:", error);
@@ -148,6 +161,8 @@ export function RestaurantProvider({
     return newItem;
   };
 
+
+  const refreshAll = () => fetchAllData(true);
 
   const restaurants =
     allItems.filter(i => i.type === 'restaurant');
@@ -197,12 +212,14 @@ export function RestaurantProvider({
       value={{
         restaurants,
         homeFoods,
+        chefs,
         allItems,
         loading,
         getRestaurantById,
         getRestaurantByOwnerId,
         fetchFullRestaurantData,
-        addDishToRestaurant
+        addDishToRestaurant,
+        refreshAll
       }}
     >
       {children}

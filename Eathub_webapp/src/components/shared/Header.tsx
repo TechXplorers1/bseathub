@@ -64,7 +64,6 @@ export function Header({ className }: HeaderProps) {
 
   // Search States
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [chefs, setChefs] = useState<Chef[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
 
     const [auth, setAuth] = useState<{
@@ -87,14 +86,35 @@ export function Header({ className }: HeaderProps) {
 
       setAuth({ email, name, role, token, avatarUrl });
       setIsLoading(false);
-
       if (role === 'CHEF') {
         const chefId = localStorage.getItem('chefId');
         if (chefId) {
           fetch(`http://localhost:8081/api/v1/chefs/${chefId}`)
             .then(res => res.json())
-            .then(data => setChefData(data))
+            .then(data => {
+              setChefData(data);
+              const picUrl = data.avatarUrl || data.imageId;
+              if (picUrl) {
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                localStorage.setItem('userAvatar', picUrl);
+              }
+            })
             .catch(err => console.error("Header fetch chef error:", err));
+        }
+      } else if (role === 'HOMEFOOD') {
+        const providerId = localStorage.getItem('providerId') || localStorage.getItem('homeFoodId');
+        if (providerId) {
+          fetch(`http://localhost:8081/api/v1/home-food/${providerId}`)
+            .then(res => res.json())
+            .then(data => {
+              setChefData(data);
+              const picUrl = data.avatarUrl || data.imageId;
+              if (picUrl) {
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                localStorage.setItem('userAvatar', picUrl);
+              }
+            })
+            .catch(err => console.error("Header fetch homefood error:", err));
         }
       } else {
         setChefData(null);
@@ -106,13 +126,14 @@ export function Header({ className }: HeaderProps) {
         })
           .then(res => res.json())
           .then(data => {
-            if (data.avatarUrl) {
+            const picUrl = data.avatarUrl || data.imageId;
+            if (picUrl) {
               try {
-                localStorage.setItem('userAvatar', data.avatarUrl);
+                localStorage.setItem('userAvatar', picUrl);
               } catch (e) {
                 console.warn("Storage quota exceeded, could not save avatar.");
               }
-              setAuth(prev => ({ ...prev, avatarUrl: data.avatarUrl }));
+              setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
             }
           })
           .catch(err => console.error("Header profile sync error:", err));
@@ -123,23 +144,14 @@ export function Header({ className }: HeaderProps) {
     window.addEventListener('storage', loadAuth);
     window.addEventListener('auth-change', loadAuth);
     window.addEventListener('chef-profile-updated', loadAuth);
-
-    const fetchChefs = async () => {
-      try {
-        const response = await fetch('http://localhost:8081/api/v1/chefs');
-        if (response.ok) {
-          const data = await response.json();
-          setChefs(Array.isArray(data) ? data : []);
-        }
-      } catch (err) {
-        console.error("Search fetch error", err);
-      }
-    };
-    fetchChefs();
-
+    window.addEventListener('home-food-profile-updated', loadAuth);
+    window.addEventListener('restaurant-profile-updated', loadAuth);
     return () => {
       window.removeEventListener('storage', loadAuth);
       window.removeEventListener('auth-change', loadAuth);
+      window.removeEventListener('chef-profile-updated', loadAuth);
+      window.removeEventListener('home-food-profile-updated', loadAuth);
+      window.removeEventListener('restaurant-profile-updated', loadAuth);
     };
   }, []);
 
@@ -167,7 +179,7 @@ export function Header({ className }: HeaderProps) {
     router.refresh();
   };
 
-  const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData } = useRestaurants();
+  const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData, chefs } = useRestaurants();
 
   // --- Context-Aware Unified Search Logic ---
   const searchResults = useMemo(() => {

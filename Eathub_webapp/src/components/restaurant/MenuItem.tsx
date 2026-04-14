@@ -13,9 +13,17 @@ interface MenuItemProps {
   item: MenuItemType;
   onClick: () => void;
   showProviderInfo?: boolean;
+  hideAddButton?: boolean;
+  hidePrice?: boolean;
 }
 
-export function MenuItem({ item, onClick, showProviderInfo = false }: MenuItemProps) {
+export function MenuItem({ 
+  item, 
+  onClick, 
+  showProviderInfo = false, 
+  hideAddButton = false,
+  hidePrice = false 
+}: MenuItemProps) {
   const displayImage = getDisplayImage(item.imageId, 'food-1');
 
   return (
@@ -62,11 +70,13 @@ export function MenuItem({ item, onClick, showProviderInfo = false }: MenuItemPr
                 </h3>
               </div>
               <div className="text-right flex flex-col items-end">
-                <span className="font-black text-xl tracking-tighter">₹{item.price}</span>
+                {!hidePrice && (
+                  <span className="font-black text-xl tracking-tighter">₹{item.price}</span>
+                )}
                 {item.isSpecial && (
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-full mt-1">Featured</span>
                 )}
-                {item.isOnOffer && (
+                {!hidePrice && item.isOnOffer && (
                   <span className="text-[10px] font-black uppercase tracking-widest text-red-600 bg-red-100 px-2 py-0.5 rounded-full mt-1">Offer Active</span>
                 )}
               </div>
@@ -90,12 +100,14 @@ export function MenuItem({ item, onClick, showProviderInfo = false }: MenuItemPr
 
         </div>
 
-        <div className="p-4 pt-0 mt-auto">
-          <div className="w-full h-9 rounded-md px-3 bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium">
-            <Plus className="h-4 w-4" />
-            Add
+        {!hideAddButton && (
+          <div className="p-4 pt-0 mt-auto">
+            <div className="w-full h-9 rounded-md px-3 bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium">
+              <Plus className="h-4 w-4" />
+              Add
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -45,7 +45,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
           if (grouped && Array.isArray(grouped)) {
             setServices(grouped);
             const flattened = grouped.flatMap(cat => 
-                cat.items.map(item => ({
+                cat.items.map((item: MenuItemType) => ({
                     ...item,
                     vendorSlug: restaurant.slug,
                     vendorName: restaurant.name,
@@ -131,33 +131,57 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
                             <p className="font-bold text-muted-foreground italic">No matching services found for Chef {chefName}.</p>
                         </div>
                     )}
-                    {filteredServices.map((category, idx) => (
-                        <Card key={category.title} id={category.title} className="overflow-hidden border-0 shadow-lg shadow-slate-200/50" style={{ contentVisibility: idx > 1 ? 'auto' : 'visible', containIntrinsicHeight: idx > 1 ? '300px' : 'auto' }}>
-                            <CardHeader className="bg-muted/10 border-b border-border/10">
-                                <CardTitle className="text-xl font-bold uppercase tracking-tight">{category.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {category.items.map((item) => <MenuItem key={item.id} item={item as any} onClick={() => setSelectedItem(item as any)} />)}
+                    <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/60 bg-white rounded-2xl flex flex-col h-[800px]">
+                        <CardHeader className="bg-primary/5 border-b border-primary/10 py-5">
+                            <CardTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+                                <span className="w-2 h-8 bg-primary rounded-full" />
+                                Chef's Menu & Services
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-10 scroll-smooth">
+                            {filteredServices.map((category, idx) => (
+                                <div key={category.title} id={category.title} className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <h3 className="text-lg font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">{category.title}</h3>
+                                        <div className="h-px bg-muted flex-1" />
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        {category.items.map((item) => (
+                                            <MenuItem 
+                                                key={item.id} 
+                                                item={item as any} 
+                                                onClick={() => setSelectedItem(item as any)} 
+                                                hideAddButton={true} 
+                                                hidePrice={true}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                            ))}
+                        </CardContent>
+                    </Card>
                 </section>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 lg:sticky lg:top-28 lg:h-fit">
             <ReviewsSection targetId={restaurant.id} type="Chef" />
             <QuickInfoCard workingHours={restaurant.workingHours} preference={restaurant.preference} />
-            <section id="book-chef" ref={bookingRef} className={cn('scroll-mt-28 transition-all duration-300 rounded-xl contain-paint', (activeTab === 'book' || activeTab === 'enquiry') ? 'ring-2 ring-orange-500 shadow-sm' : '', (animatingSection === 'book' || animatingSection === 'enquiry') ? 'animate-highlight-pop' : '')}>
+            <section id="book-chef" ref={bookingRef} className={cn('scroll-mt-28 transition-all duration-300 rounded-[3rem] contain-paint p-1.5', (activeTab === 'book' || activeTab === 'enquiry') ? 'ring-[6px] ring-orange-500 shadow-2xl' : '', (animatingSection === 'book' || animatingSection === 'enquiry') ? 'animate-highlight-pop' : '')}>
               <BookChef chefName={restaurant.name || chefName} chefId={restaurant.id} basePrice={restaurant.basePrice} services={services} />
             </section>
           </div>
         </div>
       </div>
       {selectedItem && (
-        <MenuItemDialog item={selectedItem} restaurant={restaurant} open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)} />
+        <MenuItemDialog 
+            item={selectedItem} 
+            restaurant={restaurant} 
+            open={!!selectedItem} 
+            onOpenChange={(open) => !open && setSelectedItem(null)} 
+            hideAddButton={true}
+            hidePrice={true}
+        />
       )}
     </div>
   );

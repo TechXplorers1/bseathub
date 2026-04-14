@@ -59,7 +59,12 @@ export default function RestaurantsPage() {
       r.cuisine,
       ...(r.categories || [])
     ].filter(Boolean))
-  )).sort();
+  ))
+  .filter(cat => 
+    !cat.toLowerCase().includes('home') && 
+    !cat.toLowerCase().includes('chef')
+  )
+  .sort();
 
   const restaurantsByCategory: { [category: string]: Restaurant[] } = {};
 

@@ -284,6 +284,12 @@ public class AuthService {
                     return userRepository.save(newUser);
                 });
 
+        // Ensure role is set to USER for Google logins (Default User)
+        if (user.getRole() == null) {
+            user.setRole(UserRole.USER);
+            userRepository.save(user);
+        }
+
         // If user exists but avatar is null, update it
         if (user.getAvatarUrl() == null && request.getPhotoUrl() != null) {
             user.setAvatarUrl(request.getPhotoUrl());

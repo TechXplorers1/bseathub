@@ -23,14 +23,14 @@ public class MenuItem {
     @JsonBackReference
     private MenuCategory category;
 
-    @JsonIgnore
+    @JsonIgnore // Prevent circular dependency and deep nesting in JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
+    @JsonIgnore // Prevent circular dependency and deep nesting in JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_food_id")
-    @JsonIgnoreProperties({ "categories", "menuItems" }) // Add this line
     private HomeFoodProvider homeFood;
 
     private String name;
@@ -39,11 +39,24 @@ public class MenuItem {
     private String description;
 
     private Double price;
+    
     @Column(columnDefinition = "TEXT")
     private String imageId;
+    
     private Boolean isSpecial;
+    
     private String status;
 
     @OneToOne(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Offer offer;
+
+    // Transient fields for discovery/frontend convenience
+    @Transient
+    private String providerName;
+    @Transient
+    private String providerId;
+    @Transient
+    private String providerType;
+    @Transient
+    private String providerSlug;
 }

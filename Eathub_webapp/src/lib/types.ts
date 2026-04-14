@@ -197,7 +197,7 @@ export interface ChefBooking {
   eventDate: string;
   guests: number;
   totalAmount: number;
-  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
+  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Accepted' | 'Rejected';
   paymentStatus: 'Unpaid' | 'Paid';
   createdAt?: string;
   eventAddress: string;

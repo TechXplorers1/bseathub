@@ -2,39 +2,27 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchChefs } from '@/services/api';
+import { useRestaurants } from '@/context/RestaurantProvider';
+import { ChefCard, ChefCardSkeleton } from '@/components/home/ChefCard';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { ChefCard } from '@/components/home/ChefCard';
 import type { Chef } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
 type Preference = 'all' | 'veg' | 'non-veg' | 'veg & non-veg';
 
 export default function ChefsPage() {
-  const [chefs, setChefs] = useState<Chef[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { chefs, loading } = useRestaurants();
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Preference>('all');
 
-  useEffect(() => {
-    const loadChefs = async () => {
-      try {
-        const data = await fetchChefs();
-        setChefs(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadChefs();
-  }, []);
-
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground animate-pulse">Finding culinary experts...</p>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
+        <Skeleton className="h-10 w-64 mb-10" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {[1,2,3,4,5,6,7,8].map(i => <ChefCardSkeleton key={i} />)}
+        </div>
       </div>
     );
   }
@@ -76,8 +64,8 @@ export default function ChefsPage() {
 
       {filteredChefs.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredChefs.map((chef) => (
-            <ChefCard key={chef.id || chef.name} chef={chef} />
+          {filteredChefs.map((chef, idx) => (
+            <ChefCard key={chef.id || chef.name} chef={chef} priority={idx < 4} />
           ))}
         </div>
       ) : (

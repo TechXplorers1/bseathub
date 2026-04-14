@@ -6,16 +6,18 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star, ArrowRight, ChefHat } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { Skeleton } from '../ui/skeleton';
 import { getDisplayImage } from '@/lib/image-utils';
-import type { Chef, Restaurant } from '@/lib/types';
+import type { Chef } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { FavoriteButton } from '@/components/shared/FavoriteButton';
 
 interface ChefCardProps {
     chef: Chef;
+    priority?: boolean;
 }
 
-export function ChefCard({ chef }: ChefCardProps) {
+export function ChefCard({ chef, priority = false }: ChefCardProps) {
     const displayImage = getDisplayImage(chef.avatarUrl, 'chef-1');
 
     return (
@@ -32,6 +34,8 @@ export function ChefCard({ chef }: ChefCardProps) {
                         alt={chef.name}
                         fill
                         className="object-cover"
+                        priority={priority}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                     
                     <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
@@ -81,5 +85,21 @@ export function ChefCard({ chef }: ChefCardProps) {
                 </div>
             </Card>
         </Link>
+    );
+}
+
+export function ChefCardSkeleton() {
+    return (
+        <Card className="overflow-hidden w-full flex flex-col relative animate-pulse">
+            <div className="h-96 w-full bg-muted" />
+            <div className="absolute bottom-4 left-0 w-full p-4 space-y-3">
+                <div className="flex justify-between">
+                    <Skeleton className="h-6 w-1/2 bg-slate-200" />
+                    <Skeleton className="h-6 w-12 bg-slate-200" />
+                </div>
+                <Skeleton className="h-4 w-1/3 bg-slate-200" />
+                <Skeleton className="h-10 w-full bg-slate-200" />
+            </div>
+        </Card>
     );
 }

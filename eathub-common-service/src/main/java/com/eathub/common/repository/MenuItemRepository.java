@@ -22,19 +22,36 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, String> {
 
     List<MenuItem> findByRestaurantIdAndCategory_TitleIgnoreCase(String restaurantId, String title);
 
-    // Discovery Queries
-
+    // Discovery Queries - Uses JOIN FETCH to ensure provider info is available for the frontend mapping
+    
     @Query("""
-                SELECT DISTINCT mi.restaurant FROM MenuItem mi
-                WHERE LOWER(mi.category.title) = LOWER(:title)
-                AND mi.restaurant IS NOT NULL
+                SELECT DISTINCT r FROM Restaurant r
+                JOIN r.menuCategories c
+                JOIN c.items mi
+                WHERE (LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.name) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.description) LIKE LOWER(CONCAT('%', :title, '%')))
             """)
     List<Restaurant> findRestaurantsByCategory(@Param("title") String title);
 
     @Query("""
-                SELECT DISTINCT mi.homeFood FROM MenuItem mi
-                WHERE LOWER(mi.category.title) = LOWER(:title)
-                AND mi.homeFood IS NOT NULL
+                SELECT DISTINCT hf FROM HomeFoodProvider hf
+                JOIN hf.categories c
+                JOIN c.items mi
+                WHERE (LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.name) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.description) LIKE LOWER(CONCAT('%', :title, '%')))
             """)
     List<HomeFoodProvider> findHomeFoodProvidersByCategory(@Param("title") String title);
+
+    @Query("""
+                SELECT mi FROM MenuItem mi
+                LEFT JOIN FETCH mi.category c
+                LEFT JOIN FETCH mi.restaurant r
+                LEFT JOIN FETCH mi.homeFood hf
+                WHERE (LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.name) LIKE LOWER(CONCAT('%', :title, '%'))
+                   OR LOWER(mi.description) LIKE LOWER(CONCAT('%', :title, '%')))
+            """)
+    List<MenuItem> findMenuItemsByCategory(@Param("title") String title);
 }

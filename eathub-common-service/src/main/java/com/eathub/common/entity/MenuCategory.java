@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
@@ -21,19 +20,19 @@ public class MenuCategory {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore // Prevent circular dependency back to restaurant
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
+    @JsonIgnore // Prevent circular dependency back to home food provider
     @ManyToOne
     @JoinColumn(name = "home_food_id")
     private HomeFoodProvider homeFoodProvider;
 
     private String title;
 
-    // cascade = CascadeType.ALL is vital to save items automatically
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // Allows items to be shown in Postman response
+    @JsonManagedReference
     private Set<MenuItem> items;
 }

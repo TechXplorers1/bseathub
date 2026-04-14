@@ -60,7 +60,12 @@ export default function HomeFoodPage() {
       r.cuisine,
       ...(r.categories || [])
     ].filter(Boolean))
-  )).sort();
+  ))
+  .filter(cat => 
+    !cat.toLowerCase().includes('restaurant') && 
+    !cat.toLowerCase().includes('chef')
+  )
+  .sort();
 
   const homeFoodsByCategory: { [category: string]: Restaurant[] } = {};
 

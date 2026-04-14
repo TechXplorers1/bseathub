@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChefCard } from './ChefCard';
+import { useRestaurants } from '@/context/RestaurantProvider';
+import { ChefCard, ChefCardSkeleton } from './ChefCard';
+import { Skeleton } from '../ui/skeleton';
 import { ArrowRight } from 'lucide-react';
 import { buttonVariants } from '../ui/button';
 import Link from 'next/link';
@@ -9,42 +11,21 @@ import { cn } from '@/lib/utils';
 import type { Chef } from '@/lib/types';
 
 export function ChefsCarousel() {
-    const [chefs, setChefs] = useState<Chef[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { chefs, loading: providerLoading } = useRestaurants();
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchChefs = async () => {
-            try {
-                // Ensure this matches your @RequestMapping in ChefController
-                const response = await fetch('http://localhost:8081/api/v1/chefs', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error('Access Denied: Check Backend SecurityConfig');
-                    }
-                    throw new Error('Failed to fetch chefs');
-                }
-
-                const data = await response.json();
-                setChefs(Array.isArray(data) ? data : []);
-            } catch (error: any) {
-                console.error("Error loading chefs:", error);
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchChefs();
-    }, []);
-
-    if (loading) return <div className="h-64 flex items-center justify-center font-medium">Fetching our top chefs...</div>;
+    if (providerLoading) {
+        return (
+            <div className="py-8">
+                <div className="flex justify-between items-center mb-4">
+                    <Skeleton className="h-8 w-48 bg-muted" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map((i) => <ChefCardSkeleton key={i} />)}
+                </div>
+            </div>
+        );
+    }
 
     if (error) return <div className="h-64 flex items-center justify-center text-red-500">Error: {error}</div>;
 
@@ -62,8 +43,8 @@ export function ChefsCarousel() {
                 </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {visibleChefs.map((chef) => (
-                    <ChefCard key={chef.id} chef={chef} />
+                {visibleChefs.map((chef, idx) => (
+                    <ChefCard key={chef.id} chef={chef} priority={idx < 4} />
                 ))}
             </div>
         </div>

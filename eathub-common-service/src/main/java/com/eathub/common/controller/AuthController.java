@@ -30,6 +30,11 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(authService.googleLogin(request));
+    }
+
     @PostMapping("/partner/register")
     public ResponseEntity<?> registerPartner(@RequestBody PartnerRegistrationRequest request) {
         // Spring will now be able to instantiate PartnerRegistrationRequest because it

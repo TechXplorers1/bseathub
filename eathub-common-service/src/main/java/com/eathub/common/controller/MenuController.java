@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/menu")
@@ -62,6 +63,12 @@ public class MenuController {
             // System.out.println("Error getItemsByRestaurant: " + e.getMessage());
             return ResponseEntity.ok(Collections.emptyList());
         }
+    }
+
+    @GetMapping("/offers")
+    public ResponseEntity<List<MenuItemDTO>> getItemsOnOffer(
+            @RequestParam(required = false) String offerType) {
+        return ResponseEntity.ok(menuService.getItemsOnOffer(offerType));
     }
 
     @PutMapping("/{id}")

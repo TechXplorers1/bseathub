@@ -271,6 +271,45 @@ public class AuthService {
     }
 
     @Transactional
+    public AuthResponse googleLogin(GoogleLoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(request.getEmail())
+                            .name(request.getName())
+                            .avatarUrl(request.getPhotoUrl())
+                            .role(UserRole.USER)
+                            .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                            .build();
+                    return userRepository.save(newUser);
+                });
+
+        // If user exists but avatar is null, update it
+        if (user.getAvatarUrl() == null && request.getPhotoUrl() != null) {
+            user.setAvatarUrl(request.getPhotoUrl());
+            userRepository.save(user);
+        }
+
+        String providerId = null;
+        if (user.getRole() == UserRole.RESTAURANT) {
+            providerId = restaurantRepository.findByOwnerId(user.getId()).map(Restaurant::getId).orElse(null);
+        } else if (user.getRole() == UserRole.HOMEFOOD) {
+            providerId = homeFoodRepository.findByOwnerId(user.getId()).map(HomeFoodProvider::getId).orElse(null);
+        } else if (user.getRole() == UserRole.CHEF) {
+            providerId = chefRepository.findByOwnerId(user.getId()).map(Chef::getId).orElse(null);
+        }
+
+        return new AuthResponse(
+                jwtService.generateToken(user),
+                user.getEmail(),
+                user.getRole().name(),
+                providerId,
+                user.getName(),
+                user.getAvatarUrl(),
+                user.getId());
+    }
+
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");

@@ -102,6 +102,14 @@ public class MenuService {
                 .collect(Collectors.toList());
     }
 
+    public List<MenuItemDTO> getItemsOnOffer(String offerType) {
+        return menuItemRepository.findAll().stream()
+                .filter(i -> i.getOffer() != null && i.getOffer().getIsActive())
+                .filter(i -> offerType == null || offerType.isEmpty() || offerType.equals(i.getOffer().getType()))
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<com.eathub.common.dto.MenuCategoryDTO> getGroupedMenu(String providerId, String type) {
         List<MenuItem> items;
         if ("restaurant".equalsIgnoreCase(type)) {

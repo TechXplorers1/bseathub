@@ -36,6 +36,15 @@ public class AuthDTOs {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class GoogleLoginRequest {
+        private String email;
+        private String name;
+        private String photoUrl;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PartnerRegistrationRequest {
         private String type; 
         private Map<String, Object> data; 

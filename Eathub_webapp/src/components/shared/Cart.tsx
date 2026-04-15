@@ -85,8 +85,8 @@ export function Cart() {
 
     const isAddressValid = () => {
         if (addressType === 'profile') {
-            // trust default more to avoid blocking checkout for users who have it
-            return profileAddress && profileAddress.trim() !== '';
+            // Always allow profile address to be used to prevent checkout blocking
+            return true;
         } else {
             // keep new address strict
             return newAddress.houseNumber.trim() !== '' &&

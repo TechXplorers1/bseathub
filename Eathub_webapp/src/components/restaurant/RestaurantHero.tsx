@@ -7,7 +7,14 @@ import type { Restaurant } from '@/lib/types';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
+export function RestaurantHero({ 
+  restaurant, 
+  displayName 
+}: { 
+  restaurant: Restaurant;
+  displayName?: string;
+}) {
+  const finalName = displayName || restaurant.name;
   const [isFavorited, setIsFavorited] = useState(false);
   const [animatedQuote, setAnimatedQuote] = useState('');
 
@@ -20,7 +27,7 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
 
   // TYPEWRITER TEXT
   useEffect(() => {
-    const fullText = `“Good food, better memories at ${restaurant.name}.”`;
+    const fullText = `“Good food, better memories at ${finalName}.”`;
     setAnimatedQuote('');
     let i = 0;
     const interval = setInterval(() => {
@@ -29,14 +36,14 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
       if (i >= fullText.length) clearInterval(interval);
     }, 50);
     return () => clearInterval(interval);
-  }, [restaurant.name]);
+  }, [finalName]);
 
   return (
     <div className="relative w-full h-[40vh] min-h-[220px] sm:h-[48vh] ">
       {coverImage && (
         <Image
           src={coverImage}
-          alt={restaurant.name}
+          alt={finalName}
           fill
           className="object-cover "
           priority
@@ -68,7 +75,7 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
         <div className="w-full px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
           <div className="max-w-xl space-y-1.5 sm:space-y-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-              {restaurant.name}
+              {finalName}
             </h1>
             <p className="text-xs sm:text-sm text-white/80 font-medium">
               {(restaurant as any).cuisine || ''}
@@ -91,7 +98,7 @@ export function RestaurantHero({ restaurant }: { restaurant: Restaurant }) {
         <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-white overflow-hidden z-30 shadow-md">
           <Image
             src={logoImage}
-            alt={`${restaurant.name} logo`}
+            alt={`${finalName} logo`}
             width={80}
             height={80}
             className="object-cover"

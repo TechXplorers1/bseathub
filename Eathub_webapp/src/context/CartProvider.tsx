@@ -182,27 +182,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items: orderItems
       };
 
-      const backendOrder = await createOrder(orderPayload);
-
       // --- INTEGRATING RAZORPAY IMMEDIATELY AFTER CHECKOUT ---
       try {
           const isLoaded = await loadRazorpay();
           if (!isLoaded) throw new Error('Razorpay SDK failed to load');
 
-          // Ensure we use the EXACT total amount from the backend order
-          const preciseTotal = backendOrder.totalAmount;
-          const rzpOrder = await createRazorpayOrder(preciseTotal);
+          // Only create the Razorpay session object first, NOT the database order
+          const rzpOrder = await createRazorpayOrder(totalAmount);
 
           const rzpOptions = {
               key: "rzp_test_SYC9m4DXT1gjeY",
-              amount: rzpOrder.amount, // Use the amount directly from the created Razerpay order
+              amount: rzpOrder.amount,
               currency: rzpOrder.currency,
               name: 'EatHub',
-              description: `Payment for Order #${backendOrder.id.slice(0, 8)}`,
+              description: `Payment for EatHub Order`,
               order_id: rzpOrder.id,
               handler: async (response: any) => {
                   try {
-                      await updateOrderPaymentStatus(backendOrder.id, 'Paid');
+                      // NOW create backend order as Paid since the gateway returned success
+                      orderPayload.paymentStatus = 'Paid';
+                      const backendOrder = await createOrder(orderPayload);
+
                       toast({
                           title: 'Payment Successful!',
                           description: 'Your order is confirmed and sent to the kitchen.',
@@ -210,25 +210,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
                       clearCart();
                       router.push(`/track-order?orderId=${backendOrder.id}`);
                   } catch (e) {
-                      console.error("Failed to update status after payment", e);
-                      clearCart();
-                      router.push(`/track-order?orderId=${backendOrder.id}`);
+                      console.error("Failed to create backend order after payment", e);
+                      setIsCheckingOut(false);
+                      toast({
+                          variant: 'destructive',
+                          title: 'System Error',
+                          description: 'Payment successful, but order creation failed. Please contact support.',
+                      });
                   }
               },
               prefill: {
-                  name: userProfile.name,
-                  email: userProfile.email,
-                  contact: userProfile.mobileNumber
+                  name: userProfile?.name || 'EatHub Customer',
+                  email: userProfile?.email || 'customer@example.com',
+                  contact: userProfile?.mobileNumber || '9999999999'
               },
               theme: { color: '#ef4444' },
               modal: {
                     ondismiss: function() {
+                        setIsCheckingOut(false);
                         toast({
-                            title: 'Order Placed (Payment Pending)',
-                            description: 'Please complete payment to start your order.',
+                            variant: 'destructive',
+                            title: 'Payment Cancelled',
+                            description: 'Your order has not been placed. Please complete payment to order.',
                         });
-                        clearCart();
-                        router.push(`/track-order?orderId=${backendOrder.id}`);
                     }
               }
           };
@@ -237,12 +241,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           razorpay.open();
       } catch (rzpErr) {
           console.error("Razorpay initiation failed", rzpErr);
+          setIsCheckingOut(false);
           toast({
-              title: 'Order Created',
-              description: 'Something went wrong with the payment gateway. Please check tracking.',
+              variant: 'destructive',
+              title: 'Checkout Failed',
+              description: 'Something went wrong with the payment gateway.',
           });
-          clearCart();
-          router.push(`/track-order?orderId=${backendOrder.id}`);
       }
 
     } catch (error: any) {

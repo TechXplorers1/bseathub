@@ -88,7 +88,7 @@ export function RestaurantInfo({
         {!isChefPage && (
           <Button
             variant="outline"
-            className="w-full rounded-2xl h-12 border-muted hover:border-primary/50 hover:bg-primary/5 transition-all mt-4 font-bold uppercase text-[11px] tracking-[0.15em]"
+            className="w-full rounded-2xl h-12 border-muted hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all mt-4 font-bold uppercase text-[11px] tracking-[0.15em]"
             onClick={toggleLocation}
             aria-expanded={showLocation}
           >

@@ -421,8 +421,7 @@ export default function LoginPage() {
 
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full h-10 sm:h-11 font-bold flex items-center justify-center gap-3 border shadow-sm hover:bg-muted/50"
+                  className="w-full h-10 sm:h-11 font-bold flex items-center justify-center gap-3 border shadow-sm bg-transparent text-foreground transition-all hover:bg-primary/5 hover:text-primary hover:border-primary/50"
                   onClick={handleGoogleSignIn}
                   disabled={loading}
                 >
@@ -465,8 +464,7 @@ export default function LoginPage() {
 
                   <Button
                     type="button"
-                    variant="outline"
-                    className="w-full h-10 sm:h-11 border-primary text-primary hover:bg-primary/5 font-bold text-sm sm:text-base"
+                    className="w-full h-10 sm:h-11 border border-primary bg-transparent text-primary hover:bg-primary/5 font-bold text-sm sm:text-base"
                     onClick={() => router.push('/partner')}
                   >
                     Become a Partner
@@ -548,8 +546,7 @@ export default function LoginPage() {
 
                   <Button
                     type="button"
-                    variant="ghost"
-                    className="w-full h-9 sm:h-10 flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors text-xs sm:text-sm"
+                    className="w-full h-9 sm:h-10 flex items-center justify-center gap-2 bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors text-xs sm:text-sm shadow-none"
                     onClick={() => setIsRegistering(false)}
                   >
                     <ArrowLeft size={14} className="sm:w-4 sm:h-4" /> Back to Login
@@ -597,8 +594,7 @@ export default function LoginPage() {
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    className="w-full text-xs"
+                    className="w-full text-xs bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/5 shadow-none font-semibold mt-1"
                     onClick={() => setIsForgotPassword(false)}
                   >
                     Back to Login
@@ -664,8 +660,7 @@ export default function LoginPage() {
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    className="w-full text-xs"
+                    className="w-full text-xs bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/5 shadow-none font-semibold mt-1"
                     onClick={() => setForgotOtpSent(false)}
                   >
                     Change Email

@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Pizza,
   Fish,
@@ -86,6 +87,8 @@ export function FilterCategories({}: FilterCategoriesProps) {
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  const pathname = usePathname();
 
   React.useEffect(() => {
     const container = scrollContainerRef.current;
@@ -208,9 +211,14 @@ export function FilterCategories({}: FilterCategoriesProps) {
         <Link href="/favorites">
           <Button
             variant="outline"
-            className="rounded-full flex-shrink-0 transition-all hover:bg-red-50"
+            className={cn(
+              "rounded-full flex-shrink-0 transition-all font-bold group",
+              pathname === '/favorites'
+                ? "bg-red-500 text-white border-red-500 hover:bg-red-600 shadow-md"
+                : "hover:bg-red-50 hover:text-red-600 hover:border-red-200 active:bg-red-100 active:scale-95 text-gray-700"
+            )}
           >
-            <Heart className="mr-2 h-4 w-4 text-red-500" />
+            <Heart className={cn("mr-2 h-4 w-4 transition-colors", pathname === '/favorites' ? "fill-white text-white" : "text-red-500 group-hover:text-red-600")} />
             Favourites
           </Button>
         </Link>

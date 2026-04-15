@@ -46,13 +46,13 @@ export function OrderStatusTracker({ currentStatusId, onDelivered }: OrderStatus
                 className="h-2.5 rounded-full transition-all duration-700"
             />
 
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-center">
+            <div className="flex flex-row justify-between items-start w-full relative px-0 sm:px-2">
                 {statuses.map((status, index) => {
                     const isActive = index <= currentStatusIndex;
                     const isCurrent = index === currentStatusIndex;
 
                     return (
-                        <div key={status.id} className="flex flex-col items-center gap-1">
+                        <div key={status.id} className="flex flex-col items-center gap-1.5 w-14 sm:w-24 break-words">
                             <div
                                 className={cn(
                                     'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-500',

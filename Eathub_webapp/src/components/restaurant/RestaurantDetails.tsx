@@ -32,6 +32,18 @@ const getSectionId = (title: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
+const isEmail = (str: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+
+const getDisplayName = (r: Restaurant, cName?: string) => {
+  if (cName) return cName;
+  const name = r.name || '';
+  if (isEmail(name)) {
+    // Attempt fallback to brand name or other identity fields if the name column contains an email
+    return (r as any).brandName || (r as any).legalBusinessName || (r as any).ownerName || name;
+  }
+  return name;
+};
+
 function filterMenuByCategory(
   menu: MenuCategory[],
   filter: CategoryFilterKey
@@ -57,6 +69,8 @@ export function RestaurantDetails({
   const { searchQuery, setLocalItems } = useHeader();
   const searchSectionRef = React.useRef<HTMLDivElement>(null);
 
+  const displayName = React.useMemo(() => getDisplayName(restaurant, chefName), [restaurant, chefName]);
+
   // Sync menu and header search
   React.useEffect(() => {
     async function loadMenu() {
@@ -68,8 +82,8 @@ export function RestaurantDetails({
           const grouped = await fetchGroupedMenu(restaurant.id, providerType as any);
           if (grouped && Array.isArray(grouped)) {
             setMenu(grouped);
-            const flattened = grouped.flatMap(cat => 
-              cat.items.map(item => ({ 
+            const flattened = grouped.flatMap((cat: any) => 
+              cat.items.map((item: any) => ({ 
                 ...item, 
                 vendorSlug: restaurant.slug, 
                 vendorName: restaurant.name, 
@@ -109,8 +123,6 @@ export function RestaurantDetails({
 
   const handleItemClick = (item: MenuItemType) => setSelectedItem(item);
 
-  const displayName = chefName || restaurant.name;
-
   const nonEmptyMenu = React.useMemo(() => (menu ?? []).filter(c => c.items?.length > 0), [menu]);
 
   const availableFilterKeys = React.useMemo(() => {
@@ -136,8 +148,7 @@ export function RestaurantDetails({
   }, [nonEmptyMenu, categoryFilter, searchTerm, searchQuery]);
 
   const menuCategories = nonEmptyMenu.map(c => c.title);
-  const visibleItems = filteredMenu.flatMap(c => c.items);
-  const featuredItems = visibleItems.slice(0, 3);
+  const featuredItems = filteredMenu.flatMap(c => c.items).slice(0, 3);
 
   const filterButtons = availableFilterKeys.map(key => ({ key, label: key === 'all' ? 'All' : key }));
 
@@ -159,7 +170,7 @@ export function RestaurantDetails({
     return (
       <div className="flex flex-col bg-background">
         <style>{scrollStyle}</style>
-        <div ref={heroRef as any}><ChefHero restaurant={restaurant} chefName={chefName} /></div>
+        <div ref={heroRef as any}><ChefHero restaurant={restaurant} chefName={displayName} /></div>
         <div className="mx-auto w-full px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className={leftColumnClass}>
@@ -167,11 +178,11 @@ export function RestaurantDetails({
               <Separator className="my-3" /><MenuNav menuCategories={[]} hasChef={true} />
             </div>
             <div className={rightColumnClass}>
-              <ChefAbout restaurant={restaurant} chefName={chefName} />
+              <ChefAbout restaurant={restaurant} chefName={displayName} />
               <Separator className="my-5" /><ChefCuisineSpecialties cuisines={[restaurant.cuisine, ...restaurant.categories]} />
               <Separator className="my-5" /><div id="signature-dishes"><ChefGallery /></div>
               <Separator className="my-5" /><ReviewsSection targetId={restaurant.id} type="Chef" />
-              <Separator className="my-5" /><BookChef chefName={chefName} chefId={restaurant.id} />
+              <Separator className="my-5" /><BookChef chefName={displayName} chefId={restaurant.id} />
             </div>
           </div>
         </div>
@@ -182,7 +193,7 @@ export function RestaurantDetails({
   return (
     <div className="flex flex-col bg-background">
       <style>{scrollStyle}</style>
-      <div ref={heroRef as any}><RestaurantHero restaurant={restaurant} /></div>
+      <div ref={heroRef as any}><RestaurantHero restaurant={restaurant} displayName={displayName} /></div>
       <div className="mx-auto w-full px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className={leftColumnClass}>

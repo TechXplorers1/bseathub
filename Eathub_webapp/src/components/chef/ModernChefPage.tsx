@@ -18,6 +18,17 @@ import { useHeader } from '@/context/HeaderProvider';
 
 type ChefTab = 'book' | 'signature' | 'enquiry';
 
+const isEmail = (str: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+
+const getDisplayName = (r: Restaurant, cName?: string) => {
+  if (cName) return cName;
+  const name = r.name || '';
+  if (isEmail(name)) {
+    return (r as any).brandName || (r as any).legalBusinessName || (r as any).ownerName || name;
+  }
+  return name;
+};
+
 interface ModernChefPageProps {
   restaurant: Restaurant;
   chefName: string;
@@ -27,6 +38,8 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   const [activeTab, setActiveTab] = useState<ChefTab>('book');
   const [animatingSection, setAnimatingSection] = useState<ChefTab | null>(null);
   const [selectedItem, setSelectedItem] = useState<MenuItemType | null>(null);
+
+  const displayName = useMemo(() => getDisplayName(restaurant, chefName), [restaurant, chefName]);
 
   const [services, setServices] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -111,11 +124,11 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   return (
     <div className="bg-muted/40 flex-grow">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ModernChefHero restaurant={restaurant} chefName={chefName} activeTab={activeTab} onTabChange={handleTabChange} />
+        <ModernChefHero restaurant={restaurant} chefName={displayName} activeTab={activeTab} onTabChange={handleTabChange} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
           <div className="lg:col-span-2 space-y-4">
-            <AboutCard chefName={restaurant.name || chefName} bio={restaurant.bio} experience={restaurant.experience} city={restaurant.city} />
+            <AboutCard chefName={displayName} bio={restaurant.bio} experience={restaurant.experience} city={restaurant.city} />
             <SpecialtiesCard specialty={restaurant.specialty} />
 
             {signatures.length > 0 && (
@@ -168,7 +181,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
             <ReviewsSection targetId={restaurant.id} type="Chef" />
             <QuickInfoCard workingHours={restaurant.workingHours} preference={restaurant.preference} />
             <section id="book-chef" ref={bookingRef} className={cn('scroll-mt-28 transition-all duration-300 rounded-[3rem] contain-paint p-1.5', (activeTab === 'book' || activeTab === 'enquiry') ? 'ring-[6px] ring-orange-500 shadow-2xl' : '', (animatingSection === 'book' || animatingSection === 'enquiry') ? 'animate-highlight-pop' : '')}>
-              <BookChef chefName={restaurant.name || chefName} chefId={restaurant.id} basePrice={restaurant.basePrice} services={services} />
+              <BookChef chefName={displayName} chefId={restaurant.id} basePrice={restaurant.basePrice} services={services} />
             </section>
           </div>
         </div>

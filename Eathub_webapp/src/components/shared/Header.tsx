@@ -95,8 +95,9 @@ export function Header({ className }: HeaderProps) {
               setChefData(data);
               const picUrl = data.avatarUrl || data.imageId;
               if (picUrl) {
-                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl, name: data.name || prev.name }));
                 localStorage.setItem('userAvatar', picUrl);
+                if (data.name) localStorage.setItem('userName', data.name);
               }
             })
             .catch(err => console.error("Header fetch chef error:", err));
@@ -110,8 +111,9 @@ export function Header({ className }: HeaderProps) {
               setChefData(data);
               const picUrl = data.avatarUrl || data.imageId;
               if (picUrl) {
-                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl, name: data.name || data.brandName || prev.name }));
                 localStorage.setItem('userAvatar', picUrl);
+                if (data.name || data.brandName) localStorage.setItem('userName', data.name || data.brandName);
               }
             })
             .catch(err => console.error("Header fetch homefood error:", err));
@@ -124,9 +126,11 @@ export function Header({ className }: HeaderProps) {
             .then(data => {
               const picUrl = data.avatarUrl || data.imageId;
               if (picUrl) {
-                setAuth(prev => ({ ...prev, avatarUrl: picUrl }));
+                const businessName = data.name || data.brandName;
+                setAuth(prev => ({ ...prev, avatarUrl: picUrl, name: businessName || prev.name }));
                 try {
                   localStorage.setItem('userAvatar', picUrl);
+                  if (businessName) localStorage.setItem('userName', businessName);
                 } catch (e) { console.warn("Avatar too large for storage"); }
               }
             })
@@ -320,7 +324,7 @@ export function Header({ className }: HeaderProps) {
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
 
         {/* LOGO & DYNAMIC TITLE */}
-        <div className="flex items-center gap-2 shrink-0 overflow-hidden max-w-[150px] sm:max-w-none">
+        <div className="flex items-center gap-2 shrink-0 overflow-hidden max-w-[180px] md:max-w-[300px] lg:max-w-none">
           {headerTitle ? (
             <button
               onClick={() => {
@@ -497,9 +501,9 @@ export function Header({ className }: HeaderProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl p-1">
                 <DropdownMenuLabel className="font-normal p-3">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-bold leading-none truncate">{auth.name || auth.email}</p>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">{auth.role}</p>
+                  <div className="flex flex-col space-y-1.5 max-w-[200px]">
+                    <p className="text-sm font-extrabold leading-tight text-foreground line-clamp-2">{auth.name || auth.email}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/80">{auth.role}</p>
                   </div>
                 </DropdownMenuLabel>
                 {dashboard && (

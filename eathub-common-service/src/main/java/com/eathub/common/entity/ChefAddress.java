@@ -25,4 +25,6 @@ public class ChefAddress {
     private String state;
     private String country;
     private String postalCode;
+    private Double latitude;
+    private Double longitude;
 }

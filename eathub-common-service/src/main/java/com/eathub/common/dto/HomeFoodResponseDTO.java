@@ -27,6 +27,8 @@ public class HomeFoodResponseDTO {
     private String state;
     private String postalCode;
     private String country;
+    private Double latitude;
+    private Double longitude;
 
     // Legal
     private String legalBusinessName;

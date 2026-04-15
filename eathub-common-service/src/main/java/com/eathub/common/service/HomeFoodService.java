@@ -214,6 +214,8 @@ public class HomeFoodService {
             dto.setState(a.getState());
             dto.setPostalCode(a.getPostalCode());
             dto.setCountry(a.getCountry());
+            dto.setLatitude(a.getLatitude());
+            dto.setLongitude(a.getLongitude());
         }
         if (p.getLegalProfile() != null) {
             HomeFoodLegalProfile l = p.getLegalProfile();

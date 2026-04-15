@@ -22,7 +22,9 @@ import {
   ChevronRight,
   Check,
   ChevronDown,
-  Heart
+  Heart,
+  MapPin,
+  Navigation
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -35,6 +37,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useRatingFilter } from '@/context/RatingFilterProvider';
+import { useDistanceFilter, DISTANCE_OPTIONS } from '@/context/DistanceFilterProvider';
+import { useLocation } from '@/context/LocationProvider';
 
 const mainCategories = [
   { name: 'Breakfast', icon: Sunrise },
@@ -65,6 +69,8 @@ export function FilterCategories({}: FilterCategoriesProps) {
 
   const { deliveryMode, setDeliveryMode } = useDeliveryMode();
   const { ratingFilter, setRatingFilter } = useRatingFilter();
+  const { selectedRadius, setSelectedRadius, isFetchingNearby, hasLocation } = useDistanceFilter();
+  const { isLocating, requestLocation } = useLocation();
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -219,6 +225,47 @@ export function FilterCategories({}: FilterCategoriesProps) {
             {button.name}
           </Button>
         ))}
+      </div>
+      {/* ── Distance filter tabs ──────────────────────────────────────── */}
+      <div className="flex items-center gap-2 pt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+        <div className="flex items-center shrink-0 mr-1">
+          <MapPin className="h-4 w-4 text-primary shrink-0" />
+          {(isLocating || isFetchingNearby) && (
+            <span className="ml-1.5 text-xs text-muted-foreground animate-pulse">
+              {isLocating ? 'Detecting…' : 'Filtering…'}
+            </span>
+          )}
+          {!hasLocation && !isLocating && (
+            <button
+              onClick={requestLocation}
+              className="ml-1.5 text-xs text-primary underline underline-offset-2 hover:no-underline font-medium"
+            >
+              Enable location
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-1.5 items-center flex-nowrap">
+          {DISTANCE_OPTIONS.map(opt => (
+            <button
+              key={opt.label}
+              onClick={() => {
+                if (opt.value !== null && !hasLocation) {
+                  requestLocation();
+                }
+                setSelectedRadius(opt.value);
+              }}
+              className={cn(
+                'px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border shrink-0',
+                selectedRadius === opt.value
+                  ? 'bg-primary text-white border-primary shadow-sm'
+                  : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary'
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

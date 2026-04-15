@@ -32,4 +32,7 @@ public class HomeFoodAddress {
 
     @Column(name = "postal_code")
     private String postalCode;
+
+    private Double latitude;
+    private Double longitude;
 }

@@ -1,19 +1,84 @@
 'use client';
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
 
 interface LocationContextType {
   location: string;
   setLocation: (location: string) => void;
+  coordinates: Coordinates | null;
+  setCoordinates: (coords: Coordinates | null) => void;
+  locationError: string | null;
+  isLocating: boolean;
+  requestLocation: () => void;
 }
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
-  const [location, setLocation] = useState<string>('7300182 Canada Inc.');
+  const [location, setLocation] = useState<string>('Detecting location...');
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation not supported');
+      setLocation('Location unavailable');
+      return;
+    }
+    setIsLocating(true);
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCoordinates({ lat: latitude, lng: longitude });
+
+        // Reverse geocode using Nominatim (free, no API key needed)
+        try {
+          const resp = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { headers: { 'Accept-Language': 'en' } }
+          );
+          if (resp.ok) {
+            const data = await resp.json();
+            const addr = data.address;
+            const city =
+              addr?.city || addr?.town || addr?.village || addr?.county || 'Your location';
+            const state = addr?.state || '';
+            setLocation(state ? `${city}, ${state}` : city);
+          } else {
+            setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
+        } catch {
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (err) => {
+        setIsLocating(false);
+        setLocationError(err.message);
+        setLocation('Location unavailable');
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
+  // Auto-request on mount
+  useEffect(() => {
+    requestLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <LocationContext.Provider value={{ location, setLocation }}>
+    <LocationContext.Provider
+      value={{ location, setLocation, coordinates, setCoordinates, locationError, isLocating, requestLocation }}
+    >
       {children}
     </LocationContext.Provider>
   );

@@ -128,6 +128,10 @@ public class RestaurantService {
             addr.setPostalCode(dto.getPostalCode());
         if (dto.getCountry() != null)
             addr.setCountry(dto.getCountry());
+        if (dto.getLatitude() != null)
+            addr.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null)
+            addr.setLongitude(dto.getLongitude());
 
         addressRepository.save(addr);
         return mapToResponseDTO(r);
@@ -253,6 +257,8 @@ public class RestaurantService {
             dto.setState(addr.getState());
             dto.setPostalCode(addr.getPostalCode());
             dto.setCountry(addr.getCountry());
+            dto.setLatitude(addr.getLatitude());
+            dto.setLongitude(addr.getLongitude());
         }
 
         RestaurantLegalProfile legal = r.getLegalProfile();

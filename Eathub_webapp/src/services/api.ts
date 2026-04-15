@@ -780,3 +780,14 @@ export const getDetailedFavorites = async (targetType: string): Promise<any[]> =
     if (!response.ok) throw new Error('Failed to fetch detailed favorites');
     return response.json();
 };
+
+export const fetchNearbyProviders = async (
+    lat: number,
+    lng: number,
+    radius: number = 10
+): Promise<{ restaurants: any[]; homeFoods: any[]; chefs: any[] }> => {
+    const res = await fetch(`${BASE_URL}/discovery/nearby?lat=${lat}&lng=${lng}&radius=${radius}`);
+    if (!res.ok) throw new Error('Failed to fetch nearby providers');
+    return res.json();
+};
+

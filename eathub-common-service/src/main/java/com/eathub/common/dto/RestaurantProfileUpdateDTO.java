@@ -40,6 +40,8 @@ public class RestaurantProfileUpdateDTO {
     private String state;
     private String postalCode;
     private String country;
+    private Double latitude;
+    private Double longitude;
 
     // ── Legal / banking fields ─────────────────────────────────────────────
     private String legalBusinessName;

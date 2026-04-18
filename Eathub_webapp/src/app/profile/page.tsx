@@ -74,12 +74,29 @@ export default function ProfilePage() {
                     lName = parts.slice(1).join(' ');
                 }
 
+                // Better mobile/country code extraction
+                const fullMobile = data.mobileNumber || '';
+                let foundCode = data.countryCode || '';
+                let subscriberNumber = data.mobile || '';
+
+                if (!foundCode || !subscriberNumber) {
+                    // Try to extract from mobileNumber string
+                    const sortedCountries = [...countries].sort((a, b) => b.code.length - a.code.length);
+                    for (const c of sortedCountries) {
+                        if (fullMobile.startsWith(c.code)) {
+                            foundCode = c.code;
+                            subscriberNumber = fullMobile.substring(c.code.length);
+                            break;
+                        }
+                    }
+                }
+
                 setForm({
                     firstName: fName,
                     lastName: lName,
                     email: data.email || '',
-                    mobile: data.mobile || data.mobileNumber?.replace(/^\+\d+/, '') || '',
-                    countryCode: data.countryCode || data.mobileNumber?.match(/^\+\d+/)?.[0] || '+91',
+                    mobile: subscriberNumber || fullMobile.replace(/^\+\d+/, '') || '',
+                    countryCode: foundCode || fullMobile.match(/^\+\d+/)?.[0] || '+91',
                     houseNumber: data.houseNumber || '',
                     street: data.street || '',
                     area: data.area || '',

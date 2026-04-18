@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star, ArrowRight, ChefHat } from 'lucide-react';
+import { Star, ArrowRight, ChefHat, UserCircle2, MapPin } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { getDisplayImage } from '@/lib/image-utils';
@@ -28,15 +28,22 @@ export function ChefCard({ chef, priority = false }: ChefCardProps) {
             className="flex"
         >
             <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col group relative">
-                <div className="relative h-96 w-full">
-                    <Image
-                        src={displayImage}
-                        alt={chef.name}
-                        fill
-                        className="object-cover"
-                        priority={priority}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                    />
+                <div className="relative h-96 w-full bg-muted/20 flex items-center justify-center">
+                    {!chef.avatarUrl ? (
+                        <div className="flex flex-col items-center justify-center text-muted-foreground/30">
+                            <UserCircle2 className="h-20 w-20 mb-2" />
+                            <span className="text-xs font-bold uppercase tracking-widest">No Portrait</span>
+                        </div>
+                    ) : (
+                        <Image
+                            src={displayImage}
+                            alt={chef.name}
+                            fill
+                            className="object-cover"
+                            priority={priority}
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                    )}
                     
                     <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
                         <FavoriteButton 
@@ -69,6 +76,12 @@ export function ChefCard({ chef, priority = false }: ChefCardProps) {
                                     <Badge variant="outline" className="text-white border-white/50">{chef.preference}</Badge>
                                 )}
                                 <span className="text-sm text-white/80">{chef.reviews} reviews</span>
+                                {chef.distanceKm != null && (
+                                    <Badge variant="secondary" className="bg-primary/90 text-white border-none flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" />
+                                        <span>{chef.distanceKm < 1 ? `${(chef.distanceKm * 1000).toFixed(0)}m` : `${chef.distanceKm.toFixed(1)}km`}</span>
+                                    </Badge>
+                                )}
                             </div>
                         </div>
                     </CardContent>

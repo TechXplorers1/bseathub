@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
+import { Star, UserCircle2 } from 'lucide-react';
 import type { Restaurant } from '@/lib/types';
 
 interface Chef {
@@ -51,13 +51,17 @@ export function HorizontalChefCard({ chef }: HorizontalChefCardProps) {
                 </div>
             </div>
             
-            <div className="relative h-40 w-full md:w-auto md:h-full rounded-lg overflow-hidden">
-                <Image
-                    src={chef.avatarUrl}
-                    alt={chef.name}
-                    fill
-                    className="object-cover"
-                />
+            <div className="relative h-40 w-full md:w-auto md:h-full rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+                {!chef.avatarUrl ? (
+                    <UserCircle2 className="h-16 w-16 text-slate-400" />
+                ) : (
+                    <Image
+                        src={chef.avatarUrl}
+                        alt={chef.name}
+                        fill
+                        className="object-cover"
+                    />
+                )}
                 {isTopRated && <Badge className="absolute top-2 right-2">Top Rated</Badge>}
             </div>
             </div>

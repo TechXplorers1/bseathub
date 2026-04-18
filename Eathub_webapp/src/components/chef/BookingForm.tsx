@@ -38,6 +38,7 @@ import { createChefBooking } from '@/services/api';
 import { Switch } from '@/components/ui/switch';
 import { useHeader } from '@/context/HeaderProvider';
 import type { MenuCategory } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 const bookingFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -45,7 +46,9 @@ const bookingFormSchema = z.object({
   phone: z.string().min(10, { message: 'Please enter a valid phone number.' }),
   countryCode: z.string().default('+91'),
   eventDate: z.date({ required_error: 'An event date is required.' }),
+  eventTime: z.string({ required_error: 'An event time is required.' }),
   eventType: z.string({ required_error: 'Please select an event type.' }),
+  otherOccasion: z.string().optional(),
   guests: z.coerce.number().min(1, { message: 'Must have at least 1 guest.' }),
   message: z.string().optional(),
   foodPreference: z.string({ required_error: 'Please select a food preference.' }),
@@ -54,10 +57,37 @@ const bookingFormSchema = z.object({
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
 
-export function BookingForm({ chefName, chefId, basePrice = 500, services }: { chefName: string, chefId: string, basePrice?: number, services?: MenuCategory[] }) {
+export function BookingForm({ 
+  chefName, 
+  chefId, 
+  basePrice = 500, 
+  services,
+  workingHours 
+}: { 
+  chefName: string, 
+  chefId: string, 
+  basePrice?: number, 
+  services?: MenuCategory[],
+  workingHours?: Record<string, { active: boolean, open: string, close: string }>
+}) {
   const { toast } = useToast();
   const { setIsAuthSuggestionOpen } = useHeader();
   const [loading, setLoading] = React.useState(false);
+  const [existingBookings, setExistingBookings] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    if (chefId) {
+        import('@/services/api').then(mod => {
+            mod.fetchChefBookings(chefId).then(bookings => {
+                setExistingBookings(bookings.filter(b => b.status === "Confirmed" || b.status === "Accepted"));
+            });
+        });
+    }
+  }, [chefId]);
+
+  const bookedDates = React.useMemo(() => {
+    return existingBookings.map(b => format(new Date(b.eventDate), 'yyyy-MM-dd'));
+  }, [existingBookings]);
   
   const countryCodes = [
     { code: '+91', name: 'India', flag: '🇮🇳' },
@@ -89,13 +119,27 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
       guests: 1,
       message: '',
       eventType: '',
+      eventTime: '',
+      otherOccasion: '',
       foodPreference: 'Both',
       isNegotiable: true,
     },
   });
 
   const guests = form.watch('guests');
+  const eventType = form.watch('eventType');
   const totalPrice = guests * (basePrice || 500);
+
+  // Time Selection Pieces
+  const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+  const minutes = ['00', '15', '30', '45'];
+  const [selectedHour, setSelectedHour] = React.useState('12');
+  const [selectedMinute, setSelectedMinute] = React.useState('00');
+  const [meridian, setMeridian] = React.useState('PM');
+
+  React.useEffect(() => {
+    form.setValue('eventTime', `${selectedHour}:${selectedMinute} ${meridian}`);
+  }, [selectedHour, selectedMinute, meridian, form]);
 
   const onSubmit = async (data: BookingFormValues) => {
     if (!customerInfo.id) {
@@ -109,13 +153,14 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
         customerId: customerInfo.id,
         chefId: chefId,
         eventDate: data.eventDate.toISOString(),
+        eventTime: data.eventTime,
         guests: data.guests,
         totalAmount: data.isNegotiable ? 0 : totalPrice,
         status: 'Pending',
         paymentStatus: 'Unpaid',
         eventAddress: 'To be confirmed',
         notes: data.message || '',
-        eventType: data.eventType,
+        eventType: data.eventType === 'Other' ? data.otherOccasion : data.eventType,
         customerPhone: `${data.countryCode} ${data.phone}`,
         foodPreference: data.foodPreference,
         isNegotiable: data.isNegotiable,
@@ -140,20 +185,19 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
   };
 
   return (
-    <Card className="border border-white/20 shadow-2xl bg-white/50 backdrop-blur-xl rounded-[2.5rem] overflow-hidden overflow-y-auto no-scrollbar max-h-[85vh]">
-      <CardHeader className="pt-10 px-8 pb-4">
-        <div className="h-1 w-12 bg-primary/20 rounded-full mb-6 mx-auto md:mx-0" />
-        <CardTitle className="text-3xl font-black tracking-tight uppercase leading-tight">
+    <Card className="border-none shadow-xl bg-white rounded-3xl overflow-hidden overflow-y-auto no-scrollbar max-h-[85vh]">
+      <CardHeader className="pt-8 px-8 pb-4">
+        <CardTitle className="text-2xl font-bold tracking-tight">
           Book <span className="text-primary">{chefName}</span>
         </CardTitle>
-        <CardDescription className="font-medium text-base text-muted-foreground/80 mt-2">
+        <CardDescription className="text-muted-foreground mt-2">
           Reserve your date and customize your culinary experience.
         </CardDescription>
       </CardHeader>
       
       <CardContent className="px-8 pb-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mt-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
@@ -235,7 +279,7 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                 <FormField
                   control={form.control}
                   name="eventDate"
@@ -248,16 +292,16 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                             <Button
                               variant={'outline'}
                               className={cn(
-                                'w-full pl-5 text-left font-semibold transition-all h-14 rounded-2xl border-muted/50 bg-white shadow-sm hover:border-primary/50',
+                                'w-full pl-5 text-left font-semibold transition-all h-14 rounded-2xl border-muted/50 bg-white shadow-sm hover:border-primary/50 text-sm',
                                 !field.value && 'text-muted-foreground'
                               )}
                             >
                               {field.value ? (
-                                format(field.value, 'PPP')
+                                format(field.value, 'MMM d, yyyy')
                               ) : (
                                 <span className="opacity-50">Select Date</span>
                               )}
-                              <CalendarIcon className="ml-auto h-5 w-5 opacity-40" />
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-40" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
@@ -266,7 +310,13 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => {
+                              const isPast = date < new Date();
+                              const isBooked = bookedDates.includes(format(date, 'yyyy-MM-dd'));
+                              const dayName = format(date, 'EEEE');
+                              const isAvailable = workingHours ? workingHours[dayName]?.active : true;
+                              return isPast || isBooked || !isAvailable;
+                            }}
                             initialFocus
                           />
                         </PopoverContent>
@@ -275,15 +325,73 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
                     </FormItem>
                   )}
                 />
+                
+                <div className="space-y-2">
+                  <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Timing (AM/PM)</FormLabel>
+                  <div className="flex gap-2">
+                    <Select onValueChange={setSelectedHour} defaultValue={selectedHour}>
+                      <SelectTrigger className="h-14 rounded-2xl border-muted/50 font-semibold px-4">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 rounded-2xl border-none shadow-2xl p-1">
+                        {hours.map(h => <SelectItem key={h} value={h} className="rounded-xl font-semibold">{h}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select onValueChange={setSelectedMinute} defaultValue={selectedMinute}>
+                      <SelectTrigger className="h-14 rounded-2xl border-muted/50 font-semibold px-4">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-60 rounded-2xl border-none shadow-2xl p-1">
+                        {minutes.map(m => <SelectItem key={m} value={m} className="rounded-xl font-semibold">{m}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+
+                    <Select onValueChange={setMeridian} defaultValue={meridian}>
+                      <SelectTrigger className="h-14 rounded-2xl border-muted/50 font-semibold px-4">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-none shadow-2xl p-1">
+                        <SelectItem value="AM" className="rounded-xl font-semibold">AM</SelectItem>
+                        <SelectItem value="PM" className="rounded-xl font-semibold">PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="guests"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Number of Guests</FormLabel>
+                      <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Guests</FormLabel>
                       <FormControl>
-                        <Input type="number" min="1" {...field} className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-base px-5" />
+                        <Input type="number" min="1" {...field} className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm px-5" />
                       </FormControl>
+                      <FormMessage className="text-xs font-bold" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="foodPreference"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Food Preference</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm font-semibold hover:border-primary/50 px-5">
+                            <SelectValue placeholder="Select preference" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="rounded-2xl shadow-2xl">
+                          <SelectItem value="Veg" className="rounded-xl py-2 px-4">Vegetarian Only</SelectItem>
+                          <SelectItem value="Non-Veg" className="rounded-xl py-2 px-4">Non-Vegetarian</SelectItem>
+                          <SelectItem value="Both" className="rounded-xl py-2 px-4">Both (Veg & Non-Veg)</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage className="text-xs font-bold" />
                     </FormItem>
                   )}
@@ -291,51 +399,45 @@ export function BookingForm({ chefName, chefId, basePrice = 500, services }: { c
               </div>
 
               <FormField
-                control={form.control}
-                name="foodPreference"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Food Preference</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm font-semibold hover:border-primary/50 px-5">
-                          <SelectValue placeholder="Select preference" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="rounded-2xl shadow-2xl">
-                        <SelectItem value="Veg" className="rounded-xl py-2 px-4">Vegetarian Only</SelectItem>
-                        <SelectItem value="Non-Veg" className="rounded-xl py-2 px-4">Non-Vegetarian</SelectItem>
-                        <SelectItem value="Both" className="rounded-xl py-2 px-4">Both (Veg & Non-Veg)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-bold" />
-                  </FormItem>
-                )}
-              />
+                  control={form.control}
+                  name="eventType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Specific Occasion</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm font-semibold hover:border-primary/50 px-5">
+                            <SelectValue placeholder="What's the occasion?" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className="rounded-2xl shadow-2xl">
+                          <SelectItem value="Private Dinner">Private Dinner</SelectItem>
+                          <SelectItem value="Event Catering">Large Event Catering</SelectItem>
+                          <SelectItem value="Home Cooking Class">Cooking Class</SelectItem>
+                          <SelectItem value="Celebration">Birthday / Celebration</SelectItem>
+                          <SelectItem value="Other">Other Occasion</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-xs font-bold" />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="eventType"
-                render={({ field }) => (
-                  <FormItem>
-                     <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Specific Occasion</FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+              {eventType === 'Other' && (
+                <FormField
+                  control={form.control}
+                  name="otherOccasion"
+                  render={({ field }) => (
+                    <FormItem className="animate-in fade-in slide-in-from-top-2">
+                      <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Please Specify Occasion</FormLabel>
                       <FormControl>
-                        <SelectTrigger className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm font-semibold hover:border-primary/50 px-5">
-                          <SelectValue placeholder="What's the occasion?" />
-                        </SelectTrigger>
+                        <Input placeholder="Tell us more about the event" {...field} className="rounded-2xl h-14 border-primary/20 bg-primary/5 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-base px-5" />
                       </FormControl>
-                      <SelectContent className="rounded-2xl shadow-2xl">
-                        <SelectItem value="Private Dinner">Private Dinner</SelectItem>
-                        <SelectItem value="Event Catering">Large Event Catering</SelectItem>
-                        <SelectItem value="Home Cooking Class">Cooking Class</SelectItem>
-                        <SelectItem value="Celebration">Birthday / Celebration</SelectItem>
-                        <SelectItem value="Other">Other Occasion</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
+                      <FormMessage className="text-xs font-bold" />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}

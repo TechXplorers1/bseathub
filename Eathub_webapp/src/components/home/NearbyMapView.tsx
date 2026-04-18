@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import type React from 'react';
 const BASE_URL = 'http://localhost:8081/api/v1';
 
-export interface LeafletMapProps {
+export interface MapboxMapProps {
   userLat: number;
   userLng: number;
   providers: NearbyProvider[];
@@ -21,16 +21,16 @@ export interface LeafletMapProps {
   onProviderSelect: (p: NearbyProvider) => void;
 }
 
-// Dynamic import of the actual map to avoid SSR issues with Leaflet
-const LeafletMap = dynamic<LeafletMapProps>(
-  () => import('./LeafletMap') as any,
+// Dynamic import of the Mapbox map
+const MapboxMap = dynamic<MapboxMapProps>(
+  () => import('./MapboxMap') as any,
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-full bg-gradient-to-br from-green-50 to-emerald-50">
+      <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-          <p className="text-sm text-emerald-700 font-medium">Loading map...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-primary font-medium">Initializing Mapbox...</p>
         </div>
       </div>
     ),
@@ -245,7 +245,7 @@ export default function NearbyMapView() {
           )}
 
           {coordinates && (
-            <LeafletMap
+            <MapboxMap
               userLat={coordinates.lat}
               userLng={coordinates.lng}
               providers={filteredProviders}

@@ -7,30 +7,48 @@ import { Banners } from '@/components/home/Banners';
 import { OffersForYou } from '@/components/home/OffersForYou';
 import { ChefsCarousel } from '@/components/home/ChefsCarousel';
 import { useDistanceFilter } from '@/context/DistanceFilterProvider';
+import { useUser } from '@/firebase/provider';
 import { Loader2, MapPin } from 'lucide-react';
-import type { Restaurant } from '@/lib/types';
+import type { Restaurant, Chef } from '@/lib/types';
 
 export default function Home() {
   const { restaurants, homeFoods, loading, chefs } = useRestaurants();
   const { selectedRadius, nearbyData, isFetchingNearby, hasLocation, locationLabel } = useDistanceFilter();
+  const { user } = useUser();
+  const currentUserId = user?.uid;
 
-  // When a distance is active, use the nearby API results; otherwise use the full list
-  const isFiltered = selectedRadius !== null && nearbyData !== null;
+  // Filter out the current user's provider card from showing on their own homepage
+  const filterSelf = <T extends { ownerId?: string; owner?: { id: string } }>(items: T[]): T[] => {
+    if (!currentUserId) return items;
+    return items.filter(item => {
+      const oid = item.ownerId || item.owner?.id;
+      return oid !== currentUserId;
+    });
+  };
 
-  const displayRestaurants: Restaurant[] = isFiltered
+  // Only use proximity-based sorting/data if a distance radius is explicitly selected
+  const useNearby = nearbyData !== null && selectedRadius !== null;
+  const isFiltered = selectedRadius !== null; // Used for UI labels
+
+  const displayRestaurants = filterSelf(useNearby
     ? nearbyData!.restaurants as Restaurant[]
-    : restaurants;
+    : restaurants);
 
-  const displayHomeFoods: Restaurant[] = isFiltered
+  const displayHomeFoods = filterSelf(useNearby
     ? nearbyData!.homeFoods as Restaurant[]
-    : homeFoods;
+    : homeFoods);
 
-  const displayChefs = isFiltered ? nearbyData!.chefs : chefs;
+  const displayChefs = filterSelf(useNearby 
+    ? nearbyData!.chefs as Chef[]
+    : chefs as Chef[]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-lg animate-pulse">Loading delicious food...</p>
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-xl font-bold animate-pulse text-muted-foreground">Preparing your personalized menu...</p>
+        </div>
       </div>
     );
   }
@@ -73,6 +91,8 @@ export default function Home() {
         </div>
       )}
 
+      {/* Removed NearbyScroller per user request — proximity sorting now happens in-place */}
+
       <div className="mt-2 mb-2">
         <OffersForYou />
       </div>
@@ -84,7 +104,7 @@ export default function Home() {
       {displayHomeFoods.length > 0 ? (
         <div className="mb-6">
           <RestaurantCarousel
-            title={isFiltered ? `Home Food Nearby (${displayHomeFoods.length})` : 'Home Food'}
+            title={useNearby ? `Home Food Near ${locationLabel} (${displayHomeFoods.length})` : 'Home Food'}
             restaurants={displayHomeFoods}
             href="/home-food"
           />
@@ -99,7 +119,7 @@ export default function Home() {
       {displayRestaurants.length > 0 ? (
         <div className="mb-8">
           <RestaurantCarousel
-            title={isFiltered ? `Restaurants Nearby (${displayRestaurants.length})` : 'Restaurants'}
+            title={useNearby ? `Restaurants Near ${locationLabel} (${displayRestaurants.length})` : 'Restaurants'}
             restaurants={displayRestaurants}
             href="/restaurants"
           />
@@ -111,7 +131,7 @@ export default function Home() {
         </div>
       ) : null}
 
-      <ChefsCarousel filteredChefs={isFiltered ? displayChefs : undefined} />
+      <ChefsCarousel filteredChefs={displayChefs} />
     </div>
   );
 }

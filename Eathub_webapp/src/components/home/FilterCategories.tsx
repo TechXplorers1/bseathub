@@ -233,6 +233,16 @@ export function FilterCategories({}: FilterCategoriesProps) {
             {button.name}
           </Button>
         ))}
+
+        <Link href="/nearby">
+          <Button
+            variant="outline"
+            className="rounded-full flex-shrink-0 bg-primary/5 border-primary/20 text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Navigation className="mr-2 h-4 w-4" />
+            View on Map
+          </Button>
+        </Link>
       </div>
       {/* ── Distance filter tabs ──────────────────────────────────────── */}
       <div className="flex items-center gap-2 pt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>

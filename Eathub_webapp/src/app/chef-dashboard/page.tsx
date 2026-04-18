@@ -88,7 +88,18 @@ export default function ChefDashboardPage() {
           reviewCount: reviewsData.length
         });
 
-        setBookings(bookingsData.slice(0, 5)); // Top 5 recent
+        const sortedBookings = bookingsData.sort((a, b) => {
+          // Primary sort by CreatedAt (Recent Request first)
+          if (a.createdAt && b.createdAt) {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          }
+          // Fallback to EventDate
+          const dateA = new Date(a.eventDate).getTime();
+          const dateB = new Date(b.eventDate).getTime();
+          return dateB - dateA;
+        });
+
+        setBookings(sortedBookings.slice(0, 5)); // Top 5 recent
         setReviews(reviewsData.slice(0, 3));   // Top 3 recent feedback
       } catch (error) {
         console.error("Failed to load dashboard data:", error);
@@ -169,7 +180,7 @@ export default function ChefDashboardPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Customer</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead>Date & Time</TableHead>
                     <TableHead className="hidden xl:table-cell">
                       Status
                     </TableHead>
@@ -191,7 +202,10 @@ export default function ChefDashboardPage() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{new Date(booking.eventDate).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div className="font-bold">{new Date(booking.eventDate).toLocaleDateString()}</div>
+                        <div className="text-[10px] font-black uppercase text-primary italic">{booking.eventTime}</div>
+                      </TableCell>
                       <TableCell className="hidden xl:table-cell">
                         <Badge
                           className="rounded-full font-bold uppercase text-[10px]"

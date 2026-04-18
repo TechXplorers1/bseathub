@@ -40,6 +40,8 @@ export interface Restaurant {
   preference?: 'Veg' | 'Non-Veg' | 'Veg & Non-Veg';
   basePrice?: number;
   totalEarnings?: number;
+  distanceKm?: number;
+  ownerId?: string;
 }
 
 export interface MenuCategory {
@@ -159,6 +161,8 @@ export interface Chef {
   workingHours?: string;
   city?: string;
   isActive?: boolean;
+  distanceKm?: number;
+  ownerId?: string;
 }
 
 export interface ReviewRequest {
@@ -195,6 +199,7 @@ export interface ChefBooking {
   serviceId?: string;
   serviceName?: string;
   eventDate: string;
+  eventTime?: string;
   guests: number;
   totalAmount: number;
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Accepted' | 'Rejected';

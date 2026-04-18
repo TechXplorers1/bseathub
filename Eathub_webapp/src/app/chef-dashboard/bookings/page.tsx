@@ -56,7 +56,7 @@ function BookingsTable({ bookings, onStatusUpdate }: { bookings: ChefBooking[], 
                 <TableRow className="hover:bg-transparent border-b-2">
                     <TableHead className="font-bold text-xs uppercase tracking-widest">Customer</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-widest">Contact & Details</TableHead>
-                    <TableHead className="font-bold text-xs uppercase tracking-widest">Event Date</TableHead>
+                    <TableHead className="font-bold text-xs uppercase tracking-widest">Date & Time</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-widest">Guests</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-widest">Service</TableHead>
                     <TableHead className="font-bold text-xs uppercase tracking-widest">Status</TableHead>
@@ -84,12 +84,17 @@ function BookingsTable({ bookings, onStatusUpdate }: { bookings: ChefBooking[], 
                                 </Badge>
                             </div>
                         </TableCell>
-                        <TableCell className="font-bold text-slate-600 whitespace-nowrap">
-                            {new Date(booking.eventDate).toLocaleDateString('en-IN', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                            })}
+                        <TableCell>
+                            <div className="font-bold text-slate-800 whitespace-nowrap">
+                                {new Date(booking.eventDate).toLocaleDateString('en-IN', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric'
+                                })}
+                            </div>
+                            <div className="text-[10px] font-black uppercase text-primary tracking-widest mt-1 italic">
+                                {booking.eventTime || 'No Time Set'}
+                            </div>
                         </TableCell>
                         <TableCell>
                             <Badge variant="outline" className="rounded-md font-bold tracking-tighter bg-white shadow-sm border-slate-200">
@@ -167,7 +172,17 @@ export default function BookingsPage() {
 
         try {
             const data = await fetchChefBookingsByOwner(ownerId);
-            setBookings(data);
+            const sorted = data.sort((a, b) => {
+                // Primary sort by CreatedAt (Recent Request first)
+                if (a.createdAt && b.createdAt) {
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                }
+                // Fallback to EventDate
+                const dateA = new Date(a.eventDate).getTime();
+                const dateB = new Date(b.eventDate).getTime();
+                return dateB - dateA;
+            });
+            setBookings(sorted);
         } catch (err) {
             toast({ variant: 'destructive', title: 'Error', description: 'Failed to load bookings' });
         } finally {

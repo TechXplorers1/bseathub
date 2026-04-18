@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Clock } from "lucide-react";
+import { Star, MapPin, Clock, Utensils } from "lucide-react";
 import { getDisplayImage } from "@/lib/image-utils";
 import { cn } from "@/lib/utils";
 
@@ -42,13 +42,20 @@ export function ProviderCard({ provider }: ProviderCardProps) {
     return (
         <Link href={href} className="block group">
             <Card className="overflow-hidden border-muted/60 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full bg-white flex flex-col">
-                <div className="relative h-56 w-full overflow-hidden">
-                    <Image
-                        src={imageUrl}
-                        alt={provider.name}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
+                <div className="relative h-56 w-full overflow-hidden bg-muted/30 flex items-center justify-center">
+                    {!provider.imageId ? (
+                        <div className="flex flex-col items-center justify-center text-muted-foreground/40">
+                            <Utensils className="h-14 w-14 mb-2" />
+                            <span className="text-[10px] font-black tracking-widest uppercase">No Preview</span>
+                        </div>
+                    ) : (
+                        <Image
+                            src={imageUrl}
+                            alt={provider.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                    )}
 
                     <div className="absolute top-3 left-3 flex gap-2">
                         <Badge className={cn("text-[10px] font-bold tracking-wider px-2 py-0.5 border-none shadow-sm", config.color)}>

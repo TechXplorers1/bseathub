@@ -1,7 +1,7 @@
 import { BookingForm } from "./BookingForm";
 import type { MenuCategory } from "@/lib/types";
 
-export function BookChef({ chefName, chefId, basePrice, services }: { chefName: string, chefId: string, basePrice?: number, services?: MenuCategory[] }) {
+export function BookChef({ chefName, chefId, basePrice, services, workingHours }: { chefName: string, chefId: string, basePrice?: number, services?: MenuCategory[], workingHours?: any }) {
     return (
         <div id="Book a Chef" className="pt-12 pb-6 bg-white/80 backdrop-blur-md rounded-t-[2.5rem]">
             <div className="text-center px-8">
@@ -11,7 +11,7 @@ export function BookChef({ chefName, chefId, basePrice, services }: { chefName: 
                 </p>
             </div>
             <div className="mt-8">
-                <BookingForm chefName={chefName} chefId={chefId} basePrice={basePrice} services={services} />
+                <BookingForm chefName={chefName} chefId={chefId} basePrice={basePrice} services={services} workingHours={workingHours} />
             </div>
         </div>
     )

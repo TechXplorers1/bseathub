@@ -22,13 +22,21 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Camera, ImagePlus, X, UserCircle2, CheckCircle2, AlertCircle, Loader2, FileText, Upload } from 'lucide-react';
+import { Camera, ImagePlus, X, UserCircle2, CheckCircle2, AlertCircle, Loader2, FileText, Upload, MapPin, Search } from 'lucide-react';
 import {
   fetchRestaurantProfile,
   updateRestaurantProfile,
   updateRestaurantAddress,
   updateRestaurantLegal
 } from '@/services/api';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import LocationPicker from '@/components/location/LocationPicker';
 import { compressImage } from '@/lib/image-utils';
 
 // ─── Types ──────────────────────────────────────────────────────────────
@@ -65,6 +73,8 @@ interface ProfileForm {
   businessModel: string;
   fssaiExpiryDate: string;
   fssaiDocumentUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const restaurantTypes = [
@@ -102,6 +112,7 @@ const EMPTY_FORM: ProfileForm = {
   legalBusinessName: '', gstNumber: '', panNumber: '', fssaiLicenseNumber: '',
   businessType: '', bankAccountHolderName: '', bankAccountNumber: '', bankIFSC: '', bankName: '',
   ownerName: '', mobileNumber: '', businessModel: 'both', fssaiExpiryDate: '', fssaiDocumentUrl: null,
+  latitude: null, longitude: null,
 };
 
 export default function SettingsPage() {
@@ -110,6 +121,8 @@ export default function SettingsPage() {
   const [savingSection, setSavingSection] = useState<'profile' | 'address' | 'legal' | 'availability' | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
@@ -158,6 +171,8 @@ export default function SettingsPage() {
           businessModel: data.businessModel ?? 'both',
           fssaiExpiryDate: data.fssaiExpiryDate ?? '',
           fssaiDocumentUrl: data.fssaiDocumentUrl ?? null,
+          latitude: data.latitude ?? null,
+          longitude: data.longitude ?? null,
         });
       })
       .catch(() => { })
@@ -237,6 +252,33 @@ export default function SettingsPage() {
     if (!restaurantId) return;
     setSavingSection('address');
     try {
+      let lat = form.latitude;
+      let lng = form.longitude;
+
+      // Auto-geocode if coordinates are missing
+      if (!lat || !lng) {
+        const query = `${form.addressLine1}, ${form.city}, ${form.state}, ${form.postalCode}`;
+        const performSearch = async (q: string) => {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+            return (data && data[0]) ? data[0] : null;
+          } catch { return null; }
+        };
+
+        let result = await performSearch(query);
+        // Fallback: Just city and state
+        if (!result) {
+          result = await performSearch(`${form.city}, ${form.state}, ${form.country}`);
+        }
+
+        if (result) {
+          lat = parseFloat(result.lat);
+          lng = parseFloat(result.lon);
+          setForm(f => ({ ...f, latitude: lat, longitude: lng }));
+        }
+      }
+
       const payload = {
         addressLine1: form.addressLine1,
         addressLine2: form.addressLine2,
@@ -244,6 +286,8 @@ export default function SettingsPage() {
         state: form.state,
         postalCode: form.postalCode,
         country: form.country,
+        latitude: lat,
+        longitude: lng,
       };
       await updateRestaurantAddress(restaurantId, payload);
       showToast('success', 'Address details updated!');
@@ -277,6 +321,46 @@ export default function SettingsPage() {
       showToast('error', err.message || 'Failed to save bank details.');
     } finally {
       setSavingSection(null);
+    }
+  };
+
+  const handleFetchCoords = async () => {
+    const query = `${form.addressLine1}, ${form.city}, ${form.state}, ${form.postalCode}, ${form.country}`;
+    if (!query.trim() || query.replace(/[, ]/g, '').length < 3) {
+      showToast('error', 'Please enter more address details first');
+      return;
+    }
+    setIsGeocoding(true);
+
+    const performSearch = async (q: string) => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        return (data && data[0]) ? data[0] : null;
+      } catch { return null; }
+    };
+
+    try {
+      let result = await performSearch(query);
+      
+      // Fallback 1: Remove potentially specific parts
+      if (!result && query.includes(',')) {
+        const fallbackQuery = query.split(',').slice(1).join(',').trim();
+        result = await performSearch(fallbackQuery);
+      }
+
+      if (result) {
+        const resLat = parseFloat(result.lat);
+        const resLng = parseFloat(result.lon);
+        setForm(f => ({ ...f, latitude: resLat, longitude: resLng }));
+        showToast('success', 'Coordinates updated from address!');
+      } else {
+        showToast('error', 'Location not found. Try entering a landmark or just the city.');
+      }
+    } catch (e) {
+      showToast('error', 'Geocoding failed. Check your connection.');
+    } finally {
+      setIsGeocoding(false);
     }
   };
 
@@ -544,6 +628,63 @@ export default function SettingsPage() {
                   <Label>Country</Label>
                   <Input value={form.country} onChange={setField('country')} />
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                       <MapPin className="h-4 w-4 text-primary" />
+                       Map Coordinates
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      {form.latitude && form.longitude 
+                        ? `Set to ${form.latitude.toFixed(4)}, ${form.longitude.toFixed(4)}`
+                        : "No coordinates set yet"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={handleFetchCoords}
+                      disabled={isGeocoding}
+                    >
+                      {isGeocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                      Sync from Address
+                    </Button>
+                    <Dialog open={isLocationPickerOpen} onOpenChange={setIsLocationPickerOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Pick on Map
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl h-[80vh]">
+                        <DialogHeader>
+                          <DialogTitle>Select Restaurant Location</DialogTitle>
+                        </DialogHeader>
+                        <LocationPicker 
+                          initialLat={form.latitude}
+                          initialLng={form.longitude}
+                          initialAddress={`${form.addressLine1}, ${form.city}, ${form.state}, ${form.postalCode}`}
+                          onLocationSelect={(lat, lng) => {
+                            setForm(f => ({ ...f, latitude: lat, longitude: lng }));
+                          }}
+                        />
+                        <Button className="w-full mt-4" onClick={() => setIsLocationPickerOpen(false)}>
+                          Confirm Location
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden">
+                <Input value={form.latitude ?? ''} readOnly />
+                <Input value={form.longitude ?? ''} readOnly />
               </div>
             </CardContent>
             <CardFooter>

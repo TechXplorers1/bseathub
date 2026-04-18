@@ -57,29 +57,62 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
   const [nearbyData, setNearbyData] = useState<NearbyResult | null>(null);
   const [isFetchingNearby, setIsFetchingNearby] = useState(false);
   const [resolvedCoords, setResolvedCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [resolvedLocationName, setResolvedLocationName] = useState<string>('');
 
-  // Resolve coordinates: GPS first, then fallback to profile city geocode
+  // Resolve coordinates: GPS first, then fallback to profile address geocode
   useEffect(() => {
     if (coordinates) {
       setResolvedCoords(coordinates);
+      if (location && location !== 'Location unavailable' && !location.includes('Detecting')) {
+        setResolvedLocationName(location);
+      }
       return;
     }
     if (isLocating) return;
 
-    // GPS not available — try to geocode from profile stored values
-    const city =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('userCity') ||
-          localStorage.getItem('userLocation') ||
-          localStorage.getItem('userArea')
-        : null;
+    // GPS not available — try to get from profile
+    const fetchProfileLoc = async () => {
+      try {
+        // 1. Try localStorage city name
+        const storedCity = localStorage.getItem('userCity') || localStorage.getItem('userLocation');
+        if (storedCity && storedCity.length > 2 && storedCity !== 'Location unavailable' && !storedCity.includes('Detecting')) {
+          const coords = await geocodeAddress(storedCity);
+          if (coords) {
+            setResolvedCoords(coords);
+            setResolvedLocationName(storedCity);
+            return;
+          }
+        }
 
-    if (city && city.length > 2) {
-      geocodeAddress(city).then(coords => {
-        if (coords) setResolvedCoords(coords);
-      });
-    }
-  }, [coordinates, isLocating]);
+        // 2. Try the actual user profile from backend
+        const token = localStorage.getItem('token');
+        if (token) {
+          const res = await fetch('http://localhost:8081/api/v1/users/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const profile = await res.json();
+            const city = profile.city || profile.town || '';
+            const state = profile.state || '';
+            const address = `${city}${state ? ', ' + state : ''}`.trim();
+            
+            if (address.length > 2) {
+              const coords = await geocodeAddress(address);
+              if (coords) {
+                setResolvedCoords(coords);
+                setResolvedLocationName(address);
+                return;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Fallback location resolution failed:', err);
+      }
+    };
+
+    fetchProfileLoc();
+  }, [coordinates, isLocating, location]);
 
   const fetchNearby = useCallback(async (lat: number, lng: number, radius: number) => {
     setIsFetchingNearby(true);
@@ -101,7 +134,6 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
         services: item.services ?? ['delivery', 'pickup'],
         isOpen: item.isOpen ?? item.isActive ?? true,
         reviews: item.reviewsCount ?? item.reviews ?? 0,
-        // keep distanceKm for potential display
         distanceKm: item.distanceKm,
       });
 
@@ -119,16 +151,16 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (selectedRadius === null) {
+    if (!resolvedCoords) {
       setNearbyData(null);
       return;
     }
-    if (!resolvedCoords) return;
-    fetchNearby(resolvedCoords.lat, resolvedCoords.lng, selectedRadius);
+    const radiusToFetch = selectedRadius !== null ? selectedRadius : 50; 
+    fetchNearby(resolvedCoords.lat, resolvedCoords.lng, radiusToFetch);
   }, [selectedRadius, resolvedCoords, fetchNearby]);
 
   const hasLocation = !!resolvedCoords;
-  const locationLabel = location || 'your location';
+  const locationLabel = resolvedLocationName || location || 'your location';
 
   return (
     <DistanceFilterContext.Provider

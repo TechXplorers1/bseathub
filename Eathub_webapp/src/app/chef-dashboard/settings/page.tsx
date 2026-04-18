@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Loader2, CheckCircle2, AlertCircle, Camera, Search, FileText, Upload } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertCircle, Camera, Search, FileText, Upload, MapPin } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { 
   fetchChefProfile, 
@@ -34,10 +34,18 @@ import {
 import { countries } from '@/constants/countries';
 import { compressImage } from '@/lib/image-utils';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
+import LocationPicker from '@/components/location/LocationPicker';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -93,6 +101,8 @@ export default function SettingsPage() {
     basePrice: '',
     workType: 'Freelance',
     socialLinks: '',
+    latitude: '',
+    longitude: '',
   });
 
   const [workingHours, setWorkingHours] = useState<WorkingHours>(DEFAULT_HOURS);
@@ -100,6 +110,8 @@ export default function SettingsPage() {
   const [savingStep, setSavingStep] = useState<'profile' | 'availability' | 'legal' | 'documents' | 'address' | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [chefId, setChefId] = useState<string | null>(null);
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
 
@@ -194,6 +206,8 @@ export default function SettingsPage() {
           state: data.state ?? '',
           country: data.country ?? '',
           postalCode: data.postalCode ?? '',
+          latitude: data.latitude?.toString() ?? '',
+          longitude: data.longitude?.toString() ?? '',
         });
         if (data.workingHours) {
           try {
@@ -256,7 +270,24 @@ export default function SettingsPage() {
     if (!chefId) return;
     setSavingStep('address');
     try {
-      await updateChefAddress(chefId, form);
+      let lat = parseFloat(form.latitude);
+      let lng = parseFloat(form.longitude);
+
+      // Auto-geocode if missing
+      if (!lat || !lng) {
+        const query = `${form.houseNumber} ${form.streetName}, ${form.city}, ${form.state}, ${form.postalCode}`;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          if (data && data[0]) {
+            lat = parseFloat(data[0].lat);
+            lng = parseFloat(data[0].lon);
+            setForm(f => ({ ...f, latitude: lat.toString(), longitude: lng.toString() }));
+          }
+        } catch (e) {}
+      }
+
+      await updateChefAddress(chefId, { ...form, latitude: lat, longitude: lng });
       showToast('success', 'Address updated successfully');
       setTimeout(() => {
         window.dispatchEvent(new Event('chef-profile-updated'));
@@ -294,6 +325,52 @@ export default function SettingsPage() {
       showToast('error', 'Failed to save documents');
     } finally {
       setSavingStep(null);
+    }
+  };
+
+  const handleFetchCoords = async () => {
+    const query = `${form.houseNumber} ${form.streetName}, ${form.city}, ${form.state}, ${form.postalCode}, ${form.country}`;
+    if (!query.trim() || query.replace(/[, ]/g, '').length < 3) {
+      showToast('error', 'Please enter more address details first');
+      return;
+    }
+    setIsGeocoding(true);
+
+    const performSearch = async (q: string) => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        return (data && data[0]) ? data[0] : null;
+      } catch { return null; }
+    };
+
+    try {
+      let result = await performSearch(query);
+
+      // Fallback 1: Remove house number
+      if (!result) {
+        const broaderQuery = `${form.streetName}, ${form.city}, ${form.state}, ${form.postalCode}, ${form.country}`;
+        result = await performSearch(broaderQuery);
+      }
+
+      // Fallback 2: Just city and state
+      if (!result) {
+        const minimalQuery = `${form.city}, ${form.state}, ${form.country}`;
+        result = await performSearch(minimalQuery);
+      }
+
+      if (result) {
+        const lat = parseFloat(result.lat);
+        const lng = parseFloat(result.lon);
+        setForm(f => ({ ...f, latitude: lat.toString(), longitude: lng.toString() }));
+        showToast('success', 'Coordinates updated from address!');
+      } else {
+        showToast('error', 'Location not found. Try adding a landmark or checking city spelling.');
+      }
+    } catch (e) {
+      showToast('error', 'Geocoding failed. Check your connection.');
+    } finally {
+      setIsGeocoding(false);
     }
   };
 
@@ -632,6 +709,63 @@ export default function SettingsPage() {
                     placeholder="e.g. NW1 6XE"
                   />
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold flex items-center gap-2">
+                       <MapPin className="h-4 w-4 text-primary" />
+                       Map Coordinates
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      {form.latitude && form.longitude 
+                        ? `Set to ${parseFloat(form.latitude).toFixed(4)}, ${parseFloat(form.longitude).toFixed(4)}`
+                        : "No coordinates set yet"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={handleFetchCoords}
+                      disabled={isGeocoding}
+                    >
+                      {isGeocoding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                      Sync from Address
+                    </Button>
+                    <Dialog open={isLocationPickerOpen} onOpenChange={setIsLocationPickerOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Pick on Map
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl h-[80vh]">
+                        <DialogHeader>
+                          <DialogTitle>Select Your Location</DialogTitle>
+                        </DialogHeader>
+                        <LocationPicker 
+                          initialLat={form.latitude ? parseFloat(form.latitude) : null}
+                          initialLng={form.longitude ? parseFloat(form.longitude) : null}
+                          initialAddress={`${form.houseNumber} ${form.streetName}, ${form.city}, ${form.state}, ${form.postalCode}`}
+                          onLocationSelect={(lat, lng) => {
+                            setForm(f => ({ ...f, latitude: lat.toString(), longitude: lng.toString() }));
+                          }}
+                        />
+                        <Button className="w-full mt-4" onClick={() => setIsLocationPickerOpen(false)}>
+                          Confirm Location
+                        </Button>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden">
+                 <Input value={form.latitude} />
+                 <Input value={form.longitude} />
               </div>
             </CardContent>
             <CardFooter>

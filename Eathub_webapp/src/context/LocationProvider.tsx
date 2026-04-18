@@ -20,8 +20,19 @@ interface LocationContextType {
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
-  const [location, setLocation] = useState<string>('Detecting location...');
-  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+  const [location, setLocation] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userLocation') || 'Detecting location...';
+    }
+    return 'Detecting location...';
+  });
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('userCoords');
+      return saved ? JSON.parse(saved) : null;
+    }
+    return null;
+  });
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -50,9 +61,17 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             const city =
               addr?.city || addr?.town || addr?.village || addr?.county || 'Your location';
             const state = addr?.state || '';
-            setLocation(state ? `${city}, ${state}` : city);
+            const fullLoc = state ? `${city}, ${state}` : city;
+            setLocation(fullLoc);
+            
+            // Persist for fallback/Geocoding
+            localStorage.setItem('userLocation', fullLoc);
+            localStorage.setItem('userCity', city);
+            localStorage.setItem('userCoords', JSON.stringify({ lat: latitude, lng: longitude }));
           } else {
-            setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+            const simpleCoords = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            setLocation(simpleCoords);
+            localStorage.setItem('userCoords', JSON.stringify({ lat: latitude, lng: longitude }));
           }
         } catch {
           setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);

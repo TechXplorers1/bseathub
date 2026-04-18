@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Heart } from 'lucide-react';
+import { Heart, ImageIcon, Store } from 'lucide-react';
 import { getDisplayImage } from '@/lib/image-utils';
 import type { Restaurant } from '@/lib/types';
 import { useState, useEffect } from 'react';
@@ -40,9 +40,16 @@ export function RestaurantHero({
 
   return (
     <div className="relative w-full h-[40vh] min-h-[220px] sm:h-[48vh] ">
-      {coverImage && (
+      {!restaurant.coverImageId ? (
+        <div className="absolute inset-0 bg-slate-200 flex items-center justify-center">
+            <div className="flex flex-col items-center justify-center text-slate-400">
+                <ImageIcon className="h-20 w-20 mb-2" />
+                <span className="text-sm font-bold uppercase tracking-widest">No Cover Photo</span>
+            </div>
+        </div>
+      ) : (
         <Image
-          src={coverImage}
+          src={ coverImage }
           alt={finalName}
           fill
           className="object-cover "
@@ -92,9 +99,11 @@ export function RestaurantHero({
         </div>
       </div>
 
-      {/* LOGO SQUARE (Changed from Circle) */}
-      {logoImage && (
-        // CHANGED: rounded-full -> rounded-xl
+      {!restaurant.imageId ? (
+        <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-slate-100 flex items-center justify-center z-30 shadow-md">
+            <Store className="h-8 w-8 text-slate-400" />
+        </div>
+      ) : (
         <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-white overflow-hidden z-30 shadow-md">
           <Image
             src={logoImage}

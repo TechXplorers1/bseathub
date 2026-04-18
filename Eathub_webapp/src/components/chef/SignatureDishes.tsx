@@ -85,6 +85,8 @@ export function SignatureDishes({ items, restaurant }: SignatureDishesProps) {
                     setSelectedItem(null);
                 }
             }}
+            hideAddButton={true}
+            hidePrice={true}
         />
     )}
     </>

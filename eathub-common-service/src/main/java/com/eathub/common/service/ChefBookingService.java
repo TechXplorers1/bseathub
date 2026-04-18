@@ -57,6 +57,7 @@ public class ChefBookingService {
                 .customerPhone(dto.getCustomerPhone())
                 .foodPreference(dto.getFoodPreference())
                 .isNegotiable(dto.getIsNegotiable() != null ? dto.getIsNegotiable() : false)
+                .eventTime(dto.getEventTime())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -203,6 +204,7 @@ public class ChefBookingService {
                 .customerPhone(b.getCustomerPhone())
                 .foodPreference(b.getFoodPreference())
                 .isNegotiable(b.getIsNegotiable())
+                .eventTime(b.getEventTime())
                 .build();
     }
 }

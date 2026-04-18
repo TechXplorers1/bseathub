@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class HomeFoodResponseDTO {
     private String id;
+    private String ownerId;
     private String name;
     private String description;
     private String foodType;

@@ -16,6 +16,7 @@ public class ChefBookingDTO {
     private String serviceId;
     private String serviceName;
     private LocalDateTime eventDate;
+    private String eventTime;
     private Integer guests;
     private Double totalAmount;
     private String status;

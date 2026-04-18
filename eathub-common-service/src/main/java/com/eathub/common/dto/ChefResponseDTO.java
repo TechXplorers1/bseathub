@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class ChefResponseDTO {
     private String id;
+    private String ownerId;
     private String name;
     private String bio;
     private String experience;
@@ -28,6 +29,8 @@ public class ChefResponseDTO {
     private String state;
     private String postalCode;
     private String country;
+    private Double latitude;
+    private Double longitude;
 
     // Expand legal fields
     private String legalBusinessName;

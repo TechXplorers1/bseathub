@@ -245,6 +245,7 @@ public class RestaurantService {
 
         User owner = r.getOwner();
         if (owner != null) {
+            dto.setOwnerId(owner.getId());
             dto.setOwnerName(owner.getName());
             dto.setMobileNumber(owner.getPhone());
         }

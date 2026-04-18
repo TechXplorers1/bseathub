@@ -7,6 +7,7 @@ public class RestaurantResponseDTO {
 
     // ── Core ──────────────────────────────────────────────
     private String id;
+    private String ownerId;
     private String name;
     private String description;
     private String cuisineType;

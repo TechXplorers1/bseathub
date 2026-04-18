@@ -23,6 +23,8 @@ public class ChefProfileUpdateDTO {
     private String state;
     private String postalCode;
     private String country;
+    private Double latitude;
+    private Double longitude;
 
     // ── Legal / Banking fields ──────────────────────────────────
     private String legalBusinessName;

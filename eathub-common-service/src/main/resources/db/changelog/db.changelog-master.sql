@@ -563,3 +563,7 @@ CREATE TABLE IF NOT EXISTS offers (
 );
 
 CREATE INDEX IF NOT EXISTS idx_offers_menu_item ON offers(menu_item_id);
+
+-- changeset eathub:2.5.0
+-- Add event_time to chef_bookings
+ALTER TABLE chef_bookings ADD COLUMN IF NOT EXISTS event_time VARCHAR(255);

@@ -6,6 +6,8 @@ import com.eathub.common.entity.MenuItem;
 import com.eathub.common.entity.Chef;
 import com.eathub.common.repository.MenuItemRepository;
 import com.eathub.common.repository.ChefRepository;
+import com.eathub.common.repository.RestaurantRepository;
+import com.eathub.common.repository.HomeFoodProviderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,8 @@ public class DiscoveryController {
 
     private final MenuItemRepository menuItemRepository;
     private final ChefRepository chefRepository;
-    private final com.eathub.common.repository.RestaurantRepository restaurantRepository;
-    private final com.eathub.common.repository.HomeFoodProviderRepository homeFoodRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final HomeFoodProviderRepository homeFoodRepository;
 
     @GetMapping("/category/{title}")
     public ResponseEntity<Map<String, Object>> getProvidersByCategory(@PathVariable String title) {
@@ -101,10 +103,22 @@ public class DiscoveryController {
                 }
                 item.put("latitude", provLat);
                 item.put("longitude", provLng);
+                if (r.getOwner() != null) {
+                    item.put("ownerId", r.getOwner().getId());
+                }
                 Double dist = (provLat != null && provLng != null) ? haversine(lat, lng, provLat, provLng) : null;
                 item.put("distanceKm", dist);
-                if (dist == null || dist <= radius) {
-                    restaurants.add(item);
+
+                // If a specific low radius is provided (distance filter active), exclude null coordinates
+                if (radius < 50) {
+                    if (dist != null && dist <= radius) {
+                        restaurants.add(item);
+                    }
+                } else {
+                    // Default view: include everyone (null distance at end)
+                    if (dist == null || dist <= radius) {
+                        restaurants.add(item);
+                    }
                 }
             });
             restaurants.sort(Comparator.comparingDouble(m -> {
@@ -133,10 +147,22 @@ public class DiscoveryController {
                 }
                 item.put("latitude", provLat);
                 item.put("longitude", provLng);
+                if (p.getOwner() != null) {
+                    item.put("ownerId", p.getOwner().getId());
+                }
                 Double dist = (provLat != null && provLng != null) ? haversine(lat, lng, provLat, provLng) : null;
                 item.put("distanceKm", dist);
-                if (dist == null || dist <= radius) {
-                    homeFoods.add(item);
+
+                // If a specific low radius is provided (distance filter active), exclude null coordinates
+                if (radius < 50) {
+                    if (dist != null && dist <= radius) {
+                        homeFoods.add(item);
+                    }
+                } else {
+                    // Default view: include everyone (null distance at end)
+                    if (dist == null || dist <= radius) {
+                        homeFoods.add(item);
+                    }
                 }
             });
             homeFoods.sort(Comparator.comparingDouble(m -> {
@@ -145,7 +171,7 @@ public class DiscoveryController {
             }));
 
             List<Map<String, Object>> chefs = new ArrayList<>();
-            chefRepository.findAll().forEach(c -> {
+            chefRepository.findAllWithDetails().forEach(c -> {
                 Map<String, Object> item = new HashMap<>();
                 item.put("id", c.getId());
                 item.put("name", c.getName());
@@ -162,10 +188,22 @@ public class DiscoveryController {
                 }
                 item.put("latitude", provLat);
                 item.put("longitude", provLng);
+                if (c.getOwner() != null) {
+                    item.put("ownerId", c.getOwner().getId());
+                }
                 Double dist = (provLat != null && provLng != null) ? haversine(lat, lng, provLat, provLng) : null;
                 item.put("distanceKm", dist);
-                if (dist == null || dist <= radius) {
-                    chefs.add(item);
+                
+                // If a specific low radius is provided (distance filter active), exclude null coordinates
+                if (radius < 50) {
+                    if (dist != null && dist <= radius) {
+                        chefs.add(item);
+                    }
+                } else {
+                    // Default view: include everyone (null distance at end)
+                    if (dist == null || dist <= radius) {
+                        chefs.add(item);
+                    }
                 }
             });
             chefs.sort(Comparator.comparingDouble(m -> {

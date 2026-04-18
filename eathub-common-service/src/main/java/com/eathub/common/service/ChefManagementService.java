@@ -190,6 +190,12 @@ public class ChefManagementService {
         if (dto.getCountry() != null) {
             address.setCountry(dto.getCountry());
         }
+        if (dto.getLatitude() != null) {
+            address.setLatitude(dto.getLatitude());
+        }
+        if (dto.getLongitude() != null) {
+            address.setLongitude(dto.getLongitude());
+        }
 
         chefAddressRepository.save(address);
         return mapToResponse(chef);
@@ -345,6 +351,9 @@ public class ChefManagementService {
     public ChefResponseDTO mapToResponse(Chef chef) {
         ChefResponseDTO dto = new ChefResponseDTO();
         dto.setId(chef.getId());
+        if (chef.getOwner() != null) {
+            dto.setOwnerId(chef.getOwner().getId());
+        }
         dto.setName(chef.getName());
         dto.setBio(chef.getBio());
         dto.setExperience(chef.getExperience());
@@ -368,6 +377,8 @@ public class ChefManagementService {
             dto.setState(chef.getAddress().getState());
             dto.setPostalCode(chef.getAddress().getPostalCode());
             dto.setCountry(chef.getAddress().getCountry());
+            dto.setLatitude(chef.getAddress().getLatitude());
+            dto.setLongitude(chef.getAddress().getLongitude());
         }
 
         if (chef.getLegalProfile() != null) {

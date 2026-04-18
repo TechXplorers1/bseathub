@@ -31,6 +31,9 @@ public class ChefBooking {
     @Column(name = "event_date")
     private LocalDateTime eventDate;
 
+    @Column(name = "event_time")
+    private String eventTime;
+
     private Integer guests;
 
     @Column(name = "total_amount")

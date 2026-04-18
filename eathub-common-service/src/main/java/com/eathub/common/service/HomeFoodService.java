@@ -111,6 +111,8 @@ public class HomeFoodService {
         if (dto.getState() != null) addr.setState(dto.getState());
         if (dto.getPostalCode() != null) addr.setPostalCode(dto.getPostalCode());
         if (dto.getCountry() != null) addr.setCountry(dto.getCountry());
+        if (dto.getLatitude() != null) addr.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) addr.setLongitude(dto.getLongitude());
 
         addressRepository.save(addr);
         p.setAddress(addr);
@@ -191,6 +193,9 @@ public class HomeFoodService {
     public HomeFoodResponseDTO mapToDTO(HomeFoodProvider p) {
         HomeFoodResponseDTO dto = new HomeFoodResponseDTO();
         dto.setId(p.getId());
+        if (p.getOwner() != null) {
+            dto.setOwnerId(p.getOwner().getId());
+        }
         dto.setName(p.getBrandName());
         dto.setDescription(p.getDescription());
         dto.setFoodType(p.getFoodType());

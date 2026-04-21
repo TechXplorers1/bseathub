@@ -8,6 +8,8 @@ import com.eathub.common.entity.*;
 import com.eathub.common.repository.*;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ public class RestaurantService {
     private final MenuItemRepository menuItemRepository;
 
     // ── Fetch all ──────────────────────────────────────────────────────────
+    @Cacheable(value = "restaurants")
     public List<RestaurantResponseDTO> getAllRestaurants() {
         return restaurantRepository.findAllWithDetails()
                 .stream()
@@ -38,6 +41,7 @@ public class RestaurantService {
     }
 
     // ── Fetch by slug ─────────────────────────────────────────────────────
+    @Cacheable(value = "restaurants", key = "#slug")
     public RestaurantResponseDTO getRestaurantBySlug(String slug) {
         return restaurantRepository.findBySlug(slug)
                 .map(this::mapToResponseDTO)
@@ -61,6 +65,7 @@ public class RestaurantService {
 
     /** SECTION 1: Update Core Profile (Name, Description, Cuisine, Images) */
     @Transactional
+    @CacheEvict(value = "restaurants", allEntries = true)
     public RestaurantResponseDTO updateProfile(String restaurantId, RestaurantProfileUpdateDTO dto) {
         Restaurant r = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
@@ -139,6 +144,7 @@ public class RestaurantService {
 
     /** SECTION 3: Update Legal / Banking (Separate Table) */
     @Transactional
+    @CacheEvict(value = "restaurants", allEntries = true)
     public RestaurantResponseDTO updateLegalProfile(String restaurantId, RestaurantProfileUpdateDTO dto) {
         Restaurant r = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
@@ -179,6 +185,7 @@ public class RestaurantService {
 
     // ── Register (partner onboarding) ─────────────────────────────────────
     @Transactional
+    @CacheEvict(value = "restaurants", allEntries = true)
     public RestaurantResponseDTO registerRestaurant(RestaurantCreateRequestDTO dto) {
         User owner = userRepository.findById(dto.getOwnerId())
                 .orElseGet(() -> {

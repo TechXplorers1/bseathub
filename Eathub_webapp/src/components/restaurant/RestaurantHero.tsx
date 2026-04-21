@@ -39,26 +39,23 @@ export function RestaurantHero({
   }, [finalName]);
 
   return (
-    <div className="relative w-full h-[40vh] min-h-[220px] sm:h-[48vh] ">
-      {!restaurant.coverImageId ? (
-        <div className="absolute inset-0 bg-slate-200 flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center text-slate-400">
-                <ImageIcon className="h-20 w-20 mb-2" />
-                <span className="text-sm font-bold uppercase tracking-widest">No Cover Photo</span>
-            </div>
-        </div>
-      ) : (
+    <div className={cn(
+      "relative w-full sm:h-[48vh]",
+      !restaurant.coverImageId ? "hidden sm:block sm:h-[40vh]" : "h-[25vh] sm:h-[48vh]"
+    )}>
+      {!restaurant.coverImageId ? null : (
         <Image
           src={ coverImage }
           alt={finalName}
           fill
-          className="object-cover "
           priority
+          sizes="100vw"
+          className="object-cover"
         />
       )}
 
       {/* DARK MASK */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/75" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 sm:from-black/55 sm:via-black/45 sm:to-black/75" />
 
       {/* FAVORITE BUTTON */}
       <div className="absolute top-4 right-4 z-20">
@@ -78,9 +75,12 @@ export function RestaurantHero({
       </div>
 
       {/* TEXT OVERLAY */}
-      <div className="absolute inset-0 z-10 flex items-end sm:items-center">
+      <div className={cn(
+        "absolute inset-0 z-10 flex items-end sm:items-center",
+        !restaurant.coverImageId && "hidden sm:flex"
+      )}>
         <div className="w-full px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
-          <div className="max-w-xl space-y-1.5 sm:space-y-2">
+          <div className="max-w-xl space-y-1 sm:space-y-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               {finalName}
             </h1>
@@ -99,17 +99,16 @@ export function RestaurantHero({
         </div>
       </div>
 
-      {!restaurant.imageId ? (
-        <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-slate-100 flex items-center justify-center z-30 shadow-md">
-            <Store className="h-8 w-8 text-slate-400" />
-        </div>
-      ) : (
-        <div className="absolute -bottom-10 left-4 sm:left-6 lg:left-8 h-16 w-16 sm:h-20 sm:w-20 rounded-xl border-4 border-white bg-white overflow-hidden z-30 shadow-md">
+      {!restaurant.imageId ? null : (
+        <div className={cn(
+          "hidden lg:block absolute left-8 h-24 w-24 rounded-2xl border-4 border-white bg-white overflow-hidden z-30 shadow-lg transition-all",
+          !restaurant.coverImageId ? "top-4 sm:-bottom-12" : "-bottom-10"
+        )}>
           <Image
             src={logoImage}
             alt={`${finalName} logo`}
-            width={80}
-            height={80}
+            width={96}
+            height={96}
             className="object-cover"
           />
         </div>

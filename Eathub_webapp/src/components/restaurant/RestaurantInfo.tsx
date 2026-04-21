@@ -30,8 +30,26 @@ export function RestaurantInfo({
   ].filter(Boolean).join(', ');
 
   return (
-    <div className="mt-8">
-      <h1 className="text-4xl font-bold lg:mt-0 tracking-tight">{displayName}</h1>
+    <div className="mt-4 sm:mt-8 px-4 sm:px-0">
+      {/* COMPACT MOBILE HEADER: LOGO + NAME + RATING */}
+      <div className="flex items-center gap-4 mb-3 lg:hidden">
+        {restaurant.imageId && (
+          <div className="h-16 w-16 rounded-xl border border-muted shadow-sm overflow-hidden shrink-0">
+            <img src={restaurant.imageId} alt={displayName} className="h-full w-full object-cover" />
+          </div>
+        )}
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight truncate">{displayName}</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold">
+            <Star className="h-4 w-4 fill-primary text-primary" />
+            <span className="text-foreground">
+              {restaurant.rating?.toFixed ? restaurant.rating.toFixed(1) : restaurant.rating} ({restaurant.reviewsCount || restaurant.reviews || 0})
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <h1 className="hidden lg:block text-4xl font-bold lg:mt-0 tracking-tight">{displayName}</h1>
 
       <div className="mt-6 space-y-3 text-sm">
         <h2 className="text-lg font-semibold sr-only lg:not-sr-only">
@@ -46,7 +64,7 @@ export function RestaurantInfo({
           </div>
         )}
 
-        <div className="flex items-center gap-2 text-muted-foreground font-semibold">
+        <div className="hidden lg:flex items-center gap-2 text-muted-foreground font-semibold">
           <Star className="h-4 w-4 fill-primary text-primary" />
           <span className="text-foreground">
             {restaurant.rating?.toFixed(1) || '0.0'} ({restaurant.reviewsCount || restaurant.reviews || 0})
@@ -88,7 +106,7 @@ export function RestaurantInfo({
         {!isChefPage && (
           <Button
             variant="outline"
-            className="w-full rounded-2xl h-12 border-muted hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all mt-4 font-bold uppercase text-[11px] tracking-[0.15em]"
+            className="w-full rounded-2xl h-10 border-muted hover:border-primary/50 transition-all mt-2 font-bold uppercase text-[10px] tracking-[0.1em]"
             onClick={toggleLocation}
             aria-expanded={showLocation}
           >

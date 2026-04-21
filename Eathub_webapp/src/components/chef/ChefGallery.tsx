@@ -62,12 +62,12 @@ export function ChefGallery() {
         return (
             <div className="py-8">
                 <h2 className="text-2xl font-bold mb-4">Signature Dishes</h2>
-                <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[500px]">
-                    {renderImageWithOverlay(dish1, "col-span-2 row-span-2")}
-                    {renderImageWithOverlay(dish2)}
-                    {renderImageWithOverlay(dish3)}
-                    {renderImageWithOverlay(dish4)}
-                    {renderImageWithOverlay(dish5)}
+                <div className="flex flex-col gap-4 md:grid md:grid-cols-4 md:grid-rows-2 md:h-[500px]">
+                    {renderImageWithOverlay(dish1, "aspect-[16/9] md:aspect-auto md:col-span-2 md:row-span-2")}
+                    {renderImageWithOverlay(dish2, "aspect-[16/9] md:aspect-auto")}
+                    {renderImageWithOverlay(dish3, "aspect-[16/9] md:aspect-auto")}
+                    {renderImageWithOverlay(dish4, "aspect-[16/9] md:aspect-auto")}
+                    {renderImageWithOverlay(dish5, "aspect-[16/9] md:aspect-auto")}
                 </div>
             </div>
         );

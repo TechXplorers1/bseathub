@@ -171,13 +171,13 @@ export function RestaurantDetails({
       <div className="flex flex-col bg-background">
         <style>{scrollStyle}</style>
         <div ref={heroRef as any}><ChefHero restaurant={restaurant} chefName={displayName} /></div>
-        <div className="mx-auto w-full px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className={leftColumnClass}>
+        <div className="mx-auto w-full px-0 sm:px-4 md:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8">
+            <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
               <RestaurantInfo restaurant={restaurant} displayName={displayName} isChefPage={true} />
               <Separator className="my-3" /><MenuNav menuCategories={[]} hasChef={true} />
             </div>
-            <div className={rightColumnClass}>
+            <div className={cn(rightColumnClass, "lg:col-span-8 xl:col-span-9")}>
               <ChefAbout restaurant={restaurant} chefName={displayName} />
               <Separator className="my-5" /><ChefCuisineSpecialties cuisines={[restaurant.cuisine, ...restaurant.categories]} />
               <Separator className="my-5" /><div id="signature-dishes"><ChefGallery /></div>
@@ -194,14 +194,14 @@ export function RestaurantDetails({
     <div className="flex flex-col bg-background">
       <style>{scrollStyle}</style>
       <div ref={heroRef as any}><RestaurantHero restaurant={restaurant} displayName={displayName} /></div>
-      <div className="mx-auto w-full px-4 md:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className={leftColumnClass}>
+      <div className="mx-auto w-full px-0 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8">
+          <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
             <RestaurantInfo restaurant={restaurant} displayName={displayName} />
             <Separator className="my-3" /><MenuNav menuCategories={menuCategories} hasChef={false} />
           </div>
-          <div className={rightColumnClass}>
-            <div ref={searchSectionRef} className="pt-3 pb-2 border-b">
+          <div className={cn(rightColumnClass, "lg:col-span-8 xl:col-span-9")}>
+            <div ref={searchSectionRef} className="pt-3 pb-2 border-b px-4 sm:px-0">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                   <div className="relative w-full sm:max-w-md md:max-w-lg">
@@ -237,12 +237,12 @@ export function RestaurantDetails({
                 )}
               </div>
             </div>
-            <section id="deals-and-discounts" className="mt-4"><DealsAndDiscounts /></section>
+            <section id="deals-and-discounts" className="mt-2 px-4 sm:px-0"><DealsAndDiscounts /></section>
             <Separator className="my-5" />
             {featuredItems.length > 0 && (
               <section id="featured-items"><FeaturedItems items={featuredItems} onItemClick={handleItemClick} /><Separator className="my-5" /></section>
             )}
-            <div className="mt-2 pb-6">
+            <div className="mt-2 pb-6 px-4 sm:px-0">
               {nonEmptyMenu.length === 0 ? (
                 <p className="text-sm text-slate-500 mt-2">Menu coming soon for this restaurant.</p>
               ) : filteredMenu.length === 0 ? (
@@ -261,7 +261,7 @@ export function RestaurantDetails({
                 ))
               )}
             </div>
-            <section id="reviews">
+            <section id="reviews" className="px-4 sm:px-0">
               <ReviewsSection targetId={restaurant.id} type={(restaurant.type?.toLowerCase() === 'home-food' || restaurant.type?.toLowerCase() === 'homefood') ? 'HomeFood' : 'Restaurant'} />
             </section>
             <Separator className="my-5" />

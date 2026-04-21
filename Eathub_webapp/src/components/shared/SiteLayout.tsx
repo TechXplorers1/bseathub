@@ -62,6 +62,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     typeof window !== 'undefined' ? window.innerWidth : 1024
   );
 
+  const HEADER_H = 64;
+  const SIDEBAR_W = isCollapsed ? 80 : 240;
+  const isMdUp = (windowWidth ?? 1024) >= 768;
+
   useEffect(() => {
     const onResize = () => setWindowWidth(window.innerWidth);
     onResize();
@@ -97,55 +101,19 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname?.startsWith(href);
 
-  const OPEN_PCT = 0.18;
-  const COLLAPSED_PCT = 0.07;
-  const sidebarPct = isCollapsed ? COLLAPSED_PCT : OPEN_PCT;
-  const isMdUp = (windowWidth ?? 1024) >= 768;
-  const sidebarPercentClamped = Math.max(Math.min(sidebarPct * 100, 30), 6);
-
-  const HEADER_H = 64;
-  const FOOTER_H = 56;
-  const innerScrollHeight = `calc(100vh - ${HEADER_H}px - ${FOOTER_H}px)`;
-
   const ORANGE = 'hsl(25, 95%, 53%)';
   const HIGHLIGHT_GREEN = 'rgb(29, 125, 125)';
   const DARK_GREEN = '#007575';
   const SIDEBAR_BG = 'var(--sidebar, #fff)';
   const SIDEBAR_BORDER = 'var(--sidebar-border, #e6e6e6)';
 
-  const asideStyle: React.CSSProperties =
-    isMdUp && showSidebar
-      ? {
-        position: 'fixed',
-        top: `${HEADER_H}px`,
-        left: 0,
-        width: `${sidebarPercentClamped}%`,
-        minWidth: isCollapsed ? '60px' : '72px', // Slightly wider min-width for collapsed state
-        maxWidth: '320px',
-        height: innerScrollHeight,
-        overflow: 'hidden',
-        background: SIDEBAR_BG,
-        transition: 'width 200ms ease',
-        boxSizing: 'border-box',
-        zIndex: 40,
-      }
-      : { display: 'none' };
-
-  const innerStyle: React.CSSProperties = {
-    height: '100%',
-    overflowY: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'none',
-  };
-
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="min-h-screen flex">
       <style>{`
         .sidebar-inner { -ms-overflow-style: none; scrollbar-width: none; }
         .sidebar-inner::-webkit-scrollbar { display: none; }
 
         .hub-label { font-weight: 800; color: ${ORANGE}; font-size: 0.95rem; }
-        /* Removed .collapsed-eh class as it's no longer needed */
 
         .sidebar-link { 
           display: inline-flex; 
@@ -186,10 +154,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         .sidebar-collapsed .sidebar-link { 
           justify-content: center; 
           padding: 8px 0; 
-          width: 44px; /* Slightly smaller width for collapsed items */
+          width: 44px; 
           height: 44px; 
           border-radius: 12px;
-          margin: 0 auto; /* Center items horizontally */
+          margin: 0 auto; 
         }
 
         .logout-link, .login-button {
@@ -209,7 +177,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           background: ${SIDEBAR_BORDER};
         }
 
-        /* Updated toggle button styles */
         .toggle-button-container {
            display: flex;
            align-items: center;
@@ -230,50 +197,17 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
         .mobile-sidebar-panel {
           position: fixed;
-          top: ${HEADER_H}px;
+          top: 0;
           left: 0;
-          bottom: ${FOOTER_H}px;
+          bottom: 0;
           width: min(340px, 86%);
-          max-width: 360px;
           background: #ffffff;
-          border-top-right-radius: 14px;
-          border-bottom-right-radius: 14px;
-          box-shadow: 0 12px 30px rgba(0,0,0,0.28);
           z-index: 61;
           display: flex;
           flex-direction: column;
           padding: 12px;
-          transform: translateX(-4px);
-          transition: transform 180ms ease, opacity 180ms ease;
-          overflow: hidden;
+          transition: transform 180ms ease;
         }
-
-        .mobile-sheet-header {
-          display:flex;
-          align-items:center;
-          justify-content:flex-end;
-          padding: 8px;
-          position: sticky;
-          top: 0;
-          background: transparent;
-          color: inherit;
-          border-radius: 6px;
-        }
-
-        .mobile-sidebar-panel .sidebar-menu a {
-          display:flex;
-          gap:14px;
-          align-items:center;
-          padding: 12px;
-          border-radius: 10px;
-          text-decoration:none;
-          color: inherit;
-          font-size: 16px;
-          height: 52px;
-          transition: background .12s;
-        }
-        .mobile-sidebar-panel .sidebar-menu a:hover { background: ${ORANGE}; color: white; }
-        .mobile-sidebar-panel .sidebar-menu a[aria-current="page"] { background: ${ORANGE}; color: white; }
 
         .content-body { will-change: transform, opacity; }
         .content-body.animate { animation: fadeUp .32s ease both; }
@@ -283,302 +217,70 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         }
       `}</style>
 
-      <Header className="fixed top-0 left-0 w-full h-16 bg-white shadow-sm z-50" />
-
-      {showSidebar && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleMobileSidebar}
-          aria-label="Toggle navigation"
-          className="md:hidden"
-          style={{
-            position: 'fixed',
-            top: `${HEADER_H + 8}px`,
-            left: 12,
-            zIndex: 70,
-          }}
-        >
-          <div className="h-4 w-4" style={{ fontSize: 18 }}>
-            ☰
-          </div>
-        </Button>
-      )}
-
-      {showSidebar && (
+      {showSidebar && isMdUp && (
         <aside
-          style={asideStyle}
-          className={cn(isCollapsed && 'sidebar-collapsed')}
+          className={cn("fixed top-0 left-0 h-screen border-r z-40 bg-white transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[240px]")}
           aria-label="Main navigation"
         >
-          <div style={innerStyle} className="sidebar-inner">
-            {/* REDESIGNED SIDEBAR HEADER */}
-            <div
-              className="toggle-button-container"
-              style={{
-                // Center content if collapsed, spread if expanded
-                justifyContent: isCollapsed ? 'center' : 'space-between',
-              }}
-            >
+          <div className="h-full overflow-y-auto sidebar-inner">
+            <div className="toggle-button-container" style={{ justifyContent: isCollapsed ? 'center' : 'space-between' }}>
               {!isCollapsed && <span className="hub-label">Menu</span>}
-
-              <button
-                onClick={toggleCollapse}
-                aria-expanded={!isCollapsed}
-                className="toggle-icon-btn"
-                title={isCollapsed ? 'Expand' : 'Collapse'}
-              >
-                <span className="toggle-icon-visual" aria-hidden>
-                  {isCollapsed ? (
-                    // Hamburger menu when collapsed
-                    <span>≡</span>
-                  ) : (
-                    // Arrow pointing LEFT when open (&lsaquo; is left single arrow)
-                    <span style={{ position: 'relative', top: '-1px' }}>
-                      &lsaquo;
-                    </span>
-                  )}
-                </span>
+              <button onClick={toggleCollapse} className="toggle-icon-btn">
+                <span className="toggle-icon-visual">{isCollapsed ? '≡' : '‹'}</span>
               </button>
             </div>
-
-            <nav
-              aria-label="Sidebar links"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                height: '100%',
-              }}
-            >
-              <ul
-                className="sidebar-list"
-                style={{ flex: isCollapsed ? 'none' : '0 0 auto' }}
-              >
+            <nav className="flex flex-col h-full">
+              <ul className="sidebar-list">
                 {sidebarNav.map((item) => (
                   <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className="sidebar-link"
-                      aria-current={isActive(item.href) ? 'page' : undefined}
-                    >
-                      {/* UPDATED: Icon size decreased to 18 */}
+                    <Link href={item.href} className="sidebar-link" aria-current={isActive(item.href) ? 'page' : undefined}>
                       <item.icon size={18} />
-                      {!isCollapsed && (
-                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
-                          {item.name}
-                        </span>
-                      )}
+                      {!isCollapsed && <span style={{ marginLeft: 6 }}>{item.name}</span>}
                     </Link>
                   </li>
                 ))}
               </ul>
-
-              <div style={{ padding: 8 }}>
-                <SidebarSeparator />
-              </div>
-
-              <ul
-                className="sidebar-list"
-                style={{ marginTop: 8, paddingBottom: 12 }}
-              >
+              <div style={{ padding: 8 }}><SidebarSeparator /></div>
+              <ul className="sidebar-list">
                 {categoriesNav.map((item) => (
                   <li key={item.name}>
-                    <Link href={item.href} className="sidebar-link">
-                      {/* UPDATED: Icon size decreased to 18 */}
-                      <item.icon size={18} />
-                      {!isCollapsed && (
-                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
-                          {item.name}
-                        </span>
-                      )}
-                    </Link>
+                    <Link href={item.href} className="sidebar-link"><item.icon size={18} />{!isCollapsed && <span style={{ marginLeft: 6 }}>{item.name}</span>}</Link>
                   </li>
                 ))}
               </ul>
-
-              <div style={{ marginTop: 'auto', padding: 12 }}>
-                {!isUserLoading &&
-                  (user ? (
-                    <button onClick={handleLogout} className="logout-link">
-                      <LogOut size={18} />
-                      {!isCollapsed && <span>Logout</span>}
-                    </button>
-                  ) : (
-                    <Link href="/login" className="login-button">
-                      <LogIn size={18} />
-                      {!isCollapsed && (
-                        <span style={{ marginLeft: 6, cursor: 'pointer' }}>
-                          Sign In
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-              </div>
             </nav>
           </div>
         </aside>
       )}
 
-      {/* mobile sheet */}
-      {showSidebar && (
-        <>
-          {isMobileSidebarOpen && (
-            <div
-              className="mobile-sidebar-backdrop"
-              onClick={() => setIsMobileSidebarOpen(false)}
-            />
-          )}
-
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="mobile-sidebar-panel md:hidden"
-            style={{
-              transform: isMobileSidebarOpen
-                ? 'translateX(0)'
-                : 'translateX(-110%)',
-              opacity: isMobileSidebarOpen ? 1 : 0,
-              pointerEvents: isMobileSidebarOpen ? 'auto' : 'none',
-            }}
-          >
-            <div className="mobile-sheet-header">
-              <button
-                onClick={() => setIsMobileSidebarOpen(false)}
-                aria-label="Close navigation"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'currentColor',
-                  fontSize: 22,
-                  cursor: 'pointer',
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            <div style={{ padding: 8, overflowY: 'auto' }}>
-              <SidebarMenu className="mt-1">
-                {sidebarNav.map((item) => (
-                  <SidebarMenuItem key={`m-${item.name}`}>
-                    <SidebarMenuButton asChild>
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsMobileSidebarOpen(false)}
-                        aria-current={isActive(item.href) ? 'page' : undefined}
-                        style={{
-                          display: 'flex',
-                          gap: 12,
-                          alignItems: 'center',
-                          padding: '10px 12px',
-                          borderRadius: 10,
-                          textDecoration: 'none',
-                          background: isActive(item.href)
-                            ? HIGHLIGHT_GREEN
-                            : 'transparent',
-                          color: isActive(item.href) ? 'white' : 'inherit',
-                          height: 52,
-                        }}
-                      >
-                        <item.icon size={20} />
-                        <span style={{ fontSize: 16 }}>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-
-              <div style={{ margin: '10px 0' }}>
-                <SidebarSeparator />
-              </div>
-
-              <SidebarMenu>
-                {categoriesNav.map((item) => (
-                  <SidebarMenuItem key={`m-cat-${item.name}`}>
-                    <SidebarMenuButton asChild>
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsMobileSidebarOpen(false)}
-                        style={{
-                          display: 'flex',
-                          gap: 12,
-                          alignItems: 'center',
-                          padding: '10px 12px',
-                          borderRadius: 10,
-                          textDecoration: 'none',
-                          height: 52,
-                        }}
-                      >
-                        <item.icon size={20} />
-                        <span style={{ fontSize: 16 }}>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </div>
-
-            <div style={{ marginTop: 'auto', padding: 12 }}>
-              {!isUserLoading &&
-                (user ? (
-                  <Button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileSidebarOpen(false);
-                    }}
-                    variant="outline"
-                    className="w-full justify-start"
-                    style={{ height: 48 }}
-                  >
-                    <LogOut size={18} className="mr-2" /> Logout
-                  </Button>
-                ) : (
-                  <Button
-                    asChild
-                    className="w-full justify-start"
-                    style={{ height: 48 }}
-                  >
-                    <Link
-                      href="/login"
-                      onClick={() => setIsMobileSidebarOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                      }}
-                    >
-                      <LogIn size={18} /> Sign In
-                    </Link>
-                  </Button>
-                ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* main content */}
-      <main
-        id="main-scroll-container"
-        style={{
-          position: 'fixed',
-          top: `${HEADER_H}px`,
-          right: 0,
-          left: isMdUp && showSidebar ? `${sidebarPercentClamped}%` : 0,
-          height: innerScrollHeight,
-          overflowY: 'auto',
-          boxSizing: 'border-box',
-          transition: 'left 200ms ease',
+      <div 
+        className="flex-1 flex flex-col min-h-screen"
+        style={{ 
+          marginLeft: (isMdUp && showSidebar) ? `${SIDEBAR_W}px` : 0,
+          transition: 'margin-left 0.3s ease'
         }}
       >
-        <div
-          className={`content-body ${contentAnimate ? 'animate' : ''}`}
-          style={{ padding: 16 }}
+        <Header className="fixed top-0 right-0 left-0 z-50 bg-white" />
+        
+        <main
+          id="main-scroll-container"
+          className="flex-1 relative"
+          style={{
+            paddingTop: HEADER_H,
+            minHeight: '100vh'
+          }}
         >
-          {children}
-        </div>
-      </main>
-
-      <Footer />
+          <div
+            className={`content-body ${contentAnimate ? 'animate' : ''}`}
+            style={{ 
+              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : 12) 
+            }}
+          >
+            {children}
+          </div>
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -38,6 +38,7 @@ export function MenuItem({
               alt={item.name}
               fill
               className="object-cover rounded-md"
+              sizes="96px"
             />
             {/* FAVORITE Tucked into Image Corner */}
             <div className="absolute top-1 right-1 z-10 p-1 bg-white/80 rounded-full shadow-sm">

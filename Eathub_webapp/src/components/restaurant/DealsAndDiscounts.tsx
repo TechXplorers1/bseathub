@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 
 export function DealsAndDiscounts() {
     return (
-        <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4" id="Deals & Discounts">Deals & Discounts</h2>
+        <div className="mt-4 sm:mt-8">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3" id="Deals & Discounts">Deals & Discounts</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="flex items-center p-4 gap-4 cursor-pointer hover:bg-gray-50">
                 <Tag className="h-6 w-6 text-primary" />

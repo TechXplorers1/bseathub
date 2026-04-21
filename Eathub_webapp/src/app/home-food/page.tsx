@@ -81,8 +81,8 @@ export default function HomeFoodPage() {
 
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
-      <div className="mb-10">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
+      <div className="mb-6 sm:mb-10">
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">Home Food</h1>
         <p className="text-muted-foreground">Authentic home-cooked meals from passionate chefs</p>
       </div>

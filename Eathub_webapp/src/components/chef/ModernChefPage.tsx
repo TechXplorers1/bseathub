@@ -123,7 +123,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
 
   return (
     <div className="bg-muted/40 flex-grow">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <ModernChefHero restaurant={restaurant} chefName={displayName} activeTab={activeTab} onTabChange={handleTabChange} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
@@ -144,14 +144,14 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
                             <p className="font-bold text-muted-foreground italic">No matching services found for Chef {chefName}.</p>
                         </div>
                     )}
-                    <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/60 bg-white rounded-2xl flex flex-col h-[800px]">
+                    <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/60 bg-white rounded-2xl flex flex-col min-h-[300px] lg:h-[800px]">
                         <CardHeader className="bg-primary/5 border-b border-primary/10 py-5">
                             <CardTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
                                 <span className="w-2 h-8 bg-primary rounded-full" />
                                 Chef's Menu & Services
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-10 scroll-smooth">
+                        <CardContent className="flex-1 overflow-y-auto lg:overflow-y-auto custom-scrollbar p-6 space-y-10 scroll-smooth">
                             {filteredServices.map((category, idx) => (
                                 <div key={category.title} id={category.title} className="space-y-6">
                                     <div className="flex items-center gap-4">

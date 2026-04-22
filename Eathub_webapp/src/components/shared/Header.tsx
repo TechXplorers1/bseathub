@@ -48,9 +48,10 @@ import { AuthSuggestionDialog } from './AuthSuggestionDialog';
 
 interface HeaderProps {
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function Header({ className }: HeaderProps) {
+export function Header({ className, style }: HeaderProps) {
 
   const { itemCount } = useCart();
   const { setLocation } = useLocation();
@@ -320,7 +321,7 @@ export function Header({ className }: HeaderProps) {
   })();
 
   return (
-    <header className={cn("fixed top-0 w-full z-50 border-b bg-background shadow-md", className)}>
+    <header className={cn("fixed top-0 z-50 border-b bg-background shadow-md", className)} style={style}>
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
 
         {/* LOGO & DYNAMIC TITLE */}

@@ -151,13 +151,22 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           transform: none;
         }
 
+        .sidebar-collapsed .sidebar-list {
+          padding: 8px;
+          align-items: center;
+        }
+
         .sidebar-collapsed .sidebar-link { 
           justify-content: center; 
-          padding: 8px 0; 
-          width: 44px; 
-          height: 44px; 
-          border-radius: 12px;
-          margin: 0 auto; 
+          padding: 0; 
+          width: 48px; 
+          height: 48px; 
+          border-radius: 14px;
+          margin: 4px auto; 
+        }
+
+        .sidebar-collapsed .sidebar-link span {
+          display: none;
         }
 
         .logout-link, .login-button {
@@ -219,7 +228,11 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
       {showSidebar && isMdUp && (
         <aside
-          className={cn("fixed top-0 left-0 h-screen border-r z-40 bg-white transition-all duration-300", isCollapsed ? "w-[80px]" : "w-[240px]")}
+          className={cn(
+            "fixed left-0 border-r z-40 bg-white transition-all duration-300 ease-in-out",
+            isCollapsed ? "w-[80px] sidebar-collapsed" : "w-[260px]"
+          )}
+          style={{ top: HEADER_H, height: `calc(100vh - ${HEADER_H}px)` }}
           aria-label="Main navigation"
         >
           <div className="h-full overflow-y-auto sidebar-inner">
@@ -234,8 +247,8 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 {sidebarNav.map((item) => (
                   <li key={item.name}>
                     <Link href={item.href} className="sidebar-link" aria-current={isActive(item.href) ? 'page' : undefined}>
-                      <item.icon size={18} />
-                      {!isCollapsed && <span style={{ marginLeft: 6 }}>{item.name}</span>}
+                      <item.icon size={20} />
+                      {!isCollapsed && <span className="font-medium tracking-tight">{item.name}</span>}
                     </Link>
                   </li>
                 ))}
@@ -244,7 +257,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <ul className="sidebar-list">
                 {categoriesNav.map((item) => (
                   <li key={item.name}>
-                    <Link href={item.href} className="sidebar-link"><item.icon size={18} />{!isCollapsed && <span style={{ marginLeft: 6 }}>{item.name}</span>}</Link>
+                    <Link href={item.href} className="sidebar-link">
+                      <item.icon size={20} />
+                      {!isCollapsed && <span className="font-medium tracking-tight">{item.name}</span>}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -256,11 +272,16 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <div 
         className="flex-1 flex flex-col min-h-screen"
         style={{ 
-          marginLeft: (isMdUp && showSidebar) ? `${SIDEBAR_W}px` : 0,
-          transition: 'margin-left 0.3s ease'
+          marginLeft: (isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
+          transition: 'margin-left 0.3s ease-in-out'
         }}
       >
-        <Header className="fixed top-0 right-0 left-0 z-50 bg-white" />
+        <Header 
+          className="fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300" 
+          style={{ 
+            paddingLeft: (isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0 
+          }}
+        />
         
         <main
           id="main-scroll-container"

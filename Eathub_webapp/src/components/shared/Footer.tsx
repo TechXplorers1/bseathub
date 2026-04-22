@@ -12,14 +12,14 @@ export function Footer() {
         <div className="flex justify-between items-center">
           <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} Eat Hub, Inc. All rights reserved.</p>
           <div className="flex space-x-4">
-            <Link href="#" className="hover:text-primary transition-colors duration-200">
-              <Facebook className="h-6 w-6" />
+            <Link href="https://facebook.com/eathub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors duration-200">
+              <Facebook className="h-5 w-5" />
             </Link>
-            <Link href="#" className="hover:text-primary transition-colors duration-200">
-              <Twitter className="h-6 w-6" />
+            <Link href="https://twitter.com/eathub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors duration-200">
+              <Twitter className="h-5 w-5" />
             </Link>
-            <Link href="#" className="hover:text-primary transition-colors duration-200">
-              <Instagram className="h-6 w-6" />
+            <Link href="https://instagram.com/eathub" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors duration-200">
+              <Instagram className="h-5 w-5" />
             </Link>
           </div>
         </div>

@@ -52,4 +52,5 @@ public class HomeFoodResponseDTO {
     private String idProofType;
     private String idProofNumber;
     private String idProofUrl;
+    private java.util.List<MenuCategoryDTO> menuCategories;
 }

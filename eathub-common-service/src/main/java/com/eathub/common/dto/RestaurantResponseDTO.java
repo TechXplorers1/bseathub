@@ -51,4 +51,5 @@ public class RestaurantResponseDTO {
     private String bankName;
     private String fssaiExpiryDate;
     private String fssaiDocumentUrl;
+    private java.util.List<MenuCategoryDTO> menuCategories;
 }

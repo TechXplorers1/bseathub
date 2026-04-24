@@ -15,6 +15,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, String> 
     @Query("SELECT r FROM Restaurant r LEFT JOIN FETCH r.address LEFT JOIN FETCH r.legalProfile WHERE r.owner.id = :ownerId")
     Optional<Restaurant> findByOwnerId(String ownerId);
 
-    @Query("SELECT r FROM Restaurant r LEFT JOIN FETCH r.address LEFT JOIN FETCH r.legalProfile")
+    @Query("SELECT r FROM Restaurant r LEFT JOIN FETCH r.address LEFT JOIN FETCH r.legalProfile LEFT JOIN FETCH r.menuCategories mc LEFT JOIN FETCH mc.items")
     List<Restaurant> findAllWithDetails();
 }

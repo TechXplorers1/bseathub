@@ -16,6 +16,6 @@ public interface HomeFoodProviderRepository extends JpaRepository<HomeFoodProvid
     @Query("SELECT h FROM HomeFoodProvider h LEFT JOIN FETCH h.address LEFT JOIN FETCH h.legalProfile WHERE h.owner.id = :ownerId")
     Optional<HomeFoodProvider> findByOwnerId(String ownerId);
 
-    @Query("SELECT h FROM HomeFoodProvider h LEFT JOIN FETCH h.address LEFT JOIN FETCH h.legalProfile")
+    @Query("SELECT h FROM HomeFoodProvider h LEFT JOIN FETCH h.address LEFT JOIN FETCH h.legalProfile LEFT JOIN FETCH h.categories mc LEFT JOIN FETCH mc.items")
     List<HomeFoodProvider> findAllWithDetails();
 }

@@ -3,6 +3,7 @@ package com.eathub.common.service;
 import com.eathub.common.dto.HomeFoodProfileUpdateDTO;
 import com.eathub.common.dto.HomeFoodRequestDTO;
 import com.eathub.common.dto.HomeFoodResponseDTO;
+import com.eathub.common.dto.MenuCategoryDTO;
 import com.eathub.common.dto.MenuItemDTO;
 import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.entity.*;
@@ -246,7 +247,21 @@ public class HomeFoodService {
         dto.setSpecialtyDishes(p.getSpecialtyDishes());
         dto.setDeliveryAvailability(p.getDeliveryAvailability());
 
+        if (p.getCategories() != null) {
+            dto.setMenuCategories(p.getCategories().stream()
+                    .map(this::mapCategoryToDTO)
+                    .collect(Collectors.toList()));
+        }
+
         return dto;
+    }
+
+    private MenuCategoryDTO mapCategoryToDTO(MenuCategory cat) {
+        return MenuCategoryDTO.builder()
+                .id(cat.getId())
+                .title(cat.getTitle())
+                .items(cat.getItems() != null ? cat.getItems().stream().map(this::mapMenuItem).collect(Collectors.toList()) : List.of())
+                .build();
     }
 
     private MenuItemDTO mapMenuItem(MenuItem item) {

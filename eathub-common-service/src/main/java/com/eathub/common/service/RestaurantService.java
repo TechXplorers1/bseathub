@@ -4,6 +4,7 @@ import com.eathub.common.dto.MenuItemRequestDTO;
 import com.eathub.common.dto.RestaurantCreateRequestDTO;
 import com.eathub.common.dto.RestaurantProfileUpdateDTO;
 import com.eathub.common.dto.RestaurantResponseDTO;
+import com.eathub.common.dto.MenuCategoryDTO;
 import com.eathub.common.entity.*;
 import com.eathub.common.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -285,7 +286,22 @@ public class RestaurantService {
             }
             dto.setFssaiDocumentUrl(legal.getFssaiDocumentUrl());
         }
+
+        if (r.getMenuCategories() != null) {
+            dto.setMenuCategories(r.getMenuCategories().stream()
+                    .map(this::mapCategoryToDTO)
+                    .collect(Collectors.toList()));
+        }
+
         return dto;
+    }
+
+    private MenuCategoryDTO mapCategoryToDTO(MenuCategory cat) {
+        return MenuCategoryDTO.builder()
+                .id(cat.getId())
+                .title(cat.getTitle())
+                .items(cat.getItems() != null ? cat.getItems().stream().map(this::mapToMenuItemDTO).collect(Collectors.toList()) : List.of())
+                .build();
     }
 
     @Transactional

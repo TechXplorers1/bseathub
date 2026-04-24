@@ -4,6 +4,11 @@ import com.eathub.common.entity.Restaurant;
 import com.eathub.common.entity.HomeFoodProvider;
 import com.eathub.common.entity.MenuItem;
 import com.eathub.common.entity.Chef;
+import com.eathub.common.dto.RestaurantResponseDTO;
+import com.eathub.common.dto.HomeFoodResponseDTO;
+import com.eathub.common.dto.MenuItemDTO;
+import com.eathub.common.service.RestaurantService;
+import com.eathub.common.service.HomeFoodService;
 import com.eathub.common.repository.MenuItemRepository;
 import com.eathub.common.repository.ChefRepository;
 import com.eathub.common.repository.RestaurantRepository;
@@ -18,6 +23,7 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/discovery")
@@ -29,41 +35,68 @@ public class DiscoveryController {
     private final ChefRepository chefRepository;
     private final RestaurantRepository restaurantRepository;
     private final HomeFoodProviderRepository homeFoodRepository;
+    private final RestaurantService restaurantService;
+    private final HomeFoodService homeFoodService;
 
     @GetMapping("/category/{title}")
     public ResponseEntity<Map<String, Object>> getProvidersByCategory(@PathVariable String title) {
         try {
-            List<Restaurant> restaurants = menuItemRepository.findRestaurantsByCategory(title);
-            List<HomeFoodProvider> homeFoods = menuItemRepository.findHomeFoodProvidersByCategory(title);
-            List<MenuItem> items = menuItemRepository.findMenuItemsByCategory(title);
-            List<Chef> chefs = chefRepository.findChefsByCategory(title);
+            String searchTitle = title.trim();
+            List<Restaurant> rawRestaurants = menuItemRepository.findRestaurantsByCategory(searchTitle);
+            List<HomeFoodProvider> rawHomeFoods = menuItemRepository.findHomeFoodProvidersByCategory(searchTitle);
+            List<MenuItem> rawItems = menuItemRepository.findMenuItemsByCategory(searchTitle);
+            List<Chef> rawChefs = chefRepository.findChefsByCategory(searchTitle);
 
-            // Populate provider info for individual items
-            if (items != null) {
-                items.forEach(item -> {
-                    if (item.getRestaurant() != null) {
-                        item.setProviderName(item.getRestaurant().getName());
-                        item.setProviderId(item.getRestaurant().getId());
-                        item.setProviderType("restaurant");
-                        item.setProviderSlug(item.getRestaurant().getSlug());
-                    } else if (item.getHomeFood() != null) {
-                        item.setProviderName(item.getHomeFood().getBrandName());
-                        item.setProviderId(item.getHomeFood().getId());
-                        item.setProviderType("home-food");
-                        item.setProviderSlug(item.getHomeFood().getSlug());
-                    }
-                });
-            }
+            System.out.println("Discovery: " + searchTitle + " -> " + rawItems.size() + " items found");
+
+            // Convert to DTOs to avoid circular dependencies and huge payloads
+            List<RestaurantResponseDTO> restaurants = rawRestaurants.stream()
+                    .map(restaurantService::mapToResponseDTO)
+                    .collect(Collectors.toList());
+
+            List<HomeFoodResponseDTO> homeFoods = rawHomeFoods.stream()
+                    .map(homeFoodService::mapToDTO)
+                    .collect(Collectors.toList());
+
+            List<MenuItemDTO> items = rawItems.stream()
+                    .map(item -> {
+                        MenuItemDTO dto = MenuItemDTO.builder()
+                                .id(item.getId())
+                                .name(item.getName())
+                                .description(item.getDescription())
+                                .price(item.getPrice())
+                                .status(item.getStatus())
+                                .isSpecial(item.getIsSpecial())
+                                .imageId(item.getImageId())
+                                .category(item.getCategory() != null ? item.getCategory().getTitle() : "General")
+                                .build();
+                        
+                        if (item.getRestaurant() != null) {
+                            dto.setProviderName(item.getRestaurant().getName());
+                            dto.setProviderId(item.getRestaurant().getId());
+                            dto.setProviderType("restaurant");
+                            dto.setProviderSlug(item.getRestaurant().getSlug());
+                        } else if (item.getHomeFood() != null) {
+                            dto.setProviderName(item.getHomeFood().getBrandName());
+                            dto.setProviderId(item.getHomeFood().getId());
+                            dto.setProviderType("home-food");
+                            dto.setProviderSlug(item.getHomeFood().getSlug());
+                        }
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
 
             Map<String, Object> response = new HashMap<>();
-            response.put("restaurants", restaurants != null ? restaurants : Collections.emptyList());
-            response.put("homeFoods", homeFoods != null ? homeFoods : Collections.emptyList());
-            response.put("items", items != null ? items : Collections.emptyList());
-            response.put("chefs", chefs != null ? chefs : Collections.emptyList());
+            response.put("restaurants", restaurants);
+            response.put("homeFoods", homeFoods);
+            response.put("items", items);
+            response.put("chefs", rawChefs != null ? rawChefs : Collections.emptyList());
+            response.put("categoryName", searchTitle);
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.err.println("Discovery Error: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

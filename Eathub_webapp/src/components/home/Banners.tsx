@@ -11,9 +11,9 @@ export function Banners() {
   const banner2Image = getDisplayImage('food-16', 'food-3');
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
-      <Card className="overflow-hidden bg-primary text-primary-foreground border-none shadow-xl">
-        <CardContent className="flex items-center justify-between p-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 sm:py-8 px-4 sm:px-0">
+      <Card className="overflow-hidden bg-primary text-primary-foreground border-none shadow-xl w-full max-w-full">
+        <CardContent className="flex items-center justify-between p-5 sm:p-6">
           <div className="space-y-2">
             <h3 className="text-2xl font-bold">
               Enjoy 50% off your first order!

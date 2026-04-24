@@ -57,13 +57,13 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
           const grouped = await fetchGroupedChefServices(restaurant.id);
           if (grouped && Array.isArray(grouped)) {
             setServices(grouped);
-            const flattened = grouped.flatMap(cat => 
-                cat.items.map((item: MenuItemType) => ({
-                    ...item,
-                    vendorSlug: restaurant.slug,
-                    vendorName: restaurant.name,
-                    vendorType: 'restaurant'
-                }))
+            const flattened = grouped.flatMap(cat =>
+              cat.items.map((item: MenuItemType) => ({
+                ...item,
+                vendorSlug: restaurant.slug,
+                vendorName: restaurant.name,
+                vendorType: 'restaurant'
+              }))
             );
             setLocalItems(flattened);
           }
@@ -82,7 +82,7 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   // Scroll to results when searching
   useEffect(() => {
     if (searchQuery && searchSectionRef.current) {
-        searchSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      searchSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [searchQuery]);
 
@@ -95,8 +95,8 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
     return services
       .map(category => ({
         ...category,
-        items: category.items.filter(item => 
-          item.name.toLowerCase().includes(q) || 
+        items: category.items.filter(item =>
+          item.name.toLowerCase().includes(q) ||
           item.description?.toLowerCase().includes(q)
         )
       }))
@@ -122,8 +122,8 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
   };
 
   return (
-    <div className="bg-muted/40 flex-grow">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+    <div className="bg-muted/40 flex-grow min-h-screen">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <ModernChefHero restaurant={restaurant} chefName={displayName} activeTab={activeTab} onTabChange={handleTabChange} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
@@ -132,48 +132,48 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
             <SpecialtiesCard specialty={restaurant.specialty} />
 
             {signatures.length > 0 && (
-                <section id="signature-dishes" ref={signatureRef} className={cn('scroll-mt-28 transition-all duration-300 rounded-xl overflow-hidden', activeTab === 'signature' ? 'ring-2 ring-orange-500 shadow-sm' : '', animatingSection === 'signature' ? 'animate-highlight-pop' : '')}>
-                  <SignatureDishes items={signatures} restaurant={restaurant} />
-                </section>
+              <section id="signature-dishes" ref={signatureRef} className={cn('scroll-mt-28 transition-all duration-300 rounded-xl overflow-hidden', activeTab === 'signature' ? 'ring-2 ring-orange-500 shadow-sm' : '', animatingSection === 'signature' ? 'animate-highlight-pop' : '')}>
+                <SignatureDishes items={signatures} restaurant={restaurant} />
+              </section>
             )}
 
             <div ref={searchSectionRef}>
-                <section ref={servicesRef} className="space-y-4">
-                    {filteredServices.length === 0 && searchQuery && (
-                        <div className="bg-white p-8 rounded-xl text-center shadow-lg border-2 border-dashed border-muted mt-4">
-                            <p className="font-bold text-muted-foreground italic">No matching services found for Chef {chefName}.</p>
+              <section ref={servicesRef} className="space-y-4">
+                {filteredServices.length === 0 && searchQuery && (
+                  <div className="bg-white p-8 rounded-xl text-center shadow-lg border-2 border-dashed border-muted mt-4">
+                    <p className="font-bold text-muted-foreground italic">No matching services found for Chef {chefName}.</p>
+                  </div>
+                )}
+                <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/60 bg-white rounded-2xl flex flex-col min-h-[300px] lg:h-[800px]">
+                  <CardHeader className="bg-primary/5 border-b border-primary/10 py-5">
+                    <CardTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
+                      <span className="w-2 h-8 bg-primary rounded-full" />
+                      Chef's Menu & Services
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 overflow-y-auto lg:overflow-y-auto custom-scrollbar p-6 space-y-10 scroll-smooth">
+                    {filteredServices.map((category, idx) => (
+                      <div key={category.title} id={category.title} className="space-y-6">
+                        <div className="flex items-center gap-4">
+                          <h3 className="text-lg font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">{category.title}</h3>
+                          <div className="h-px bg-muted flex-1" />
                         </div>
-                    )}
-                    <Card className="overflow-hidden border-0 shadow-xl shadow-slate-200/60 bg-white rounded-2xl flex flex-col min-h-[300px] lg:h-[800px]">
-                        <CardHeader className="bg-primary/5 border-b border-primary/10 py-5">
-                            <CardTitle className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
-                                <span className="w-2 h-8 bg-primary rounded-full" />
-                                Chef's Menu & Services
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-1 overflow-y-auto lg:overflow-y-auto custom-scrollbar p-6 space-y-10 scroll-smooth">
-                            {filteredServices.map((category, idx) => (
-                                <div key={category.title} id={category.title} className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <h3 className="text-lg font-black uppercase tracking-widest text-muted-foreground whitespace-nowrap">{category.title}</h3>
-                                        <div className="h-px bg-muted flex-1" />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        {category.items.map((item) => (
-                                            <MenuItem 
-                                                key={item.id} 
-                                                item={item as any} 
-                                                onClick={() => setSelectedItem(item as any)} 
-                                                hideAddButton={true} 
-                                                hidePrice={true}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                </section>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                          {category.items.map((item) => (
+                            <MenuItem
+                              key={item.id}
+                              item={item as any}
+                              onClick={() => setSelectedItem(item as any)}
+                              hideAddButton={true}
+                              hidePrice={true}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </section>
             </div>
           </div>
 
@@ -187,13 +187,13 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
         </div>
       </div>
       {selectedItem && (
-        <MenuItemDialog 
-            item={selectedItem} 
-            restaurant={restaurant} 
-            open={!!selectedItem} 
-            onOpenChange={(open) => !open && setSelectedItem(null)} 
-            hideAddButton={true}
-            hidePrice={true}
+        <MenuItemDialog
+          item={selectedItem}
+          restaurant={restaurant}
+          open={!!selectedItem}
+          onOpenChange={(open) => !open && setSelectedItem(null)}
+          hideAddButton={true}
+          hidePrice={true}
         />
       )}
     </div>

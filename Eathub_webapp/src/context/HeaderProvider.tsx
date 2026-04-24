@@ -15,6 +15,8 @@ interface HeaderContextType {
   setLocalItems: (items: any[] | null) => void;
   isAuthSuggestionOpen: boolean;
   setIsAuthSuggestionOpen: (open: boolean) => void;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (open: boolean) => void;
 }
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
@@ -26,6 +28,7 @@ export function HeaderProvider({ children }: { children: ReactNode }) {
   const [searchPlaceholder, setSearchPlaceholder] = useState('Search food, restaurants, chefs...');
   const [localItems, setLocalItems] = useState<any[] | null>(null);
   const [isAuthSuggestionOpen, setIsAuthSuggestionOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <HeaderContext.Provider 
@@ -35,7 +38,8 @@ export function HeaderProvider({ children }: { children: ReactNode }) {
         searchQuery, setSearchQuery,
         searchPlaceholder, setSearchPlaceholder,
         localItems, setLocalItems,
-        isAuthSuggestionOpen, setIsAuthSuggestionOpen
+        isAuthSuggestionOpen, setIsAuthSuggestionOpen,
+        isSidebarOpen, setIsSidebarOpen
       }}
     >
       {children}

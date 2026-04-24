@@ -8,11 +8,13 @@ import { OffersForYou } from '@/components/home/OffersForYou';
 import { ChefsCarousel } from '@/components/home/ChefsCarousel';
 import { useDistanceFilter } from '@/context/DistanceFilterProvider';
 import { useUser } from '@/firebase/provider';
+import { useDeliveryMode } from '@/context/DeliveryModeProvider';
 import { Loader2, MapPin } from 'lucide-react';
 import type { Restaurant, Chef } from '@/lib/types';
 
 export default function Home() {
   const { restaurants, homeFoods, loading, chefs } = useRestaurants();
+  const { deliveryMode } = useDeliveryMode();
   const { selectedRadius, nearbyData, isFetchingNearby, hasLocation, locationLabel } = useDistanceFilter();
   const { user } = useUser();
   const currentUserId = user?.uid;
@@ -54,7 +56,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col w-full min-w-0">
+    <div className="flex flex-col w-full min-w-0 overflow-x-hidden relative max-w-[100vw]">
       <FilterCategories />
 
       {/* ── Distance filter status banner ──────────────────────────── */}

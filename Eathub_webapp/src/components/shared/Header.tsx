@@ -18,7 +18,8 @@ import {
   Store,
   ChefHat,
   User,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 
 import { Cart } from './Cart';
@@ -55,13 +56,21 @@ export function Header({ className, style }: HeaderProps) {
 
   const { itemCount } = useCart();
   const { setLocation } = useLocation();
-  const { headerTitle, headerPath, searchQuery, setSearchQuery, searchPlaceholder, localItems } = useHeader();
+  const { headerTitle, headerPath, searchQuery, setSearchQuery, searchPlaceholder, localItems, setIsSidebarOpen, isSidebarOpen } = useHeader();
   const { unreadCount } = useNotifications();
   const router = useRouter();
   const pathname = usePathname();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  const isMdUp = windowWidth >= 768;
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Search States
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -322,35 +331,32 @@ export function Header({ className, style }: HeaderProps) {
 
   return (
     <header className={cn("fixed top-0 z-50 border-b bg-background shadow-md", className)} style={style}>
-      <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto gap-2">
+      <div className="flex h-16 items-center justify-between w-full px-2 sm:px-4 gap-2">
 
-        {/* LOGO & DYNAMIC TITLE */}
-        <div className="flex items-center gap-2 shrink-0 overflow-hidden max-w-[180px] md:max-w-[300px] lg:max-w-none">
-          {headerTitle ? (
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                if (headerPath) router.push(headerPath);
-              }}
-              className="flex items-center space-x-2 group hover:opacity-80 transition-all duration-300"
+        {/* LOGO AREA */}
+        <div className="flex items-center gap-1 shrink-0 -ml-1 sm:-ml-2">
+          {!isMdUp && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-10 w-10 flex-shrink-0"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
-              <Flame className="h-8 w-8 text-primary shrink-0" />
-              <span className="text-xl font-bold text-primary truncate">{headerTitle}</span>
-            </button>
-          ) : (
-            <Link href="/" className="flex items-center space-x-2">
-              <Flame className="h-8 w-8 text-primary" />
-              <span className="hidden md:inline text-xl font-bold text-primary">Eat Hub</span>
-            </Link>
+              <Menu className="h-6 w-6 text-foreground" />
+            </Button>
           )}
+          <Link href="/" className="flex items-center space-x-1 hover:opacity-80 transition-opacity ml-1">
+            <Flame className="h-6 w-6 text-primary shrink-0" />
+            <span className="hidden sm:inline text-lg font-bold text-primary">Eat Hub</span>
+          </Link>
         </div>
 
-        {/* SEARCH BAR */}
-        <div className="flex-1 relative max-w-md ml-4" ref={searchRef}>
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        {/* SEARCH BAR - THE CENTERPIECE */}
+        <div className="flex-1 min-w-0 relative mx-1.5 sm:mx-4" ref={searchRef}>
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={searchPlaceholder}
-            className="pl-10 rounded-full bg-muted/50 border-none focus-visible:ring-2 focus-visible:ring-primary/20"
+            placeholder={windowWidth < 400 ? "Search..." : "Search for food, chefs..."}
+            className="pl-8 h-9 sm:h-10 rounded-full bg-muted/60 border-none text-[12px] sm:text-sm focus-visible:ring-1 focus-visible:ring-primary/30 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
@@ -456,13 +462,13 @@ export function Header({ className, style }: HeaderProps) {
         </div>
 
         {/* RIGHT NAV */}
-        <nav className="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-2">
+        <nav className="flex items-center space-x-1 shrink-0">
           <Sheet open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10">
-                <Bell className="h-6 w-6" />
+              <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9 sm:h-12 sm:w-12">
+                <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
                 {unreadCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] rounded-full animate-in zoom-in border-2 border-background">
+                  <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center p-0 text-[8px] sm:text-[10px] rounded-full">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </Badge>
                 )}
@@ -475,8 +481,9 @@ export function Header({ className, style }: HeaderProps) {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative rounded-full h-10 w-10"><ShoppingCart className="h-6 w-6" />
-                {itemCount > 0 && <Badge className="absolute -top-0.5 -right-0.5 px-1.5 py-0.5 text-[10px] rounded-full">{itemCount}</Badge>}
+              <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9 sm:h-12 sm:w-12">
+                <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
+                {itemCount > 0 && <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center p-0 text-[8px] sm:text-[10px] rounded-full">{itemCount}</Badge>}
               </Button>
             </SheetTrigger>
             <SheetContent className="p-0 sm:max-w-lg w-[90vw] md:w-[500px]">
@@ -485,24 +492,24 @@ export function Header({ className, style }: HeaderProps) {
           </Sheet>
 
           {isLoading ? (
-            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-9 w-9 sm:h-12 sm:w-12 rounded-full" />
           ) : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 w-10 rounded-full p-0 border border-border overflow-hidden ring-2 ring-primary/10 hover:ring-primary/30 transition-all">
+                <Button variant="ghost" className="h-9 w-9 sm:h-12 sm:w-12 rounded-full p-0 border border-border overflow-hidden transition-all hover:ring-2 hover:ring-primary/20">
                   <Avatar className="h-full w-full object-cover">
                     {(chefData?.avatarUrl || auth.avatarUrl) ? (
                       <AvatarImage src={chefData?.avatarUrl || auth.avatarUrl || undefined} alt={chefData?.name || auth.email || ''} className="object-cover" />
                     ) : null}
-                    <AvatarFallback className="bg-primary text-primary-foreground text-sm flex items-center justify-center">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs sm:text-sm flex items-center justify-center font-bold">
                       {(auth.name || auth.email || 'U')[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-xl p-1">
+              <DropdownMenuContent align="end" className="w-52 rounded-xl shadow-xl p-1">
                 <DropdownMenuLabel className="font-normal p-3">
-                  <div className="flex flex-col space-y-1.5 max-w-[200px]">
+                  <div className="flex flex-col space-y-1.5 max-w-[180px]">
                     <p className="text-sm font-extrabold leading-tight text-foreground line-clamp-2">{auth.name || auth.email}</p>
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary/80">{auth.role}</p>
                   </div>
@@ -520,7 +527,7 @@ export function Header({ className, style }: HeaderProps) {
                       <DropdownMenuItem asChild>
                         <Link href="/profile" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
                           <User className="mr-3 h-4 w-4 text-blue-500" />
-                          Profile Settings
+                          Account
                         </Link>
                       </DropdownMenuItem>
                     )}
@@ -530,7 +537,7 @@ export function Header({ className, style }: HeaderProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="outline" size="sm" asChild className="rounded-full px-5 h-10 font-bold"><Link href="/login">Sign In</Link></Button>
+            <Button variant="outline" size="sm" asChild className="rounded-full px-3 sm:px-5 h-8 sm:h-10 text-[10px] sm:text-xs font-bold leading-none"><Link href="/login">Sign In</Link></Button>
           )}
         </nav>
       </div>

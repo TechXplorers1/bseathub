@@ -13,11 +13,14 @@ import {
   ChefHat,
   LogOut,
   LogIn,
+  Menu,
 } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { useUser } from '@/firebase';
 import { usePathname } from 'next/navigation';
+import { useHeader } from '@/context/HeaderProvider';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import {
   Sidebar as MobileSidebar,
   SidebarContent,
@@ -41,22 +44,26 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isRestaurantsList = pathname === '/restaurants';
   const isHomeFoodList = pathname === '/home-food';
   const isChefsList = pathname === '/chefs';
+  const isFavorites = pathname === '/favorites';
 
   // where to HIDE sidebar (individual detail pages)
   const isRestaurantDetail = pathname?.startsWith('/restaurant/');
   const isHomeFoodDetail = pathname?.startsWith('/home-food/');
 
   // final rule:
-  // - show on home, category, restaurants list, home-food list, chefs list
+  // - show on home, category, restaurants list, home-food list, chefs list, favorites
   // - hide on individual restaurant + home food pages
   const showSidebar =
-    (isHome || isCategory || isRestaurantsList || isHomeFoodList || isChefsList) &&
+    (isHome || isCategory || isRestaurantsList || isHomeFoodList || isChefsList || isFavorites) &&
     !isRestaurantDetail &&
     !isHomeFoodDetail;
 
+  const { isSidebarOpen: isMobileSidebarOpen, setIsSidebarOpen: setIsMobileSidebarOpen } = useHeader();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [contentAnimate, setContentAnimate] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [showMenuTrigger, setShowMenuTrigger] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   const [windowWidth, setWindowWidth] = useState<number>(() =>
     typeof window !== 'undefined' ? window.innerWidth : 1024
@@ -67,11 +74,37 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isMdUp = (windowWidth ?? 1024) >= 768;
 
   useEffect(() => {
+    setIsMounted(true);
     const onResize = () => setWindowWidth(window.innerWidth);
     onResize();
+
+    // Show for 4s on mount, then auto-hide
+    const initialTimer = setTimeout(() => {
+      setShowMenuTrigger(false);
+    }, 4000);
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Reveal on scroll-up, hide on scroll-down (after some threshold)
+      if (currentScrollY < lastScrollY) {
+        setShowMenuTrigger(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        setShowMenuTrigger(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(initialTimer);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     setContentAnimate(true);
@@ -80,7 +113,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   }, [pathname, isMobileSidebarOpen]);
 
   const toggleCollapse = () => setIsCollapsed((p) => !p);
-  const toggleMobileSidebar = () => setIsMobileSidebarOpen((p) => !p);
+  const toggleMobileSidebar = () => setIsMobileSidebarOpen(!isMobileSidebarOpen);
 
   const handleLogout = async () => {
     const { signOut } = await import('@/firebase');
@@ -226,7 +259,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         }
       `}</style>
 
-      {showSidebar && isMdUp && (
+      {isMounted && showSidebar && isMdUp && (
         <aside
           className={cn(
             "fixed left-0 border-r z-40 bg-white transition-all duration-300 ease-in-out",
@@ -272,16 +305,18 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       <div 
         className="flex-1 flex flex-col min-h-screen"
         style={{ 
-          marginLeft: (isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
+          marginLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
           transition: 'margin-left 0.3s ease-in-out'
         }}
       >
         <Header 
           className="fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300" 
           style={{ 
-            paddingLeft: (isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0 
+            paddingLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0 
           }}
         />
+
+        {/* Mobile Hamburger Menu moved to Header */}
         
         <main
           id="main-scroll-container"
@@ -294,12 +329,40 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
           <div
             className={`content-body ${contentAnimate ? 'animate' : ''}`}
             style={{ 
-              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : 12) 
+              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : (isMounted ? 8 : 12)) 
             }}
           >
             {children}
           </div>
         </main>
+
+        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-[280px]">
+            <div className="flex flex-col h-full bg-white">
+              <div className="p-6 border-b">
+                <span className="hub-label">Eat Hub Menu</span>
+              </div>
+              <nav className="flex-1 overflow-y-auto p-4">
+                <ul className="sidebar-list">
+                  {sidebarNav.map((item) => (
+                    <li key={item.name}>
+                      <Link 
+                        href={item.href} 
+                        className="sidebar-link" 
+                        onClick={() => setIsMobileSidebarOpen(false)}
+                        aria-current={isActive(item.href) ? 'page' : undefined}
+                      >
+                        <item.icon size={20} />
+                        <span className="font-bold">{item.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </div>
+          </SheetContent>
+        </Sheet>
+        
         <Footer />
       </div>
     </div>

@@ -138,15 +138,13 @@ export function OffersForYou() {
     scrollRef.current?.scrollBy({ left: dir === 'left' ? -240 : 240, behavior: 'smooth' });
 
   return (
-    <section className="mb-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Offers For You</h2>
+    <section className="mb-6 overflow-hidden px-4 sm:px-0">
+      <h2 className="text-xl font-bold text-gray-800 mb-4 px-1">Offers For You</h2>
 
       <div className="relative group/scroll">
-        {/* Scroll container */}
         <div
           ref={scrollRef}
-          className="flex gap-5 overflow-x-auto pb-2 scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex flex-nowrap items-center gap-5 overflow-x-auto pb-4 no-scrollbar scroll-smooth"
         >
           {OFFERS.map((offer) => (
             <OfferPill key={offer.id} offer={offer} />

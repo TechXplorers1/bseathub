@@ -18,7 +18,7 @@ export function ChefsCarousel({ filteredChefs }: ChefsCarouselProps) {
 
   if (providerLoading) {
     return (
-      <div className="py-8">
+      <div className="py-4 sm:py-8">
         <div className="flex justify-between items-center mb-4">
           <Skeleton className="h-8 w-48 bg-muted" />
         </div>
@@ -40,7 +40,7 @@ export function ChefsCarousel({ filteredChefs }: ChefsCarouselProps) {
   if (displayChefs.length === 0) {
     if (isFiltered) {
       return (
-        <div className="py-8">
+        <div className="py-4 sm:py-8">
           <h2 className="text-2xl font-bold mb-3">{title}</h2>
           <p className="text-muted-foreground text-sm">No chefs found within this distance.</p>
         </div>
@@ -53,7 +53,7 @@ export function ChefsCarousel({ filteredChefs }: ChefsCarouselProps) {
   const visibleChefs = displayChefs.slice(0, INITIAL_VISIBLE_COUNT);
 
   return (
-    <div className="py-8">
+    <div className="py-4 sm:py-8">
       <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
         <h2 className="text-2xl font-bold">{title}</h2>
         <Link href="/chefs" className={cn(buttonVariants({ variant: 'ghost' }))}>

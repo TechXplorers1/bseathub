@@ -7,10 +7,10 @@ import type { Restaurant } from '@/lib/types';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
-export function RestaurantHero({ 
-  restaurant, 
-  displayName 
-}: { 
+export function RestaurantHero({
+  restaurant,
+  displayName
+}: {
   restaurant: Restaurant;
   displayName?: string;
 }) {
@@ -40,12 +40,12 @@ export function RestaurantHero({
 
   return (
     <div className={cn(
-      "relative w-full sm:h-[48vh]",
-      !restaurant.coverImageId ? "hidden sm:block sm:h-[40vh]" : "h-[25vh] sm:h-[48vh]"
+      "relative w-full",
+      "h-[25vh] sm:h-[40vh]"
     )}>
       {!restaurant.coverImageId ? null : (
         <Image
-          src={ coverImage }
+          src={coverImage}
           alt={finalName}
           fill
           priority
@@ -101,15 +101,14 @@ export function RestaurantHero({
 
       {!restaurant.imageId ? null : (
         <div className={cn(
-          "hidden lg:block absolute left-8 h-24 w-24 rounded-2xl border-4 border-white bg-white overflow-hidden z-30 shadow-lg transition-all",
-          !restaurant.coverImageId ? "top-4 sm:-bottom-12" : "-bottom-10"
+          "absolute left-4 sm:left-8 h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-white bg-white overflow-hidden z-30 shadow-lg bottom-0 translate-y-1/2"
         )}>
           <Image
             src={logoImage}
             alt={`${finalName} logo`}
             width={96}
             height={96}
-            className="object-cover"
+            className="object-cover h-full w-full"
           />
         </div>
       )}

@@ -1,5 +1,3 @@
-// components/home/FilterCategories.tsx (or wherever it's located)
-
 'use client';
 
 import * as React from 'react';
@@ -25,7 +23,8 @@ import {
   ChevronDown,
   Heart,
   MapPin,
-  Navigation
+  Navigation,
+  Utensils
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -40,6 +39,7 @@ import {
 import { useRatingFilter } from '@/context/RatingFilterProvider';
 import { useDistanceFilter, DISTANCE_OPTIONS } from '@/context/DistanceFilterProvider';
 import { useLocation } from '@/context/LocationProvider';
+import { useRestaurants } from '@/context/RestaurantProvider';
 
 const mainCategories = [
   { name: 'Breakfast', icon: Sunrise },
@@ -61,9 +61,9 @@ const mainCategories = [
 
 const filterButtons = [{ name: 'Eat Hub', icon: Check }];
 
-interface FilterCategoriesProps {}
+interface FilterCategoriesProps { }
 
-export function FilterCategories({}: FilterCategoriesProps) {
+export function FilterCategories({ }: FilterCategoriesProps) {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   const [showLeftButton, setShowLeftButton] = React.useState(false);
   const [showRightButton, setShowRightButton] = React.useState(true);
@@ -110,180 +110,84 @@ export function FilterCategories({}: FilterCategoriesProps) {
   ];
 
   return (
-    <div className="py-8">
+    <div className="py-3 sm:py-6 overflow-hidden">
       {/* Category pills (horizontal scroll) */}
-      <div className="relative group">
+      <div className="relative group mb-1">
         <div
           ref={scrollContainerRef}
-          className="flex justify-start space-x-6 overflow-x-auto pb-4 scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex flex-nowrap items-center gap-x-6 sm:gap-x-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth"
         >
           {mainCategories.map((category) => (
             <Link
               key={category.name}
               href={`/category/${encodeURIComponent(category.name)}`}
-              className="flex flex-col items-center space-y-2 cursor-pointer group/item flex-shrink-0"
+              className="flex flex-col items-center space-y-1.5 cursor-pointer group/item shrink-0"
             >
-              <div className="p-3 bg-gray-100 rounded-full group-hover/item:bg-primary/10 transition-colors">
-                <category.icon className="h-7 w-7 text-gray-700 group-hover/item:text-primary" />
+              <div className="p-2 sm:p-3 bg-gray-100 rounded-full group-hover/item:bg-primary/10 transition-colors">
+                <category.icon className="h-6 w-6 sm:h-8 sm:w-8 text-gray-700 group-hover/item:text-primary" />
               </div>
-              <p className="text-sm font-medium text-gray-700 group-hover/item:text-primary">
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-tight text-gray-700 group-hover/item:text-primary">
                 {category.name}
               </p>
             </Link>
           ))}
         </div>
-
-        {/* left/right scroll buttons */}
-        <Button
-          variant="outline"
-          size="icon"
-          className={cn(
-            'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full h-8 w-8 bg-white shadow-md hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity',
-            !showLeftButton && 'hidden'
-          )}
-          onClick={() => scroll('left')}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
-
-        <Button
-          variant="outline"
-          size="icon"
-          className={cn(
-            'absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded-full h-8 w-8 bg-white shadow-md hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity',
-            !showRightButton && 'hidden'
-          )}
-          onClick={() => scroll('right')}
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
       </div>
 
-      {/* delivery / rating / extra filter buttons */}
-      <div className="flex justify-start items-center space-x-2 overflow-x-auto pt-4">
-        <div className="flex bg-gray-100 rounded-full p-1 mr-2">
-          <Button
-            variant={deliveryMode === 'all' ? 'default' : 'ghost'}
-            className="rounded-full flex-shrink-0 text-sm h-9"
-            onClick={() => setDeliveryMode('all')}
-          >
-            All
-          </Button>
-          <Button
-            variant={deliveryMode === 'delivery' ? 'default' : 'ghost'}
-            className="rounded-full flex-shrink-0 text-sm h-9"
-            onClick={() => setDeliveryMode('delivery')}
-          >
-            Delivery
-          </Button>
-          <Button
-            variant={deliveryMode === 'pickup' ? 'default' : 'ghost'}
-            className="rounded-full flex-shrink-0 text-sm h-9"
-            onClick={() => setDeliveryMode('pickup')}
-          >
-            Pickup
-          </Button>
+      <div className="flex flex-nowrap items-center gap-3 pt-2 overflow-x-auto no-scrollbar">
+        {/* Delivery Modes */}
+        <div className="flex bg-gray-100 rounded-full p-1 shrink-0">
+          <Button variant={deliveryMode === 'all' ? 'default' : 'ghost'} size="sm" className="rounded-full h-8 text-[11px] px-3 font-bold shrink-0" onClick={() => setDeliveryMode('all')}>All</Button>
+          <Button variant={deliveryMode === 'delivery' ? 'default' : 'ghost'} size="sm" className="rounded-full h-8 text-[11px] px-3 font-bold shrink-0" onClick={() => setDeliveryMode('delivery')}>Delivery</Button>
+          <Button variant={deliveryMode === 'pickup' ? 'default' : 'ghost'} size="sm" className="rounded-full h-8 text-[11px] px-3 font-bold shrink-0" onClick={() => setDeliveryMode('pickup')}>Pickup</Button>
         </div>
 
+        {/* Rating */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="rounded-full flex-shrink-0">
-              <Star className="mr-2 h-4 w-4" />
-              {ratingFilter > 0
-                ? ratingOptions.find((o) => o.value === ratingFilter)?.label
-                : 'Rating'}
-              <ChevronDown className="ml-2 h-4 w-4" />
+            <Button variant="outline" size="sm" className="rounded-full h-10 px-4 text-[12px] whitespace-nowrap bg-white border-gray-200 font-extrabold shadow-sm shrink-0">
+              <Star className="mr-1.5 h-4 w-4 text-yellow-500 fill-yellow-500" />
+              {ratingFilter > 0 ? ratingOptions.find((o) => o.value === ratingFilter)?.label : 'Rating'}
+              <ChevronDown className="ml-1.5 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {ratingOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onSelect={() => setRatingFilter(option.value)}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
+          <DropdownMenuContent><div className="p-1">{ratingOptions.map((opt) => (<DropdownMenuItem key={opt.value} className="text-sm font-bold" onSelect={() => setRatingFilter(opt.value)}>{opt.label}</DropdownMenuItem>))}</div></DropdownMenuContent>
         </DropdownMenu>
 
-        <Link href="/favorites">
-          <Button
-            variant="outline"
-            className={cn(
-              "rounded-full flex-shrink-0 transition-all font-bold group",
-              pathname === '/favorites'
-                ? "bg-red-500 text-white border-red-500 hover:bg-red-600 shadow-md"
-                : "hover:bg-red-50 hover:text-red-600 hover:border-red-200 active:bg-red-100 active:scale-95 text-gray-700"
-            )}
-          >
-            <Heart className={cn("mr-2 h-4 w-4 transition-colors", pathname === '/favorites' ? "fill-white text-white" : "text-red-500 group-hover:text-red-600")} />
-            Favourites
+        <Link href="/favorites" className="shrink-0">
+          <Button variant="outline" size="sm" className={cn("rounded-full h-10 px-4 text-[12px] font-extrabold shadow-sm w-full", pathname === '/favorites' ? "bg-red-500 text-white border-red-500" : "bg-white border-gray-200")}>
+            <Heart className={cn("mr-1.5 h-4 w-4", pathname === '/favorites' ? "fill-white" : "text-red-500")} /> Favourites
           </Button>
         </Link>
 
-        {filterButtons.map((button) => (
-          <Button
-            key={button.name}
-            variant="outline"
-            className="rounded-full flex-shrink-0"
-          >
-            {button.icon && <button.icon className="mr-2 h-4 w-4" />}
-            {button.name}
-          </Button>
-        ))}
-
-        <Link href="/nearby">
-          <Button
-            variant="outline"
-            className="rounded-full flex-shrink-0 bg-primary/5 border-primary/20 text-primary hover:bg-primary/10 transition-colors"
-          >
-            <Navigation className="mr-2 h-4 w-4" />
-            View on Map
-          </Button>
+        <Link href="/nearby" className="shrink-0">
+          <Button variant="outline" size="sm" className="rounded-full h-10 px-4 text-[12px] whitespace-nowrap bg-primary/5 text-primary border-primary/20 font-extrabold shadow-sm w-full"><Navigation className="mr-1.5 h-4 w-4" /> View in map</Button>
         </Link>
       </div>
-      {/* ── Distance filter tabs ──────────────────────────────────────── */}
-      <div className="flex items-center gap-2 pt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-        <div className="flex items-center shrink-0 mr-1">
+
+      {/* Row 3: Distance Tabs (Horizontal Scroll) */}
+      <div className="flex flex-nowrap items-center gap-3 pt-3 overflow-x-auto no-scrollbar">
+        {/* Radius Info */}
+        <div className="flex items-center bg-primary/5 rounded-full h-10 px-4 shrink-0 border border-primary/20 shadow-sm">
           <MapPin className="h-4 w-4 text-primary shrink-0" />
-          {(isLocating || isFetchingNearby) && (
-            <span className="ml-1.5 text-xs text-muted-foreground animate-pulse">
-              {isLocating ? 'Detecting…' : 'Filtering…'}
-            </span>
-          )}
-          {!hasLocation && !isLocating && (
-            <button
-              onClick={requestLocation}
-              className="ml-1.5 text-xs text-primary underline underline-offset-2 hover:no-underline font-medium"
-            >
-              Enable location
-            </button>
-          )}
+          <span className="ml-2 text-[11px] text-primary font-black uppercase tracking-widest">
+            {selectedRadius ? `${selectedRadius / 1000}km` : 'Nearby'}
+          </span>
         </div>
 
-        <div className="flex gap-1.5 items-center flex-nowrap">
-          {DISTANCE_OPTIONS.map(opt => (
-            <button
-              key={opt.label}
-              onClick={() => {
-                if (opt.value !== null && !hasLocation) {
-                  requestLocation();
-                }
-                setSelectedRadius(opt.value);
-              }}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border shrink-0',
-                selectedRadius === opt.value
-                  ? 'bg-primary text-white border-primary shadow-sm'
-                  : 'bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        {/* Radius Options */}
+        {DISTANCE_OPTIONS.map(opt => (
+          <button
+            key={opt.label}
+            onClick={() => { if (opt.value !== null && !hasLocation) requestLocation(); setSelectedRadius(opt.value); }}
+            className={cn(
+              'h-10 px-5 rounded-full text-[12px] font-extrabold whitespace-nowrap transition-all border shrink-0 shadow-sm',
+              selectedRadius === opt.value ? 'bg-primary text-white border-primary' : 'bg-white text-muted-foreground border-gray-100'
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
     </div>
   );

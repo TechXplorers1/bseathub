@@ -43,8 +43,8 @@ export function RestaurantCarousel({
   if (visibleRestaurants.length === 0) return null;
 
   return (
-    <div className="py-8">
-      <div className="flex justify-between items-center mb-4">
+    <div className="py-4 sm:py-8 px-4 sm:px-0">
+      <div className="flex justify-between items-center mb-4 px-1">
         <h2 className="text-2xl font-bold">{title}</h2>
         {href && (
           <Link href={href} className={cn(buttonVariants({ variant: 'ghost' }))}>

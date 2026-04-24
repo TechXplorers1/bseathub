@@ -79,7 +79,7 @@ export default function RestaurantsPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
       <div className="mb-6 sm:mb-10">
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">All Restaurants</h1>
         <p className="text-muted-foreground">Discover the best places to eat around you</p>

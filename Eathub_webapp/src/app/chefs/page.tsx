@@ -18,7 +18,7 @@ export default function ChefsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
         <Skeleton className="h-10 w-64 mb-6 sm:mb-10" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {[1,2,3,4,5,6,7,8].map(i => <ChefCardSkeleton key={i} />)}
@@ -48,7 +48,7 @@ export default function ChefsPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6 sm:mb-10">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight mb-2">Book a Private Chef</h1>

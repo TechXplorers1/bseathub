@@ -82,12 +82,12 @@ export function RestaurantDetails({
           const grouped = await fetchGroupedMenu(restaurant.id, providerType as any);
           if (grouped && Array.isArray(grouped)) {
             setMenu(grouped);
-            const flattened = grouped.flatMap((cat: any) => 
-              cat.items.map((item: any) => ({ 
-                ...item, 
-                vendorSlug: restaurant.slug, 
-                vendorName: restaurant.name, 
-                vendorType: restaurant.type 
+            const flattened = grouped.flatMap((cat: any) =>
+              cat.items.map((item: any) => ({
+                ...item,
+                vendorSlug: restaurant.slug,
+                vendorName: restaurant.name,
+                vendorType: restaurant.type
               }))
             );
             setLocalItems(flattened);
@@ -107,7 +107,7 @@ export function RestaurantDetails({
   // Scroll to results when searching in header
   React.useEffect(() => {
     if (searchQuery && searchSectionRef.current) {
-        searchSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      searchSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [searchQuery]);
 
@@ -139,8 +139,8 @@ export function RestaurantDetails({
     return byCategory
       .map((category) => ({
         ...category,
-        items: category.items.filter((item) => 
-          item.name?.toLowerCase().includes(term) || 
+        items: category.items.filter((item) =>
+          item.name?.toLowerCase().includes(term) ||
           item.description?.toLowerCase().includes(term)
         ),
       }))
@@ -155,24 +155,25 @@ export function RestaurantDetails({
   const leftColumnClass = cn(
     'lg:col-span-1 lg:pr-4',
     heroOutOfView
-      ? 'lg:border-r lg:sticky lg:top-24 self-start h-[calc(100vh-7rem)] overflow-y-auto pr-1 no-scrollbar'
-      : 'pr-1'
+      ? 'lg:border-r lg:sticky lg:top-24 self-start'
+      : ''
   );
 
   const rightColumnClass = cn(
-    'lg:col-span-4 lg:pr-1',
-    heroOutOfView ? 'lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto no-scrollbar' : ''
+    'lg:col-span-8 xl:col-span-9'
   );
 
   const scrollStyle = `.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`;
 
   if (chefName) {
     return (
-      <div className="flex flex-col bg-background">
+      <div className="flex flex-col bg-background relative w-full">
         <style>{scrollStyle}</style>
-        <div ref={heroRef as any}><ChefHero restaurant={restaurant} chefName={displayName} /></div>
-        <div className="mx-auto w-full px-0 sm:px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8">
+        <div ref={heroRef as any} className="w-full relative">
+          <ChefHero restaurant={restaurant} chefName={displayName} />
+        </div>
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 lg:pt-6">
             <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
               <RestaurantInfo restaurant={restaurant} displayName={displayName} isChefPage={true} />
               <Separator className="my-3" /><MenuNav menuCategories={[]} hasChef={true} />
@@ -191,11 +192,13 @@ export function RestaurantDetails({
   }
 
   return (
-    <div className="flex flex-col bg-background">
+    <div className="flex flex-col bg-background min-h-screen w-full relative">
       <style>{scrollStyle}</style>
-      <div ref={heroRef as any}><RestaurantHero restaurant={restaurant} displayName={displayName} /></div>
-      <div className="mx-auto w-full px-0 sm:px-4 md:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8">
+      <div ref={heroRef as any} className="w-full relative">
+        <RestaurantHero restaurant={restaurant} displayName={displayName} />
+      </div>
+      <div className="w-full max-w-none px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 lg:pt-6">
           <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
             <RestaurantInfo restaurant={restaurant} displayName={displayName} />
             <Separator className="my-3" /><MenuNav menuCategories={menuCategories} hasChef={false} />
@@ -210,8 +213,8 @@ export function RestaurantDetails({
                       placeholder={`Search ${restaurant.name}`}
                       value={searchQuery || searchTerm}
                       onChange={(e) => {
-                          if (searchQuery) { /* Read only if header is active */ }
-                          else setSearchTerm(e.target.value);
+                        if (searchQuery) { /* Read only if header is active */ }
+                        else setSearchTerm(e.target.value);
                       }}
                       className="pl-9 rounded-full bg-gray-50 border border-gray-200 text-black placeholder:text-slate-400 focus-visible:border-orange-500 transition-colors"
                     />
@@ -221,7 +224,7 @@ export function RestaurantDetails({
                   </Button>
                 </div>
                 {filterButtons.length > 1 && (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="hidden lg:flex flex-wrap gap-1.5">
                     {filterButtons.map(btn => (
                       <Button
                         key={btn.key}
@@ -237,10 +240,10 @@ export function RestaurantDetails({
                 )}
               </div>
             </div>
-            <section id="deals-and-discounts" className="mt-2 px-4 sm:px-0"><DealsAndDiscounts /></section>
+            <section id="deals-and-discounts" className="mt-2 px-4 sm:px-0 scroll-mt-28"><DealsAndDiscounts /></section>
             <Separator className="my-5" />
             {featuredItems.length > 0 && (
-              <section id="featured-items"><FeaturedItems items={featuredItems} onItemClick={handleItemClick} /><Separator className="my-5" /></section>
+              <section id="featured-items" className="scroll-mt-28"><FeaturedItems items={featuredItems} onItemClick={handleItemClick} /><Separator className="my-5" /></section>
             )}
             <div className="mt-2 pb-6 px-4 sm:px-0">
               {nonEmptyMenu.length === 0 ? (
@@ -250,18 +253,20 @@ export function RestaurantDetails({
               ) : (
                 filteredMenu.map((category, index) => (
                   <React.Fragment key={category.title}>
-                    <section id={getSectionId(category.title)}>
-                      <h2 className="text-xl md:text-2xl font-bold text-black mt-4 mb-3 tracking-tight">{category.title}</h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {category.items.map(item => <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />)}
-                      </div>
+                    <section id={getSectionId(category.title)} className="scroll-mt-28">
+                      <section className="mb-6 overflow-hidden px-4 sm:px-0">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4 px-1 tracking-tight">{category.title}</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {category.items.map(item => <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />)}
+                        </div>
+                      </section>
                     </section>
                     {index < filteredMenu.length - 1 && <Separator className="my-5" />}
                   </React.Fragment>
                 ))
               )}
             </div>
-            <section id="reviews" className="px-4 sm:px-0">
+            <section id="reviews" className="px-4 sm:px-0 scroll-mt-28">
               <ReviewsSection targetId={restaurant.id} type={(restaurant.type?.toLowerCase() === 'home-food' || restaurant.type?.toLowerCase() === 'homefood') ? 'HomeFood' : 'Restaurant'} />
             </section>
             <Separator className="my-5" />

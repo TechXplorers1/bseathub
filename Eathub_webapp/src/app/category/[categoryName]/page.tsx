@@ -6,6 +6,7 @@ import { ProviderCard } from "@/components/discovery/ProviderCard";
 import { MenuItem } from "@/components/restaurant/MenuItem";
 import { MenuItemDialog } from "@/components/restaurant/MenuItemDialog";
 import { Loader2, UtensilsCrossed, ChefHat, Store, Sparkles } from "lucide-react";
+import { useRestaurants } from "@/context/RestaurantProvider";
 
 type CategoryPageProps = {
   params: Promise<{ categoryName: string }>;
@@ -21,6 +22,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const { allItems: allVendors, loading: vendorsLoading } = useRestaurants();
 
   useEffect(() => {
     async function fetchProviders() {
@@ -32,11 +34,66 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         if (!response.ok) throw new Error(`Failed to fetch discovery results`);
 
         const data = await response.json();
+        console.log("Discovery data received for category", categoryName, ":", data);
 
-        setRestaurants((data.restaurants || []).map((item: any) => ({ ...item, type: "RESTAURANT" as const })));
-        setHomeFoods((data.homeFoods || []).map((item: any) => ({ ...item, type: "HOME_FOOD" as const })));
-        setChefs((data.chefs || []).map((item: any) => ({ ...item, type: "CHEF" as const })));
-        setItems(data.items || []);
+        let fetchedRestaurants = (data.restaurants || []).map((item: any) => ({ ...item, type: "RESTAURANT" as const }));
+        let fetchedHomeFoods = (data.homeFoods || []).map((item: any) => ({ ...item, type: "HOME_FOOD" as const }));
+        let fetchedChefs = (data.chefs || []).map((item: any) => ({ ...item, type: "CHEF" as const }));
+        let fetchedItems = data.items || [];
+
+        // FALLBACK: If backend finds nothing, perform a thorough local search
+        if (allVendors.length > 0) {
+          const query = categoryName.toLowerCase();
+          const extraItems: any[] = [];
+          const extraVendors = new Set<string>();
+
+          allVendors.forEach(v => {
+            // Check vendor metadata
+            const isMatch = v.name?.toLowerCase().includes(query) ||
+              v.cuisine?.toLowerCase().includes(query) ||
+              v.categories?.some(c => c.toLowerCase().includes(query));
+
+            if (isMatch) extraVendors.add(v.id);
+
+            // Check items within vendor
+            v.menu?.forEach((cat: any) => {
+              const catMatch = cat.title?.toLowerCase().includes(query);
+              cat.items?.forEach((item: any) => {
+                const itemMatch = catMatch ||
+                  item.name?.toLowerCase().includes(query) ||
+                  item.description?.toLowerCase().includes(query);
+
+                if (itemMatch && !fetchedItems.find((fi: any) => fi.id === item.id)) {
+                  extraItems.push({
+                    ...item,
+                    providerName: v.name,
+                    providerSlug: v.slug,
+                    providerType: v.type,
+                    providerId: v.id
+                  });
+                  extraVendors.add(v.id);
+                }
+              });
+            });
+          });
+
+          fetchedItems = [...fetchedItems, ...extraItems];
+
+          allVendors.forEach(v => {
+            if (extraVendors.has(v.id)) {
+              if (v.type === 'restaurant' && !fetchedRestaurants.find((r: any) => r.id === v.id)) {
+                fetchedRestaurants.push({ ...v, type: "RESTAURANT" as const });
+              } else if (v.type === 'home-food' && !fetchedHomeFoods.find((hf: any) => hf.id === v.id)) {
+                fetchedHomeFoods.push({ ...v, type: "HOME_FOOD" as const });
+              }
+            }
+          });
+        }
+
+        setRestaurants(fetchedRestaurants);
+        setHomeFoods(fetchedHomeFoods);
+        setChefs(fetchedChefs);
+        setItems(fetchedItems);
 
       } catch (error) {
         console.error("Discovery error:", error);
@@ -45,13 +102,15 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       }
     }
 
-    fetchProviders();
-  }, [categoryName]);
+    if (!vendorsLoading) {
+      fetchProviders();
+    }
+  }, [categoryName, allVendors, vendorsLoading]);
 
   const hasResults = restaurants.length > 0 || homeFoods.length > 0 || chefs.length > 0 || items.length > 0;
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in duration-500">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in duration-500">
       <header className="mb-12 text-center md:text-left">
         <div className="flex items-center justify-center md:justify-start gap-4 mb-2">
           <div className="p-3 bg-orange-100 rounded-2xl">
@@ -60,7 +119,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight capitalize">{categoryName}</h1>
             <p className="text-muted-foreground text-lg">
-                Discover the best {categoryName} items and places near you.
+              Discover the best {categoryName} items and places near you.
             </p>
           </div>
         </div>
@@ -84,9 +143,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {items.map((item) => (
-                  <MenuItem 
-                    key={item.id} 
-                    item={item} 
+                  <MenuItem
+                    key={item.id}
+                    item={item}
                     onClick={() => setSelectedItem(item)}
                     showProviderInfo={true}
                   />
@@ -159,11 +218,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       )}
 
       {selectedItem && (
-          <MenuItemDialog 
-            item={selectedItem}
-            open={!!selectedItem}
-            onOpenChange={(open) => !open && setSelectedItem(null)}
-          />
+        <MenuItemDialog
+          item={selectedItem}
+          open={!!selectedItem}
+          onOpenChange={(open) => !open && setSelectedItem(null)}
+        />
       )}
     </div>
   );

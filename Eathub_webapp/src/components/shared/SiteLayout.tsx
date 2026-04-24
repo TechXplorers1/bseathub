@@ -85,14 +85,14 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Reveal on scroll-up, hide on scroll-down (after some threshold)
       if (currentScrollY < lastScrollY) {
         setShowMenuTrigger(true);
       } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
         setShowMenuTrigger(false);
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
@@ -302,34 +302,35 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         </aside>
       )}
 
-      <div 
+      <div
         className="flex-1 flex flex-col min-h-screen"
-        style={{ 
+        style={{
           marginLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
           transition: 'margin-left 0.3s ease-in-out'
         }}
       >
-        <Header 
-          className="fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300" 
-          style={{ 
-            paddingLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0 
+        <Header
+          className="fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300"
+          style={{
+            paddingLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0
           }}
         />
 
         {/* Mobile Hamburger Menu moved to Header */}
-        
+
         <main
           id="main-scroll-container"
           className="flex-1 relative"
           style={{
             paddingTop: HEADER_H,
-            minHeight: '100vh'
+            minHeight: '100vh',
+            minWidth: '100vw'
           }}
         >
           <div
             className={`content-body ${contentAnimate ? 'animate' : ''}`}
-            style={{ 
-              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : (isMounted ? 8 : 12)) 
+            style={{
+              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : (isMounted ? 8 : 12))
             }}
           >
             {children}
@@ -346,9 +347,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 <ul className="sidebar-list">
                   {sidebarNav.map((item) => (
                     <li key={item.name}>
-                      <Link 
-                        href={item.href} 
-                        className="sidebar-link" 
+                      <Link
+                        href={item.href}
+                        className="sidebar-link"
                         onClick={() => setIsMobileSidebarOpen(false)}
                         aria-current={isActive(item.href) ? 'page' : undefined}
                       >
@@ -362,7 +363,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
             </div>
           </SheetContent>
         </Sheet>
-        
+
         <Footer />
       </div>
     </div>

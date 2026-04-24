@@ -220,6 +220,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       {selectedItem && (
         <MenuItemDialog
           item={selectedItem}
+          restaurant={allVendors.find(v => v.id === selectedItem.providerId)}
           open={!!selectedItem}
           onOpenChange={(open) => !open && setSelectedItem(null)}
         />

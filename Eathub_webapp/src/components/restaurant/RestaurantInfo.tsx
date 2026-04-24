@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Star, Info, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { Restaurant } from '@/lib/types';
 
 interface RestaurantInfoProps {

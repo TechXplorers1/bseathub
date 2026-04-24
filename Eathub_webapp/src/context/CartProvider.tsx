@@ -14,6 +14,7 @@ interface CartContextType {
   cartItems: CartItem[];
   providerInfo: { id: string; type: 'Restaurant' | 'HomeFood'; name: string } | null;
   addToCart: (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => void;
+  clearAndAddToCart: (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -83,10 +84,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => {
     // Check if adding from a different provider
     if (providerInfo && providerInfo.id !== provider.id) {
+      // Instead of just a toast, we could trigger a global modal. 
+      // For now, we'll keep the toast but explain clearly.
       toast({
         variant: 'destructive',
         title: 'Different Restaurant',
-        description: `Your cart contains items from ${providerInfo.name}. Clear it to add from ${provider.name}.`,
+        description: `Your cart has items from ${providerInfo.name}. You can only order from one place at a time. Please clear your cart first.`,
       });
       return;
     }
@@ -107,8 +110,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     toast({
       title: 'Added to cart',
-      description: `${item.name} has been added to your cart.`,
+      description: `${item.name} added to your order from ${provider.name}.`,
     });
+  };
+
+  const clearAndAddToCart = (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => {
+    clearCart();
+    // Use a small timeout to ensure state is cleared before adding new one
+    setTimeout(() => {
+        setProviderInfo(provider);
+        setCartItems([{ ...item, quantity: 1 }]);
+        toast({
+            title: 'Cart Updated',
+            description: `Items cleared. Now adding from ${provider.name}.`,
+        });
+    }, 10);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -278,6 +294,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartItems,
         providerInfo,
         addToCart,
+        clearAndAddToCart,
         removeFromCart,
         updateQuantity,
         clearCart,

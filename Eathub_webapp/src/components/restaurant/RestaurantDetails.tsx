@@ -197,7 +197,7 @@ export function RestaurantDetails({
       <div ref={heroRef as any} className="w-full relative">
         <RestaurantHero restaurant={restaurant} displayName={displayName} />
       </div>
-      <div className="w-full max-w-none px-4 sm:px-6 lg:px-8">
+      <div className="w-100% max-w-none px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 lg:pt-6">
           <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
             <RestaurantInfo restaurant={restaurant} displayName={displayName} />

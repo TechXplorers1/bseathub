@@ -82,21 +82,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cartItems, providerInfo]);
 
   const addToCart = (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => {
-    // Check if adding from a different provider
-    if (providerInfo && providerInfo.id !== provider.id) {
-      // Instead of just a toast, we could trigger a global modal. 
-      // For now, we'll keep the toast but explain clearly.
-      toast({
-        variant: 'destructive',
-        title: 'Different Restaurant',
-        description: `Your cart has items from ${providerInfo.name}. You can only order from one place at a time. Please clear your cart first.`,
-      });
-      return;
-    }
-
-    if (!providerInfo) {
-      setProviderInfo(provider);
-    }
+    // MULTI-VENDOR SUPPORT: We no longer block different restaurants.
+    // We just ensure the item has the provider info attached.
+    const itemWithProvider = {
+        ...item,
+        providerId: provider.id,
+        providerName: provider.name,
+        providerType: provider.type.toLowerCase() as any
+    };
 
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((i) => i.id === item.id);
@@ -105,25 +98,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prevItems, { ...item, quantity: 1 }];
+      return [...prevItems, { ...itemWithProvider, quantity: 1 }];
     });
 
     toast({
       title: 'Added to cart',
-      description: `${item.name} added to your order from ${provider.name}.`,
+      description: `${item.name} added to your order.`,
     });
   };
 
+  // This is now just a helper to quickly reset and add one thing, 
+  // but standard addToCart now supports multiple too.
   const clearAndAddToCart = (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => {
     clearCart();
-    // Use a small timeout to ensure state is cleared before adding new one
     setTimeout(() => {
-        setProviderInfo(provider);
-        setCartItems([{ ...item, quantity: 1 }]);
-        toast({
-            title: 'Cart Updated',
-            description: `Items cleared. Now adding from ${provider.name}.`,
-        });
+        addToCart(item, provider);
     }, 10);
   };
 

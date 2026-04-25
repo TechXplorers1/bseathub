@@ -51,12 +51,12 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const isHomeFoodDetail = pathname?.startsWith('/home-food/');
 
   // final rule:
-  // - show on home, category, restaurants list, home-food list, chefs list, favorites
-  // - hide on individual restaurant + home food pages
   const showSidebar =
     (isHome || isCategory || isRestaurantsList || isHomeFoodList || isChefsList || isFavorites) &&
     !isRestaurantDetail &&
     !isHomeFoodDetail;
+
+  const isWidePage = isRestaurantDetail || isHomeFoodDetail || isRestaurantsList || isHomeFoodList;
 
   const { isSidebarOpen: isMobileSidebarOpen, setIsSidebarOpen: setIsMobileSidebarOpen } = useHeader();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -78,22 +78,36 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
     const onResize = () => setWindowWidth(window.innerWidth);
     onResize();
 
-    // Show for 4s on mount, then auto-hide
+    // Show for 4s on mount, then auto-hide only if scrolled down
     const initialTimer = setTimeout(() => {
-      setShowMenuTrigger(false);
+      if (window.scrollY > 100) {
+        setShowMenuTrigger(false);
+      }
     }, 4000);
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      // Reveal on scroll-up, hide on scroll-down (after some threshold)
       if (currentScrollY < lastScrollY) {
+        // Scrolling UP - show immediately
         setShowMenuTrigger(true);
-      } else if (currentScrollY > lastScrollY && currentScrollY > 60) {
+      } else if (currentScrollY > lastScrollY && currentScrollY > 64) {
+        // Scrolling DOWN - hide
         setShowMenuTrigger(false);
       }
 
       setLastScrollY(currentScrollY);
+
+      // Auto-hide after 3 seconds of inactivity if currently shown
+      clearTimeout((window as any).menuTriggerTimer);
+      if (currentScrollY < 100) {
+        setShowMenuTrigger(true); // Keep shown at top
+      } else {
+        (window as any).menuTriggerTimer = setTimeout(() => {
+           // Optional: you can auto-hide here if you want it to disappear when idle
+           // setShowMenuTrigger(false); 
+        }, 3000);
+      }
     };
 
     window.addEventListener('resize', onResize);
@@ -311,26 +325,46 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       >
         <Header
           className="fixed top-0 left-0 right-0 z-50 bg-white transition-all duration-300"
-          style={{
-            paddingLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0
-          }}
+          style={{}}
         />
 
-        {/* Mobile Hamburger Menu moved to Header */}
+        {/* Floating Hamburger Trigger */}
+        {true && !isMobileSidebarOpen && (
+          <div
+            className={cn(
+              "fixed left-4 z-[60] transition-all duration-700 ease-in-out",
+              showMenuTrigger ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10 pointer-events-none"
+            )}
+            style={{ top: HEADER_H + 12 }}
+          >
+            <Button
+              onClick={toggleMobileSidebar}
+              className="h-10 w-10 rounded-full shadow-lg border border-white/40 flex items-center justify-center p-0 overflow-hidden group transition-transform active:scale-95"
+              style={{
+                background: 'rgba(255, 255, 255, 0.75)',
+                backdropFilter: 'blur(12px) saturate(180%)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.5)',
+              }}
+            >
+              <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Menu className="h-5 w-5 text-orange-500 relative z-10 drop-shadow-sm" />
+            </Button>
+          </div>
+        )}
 
         <main
           id="main-scroll-container"
-          className="flex-1 relative"
+          className="flex-1 relative w-full"
           style={{
             paddingTop: HEADER_H,
             minHeight: '100vh',
-            minWidth: '100vw'
           }}
         >
           <div
-            className={`content-body ${contentAnimate ? 'animate' : ''}`}
+            className={`content-body ${contentAnimate ? 'animate' : ''} w-full max-w-none`}
             style={{
-              padding: isRestaurantDetail || isHomeFoodDetail ? 0 : (isMdUp ? 16 : (isMounted ? 8 : 12))
+              padding: isWidePage ? 0 : (isMdUp ? 16 : (isMounted ? 8 : 12)),
+              width: '100%'
             }}
           >
             {children}

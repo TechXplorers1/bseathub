@@ -80,7 +80,7 @@ export function RestaurantHero({
         !restaurant.coverImageId && "hidden sm:flex"
       )}>
         <div className="w-full px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8">
-          <div className="max-w-xl space-y-1 sm:space-y-2">
+          <div className="max-w-4xl space-y-1 sm:space-y-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
               {finalName}
             </h1>
@@ -101,7 +101,7 @@ export function RestaurantHero({
 
       {!restaurant.imageId ? null : (
         <div className={cn(
-          "absolute left-4 sm:left-8 h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-white bg-white overflow-hidden z-30 shadow-lg bottom-0 translate-y-1/2"
+          "absolute left-4 sm:left-12 h-16 w-16 sm:h-24 sm:w-24 rounded-2xl border-4 border-white bg-white overflow-hidden z-30 shadow-lg bottom-0 translate-y-1/2"
         )}>
           <Image
             src={logoImage}

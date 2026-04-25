@@ -32,13 +32,7 @@ export function RestaurantInfo({
 
   return (
     <div className="mt-4 sm:mt-8 px-4 sm:px-0">
-      {/* COMPACT MOBILE HEADER: LOGO + NAME + RATING */}
       <div className="flex items-center gap-4 mb-3 lg:hidden">
-        {restaurant.imageId && (
-          <div className="h-16 w-16 rounded-xl border border-muted shadow-sm overflow-hidden shrink-0">
-            <img src={restaurant.imageId} alt={displayName} className="h-full w-full object-cover" />
-          </div>
-        )}
         <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight truncate">{displayName}</h1>
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold">

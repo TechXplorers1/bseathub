@@ -8,7 +8,7 @@ export function Footer() {
     // bg-muted ensures the background color spans the full width.
     <footer className="bg-muted text-muted-foreground border-t">
       {/* container mx-auto limits the inner content width, which is correct. */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} Eat Hub, Inc. All rights reserved.</p>
           <div className="flex space-x-4">

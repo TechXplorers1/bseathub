@@ -82,7 +82,7 @@ export default function RestaurantDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4 2xl:grid-cols-6 3xl:grid-cols-8">
         <StatCard
           title="Total Revenue"
           value={`$${totalRevenue.toLocaleString()}`}
@@ -109,7 +109,7 @@ export default function RestaurantDashboardPage() {
         />
       </div>
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5">
         <Card className="xl:col-span-2 border-none shadow-2xl bg-card/60 backdrop-blur-md overflow-hidden">
           <CardHeader className="flex flex-row items-center bg-muted/30 border-b border-border/50">
             <div className="grid gap-1">

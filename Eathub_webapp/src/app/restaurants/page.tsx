@@ -79,21 +79,21 @@ export default function RestaurantsPage() {
   });
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8 animate-in fade-in duration-500">
-      <div className="mb-6 sm:mb-10">
+    <div className="w-full py-4 sm:py-8 animate-in fade-in duration-500">
+      <div className="mb-6 sm:mb-10 px-4 sm:px-6">
         <h1 className="text-4xl font-extrabold tracking-tight mb-2">All Restaurants</h1>
         <p className="text-muted-foreground">Discover the best places to eat around you</p>
       </div>
 
       {Object.entries(restaurantsByCategory).length > 0 ? (
         Object.entries(restaurantsByCategory).map(([category, list]) => (
-          <div key={category} className="mb-12">
+          <div key={category} className="mb-12 px-4 sm:px-6">
             <div className="flex items-center gap-3 mb-6">
               <h2 className="text-2xl font-bold">{category}</h2>
               <div className="h-px flex-1 bg-muted" />
               <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-1 rounded-full">{list.length} places</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
               {list.map((restaurant) => (
                 <RestaurantCard key={restaurant.id} restaurant={restaurant} />
               ))}

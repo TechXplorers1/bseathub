@@ -197,13 +197,14 @@ export function RestaurantDetails({
       <div ref={heroRef as any} className="w-full relative">
         <RestaurantHero restaurant={restaurant} displayName={displayName} />
       </div>
-      <div className="w-100% max-w-none px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 lg:pt-6">
-          <div className={cn(leftColumnClass, "lg:col-span-4 xl:col-span-3")}>
+      <div className="w-full px-0 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-0 lg:pt-6">
+          <div className={cn(leftColumnClass, "lg:w-[350px] xl:w-[400px] shrink-0")}>
             <RestaurantInfo restaurant={restaurant} displayName={displayName} />
-            <Separator className="my-3" /><MenuNav menuCategories={menuCategories} hasChef={false} />
+            <Separator className="my-3" />
+            <MenuNav menuCategories={menuCategories} hasChef={false} />
           </div>
-          <div className={cn(rightColumnClass, "lg:col-span-8 xl:col-span-9")}>
+          <div className={cn(rightColumnClass, "flex-1 min-w-0")}>
             <div ref={searchSectionRef} className="pt-3 pb-2 border-b px-4 sm:px-0">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
@@ -256,7 +257,7 @@ export function RestaurantDetails({
                     <section id={getSectionId(category.title)} className="scroll-mt-28">
                       <section className="mb-6 overflow-hidden px-4 sm:px-0">
                         <h2 className="text-xl font-bold text-gray-800 mb-4 px-1 tracking-tight">{category.title}</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
                           {category.items.map(item => <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />)}
                         </div>
                       </section>

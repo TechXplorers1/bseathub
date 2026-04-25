@@ -76,7 +76,7 @@ export function Header({ className, style }: HeaderProps) {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-    const [auth, setAuth] = useState<{
+  const [auth, setAuth] = useState<{
     email: string | null;
     name: string | null;
     role: string | null;
@@ -331,28 +331,18 @@ export function Header({ className, style }: HeaderProps) {
 
   return (
     <header className={cn("fixed top-0 z-50 border-b bg-background shadow-md", className)} style={style}>
-      <div className="flex h-16 items-center justify-between w-full px-2 sm:px-4 gap-2">
+      <div className="h-16 flex items-center justify-center gap-4 sm:gap-8 md:gap-12 w-full px-4 sm:px-6">
 
-        {/* LOGO AREA */}
-        <div className="flex items-center gap-1 shrink-0 -ml-1 sm:-ml-2">
-          {!isMdUp && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-10 w-10 flex-shrink-0"
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            >
-              <Menu className="h-6 w-6 text-foreground" />
-            </Button>
-          )}
-          <Link href="/" className="flex items-center space-x-1 hover:opacity-80 transition-opacity ml-1">
-            <Flame className="h-6 w-6 text-primary shrink-0" />
-            <span className="hidden sm:inline text-lg font-bold text-primary">Eat Hub</span>
+        {/* LEFT: LOGO AREA (flex-1 with SiteLayout balancing) */}
+        <div className="flex-none flex items-center gap-2 min-w-0">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+            <Flame className="h-7 w-7 text-primary shrink-0" />
+            <span className="hidden lg:inline text-xl font-black text-primary tracking-tighter">Eat Hub</span>
           </Link>
         </div>
 
-        {/* SEARCH BAR - THE CENTERPIECE */}
-        <div className="flex-1 min-w-0 relative mx-1.5 sm:mx-4" ref={searchRef}>
+        {/* MIDDLE: SEARCH BAR (Universal Center) */}
+        <div className="flex-1 max-w-3xl relative" ref={searchRef}>
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={windowWidth < 400 ? "Search..." : "Search for food, chefs..."}
@@ -461,8 +451,8 @@ export function Header({ className, style }: HeaderProps) {
           )}
         </div>
 
-        {/* RIGHT NAV */}
-        <nav className="flex items-center space-x-1 shrink-0">
+        {/* RIGHT: NAV AREA (flex-1 with SiteLayout balancing) */}
+        <nav className="flex-none flex items-center justify-end space-x-2 sm:space-x-3 shrink-0">
           <Sheet open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9 sm:h-12 sm:w-12">

@@ -39,9 +39,8 @@ export function MenuItemDialog({
   hideAddButton = false,
   hidePrice = false,
 }: MenuItemDialogProps) {
-  const { addToCart, providerInfo, clearAndAddToCart } = useCart();
+  const { addToCart } = useCart();
   const { setIsAuthSuggestionOpen } = useHeader();
-  const [showReplaceConfirm, setShowReplaceConfirm] = React.useState(false);
 
   const handleAddToCart = () => {
     // Guest Mode Check
@@ -67,29 +66,7 @@ export function MenuItemDialog({
         name: pName
     };
 
-    // CONFLICT CHECK
-    if (providerInfo && providerInfo.id !== pId) {
-        setShowReplaceConfirm(true);
-        return;
-    }
-
     addToCart(item, providerData);
-    onOpenChange(false);
-  };
-
-  const handleConfirmReplace = () => {
-    const pId = restaurant?.id || item.providerId;
-    const pName = restaurant?.name || item.providerName || 'Unknown Provider';
-    const pTypeRaw = restaurant?.type || item.providerType || 'restaurant';
-    
-    const providerData = {
-        id: pId!,
-        type: ((pTypeRaw as string) === 'home-food' || (pTypeRaw as string) === 'homefood') ? 'HomeFood' : 'Restaurant' as any,
-        name: pName
-    };
-
-    clearAndAddToCart(item, providerData);
-    setShowReplaceConfirm(false);
     onOpenChange(false);
   };
 
@@ -204,27 +181,9 @@ export function MenuItemDialog({
                 </div>
               )}
               {!hideAddButton && (
-                <div className="flex flex-col items-end gap-2">
-                    {showReplaceConfirm ? (
-                        <div className="flex flex-col items-end gap-2 animate-in fade-in slide-in-from-bottom-2">
-                            <p className="text-[10px] text-red-600 font-black uppercase text-right max-w-[200px]">
-                                Your cart has items from {providerInfo?.name}. Clear it?
-                            </p>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => setShowReplaceConfirm(false)} className="rounded-full text-[10px] h-8">
-                                    Cancel
-                                </Button>
-                                <Button variant="destructive" size="sm" onClick={handleConfirmReplace} className="rounded-full text-[10px] h-8 bg-red-600">
-                                    Clear & Add
-                                </Button>
-                            </div>
-                        </div>
-                    ) : (
-                        <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8 whitespace-nowrap bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs">
-                            Add To Cart
-                        </Button>
-                    )}
-                </div>
+                <Button size="lg" onClick={handleAddToCart} className="rounded-full px-8 whitespace-nowrap bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-widest text-xs">
+                    Add To Cart
+                </Button>
               )}
             </DialogFooter>
           </div>

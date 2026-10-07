@@ -29,7 +29,7 @@ public class NotificationHistoryService {
     }
 
     public List<Notification> getNotificationsForUser(String userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        return notificationRepository.findTop50ByUserIdOrderByCreatedAtDesc(userId);
     }
 
     @Transactional
@@ -42,7 +42,7 @@ public class NotificationHistoryService {
 
     @Transactional
     public void markAllAsRead(String userId) {
-        List<Notification> unread = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Notification> unread = notificationRepository.findTop50ByUserIdOrderByCreatedAtDesc(userId);
         unread.forEach(n -> n.setRead(true));
         notificationRepository.saveAll(unread);
     }
@@ -58,7 +58,7 @@ public class NotificationHistoryService {
 
     @Transactional
     public void deleteAllForUser(String userId) {
-        List<Notification> all = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Notification> all = notificationRepository.findTop50ByUserIdOrderByCreatedAtDesc(userId);
         notificationRepository.deleteAll(all);
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/home-food")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000") // Adjusted to standard Next.js port
+
 public class HomeFoodController {
     private final HomeFoodService homeFoodService;
     private final HomeFoodProviderRepository repository;

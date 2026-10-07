@@ -143,7 +143,7 @@ public class OrderService {
         if (!userRepository.existsById(customerId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found: " + customerId);
         }
-        return orderRepository.findByCustomer_IdOrderByOrderPlacedAtDesc(customerId)
+        return orderRepository.findTop50ByCustomer_IdOrderByOrderPlacedAtDesc(customerId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
@@ -161,7 +161,7 @@ public class OrderService {
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found: " + restaurantId);
         }
-        return orderRepository.findByRestaurant_IdOrderByOrderPlacedAtDesc(restaurantId)
+        return orderRepository.findTop50ByRestaurant_IdOrderByOrderPlacedAtDesc(restaurantId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
@@ -170,7 +170,7 @@ public class OrderService {
         if (!homeFoodRepository.existsById(providerId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "HomeFood provider not found: " + providerId);
         }
-        return orderRepository.findByHomeFoodProvider_IdOrderByOrderPlacedAtDesc(providerId)
+        return orderRepository.findTop50ByHomeFoodProvider_IdOrderByOrderPlacedAtDesc(providerId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 

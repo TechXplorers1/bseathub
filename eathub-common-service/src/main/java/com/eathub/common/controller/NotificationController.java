@@ -9,7 +9,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/notifications")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class NotificationController {
 
     private final NotificationHistoryService notificationHistoryService;

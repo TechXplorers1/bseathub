@@ -25,6 +25,7 @@ public class ChefManagementService {
     private final ChefServiceRepository chefServiceRepository;
     private final ChefAddressRepository chefAddressRepository;
     private final ChefLegalProfileRepository chefLegalProfileRepository;
+    private final ImageStorageService imageStorageService;
 
     // ================= CHEF PROFILE =================
     public List<ChefResponseDTO> getAllChefs() {
@@ -61,7 +62,7 @@ public class ChefManagementService {
                 .name(dto.getName())
                 .bio(dto.getBio())
                 .experience(dto.getExperience())
-                .avatarUrl(dto.getAvatarUrl())
+                .avatarUrl(imageStorageService.storeImageIfBase64(dto.getAvatarUrl()))
                 .slug(dto.getSlug())
                 .rating(5.0)
                 .reviewsCount(0)
@@ -94,9 +95,10 @@ public class ChefManagementService {
             chef.setSpecialty(dto.getSpecialty());
         }
         if (dto.getAvatarUrl() != null) {
-            chef.setAvatarUrl(dto.getAvatarUrl());
+            String url = imageStorageService.storeImageIfBase64(dto.getAvatarUrl());
+            chef.setAvatarUrl(url);
             if (chef.getOwner() != null) {
-                chef.getOwner().setAvatarUrl(dto.getAvatarUrl());
+                chef.getOwner().setAvatarUrl(url);
                 userRepository.save(chef.getOwner());
             }
         }
@@ -104,7 +106,7 @@ public class ChefManagementService {
             chef.setWorkingHours(dto.getWorkingHours());
         }
         if (dto.getCoverImageId() != null) {
-            chef.setCoverImageId(dto.getCoverImageId());
+            chef.setCoverImageId(imageStorageService.storeImageIfBase64(dto.getCoverImageId()));
         }
         if (dto.getIsActive() != null) {
             chef.setIsActive(dto.getIsActive());
@@ -297,7 +299,7 @@ public class ChefManagementService {
                 .itemType(dto.getItemType())
                 .isSignature(dto.getIsSignature() != null ? dto.getIsSignature() : false)
                 .isNegotiable(dto.getIsNegotiable() != null ? dto.getIsNegotiable() : false)
-                .imageId(dto.getImageId())
+                .imageId(imageStorageService.storeImageIfBase64(dto.getImageId()))
                 .status(dto.getStatus() != null ? dto.getStatus() : "Active")
                 .chef(chef)
                 .build();
@@ -321,7 +323,7 @@ public class ChefManagementService {
         if (dto.getIsNegotiable() != null) {
             service.setIsNegotiable(dto.getIsNegotiable());
         }
-        service.setImageId(dto.getImageId());
+        service.setImageId(imageStorageService.storeImageIfBase64(dto.getImageId()));
         service.setStatus(dto.getStatus());
 
         return mapToServiceDTO(chefServiceRepository.save(service));

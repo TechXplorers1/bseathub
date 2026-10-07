@@ -31,6 +31,7 @@ public class RestaurantService {
     private final UserRepository userRepository;
     private final MenuCategoryRepository menuCategoryRepository;
     private final MenuItemRepository menuItemRepository;
+    private final ImageStorageService imageStorageService;
 
     // ── Fetch all ──────────────────────────────────────────────────────────
     @Cacheable(value = "restaurants")
@@ -80,10 +81,10 @@ public class RestaurantService {
         if (dto.getRestaurantType() != null)
             r.setType(dto.getRestaurantType());
         if (dto.getImageId() != null) {
-            r.setImageId(dto.getImageId());
+            r.setImageId(imageStorageService.storeImageIfBase64(dto.getImageId()));
         }
         if (dto.getCoverImageId() != null)
-            r.setCoverImageId(dto.getCoverImageId());
+            r.setCoverImageId(imageStorageService.storeImageIfBase64(dto.getCoverImageId()));
 
         if (dto.getIsOpen() != null) {
             r.setIsOpen(dto.getIsOpen());
@@ -337,7 +338,7 @@ public class RestaurantService {
                     .restaurant(restaurant)
                     .status(dto.getStatus() != null ? dto.getStatus() : "Available")
                     .isSpecial(dto.getIsSpecial() != null ? dto.getIsSpecial() : false)
-                    .imageId(dto.getImageUrl())
+                    .imageId(imageStorageService.storeImageIfBase64(dto.getImageUrl()))
                     .build();
 
             return mapToMenuItemDTO(menuItemRepository.save(newItem));

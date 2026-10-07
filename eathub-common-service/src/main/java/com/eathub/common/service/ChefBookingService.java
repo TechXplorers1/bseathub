@@ -91,7 +91,7 @@ public class ChefBookingService {
     }
 
     public List<ChefBookingDTO> getChefBookings(String chefId) {
-        return chefBookingRepository.findByChef_IdOrderByEventDateDesc(chefId)
+        return chefBookingRepository.findTop50ByChef_IdOrderByEventDateDesc(chefId)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -104,7 +104,7 @@ public class ChefBookingService {
     }
 
     public List<ChefBookingDTO> getCustomerBookings(String customerId) {
-        return chefBookingRepository.findByCustomer_IdOrderByCreatedAtDesc(customerId)
+        return chefBookingRepository.findTop50ByCustomer_IdOrderByCreatedAtDesc(customerId)
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -169,7 +169,7 @@ public class ChefBookingService {
     }
 
     public Double getChefEarnings(String chefId) {
-        return chefBookingRepository.findByChef_Id(chefId)
+        return chefBookingRepository.findTop50ByChef_Id(chefId)
                 .stream()
                 .filter(b -> b.getStatus().equals("Completed") && b.getPaymentStatus().equals("Paid"))
                 .mapToDouble(ChefBooking::getTotalAmount)

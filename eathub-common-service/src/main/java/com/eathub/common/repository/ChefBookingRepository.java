@@ -8,9 +8,9 @@ import java.util.List;
 
 @Repository
 public interface ChefBookingRepository extends JpaRepository<ChefBooking, String> {
-    List<ChefBooking> findByChef_Id(String chefId);
-    List<ChefBooking> findByCustomer_Id(String customerId);
-    List<ChefBooking> findByChef_IdOrderByEventDateDesc(String chefId);
-    List<ChefBooking> findByChef_IdOrderByCreatedAtDesc(String chefId);
-    List<ChefBooking> findByCustomer_IdOrderByCreatedAtDesc(String customerId);
+    List<ChefBooking> findTop50ByChef_Id(String chefId);
+    List<ChefBooking> findTop50ByCustomer_Id(String customerId);
+    List<ChefBooking> findTop50ByChef_IdOrderByEventDateDesc(String chefId);
+    List<ChefBooking> findTop50ByChef_IdOrderByCreatedAtDesc(String chefId);
+    List<ChefBooking> findTop50ByCustomer_IdOrderByCreatedAtDesc(String customerId);
 }

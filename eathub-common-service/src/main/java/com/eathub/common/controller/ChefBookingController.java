@@ -12,7 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/chef-bookings")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class ChefBookingController {
     private final ChefBookingService chefBookingService;
 

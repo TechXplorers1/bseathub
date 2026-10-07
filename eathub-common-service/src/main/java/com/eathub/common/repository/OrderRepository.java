@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, String> {
-    List<Order> findByCustomer_IdOrderByOrderPlacedAtDesc(String customerId);
-    List<Order> findByRestaurant_IdOrderByOrderPlacedAtDesc(String restaurantId);
-    List<Order> findByHomeFoodProvider_IdOrderByOrderPlacedAtDesc(String homeFoodProviderId);
+    List<Order> findTop50ByCustomer_IdOrderByOrderPlacedAtDesc(String customerId);
+    List<Order> findTop50ByRestaurant_IdOrderByOrderPlacedAtDesc(String restaurantId);
+    List<Order> findTop50ByHomeFoodProvider_IdOrderByOrderPlacedAtDesc(String homeFoodProviderId);
 }

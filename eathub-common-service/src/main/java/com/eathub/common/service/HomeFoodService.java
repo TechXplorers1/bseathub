@@ -28,6 +28,7 @@ public class HomeFoodService {
     private final UserRepository userRepository;
     private final MenuCategoryRepository menuCategoryRepository;
     private final MenuItemRepository menuItemRepository;
+    private final ImageStorageService imageStorageService;
 
     public List<HomeFoodResponseDTO> getAllHomeFoods() {
         return repository.findAllWithDetails()
@@ -53,7 +54,7 @@ public class HomeFoodService {
                 .slug(dto.getSlug())
                 .foodType(dto.getFoodType())
                 .description(dto.getDescription())
-                .imageId(dto.getImageId() != null ? dto.getImageId() : "home-food-default")
+                .imageId(dto.getImageId() != null ? imageStorageService.storeImageIfBase64(dto.getImageId()) : "home-food-default")
                 .rating(5.0)
                 .reviewsCount(0)
                 .isActive(true)
@@ -74,9 +75,9 @@ public class HomeFoodService {
         if (dto.getFoodType() != null) p.setFoodType(dto.getFoodType());
         if (dto.getIsActive() != null) p.setIsActive(dto.getIsActive());
         if (dto.getImageId() != null) {
-            p.setImageId(dto.getImageId());
+            p.setImageId(imageStorageService.storeImageIfBase64(dto.getImageId()));
         }
-        if (dto.getCoverImageId() != null) p.setCoverImageId(dto.getCoverImageId());
+        if (dto.getCoverImageId() != null) p.setCoverImageId(imageStorageService.storeImageIfBase64(dto.getCoverImageId()));
         if (dto.getWorkingHours() != null) p.setWorkingHours(dto.getWorkingHours());
         
         if (dto.getOperationalStatus() != null) {
@@ -177,7 +178,7 @@ public class HomeFoodService {
                 .homeFood(provider)
                 .status(dto.getStatus() != null ? dto.getStatus() : "Available")
                 .isSpecial(Boolean.TRUE.equals(dto.getIsSpecial()))
-                .imageId(dto.getImageUrl())
+                .imageId(imageStorageService.storeImageIfBase64(dto.getImageUrl()))
                 .build();
 
         return mapMenuItem(menuItemRepository.save(item));

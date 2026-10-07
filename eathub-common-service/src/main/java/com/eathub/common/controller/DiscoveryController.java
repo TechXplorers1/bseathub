@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1/discovery")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class DiscoveryController {
 
     private final MenuItemRepository menuItemRepository;

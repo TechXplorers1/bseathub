@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/chefs")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000") // Adjusted to standard Next.js port
+
 public class ChefController {
 
     private final ChefManagementService service;

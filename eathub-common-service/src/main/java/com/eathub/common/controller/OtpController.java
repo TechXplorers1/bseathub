@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/v1/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+
 public class OtpController {
 
     private final OtpService otpService;

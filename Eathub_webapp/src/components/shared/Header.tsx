@@ -202,11 +202,13 @@ export function Header({ className, style }: HeaderProps) {
   }, [pathname]);
 
   const handleLogout = () => {
-    localStorage.clear();
-    setAuth({ email: null, name: null, role: null, token: null, avatarUrl: null });
-    window.dispatchEvent(new Event('auth-change'));
-    router.push('/');
-    router.refresh();
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.clear();
+      setAuth({ email: null, name: null, role: null, token: null, avatarUrl: null });
+      window.dispatchEvent(new Event('auth-change'));
+      router.push('/');
+      router.refresh();
+    }
   };
 
   const { restaurants: allRestaurantsData, homeFoods: allHomeFoodsData, chefs } = useRestaurants();

@@ -70,7 +70,7 @@ export function RestaurantInfo({
 
         {!isChefPage && (
           <p className="text-muted-foreground font-medium">
-             • {restaurant.cuisineType || restaurant.cuisine}
+            • {restaurant.cuisineType || restaurant.cuisine}
           </p>
         )}
 
@@ -105,7 +105,7 @@ export function RestaurantInfo({
             onClick={toggleLocation}
             aria-expanded={showLocation}
           >
-            {showLocation ? 'Conceal Address' : 'View Full Address'}
+            {showLocation ? 'Cancel Address' : 'View Full Address'}
           </Button>
         )}
       </div>

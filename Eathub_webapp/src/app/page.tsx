@@ -46,7 +46,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh] w-full">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary" />
           <p className="text-xl font-bold animate-pulse text-muted-foreground">Preparing your personalized menu...</p>
@@ -133,7 +133,7 @@ export default function Home() {
         </div>
       ) : null}
 
-      <ChefsCarousel filteredChefs={displayChefs} />
+      <ChefsCarousel filteredChefs={displayChefs} isFiltered={isFiltered} />
     </div>
   );
 }

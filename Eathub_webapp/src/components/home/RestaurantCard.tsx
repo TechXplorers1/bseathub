@@ -13,6 +13,7 @@ interface RestaurantCardProps {
 
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
   const displayImage = getDisplayImage(restaurant.coverImageId || restaurant.imageId, 'restaurant-1');
+  const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:'));
   // Safe check for services array
   const services = restaurant.services || [];
   const typePrefix = restaurant.type === 'home-food' ? 'home-food' : 'restaurant';
@@ -27,7 +28,7 @@ export function RestaurantCard({ restaurant }: RestaurantCardProps) {
     >
       <Card className="overflow-hidden transition-all hover:shadow-xl w-full flex flex-col border-muted/60">
         <div className="relative h-48 w-full overflow-hidden bg-muted/30 flex items-center justify-center">
-          {(!restaurant.coverImageId && !restaurant.imageId) ? (
+          {(!isValidImage) ? (
             <div className="flex flex-col items-center justify-center text-muted-foreground/40">
               {restaurant.type === 'home-food' ? (
                 <ChefHat className="h-12 w-12 mb-2" />

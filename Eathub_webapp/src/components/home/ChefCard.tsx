@@ -19,6 +19,7 @@ interface ChefCardProps {
 
 export function ChefCard({ chef, priority = false }: ChefCardProps) {
     const displayImage = getDisplayImage(chef.avatarUrl, 'chef-1');
+    const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:'));
 
     return (
         <Link
@@ -29,7 +30,7 @@ export function ChefCard({ chef, priority = false }: ChefCardProps) {
         >
             <Card className="overflow-hidden transition-all hover:shadow-lg w-full flex flex-col group relative">
                 <div className="relative h-96 w-full bg-muted/20 flex items-center justify-center">
-                    {!chef.avatarUrl ? (
+                    {!isValidImage ? (
                         <div className="flex flex-col items-center justify-center text-muted-foreground/30">
                             <UserCircle2 className="h-20 w-20 mb-2" />
                             <span className="text-xs font-bold uppercase tracking-widest">No Portrait</span>

@@ -130,8 +130,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const toggleMobileSidebar = () => setIsMobileSidebarOpen(!isMobileSidebarOpen);
 
   const handleLogout = async () => {
-    const { signOut } = await import('@/firebase');
-    if (signOut) signOut();
+    if (window.confirm("Are you sure you want to logout?")) {
+      const { signOut } = await import('@/firebase');
+      if (signOut) signOut();
+    }
   };
 
   const sidebarNav = [
@@ -155,7 +157,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
   const SIDEBAR_BORDER = 'var(--sidebar-border, #e6e6e6)';
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex w-full">
       <style>{`
         .sidebar-inner { -ms-overflow-style: none; scrollbar-width: none; }
         .sidebar-inner::-webkit-scrollbar { display: none; }
@@ -317,10 +319,10 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
       )}
 
       <div
-        className="flex-1 flex flex-col min-h-screen"
+        className="flex-1 flex flex-col min-h-screen w-full min-w-0"
         style={{
-          marginLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
-          transition: 'margin-left 0.3s ease-in-out'
+          paddingLeft: (isMounted && isMdUp && showSidebar) ? (isCollapsed ? '80px' : '260px') : 0,
+          transition: 'padding-left 0.3s ease-in-out'
         }}
       >
         <Header
@@ -329,7 +331,7 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
         />
 
         {/* Floating Hamburger Trigger */}
-        {true && !isMobileSidebarOpen && (
+        {!isMdUp && !isMobileSidebarOpen && (
           <div
             className={cn(
               "fixed left-4 z-[60] transition-all duration-700 ease-in-out",

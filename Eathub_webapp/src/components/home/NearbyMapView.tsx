@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { useState, useCallback, useEffect } from 'react';
 import { MapPin, ChefHat, Store, Home, Loader2, Navigation, Filter, SlidersHorizontal, Star, Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -298,10 +299,12 @@ export default function NearbyMapView() {
                 p.type === 'chef' ? 'bg-purple-600' : p.type === 'home-food' ? 'bg-orange-500' : 'bg-blue-600'
               )}>
                 {p.imageId || p.avatarUrl ? (
-                  <img
+                  <Image
                     src={p.imageId || p.avatarUrl}
                     alt={p.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="48px"
+                    className="object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
                 ) : (

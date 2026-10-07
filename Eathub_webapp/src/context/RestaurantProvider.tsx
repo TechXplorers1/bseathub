@@ -57,15 +57,15 @@ export function RestaurantProvider({
     try {
       const [restaurantsRes, homeFoodRes, chefsRes] =
         await Promise.all([
-          fetch(`${API_BASE}/restaurants`),
-          fetch(`${API_BASE}/home-food`),
-          fetch(`${API_BASE}/chefs`)
+          fetch(`${API_BASE}/restaurants`).catch(e => { console.error("Restaurants API failed:", e); return null; }),
+          fetch(`${API_BASE}/home-food`).catch(e => { console.error("Home-food API failed:", e); return null; }),
+          fetch(`${API_BASE}/chefs`).catch(e => { console.error("Chefs API failed:", e); return null; })
         ]);
 
       const [rawRestaurantsData, homeFoodData, rawChefsData] = await Promise.all([
-        restaurantsRes.ok ? restaurantsRes.json() : [],
-        homeFoodRes.ok ? homeFoodRes.json() : [],
-        chefsRes.ok ? chefsRes.json() : []
+        restaurantsRes && restaurantsRes.ok ? restaurantsRes.json() : [],
+        homeFoodRes && homeFoodRes.ok ? homeFoodRes.json() : [],
+        chefsRes && chefsRes.ok ? chefsRes.json() : []
       ]);
 
       const restaurantsData = rawRestaurantsData.filter((item: any) => 

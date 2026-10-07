@@ -816,7 +816,7 @@ export default function HomeFoodSettingsPage() {
                             <span className="text-xs font-medium text-muted-foreground">PDF Document Uploaded</span>
                           </div>
                         ) : (
-                          <img src={form.idProofUrl} className="w-full h-full object-cover" />
+                          <img src={form.idProofUrl} className="w-full h-full object-cover" alt="ID Proof" />
                         )}
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button size="sm" variant="secondary" onClick={() => idProofInputRef.current?.click()}>Change</Button>

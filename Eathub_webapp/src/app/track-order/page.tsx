@@ -79,10 +79,10 @@ export default function TrackOrderPage() {
 
     return (
         <>
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow flex items-center justify-center">
-                <div className='w-full'>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow flex flex-col items-center justify-center w-full min-h-[calc(100vh-100px)]">
+                <div className="w-full flex flex-col items-center justify-center max-w-5xl mx-auto">
                     <h1 className="text-3xl font-bold text-center mb-8">Track Your Order</h1>
-                    <Card className="mx-auto max-w-4xl shadow-xl border-t-4 border-t-primary">
+                    <Card className="w-full max-w-4xl shadow-xl border-t-4 border-t-primary mx-auto">
                         <CardHeader className="pb-4">
                             <div className="flex justify-between items-start">
                                 <div>

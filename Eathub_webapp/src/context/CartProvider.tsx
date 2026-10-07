@@ -101,6 +101,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...prevItems, { ...itemWithProvider, quantity: 1 }];
     });
 
+    if (!providerInfo) {
+      setProviderInfo(provider);
+    }
+
     toast({
       title: 'Added to cart',
       description: `${item.name} added to your order.`,
@@ -144,7 +148,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const checkout = async (customAddress?: string) => {
-    if (cartItems.length === 0 || !providerInfo) return;
+    const activeProvider = providerInfo || (cartItems.length > 0 && cartItems[0].providerId ? {
+        id: cartItems[0].providerId as string,
+        type: (cartItems[0].providerType === 'home-food' ? 'HomeFood' : 'Restaurant') as 'HomeFood' | 'Restaurant',
+        name: cartItems[0].providerName as string
+    } : null);
+
+    if (cartItems.length === 0 || !activeProvider) {
+        console.warn('Checkout failed: Missing cart items or provider info', { cartItems, providerInfo, activeProvider });
+        return;
+    }
 
     setIsCheckingOut(true);
     try {
@@ -172,8 +185,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       const orderPayload: OrderRequest = {
         customerId: userProfile.id,
-        sourceType: providerInfo.type,
-        sourceId: providerInfo.id,
+        sourceType: activeProvider.type,
+        sourceId: activeProvider.id,
         deliveryAddress: finalAddress,
         subtotalAmount: subtotal,
         taxAmount: tax,

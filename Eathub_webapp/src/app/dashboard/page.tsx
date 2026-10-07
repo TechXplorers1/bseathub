@@ -296,7 +296,7 @@ export default function DashboardPage() {
                                                                     <TableCell className="text-right py-4">
                                                                         <DropdownMenu>
                                                                             <DropdownMenuTrigger asChild>
-                                                                                <Button variant="ghost" size="icon" className="rounded-full"><MoreHorizontal className="h-4 w-4" /></Button>
+                                                                                <Button variant="ghost" size="icon" className="rounded-full" aria-label="More options"><MoreHorizontal className="h-4 w-4" /></Button>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align="end" className="rounded-xl shadow-xl w-48 p-2">
                                                                                 <DropdownMenuItem className="font-bold rounded-lg" onClick={() => setSelectedOrder(order)}>View Invoice</DropdownMenuItem>
@@ -419,7 +419,7 @@ export default function DashboardPage() {
                                                                     <TableCell className="text-right py-4">
                                                                         <DropdownMenu>
                                                                             <DropdownMenuTrigger asChild>
-                                                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full"><MoreHorizontal className="h-4 w-4" /></Button>
+                                                                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" aria-label="More options"><MoreHorizontal className="h-4 w-4" /></Button>
                                                                             </DropdownMenuTrigger>
                                                                             <DropdownMenuContent align="end" className="rounded-xl shadow-xl w-48 p-2">
                                                                                 <DropdownMenuItem className="font-bold rounded-lg" onClick={() => router.push(`/restaurant/${booking.chefId}?chef=${booking.chefName}`)}>

@@ -12,6 +12,14 @@ import {
     SheetClose,
 } from '@/components/ui/sheet';
 import { getDisplayImage } from '@/lib/image-utils';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter
+} from '@/components/ui/dialog';
 import { Minus, Plus, Trash2, ShoppingCart, Loader2, MapPin, Home, Navigation, Map, Building2, Globe, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fetchUserProfile } from '@/services/api';
@@ -35,6 +43,7 @@ export function Cart() {
     const [addressType, setAddressType] = useState<'profile' | 'new'>('profile');
     const [profileAddress, setProfileAddress] = useState<string>('');
     const [loadingProfile, setLoadingProfile] = useState(false);
+    const [isNewAddressModalOpen, setIsNewAddressModalOpen] = useState(false);
     const [newAddress, setNewAddress] = useState({
         houseNumber: '',
         street: '',
@@ -206,7 +215,12 @@ export function Cart() {
                             <RadioGroup
                                 defaultValue="profile"
                                 value={addressType}
-                                onValueChange={(val) => setAddressType(val as 'profile' | 'new')}
+                                onValueChange={(val) => {
+                                    setAddressType(val as 'profile' | 'new');
+                                    if (val === 'new') {
+                                        setIsNewAddressModalOpen(true);
+                                    }
+                                }}
                                 className="space-y-4"
                             >
                                 <div className={cn(
@@ -233,14 +247,21 @@ export function Cart() {
                                     addressType === 'new' ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"
                                 )}>
                                     <RadioGroupItem value="new" id="new" className="mt-1" />
-                                    <Label htmlFor="new" className="flex-1 font-normal cursor-pointer">
+                                    <Label htmlFor="new" className="flex-1 font-normal cursor-pointer" onClick={(e) => {
+                                        if (addressType === 'new') {
+                                            e.preventDefault();
+                                            setIsNewAddressModalOpen(true);
+                                        }
+                                    }}>
                                         <div className="flex flex-col gap-1">
                                             <span className="font-bold flex items-center gap-2">
                                                 <Home className="h-4 w-4 text-primary" />
                                                 New Delivery Address
                                             </span>
                                             <span className="text-xs text-muted-foreground">
-                                                Enter a different location for this order.
+                                                {addressType === 'new' && isAddressValid() ? 
+                                                    `${newAddress.houseNumber}, ${newAddress.street}, ${newAddress.city}` : 
+                                                    "Enter a different location for this order."}
                                             </span>
                                         </div>
                                     </Label>
@@ -261,43 +282,10 @@ export function Cart() {
                             )}
 
                             {addressType === 'new' && (
-                                <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-4 duration-300">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">Flat / House No.</Label>
-                                            <div className="relative">
-                                                <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                                                <Input name="houseNumber" value={newAddress.houseNumber} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Apt 4B" />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">Street / Locality</Label>
-                                            <div className="relative">
-                                                <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                                                <Input name="street" value={newAddress.street} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Main St" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs">Landmark / Area</Label>
-                                        <div className="relative">
-                                            <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                                            <Input name="area" value={newAddress.area} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Near Park" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">City</Label>
-                                            <div className="relative">
-                                                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                                                <Input name="city" value={newAddress.city} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Mumbai" />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label className="text-xs">State</Label>
-                                            <Input name="state" value={newAddress.state} onChange={handleAddressChange} className="h-9 text-sm" placeholder="MH" />
-                                        </div>
-                                    </div>
+                                <div className="pt-2 flex justify-center">
+                                    <Button variant="outline" size="sm" onClick={() => setIsNewAddressModalOpen(true)}>
+                                        Edit Address Details
+                                    </Button>
                                 </div>
                             )}
                         </div>
@@ -375,6 +363,58 @@ export function Cart() {
                     )}
                 </div>
             </SheetFooter>
+
+            <Dialog open={isNewAddressModalOpen} onOpenChange={setIsNewAddressModalOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>New Delivery Address</DialogTitle>
+                        <DialogDescription>
+                            Enter the details for your new delivery location.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label className="text-xs">Flat / House No.</Label>
+                                <div className="relative">
+                                    <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                    <Input name="houseNumber" value={newAddress.houseNumber} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Apt 4B" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-xs">Street / Locality</Label>
+                                <div className="relative">
+                                    <Navigation className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                    <Input name="street" value={newAddress.street} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Main St" />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Landmark / Area</Label>
+                            <div className="relative">
+                                <Map className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                <Input name="area" value={newAddress.area} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Near Park" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label className="text-xs">City</Label>
+                                <div className="relative">
+                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                    <Input name="city" value={newAddress.city} onChange={handleAddressChange} className="pl-9 h-9 text-sm" placeholder="Mumbai" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-xs">State</Label>
+                                <Input name="state" value={newAddress.state} onChange={handleAddressChange} className="h-9 text-sm" placeholder="MH" />
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={() => setIsNewAddressModalOpen(false)}>Save Address</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

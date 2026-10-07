@@ -9,11 +9,13 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface ChefsCarouselProps {
-  /** When provided (distance filter active), overrides the full chefs list */
+  /** When provided, overrides the full chefs list */
   filteredChefs?: any[];
+  /** Indicates if a distance filter is active */
+  isFiltered?: boolean;
 }
 
-export function ChefsCarousel({ filteredChefs }: ChefsCarouselProps) {
+export function ChefsCarousel({ filteredChefs, isFiltered = false }: ChefsCarouselProps) {
   const { chefs, loading: providerLoading } = useRestaurants();
 
   if (providerLoading) {
@@ -29,10 +31,9 @@ export function ChefsCarousel({ filteredChefs }: ChefsCarouselProps) {
     );
   }
 
-  // Use filteredChefs when distance filter is active, otherwise use full list
+  // Use filteredChefs when provided, otherwise use full list
   const displayChefs = filteredChefs !== undefined ? filteredChefs : chefs;
 
-  const isFiltered = filteredChefs !== undefined;
   const title = isFiltered
     ? `Private Chefs Nearby (${displayChefs.length})`
     : 'Book a Private Chef';

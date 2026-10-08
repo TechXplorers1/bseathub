@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Restaurant } from '@/lib/types';
@@ -12,42 +13,44 @@ interface RestaurantCardProps {
 }
 
 export function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  const displayImage = getDisplayImage(restaurant.coverImageId || restaurant.imageId, 'restaurant-1');
-  const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:'));
-  // Safe check for services array
-  const services = restaurant.services || [];
-  const typePrefix = restaurant.type === 'home-food' ? 'home-food' : 'restaurant';
-  const displayName = restaurant.name || (restaurant as any).brandName || 'Provider';
+    const displayImage = getDisplayImage(restaurant.coverImageId || restaurant.imageId, 'restaurant-1');
+    const [imgError, setImgError] = useState(false);
+    const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:')) && !imgError;
+    // Safe check for services array
+    const services = restaurant.services || [];
+    const typePrefix = restaurant.type === 'home-food' ? 'home-food' : 'restaurant';
+    const displayName = restaurant.name || (restaurant as any).brandName || 'Provider';
 
-  return (
-    <Link
-      href={`/${typePrefix}/${restaurant.slug || restaurant.id}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex group"
-    >
-      <Card className="overflow-hidden transition-all hover:shadow-xl w-full flex flex-col border-muted/60">
-        <div className="relative h-48 w-full overflow-hidden bg-muted/30 flex items-center justify-center">
-          {(!isValidImage) ? (
-            <div className="flex flex-col items-center justify-center text-muted-foreground/40">
-              {restaurant.type === 'home-food' ? (
-                <ChefHat className="h-12 w-12 mb-2" />
-              ) : (
-                <Utensils className="h-12 w-12 mb-2" />
-              )}
-              <span className="text-xs font-semibold uppercase tracking-wider">No Image</span>
-            </div>
-          ) : (
-            <Image
-              src={displayImage}
-              alt={displayName}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          )}
-          
-          <div className="absolute top-2 right-2">
+    return (
+        <Link
+            href={`/${typePrefix}/${restaurant.slug || restaurant.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex group"
+        >
+            <Card className="overflow-hidden transition-all hover:shadow-xl w-full flex flex-col border-muted/60">
+                <div className="relative h-48 w-full overflow-hidden bg-muted/30 flex items-center justify-center">
+                    {(!isValidImage) ? (
+                        <div className="flex flex-col items-center justify-center text-muted-foreground/40">
+                            {restaurant.type === 'home-food' ? (
+                                <ChefHat className="h-12 w-12 mb-2" />
+                            ) : (
+                                <Utensils className="h-12 w-12 mb-2" />
+                            )}
+                            <span className="text-xs font-semibold uppercase tracking-wider">No Image</span>
+                        </div>
+                    ) : (
+                        <Image
+                            src={displayImage}
+                            alt={displayName}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            onError={() => setImgError(true)}
+                        />
+                    )}
+                    
+                    <div className="absolute top-2 right-2">
             <FavoriteButton
               targetId={restaurant.id}
               targetType={restaurant.type === 'home-food' ? 'HOME_FOOD' : 'RESTAURANT'}

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useLocation } from '@/context/LocationProvider';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { getDisplayImage } from '@/lib/image-utils';
 
 import type React from 'react';
 const BASE_URL = 'http://localhost:8081/api/v1';
@@ -300,7 +301,7 @@ export default function NearbyMapView() {
               )}>
                 {p.imageId || p.avatarUrl ? (
                   <Image
-                    src={p.imageId || p.avatarUrl}
+                    src={getDisplayImage(p.imageId || p.avatarUrl, 'restaurant-1')}
                     alt={p.name}
                     fill
                     sizes="48px"

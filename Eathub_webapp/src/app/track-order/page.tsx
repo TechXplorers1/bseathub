@@ -67,8 +67,8 @@ export default function TrackOrderPage() {
     }
 
     const dynamicItems = orderDetail 
-        ? orderDetail.items.map(item => ({ id: item.itemRefId, name: item.itemName }))
-        : (DEMO_ORDER.items.map(name => ({ id: 'demo-1', name: name })));
+        ? orderDetail.items.map(item => ({ itemRefId: item.itemRefId, itemName: item.itemName }))
+        : (DEMO_ORDER.items.map(name => ({ itemRefId: 'demo-1', itemName: name })));
 
     const dynamicTotal = orderDetail ? orderDetail.totalAmount : DEMO_ORDER.amount;
     const dynamicRestaurant = orderDetail ? (orderDetail.sourceType + " " + orderDetail.sourceId) : DEMO_ORDER.restaurant;

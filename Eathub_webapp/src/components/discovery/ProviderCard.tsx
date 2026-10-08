@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,8 @@ interface ProviderCardProps {
 
 export function ProviderCard({ provider }: ProviderCardProps) {
     const imageUrl = getDisplayImage(provider.imageId, 'restaurant-1');
+    const [imgError, setImgError] = useState(false);
+    const isValidImage = imageUrl && (imageUrl.startsWith('/') || imageUrl.startsWith('http') || imageUrl.startsWith('data:')) && !imgError;
 
     const href =
         provider.type === "RESTAURANT"
@@ -43,7 +46,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
         <Link href={href} className="block group">
             <Card className="overflow-hidden border-muted/60 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full bg-white flex flex-col">
                 <div className="relative h-56 w-full overflow-hidden bg-muted/30 flex items-center justify-center">
-                    {!provider.imageId ? (
+                    {!isValidImage ? (
                         <div className="flex flex-col items-center justify-center text-muted-foreground/40">
                             <Utensils className="h-14 w-14 mb-2" />
                             <span className="text-[10px] font-black tracking-widest uppercase">No Preview</span>
@@ -54,6 +57,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
                             alt={provider.name}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            onError={() => setImgError(true)}
                         />
                     )}
 

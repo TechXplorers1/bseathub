@@ -44,7 +44,15 @@ export function getDisplayImage(
   }
 
   // Assume it's a URL or Base64 string
-  return idOrUrl as string;
+  const urlStr = idOrUrl as string;
+  
+  // Block API images to decrease loading time and prevent timeouts/500 errors
+  if (urlStr.startsWith('http://localhost') || urlStr.startsWith('https://example.com')) {
+    const fallback = getImageById(fallbackId);
+    return fallback?.imageUrl || '';
+  }
+
+  return urlStr;
 }
 
 /**

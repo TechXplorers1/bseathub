@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,7 +20,8 @@ interface ChefCardProps {
 
 export function ChefCard({ chef, priority = false }: ChefCardProps) {
     const displayImage = getDisplayImage(chef.avatarUrl, 'chef-1');
-    const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:'));
+    const [imgError, setImgError] = useState(false);
+    const isValidImage = displayImage && (displayImage.startsWith('/') || displayImage.startsWith('http') || displayImage.startsWith('data:')) && !imgError;
 
     return (
         <Link
@@ -43,6 +45,7 @@ export function ChefCard({ chef, priority = false }: ChefCardProps) {
                             className="object-cover"
                             priority={priority}
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                            onError={() => setImgError(true)}
                         />
                     )}
                     

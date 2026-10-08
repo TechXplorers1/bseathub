@@ -37,9 +37,15 @@ public class DataMigrationService {
             if (r.getImageId() != null && r.getImageId().startsWith("data:image/")) {
                 r.setImageId(imageStorageService.storeImageIfBase64(r.getImageId()));
                 updated = true;
+            } else if (r.getImageId() != null && r.getImageId().contains("/uploads/images/") && !r.getImageId().contains("/api/uploads/images/")) {
+                r.setImageId(r.getImageId().replace("/uploads/images/", "/api/uploads/images/"));
+                updated = true;
             }
             if (r.getCoverImageId() != null && r.getCoverImageId().startsWith("data:image/")) {
                 r.setCoverImageId(imageStorageService.storeImageIfBase64(r.getCoverImageId()));
+                updated = true;
+            } else if (r.getCoverImageId() != null && r.getCoverImageId().contains("/uploads/images/") && !r.getCoverImageId().contains("/api/uploads/images/")) {
+                r.setCoverImageId(r.getCoverImageId().replace("/uploads/images/", "/api/uploads/images/"));
                 updated = true;
             }
             if (updated) {
@@ -57,6 +63,10 @@ public class DataMigrationService {
                 mi.setImageId(imageStorageService.storeImageIfBase64(mi.getImageId()));
                 menuItemRepository.save(mi);
                 miUpdated = true;
+            } else if (mi.getImageId() != null && mi.getImageId().contains("/uploads/images/") && !mi.getImageId().contains("/api/uploads/images/")) {
+                mi.setImageId(mi.getImageId().replace("/uploads/images/", "/api/uploads/images/"));
+                menuItemRepository.save(mi);
+                miUpdated = true;
             }
         }
         if (miUpdated) System.out.println("Migrated menu item images.");
@@ -67,6 +77,10 @@ public class DataMigrationService {
         for (com.eathub.common.entity.ChefService cs : chefServices) {
             if (cs.getImageId() != null && cs.getImageId().startsWith("data:image/")) {
                 cs.setImageId(imageStorageService.storeImageIfBase64(cs.getImageId()));
+                chefServiceRepository.save(cs);
+                csUpdated = true;
+            } else if (cs.getImageId() != null && cs.getImageId().contains("/uploads/images/") && !cs.getImageId().contains("/api/uploads/images/")) {
+                cs.setImageId(cs.getImageId().replace("/uploads/images/", "/api/uploads/images/"));
                 chefServiceRepository.save(cs);
                 csUpdated = true;
             }
@@ -81,9 +95,15 @@ public class DataMigrationService {
             if (h.getImageId() != null && h.getImageId().startsWith("data:image/")) {
                 h.setImageId(imageStorageService.storeImageIfBase64(h.getImageId()));
                 updated = true;
+            } else if (h.getImageId() != null && h.getImageId().contains("/uploads/images/") && !h.getImageId().contains("/api/uploads/images/")) {
+                h.setImageId(h.getImageId().replace("/uploads/images/", "/api/uploads/images/"));
+                updated = true;
             }
             if (h.getCoverImageId() != null && h.getCoverImageId().startsWith("data:image/")) {
                 h.setCoverImageId(imageStorageService.storeImageIfBase64(h.getCoverImageId()));
+                updated = true;
+            } else if (h.getCoverImageId() != null && h.getCoverImageId().contains("/uploads/images/") && !h.getCoverImageId().contains("/api/uploads/images/")) {
+                h.setCoverImageId(h.getCoverImageId().replace("/uploads/images/", "/api/uploads/images/"));
                 updated = true;
             }
             if (updated) {
@@ -101,9 +121,15 @@ public class DataMigrationService {
             if (c.getAvatarUrl() != null && c.getAvatarUrl().startsWith("data:image/")) {
                 c.setAvatarUrl(imageStorageService.storeImageIfBase64(c.getAvatarUrl()));
                 updated = true;
+            } else if (c.getAvatarUrl() != null && c.getAvatarUrl().contains("/uploads/images/") && !c.getAvatarUrl().contains("/api/uploads/images/")) {
+                c.setAvatarUrl(c.getAvatarUrl().replace("/uploads/images/", "/api/uploads/images/"));
+                updated = true;
             }
             if (c.getCoverImageId() != null && c.getCoverImageId().startsWith("data:image/")) {
                 c.setCoverImageId(imageStorageService.storeImageIfBase64(c.getCoverImageId()));
+                updated = true;
+            } else if (c.getCoverImageId() != null && c.getCoverImageId().contains("/uploads/images/") && !c.getCoverImageId().contains("/api/uploads/images/")) {
+                c.setCoverImageId(c.getCoverImageId().replace("/uploads/images/", "/api/uploads/images/"));
                 updated = true;
             }
             if (updated) {

@@ -52,7 +52,7 @@ public class ImageStorageService {
                     fos.write(imageBytes);
                 }
 
-                return SERVER_URL + "/uploads/images/" + fileName;
+                return SERVER_URL + "/api/uploads/images/" + fileName;
 
             } catch (Exception e) {
                 System.err.println("Failed to process base64 image: " + e.getMessage());

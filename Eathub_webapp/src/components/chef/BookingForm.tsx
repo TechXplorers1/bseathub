@@ -39,6 +39,7 @@ import { Switch } from '@/components/ui/switch';
 import { useHeader } from '@/context/HeaderProvider';
 import type { MenuCategory } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 const bookingFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -144,6 +145,16 @@ export function BookingForm({
   const onSubmit = async (data: BookingFormValues) => {
     if (!customerInfo.id) {
       setIsAuthSuggestionOpen(true);
+      return;
+    }
+    
+    const fullNumber = `${data.countryCode}${data.phone}`;
+    if (!isValidPhoneNumber(fullNumber)) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a valid mobile number for the selected country.',
+      });
       return;
     }
 
@@ -270,7 +281,16 @@ export function BookingForm({
                       <FormItem>
                         <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">Mobile Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter Number" {...field} className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-base px-5" />
+                          <Input 
+                            placeholder="Enter Number" 
+                            {...field} 
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              field.onChange(numericValue);
+                            }}
+                            className="rounded-2xl h-14 border-muted/50 bg-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-base px-5" 
+                            inputMode="numeric"
+                          />
                         </FormControl>
                         <FormMessage className="text-xs font-bold" />
                       </FormItem>

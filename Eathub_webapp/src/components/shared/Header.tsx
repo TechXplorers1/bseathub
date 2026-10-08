@@ -519,7 +519,7 @@ export function Header({ className, style }: HeaderProps) {
                       <DropdownMenuItem asChild>
                         <Link href="/profile" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
                           <User className="mr-3 h-4 w-4 text-blue-500" />
-                          Account
+                          Profile
                         </Link>
                       </DropdownMenuItem>
                     )}

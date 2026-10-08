@@ -23,16 +23,16 @@ export interface MapboxMapProps {
   onProviderSelect: (p: NearbyProvider) => void;
 }
 
-// Dynamic import of the Mapbox map
-const MapboxMap = dynamic<MapboxMapProps>(
-  () => import('./MapboxMap') as any,
+// Dynamic import of the Leaflet map
+const LeafletMap = dynamic<MapboxMapProps>(
+  () => import('./LeafletMap') as any,
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-primary font-medium">Initializing Mapbox...</p>
+          <p className="text-sm text-primary font-medium">Initializing Map...</p>
         </div>
       </div>
     ),
@@ -247,14 +247,16 @@ export default function NearbyMapView() {
           )}
 
           {coordinates && (
-            <MapboxMap
-              userLat={coordinates.lat}
-              userLng={coordinates.lng}
-              providers={filteredProviders}
-              selectedProvider={selectedProvider}
-              hoveredId={hoveredId}
-              onProviderSelect={setSelectedProvider}
-            />
+            <div className="absolute inset-0 w-full h-full z-0">
+              <LeafletMap
+                userLat={coordinates.lat}
+                userLng={coordinates.lng}
+                providers={filteredProviders}
+                selectedProvider={selectedProvider}
+                hoveredId={hoveredId}
+                onProviderSelect={setSelectedProvider}
+              />
+            </div>
           )}
 
           {/* Map Legend */}

@@ -52,7 +52,12 @@ export function getDisplayImage(
     return fallback?.imageUrl || '';
   }
 
-  return urlStr;
+  if (urlStr.startsWith('data:image') || urlStr.startsWith('http') || urlStr.startsWith('/')) {
+    return urlStr;
+  }
+
+  const fallback = getImageById(fallbackId);
+  return fallback?.imageUrl || '';
 }
 
 /**

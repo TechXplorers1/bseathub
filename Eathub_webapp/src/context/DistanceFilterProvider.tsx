@@ -114,11 +114,12 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
     fetchProfileLoc();
   }, [coordinates, isLocating, location]);
 
-  const fetchNearby = useCallback(async (lat: number, lng: number, radius: number) => {
+  const fetchNearby = useCallback(async (lat: number, lng: number, radius: number, signal?: AbortSignal) => {
     setIsFetchingNearby(true);
     try {
       const res = await fetch(
-        `${API_BASE}/discovery/nearby?lat=${lat}&lng=${lng}&radius=${radius}`
+        `${API_BASE}/discovery/nearby?lat=${lat}&lng=${lng}&radius=${radius}`,
+        { signal }
       );
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -142,7 +143,10 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
         homeFoods: (data.homeFoods || []).map((h: any) => normalize(h, 'home-food')),
         chefs: data.chefs || [],
       });
-    } catch (e) {
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        return; // Silent ignore for aborted duplicate requests
+      }
       console.error('Distance filter fetch error:', e);
       setNearbyData(null);
     } finally {
@@ -155,8 +159,13 @@ export function DistanceFilterProvider({ children }: { children: ReactNode }) {
       setNearbyData(null);
       return;
     }
+    const abortController = new AbortController();
     const radiusToFetch = selectedRadius !== null ? selectedRadius : 50; 
-    fetchNearby(resolvedCoords.lat, resolvedCoords.lng, radiusToFetch);
+    fetchNearby(resolvedCoords.lat, resolvedCoords.lng, radiusToFetch, abortController.signal);
+    
+    return () => {
+      abortController.abort();
+    };
   }, [selectedRadius, resolvedCoords, fetchNearby]);
 
   const hasLocation = !!resolvedCoords;

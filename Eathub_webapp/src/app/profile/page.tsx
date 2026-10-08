@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import {
     Popover,
@@ -31,10 +32,12 @@ import {
 } from "@/components/ui/popover";
 import { countries } from '@/constants/countries';
 import { fetchUserProfile, updateProfile } from '@/services/api';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [form, setForm] = useState({
         firstName: '',
         lastName: '',
@@ -125,16 +128,44 @@ export default function ProfilePage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        if (errors[e.target.name]) {
+            setErrors({ ...errors, [e.target.name]: '' });
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const newErrors: Record<string, string> = {};
+        if (!form.firstName.trim()) newErrors.firstName = "First Name is required";
+        if (!form.lastName.trim()) newErrors.lastName = "Last Name is required";
+        if (!form.mobile.trim()) newErrors.mobile = "Mobile Number is required";
+        if (!form.houseNumber.trim()) newErrors.houseNumber = "Address Line 1 is required";
+        if (!form.city.trim()) newErrors.city = "City is required";
+        if (!form.state.trim()) newErrors.state = "State is required";
+        if (!form.country.trim()) newErrors.country = "Country is required";
+
+        const fullNumber = `${form.countryCode}${form.mobile}`;
+        if (form.mobile.trim() && !isValidPhoneNumber(fullNumber)) {
+            newErrors.mobile = "Please enter a valid mobile number";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            toast({
+                variant: "destructive",
+                title: "Validation Error",
+                description: "Please fill in all required fields correctly.",
+            });
+            return;
+        }
+
         setSaving(true);
         try {
             await updateProfile({
                 ...form,
                 name: `${form.firstName} ${form.lastName}`,
-                mobileNumber: `${form.countryCode}${form.mobile}`
+                mobileNumber: fullNumber
             });
 
             const fullName = `${form.firstName} ${form.lastName}`;
@@ -147,8 +178,12 @@ export default function ProfilePage() {
 
             toast({
                 title: "Profile Updated",
-                description: "Your details have been successfully saved.",
+                description: "Your details have been successfully saved. Redirecting to home...",
             });
+            
+            setTimeout(() => {
+                router.push('/');
+            }, 1500);
         } catch (error: any) {
             toast({
                 variant: "destructive",
@@ -188,7 +223,7 @@ export default function ProfilePage() {
                 </Button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Summary Card */}
                     <Card className="md:col-span-1 h-fit">
@@ -245,12 +280,14 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>First Name</Label>
-                                    <Input name="firstName" value={form.firstName} onChange={handleChange} placeholder="John" required />
+                                    <Label>First Name <span className="text-red-500">*</span></Label>
+                                    <Input name="firstName" value={form.firstName} onChange={handleChange} placeholder="John" className={cn(errors.firstName && "border-red-500 focus-visible:ring-red-500")} />
+                                    {errors.firstName && <p className="text-xs text-red-500 font-medium">{errors.firstName}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Last Name</Label>
-                                    <Input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Doe" required />
+                                    <Label>Last Name <span className="text-red-500">*</span></Label>
+                                    <Input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Doe" className={cn(errors.lastName && "border-red-500 focus-visible:ring-red-500")} />
+                                    {errors.lastName && <p className="text-xs text-red-500 font-medium">{errors.lastName}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Email Address</Label>
@@ -258,7 +295,7 @@ export default function ProfilePage() {
                                     <p className="text-[10px] text-muted-foreground">Email cannot be changed.</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Mobile Number</Label>
+                                    <Label>Mobile Number <span className="text-red-500">*</span></Label>
                                     <div className="flex gap-2">
                                         <Popover open={isCountrySelectOpen} onOpenChange={setIsCountrySelectOpen}>
                                             <PopoverTrigger asChild>
@@ -303,8 +340,21 @@ export default function ProfilePage() {
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
-                                        <Input name="mobile" value={form.mobile} onChange={handleChange} placeholder="9876543210" className="flex-1" required />
+                                        <Input
+                                            name="mobile"
+                                            value={form.mobile}
+                                            onChange={(e) => {
+                                                const numericValue = e.target.value.replace(/\D/g, '');
+                                                handleChange({
+                                                    target: { name: 'mobile', value: numericValue }
+                                                } as any);
+                                            }}
+                                            placeholder="9876543210"
+                                            className={cn("flex-1", errors.mobile && "border-red-500 focus-visible:ring-red-500")}
+                                            inputMode="numeric"
+                                        />
                                     </div>
+                                    {errors.mobile && <p className="text-xs text-red-500 font-medium">{errors.mobile}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -318,11 +368,12 @@ export default function ProfilePage() {
                             </CardHeader>
                             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>Address Line 1 (House, Apt, Building)</Label>
+                                    <Label>Address Line 1 (House, Apt, Building) <span className="text-red-500">*</span></Label>
                                     <div className="relative">
                                         <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="houseNumber" value={form.houseNumber} onChange={handleChange} placeholder="Apt 4B / 123 Main St" className="pl-10" required />
+                                        <Input name="houseNumber" value={form.houseNumber} onChange={handleChange} placeholder="Apt 4B / 123 Main St" className={cn("pl-10", errors.houseNumber && "border-red-500 focus-visible:ring-red-500")} />
                                     </div>
+                                    {errors.houseNumber && <p className="text-xs text-red-500 font-medium">{errors.houseNumber}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Address Line 2 (Street, Sector, Area)</Label>
@@ -339,25 +390,28 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Town / City</Label>
+                                    <Label>Town / City <span className="text-red-500">*</span></Label>
                                     <div className="relative">
                                         <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="city" value={form.city} onChange={handleChange} placeholder="New York" className="pl-10" required />
+                                        <Input name="city" value={form.city} onChange={handleChange} placeholder="New York" className={cn("pl-10", errors.city && "border-red-500 focus-visible:ring-red-500")} />
                                     </div>
+                                    {errors.city && <p className="text-xs text-red-500 font-medium">{errors.city}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>State / Province / Region</Label>
+                                    <Label>State / Province / Region <span className="text-red-500">*</span></Label>
                                     <div className="relative">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="state" value={form.state} onChange={handleChange} placeholder="NY" className="pl-10" required />
+                                        <Input name="state" value={form.state} onChange={handleChange} placeholder="NY" className={cn("pl-10", errors.state && "border-red-500 focus-visible:ring-red-500")} />
                                     </div>
+                                    {errors.state && <p className="text-xs text-red-500 font-medium">{errors.state}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Country</Label>
+                                    <Label>Country <span className="text-red-500">*</span></Label>
                                     <div className="relative">
                                         <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input name="country" value={form.country} onChange={handleChange} placeholder="United States" className="pl-10" required />
+                                        <Input name="country" value={form.country} onChange={handleChange} placeholder="United States" className={cn("pl-10", errors.country && "border-red-500 focus-visible:ring-red-500")} />
                                     </div>
+                                    {errors.country && <p className="text-xs text-red-500 font-medium">{errors.country}</p>}
                                 </div>
                             </CardContent>
                         </Card>

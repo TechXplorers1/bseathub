@@ -8,7 +8,7 @@ import { createOrder, fetchUserProfile, createRazorpayOrder, updateOrderPaymentS
 import { useRouter } from 'next/navigation';
 import { loadRazorpay } from '@/lib/razorpay';
 import { requestForToken, onMessageListener } from '@/lib/firebase';
-import { updateFcmToken } from '@/services/api';
+import { requestForToken, onMessageListener } from '@/lib/firebase';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -52,18 +52,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Initialize Firebase Notifications
-    const initNotifications = async () => {
-      const token = await requestForToken();
-      if (token) {
-        await updateFcmToken(token);
-      }
-    };
-
-    // Only init if logged in
-    if (localStorage.getItem('token')) {
-      initNotifications();
-    }
+    // Firebase initialization is handled in NotificationProvider
   }, []);
 
   // Save cart to localStorage on change

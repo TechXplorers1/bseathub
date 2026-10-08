@@ -166,7 +166,7 @@ export function HomeFoodRegistrationDialog({
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0 text-foreground overflow-hidden">
-          <ScrollArea className="flex-1 w-full">
+          <div className="flex-1 w-full overflow-y-auto">
             <div className="p-6 space-y-6 pb-12">
               <DialogHeader>
                 <DialogTitle className="text-xl text-center font-bold">Home Food Registration</DialogTitle>
@@ -306,7 +306,7 @@ export function HomeFoodRegistrationDialog({
                 </Button>
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
 

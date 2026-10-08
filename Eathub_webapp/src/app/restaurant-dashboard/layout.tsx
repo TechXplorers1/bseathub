@@ -99,7 +99,7 @@ export default function RestaurantDashboardLayout({
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       {/* ===== DESKTOP SIDEBAR (FIXED & UNSCROLLABLE) ===== */}
-      <aside className="hidden md:block w-[260px] border-r bg-white h-screen fixed left-0 top-0">
+      <aside className="hidden md:block w-[260px] border-r bg-white sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto">
         <div className="h-full flex flex-col py-2">
           <nav className="grid items-start px-4 text-sm font-medium">
             {navItems.map((item) => (
@@ -185,8 +185,8 @@ export default function RestaurantDashboardLayout({
       </aside>
 
       {/* ===== MAIN CONTENT (ONLY THIS SCROLLS) ===== */}
-      <div className="flex-1 md:ml-[260px]">
-        <main className="h-screen overflow-y-auto p-4 lg:p-6">
+      <div className="flex-1">
+        <main className="p-4 lg:p-6">
           {/* Hamburger button only on mobile */}
           <button
             onClick={toggleSidebar}

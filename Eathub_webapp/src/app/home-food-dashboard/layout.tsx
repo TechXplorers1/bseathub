@@ -149,7 +149,7 @@ export default function HomeFoodDashboardLayout({
 
   return (
     <div className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 md:block">
+      <div className="hidden border-r bg-muted/40 md:block sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto">
         <NavContent />
       </div>
 
@@ -176,7 +176,7 @@ export default function HomeFoodDashboardLayout({
           </div>
         </header>
 
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/40 overflow-auto">
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/40">
           {children}
         </main>
       </div>

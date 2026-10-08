@@ -23,6 +23,7 @@ import { login as apiLogin, sendOtp, verifyOtp, AUTH_URL, forgotPassword, resetP
 import { Label } from '@/components/ui/label';
 import { signInWithPopup } from 'firebase/auth';
 import { auth as firebaseAuth, googleProvider } from '@/lib/firebase';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 export default function LoginPage() {
   const [open, setOpen] = useState(true);
@@ -193,6 +194,16 @@ export default function LoginPage() {
 
     try {
       if (!otpSent) {
+        if (!isValidPhoneNumber(regForm.mobile, 'IN')) {
+          toast({
+            variant: "destructive",
+            title: "Invalid Mobile Number",
+            description: "Please enter a valid 10-digit mobile number.",
+          });
+          setLoading(false);
+          return;
+        }
+
         // Step 1: Send OTP
         await sendOtp(regForm.email);
         setOtpSent(true);
@@ -514,7 +525,20 @@ export default function LoginPage() {
                         <Label className="text-[10px] sm:text-xs font-semibold text-muted-foreground">Mobile Number</Label>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input name="mobile" value={regForm.mobile} onChange={handleRegChange} placeholder="9876543210" className="pl-9 h-9 sm:h-10" required />
+                          <Input
+                            name="mobile"
+                            value={regForm.mobile}
+                            onChange={(e) => {
+                              const numericValue = e.target.value.replace(/\D/g, '');
+                              handleRegChange({
+                                target: { name: 'mobile', value: numericValue }
+                              } as any);
+                            }}
+                            placeholder="9876543210"
+                            className="pl-9 h-9 sm:h-10"
+                            inputMode="numeric"
+                            required
+                          />
                         </div>
                       </div>
 

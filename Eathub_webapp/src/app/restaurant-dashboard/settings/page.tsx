@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/dialog';
 import LocationPicker from '@/components/location/LocationPicker';
 import { compressImage } from '@/lib/image-utils';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 export type DayAvailability = { day: string; isOpen: boolean; openTime: string; closeTime: string };
@@ -215,6 +216,12 @@ export default function SettingsPage() {
   // ── Sectioned Save Handlers ───────────────────────────────────────────
   const handleSaveProfile = async () => {
     if (!restaurantId) return;
+    
+    if (form.mobileNumber && !isValidPhoneNumber(form.mobileNumber, 'IN')) {
+      showToast('error', 'Please enter a valid mobile number.');
+      return;
+    }
+
     setSavingSection('profile');
     try {
       // Send core profile data including images
@@ -487,7 +494,15 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Mobile Number</Label>
-                  <Input value={form.mobileNumber} onChange={setField('mobileNumber')} placeholder="10-digit number" />
+                  <Input
+                    value={form.mobileNumber}
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/\D/g, '');
+                      setForm(f => ({ ...f, mobileNumber: numericValue }));
+                    }}
+                    placeholder="10-digit number"
+                    inputMode="numeric"
+                  />
                 </div>
               </div>
 

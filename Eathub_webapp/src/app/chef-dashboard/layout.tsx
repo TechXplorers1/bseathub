@@ -91,7 +91,7 @@ export default function ChefDashboardLayout({
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       {/* Sidebar */}
-      <aside className="hidden border-r bg-background md:block w-[220px] lg:w-[280px]">
+      <aside className="hidden border-r bg-background md:block w-[220px] lg:w-[280px] sticky top-[64px] h-[calc(100vh-64px)] overflow-y-auto">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">

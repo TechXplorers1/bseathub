@@ -45,6 +45,7 @@ import {
   PopoverTrigger
 } from '@/components/ui/popover';
 import { Globe, Phone, Search, FileText, Upload, Trash2, Plus, Home, MapPin } from 'lucide-react';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 // ─── Types ──────────────────────────────────────────────────────────────
 export type DayAvailability = { day: string; isOpen: boolean; openTime: string; closeTime: string };
@@ -208,6 +209,13 @@ export default function HomeFoodSettingsPage() {
   // ── Sectioned Save Handlers ───────────────────────────────────────────
   const handleSaveProfile = async () => {
     if (!homeFoodId) return;
+    
+    const fullNumber = `${form.countryCode}${form.contactNumber}`;
+    if (form.contactNumber && !isValidPhoneNumber(fullNumber)) {
+      showToast('error', 'Please enter a valid mobile number for the selected country.');
+      return;
+    }
+
     setSavingSection('profile');
     try {
       const payload = {
@@ -505,9 +513,13 @@ export default function HomeFoodSettingsPage() {
                     </Popover>
                     <Input
                       value={form.contactNumber}
-                      onChange={setField('contactNumber')}
+                      onChange={(e) => {
+                        const numericValue = e.target.value.replace(/\D/g, '');
+                        setForm(f => ({ ...f, contactNumber: numericValue }));
+                      }}
                       className="flex-1"
                       placeholder="Mobile Number"
+                      inputMode="numeric"
                     />
                   </div>
                 </div>

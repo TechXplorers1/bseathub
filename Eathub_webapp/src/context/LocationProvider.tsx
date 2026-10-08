@@ -81,7 +81,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       },
       (err) => {
         setIsLocating(false);
-        setLocationError(err.message);
+        if (err.code === 1) { // PERMISSION_DENIED
+          setLocationError('Location access was denied. Please enable it in your browser settings.');
+          alert('Location access was denied. Please enable it in your browser settings to use this feature.');
+        } else {
+          setLocationError(err.message);
+        }
         setLocation('Location unavailable');
       },
       { timeout: 10000, enableHighAccuracy: true }

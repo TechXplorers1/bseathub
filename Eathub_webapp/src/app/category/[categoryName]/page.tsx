@@ -5,7 +5,8 @@ import { useState, useEffect, use } from "react";
 import { ProviderCard } from "@/components/discovery/ProviderCard";
 import { MenuItem } from "@/components/restaurant/MenuItem";
 import { MenuItemDialog } from "@/components/restaurant/MenuItemDialog";
-import { Loader2, UtensilsCrossed, ChefHat, Store, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, UtensilsCrossed, ChefHat, Store, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { useRestaurants } from "@/context/RestaurantProvider";
 
 type CategoryPageProps = {
@@ -22,14 +23,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const [items, setItems] = useState<any[]>([]);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAllItems, setShowAllItems] = useState(false);
+  const [showAllRestaurants, setShowAllRestaurants] = useState(false);
+  const [showAllHomeFoods, setShowAllHomeFoods] = useState(false);
+  const [showAllChefs, setShowAllChefs] = useState(false);
   const { allItems: allVendors, loading: vendorsLoading } = useRestaurants();
+  const MAX_INITIAL_ITEMS = 4;
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     async function fetchProviders() {
       try {
         setLoading(true);
         const apiUrl = `http://localhost:8081/api/v1/discovery/category/${encodeURIComponent(categoryName)}`;
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, { signal: abortController.signal });
 
         if (!response.ok) throw new Error(`Failed to fetch discovery results`);
 
@@ -95,7 +103,11 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         setChefs(fetchedChefs);
         setItems(fetchedItems);
 
-      } catch (error) {
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          console.log('Discovery fetch aborted');
+          return;
+        }
         console.error("Discovery error:", error);
       } finally {
         setLoading(false);
@@ -105,6 +117,10 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     if (!vendorsLoading) {
       fetchProviders();
     }
+    
+    return () => {
+      abortController.abort();
+    };
   }, [categoryName, allVendors, vendorsLoading]);
 
   const hasResults = restaurants.length > 0 || homeFoods.length > 0 || chefs.length > 0 || items.length > 0;
@@ -140,9 +156,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <h2 className="text-2xl font-black uppercase tracking-tight">Delicious {categoryName} Dishes</h2>
                 <div className="h-px flex-1 bg-gradient-to-r from-muted to-transparent" />
                 <span className="text-xs font-bold bg-amber-50 text-amber-600 px-3 py-1 rounded-full">{items.length} ITEMS</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 font-bold flex items-center gap-1 rounded-full px-4"
+                  onClick={() => setShowAllItems(!showAllItems)}
+                >
+                  {showAllItems ? (
+                    <>Show Less <ChevronUp className="w-4 h-4" /></>
+                  ) : (
+                    <>View All <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </Button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {items.map((item) => (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                {items.slice(0, showAllItems ? items.length : MAX_INITIAL_ITEMS).map((item) => (
                   <MenuItem
                     key={item.id}
                     item={item}
@@ -162,9 +190,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <h2 className="text-2xl font-bold">Top Restaurants</h2>
                 <div className="h-px flex-1 bg-muted/60" />
                 <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">{restaurants.length} AVAILABLE</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold flex items-center gap-1 rounded-full px-4"
+                  onClick={() => setShowAllRestaurants(!showAllRestaurants)}
+                >
+                  {showAllRestaurants ? (
+                    <>Show Less <ChevronUp className="w-4 h-4" /></>
+                  ) : (
+                    <>View All <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {restaurants.map((provider) => (
+                {restaurants.slice(0, showAllRestaurants ? restaurants.length : MAX_INITIAL_ITEMS).map((provider) => (
                   <ProviderCard key={`res-${provider.id}`} provider={provider} />
                 ))}
               </div>
@@ -179,9 +219,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <h2 className="text-2xl font-bold">Kitchens & Home Food</h2>
                 <div className="h-px flex-1 bg-muted/60" />
                 <span className="text-xs font-bold bg-teal-100 text-teal-700 px-3 py-1 rounded-full">{homeFoods.length} KITCHENS</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 font-bold flex items-center gap-1 rounded-full px-4"
+                  onClick={() => setShowAllHomeFoods(!showAllHomeFoods)}
+                >
+                  {showAllHomeFoods ? (
+                    <>Show Less <ChevronUp className="w-4 h-4" /></>
+                  ) : (
+                    <>View All <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {homeFoods.map((provider) => (
+                {homeFoods.slice(0, showAllHomeFoods ? homeFoods.length : MAX_INITIAL_ITEMS).map((provider) => (
                   <ProviderCard key={`hf-${provider.id}`} provider={provider} />
                 ))}
               </div>
@@ -196,9 +248,21 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <h2 className="text-2xl font-bold">Culinary Experts</h2>
                 <div className="h-px flex-1 bg-muted/60" />
                 <span className="text-xs font-bold bg-purple-100 text-purple-700 px-3 py-1 rounded-full">{chefs.length} CHEFS</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 font-bold flex items-center gap-1 rounded-full px-4"
+                  onClick={() => setShowAllChefs(!showAllChefs)}
+                >
+                  {showAllChefs ? (
+                    <>Show Less <ChevronUp className="w-4 h-4" /></>
+                  ) : (
+                    <>View All <ChevronDown className="w-4 h-4" /></>
+                  )}
+                </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {chefs.map((provider) => (
+                {chefs.slice(0, showAllChefs ? chefs.length : MAX_INITIAL_ITEMS).map((provider) => (
                   <ProviderCard key={`chef-${provider.id}`} provider={provider} />
                 ))}
               </div>

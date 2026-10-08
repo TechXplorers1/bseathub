@@ -46,6 +46,7 @@ import {
   PopoverTrigger
 } from '@/components/ui/popover';
 import LocationPicker from '@/components/location/LocationPicker';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -240,6 +241,13 @@ export default function SettingsPage() {
 
   const handleSaveProfile = async () => {
     if (!chefId) return;
+    
+    const fullNumber = `${form.countryCode}${form.contactNumber}`;
+    if (form.contactNumber && !isValidPhoneNumber(fullNumber)) {
+      showToast('error', 'Please enter a valid mobile number for the selected country.');
+      return;
+    }
+
     setSavingStep('profile');
     try {
       const expString = `${form.expYears} Years, ${form.expMonths} Months, ${form.expDays} Days`;
@@ -528,8 +536,12 @@ export default function SettingsPage() {
                     <Input
                       className="flex-1"
                       value={form.contactNumber}
-                      onChange={(e) => setForm({ ...form, contactNumber: e.target.value })}
+                      onChange={(e) => {
+                        const numericValue = e.target.value.replace(/\D/g, '');
+                        setForm({ ...form, contactNumber: numericValue });
+                      }}
                       placeholder="Phone for coordination"
+                      inputMode="numeric"
                     />
                   </div>
                 </div>

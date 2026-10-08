@@ -1,15 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MapPin, Navigation, Search, Loader2 } from 'lucide-react';
-
-// Extract token from existing component or use default
-const MAPBOX_TOKEN = 'pk.eyJ1IjoicGxhY2Vob2xkZXIiLCJhIjoiY20waW94am1tMDByNzJycHh6M2R3c213dyJ9.PlaceholderToken'; 
-mapboxgl.accessToken = MAPBOX_TOKEN;
 
 interface LocationPickerProps {
   initialLat?: number | null;
@@ -20,8 +16,8 @@ interface LocationPickerProps {
 
 export default function LocationPicker({ initialLat, initialLng, initialAddress, onLocationSelect }: LocationPickerProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
   
   const [searchQuery, setSearchQuery] = useState(initialAddress || '');
   const [isSearching, setIsSearching] = useState(false);
@@ -30,48 +26,68 @@ export default function LocationPicker({ initialLat, initialLng, initialAddress,
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
+    // Fix leaflet default icon issue
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    });
+
     const startLat = initialLat || 20.5937; // Default to India center
     const startLng = initialLng || 78.9629;
 
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [startLng, startLat],
-      zoom: initialLat ? 15 : 4,
-    });
+    const map = L.map(mapContainerRef.current).setView([startLat, startLng], initialLat ? 15 : 4);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
 
     mapRef.current = map;
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+
+    const customIcon = L.divIcon({
+      className: 'custom-picker-marker',
+      html: `
+        <div style="width: 32px; height: 32px; background: #f97316; border: 2px solid white; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
+           <div style="width: 12px; height: 12px; background: white; border-radius: 50%; transform: rotate(45deg);"></div>
+        </div>
+      `,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
 
     // Add marker
-    const marker = new mapboxgl.Marker({
+    const marker = L.marker([startLat, startLng], {
       draggable: true,
-      color: '#f97316' // Primary orange
-    })
-      .setLngLat([startLng, startLat])
-      .addTo(map);
+      icon: customIcon
+    }).addTo(map);
 
     markerRef.current = marker;
 
     // IF we have an initial address but NO coords, trigger search automatically
     if (!initialLat && !initialLng && initialAddress) {
-       // We'll call the search logic after map is initialized
        geocodeAddress(initialAddress, map, marker);
     }
 
     marker.on('dragend', () => {
-      const lngLat = marker.getLngLat();
-      onLocationSelect(lngLat.lat, lngLat.lng);
+      const latLng = marker.getLatLng();
+      onLocationSelect(latLng.lat, latLng.lng);
     });
 
     map.on('click', (e) => {
-      marker.setLngLat(e.lngLat);
-      onLocationSelect(e.lngLat.lat, e.lngLat.lng);
+      marker.setLatLng(e.latlng);
+      onLocationSelect(e.latlng.lat, e.latlng.lng);
     });
 
     return () => {
       map.remove();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleGetCurrentLocation = () => {
@@ -80,8 +96,8 @@ export default function LocationPicker({ initialLat, initialLng, initialAddress,
       (pos) => {
         const { latitude, longitude } = pos.coords;
         if (mapRef.current && markerRef.current) {
-          mapRef.current.flyTo({ center: [longitude, latitude], zoom: 16 });
-          markerRef.current.setLngLat([longitude, latitude]);
+          mapRef.current.flyTo([latitude, longitude], 16);
+          markerRef.current.setLatLng([latitude, longitude]);
           onLocationSelect(latitude, longitude);
         }
         setIsLocating(false);
@@ -93,7 +109,7 @@ export default function LocationPicker({ initialLat, initialLng, initialAddress,
     );
   };
 
-  const geocodeAddress = async (query: string, mapObj?: mapboxgl.Map | null, markerObj?: mapboxgl.Marker | null) => {
+  const geocodeAddress = async (query: string, mapObj?: L.Map | null, markerObj?: L.Marker | null) => {
     if (!query.trim()) return;
     setIsSearching(true);
     
@@ -133,8 +149,8 @@ export default function LocationPicker({ initialLat, initialLng, initialAddress,
         const marker = markerObj || markerRef.current;
         
         if (map && marker) {
-          map.flyTo({ center: [lon, lat], zoom: 15 });
-          marker.setLngLat([lon, lat]);
+          map.flyTo([lat, lon], 15);
+          marker.setLatLng([lat, lon]);
           onLocationSelect(lat, lon, result.display_name);
         }
       } else if (!mapObj) {
@@ -177,8 +193,8 @@ export default function LocationPicker({ initialLat, initialLng, initialAddress,
       </div>
       
       <div className="relative flex-1 rounded-xl overflow-hidden border-2 border-primary/20 bg-muted">
-        <div ref={mapContainerRef} className="absolute inset-0" />
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-primary/20 flex items-center gap-2 text-xs font-semibold text-primary">
+        <div ref={mapContainerRef} className="absolute inset-0 w-full h-full z-0" />
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[400] bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-primary/20 flex items-center gap-2 text-xs font-semibold text-primary">
           <MapPin className="h-3 w-3" />
           Drag pin to refine location
         </div>

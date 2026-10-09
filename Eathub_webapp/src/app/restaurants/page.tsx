@@ -23,7 +23,12 @@ export default function RestaurantsPage() {
           categories: item.restaurantType ? [item.restaurantType] : (item.categories || ["General"]),
           type: 'restaurant' as const
         }));
-        setRestaurants(normalized);
+        const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+        let filteredNormalized = normalized;
+        if (currentUserId) {
+          filteredNormalized = normalized.filter((item: any) => item.ownerId !== currentUserId);
+        }
+        setRestaurants(filteredNormalized);
       } catch (err: any) {
         setError(err.message);
       } finally {

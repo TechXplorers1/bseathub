@@ -44,7 +44,7 @@ export function RestaurantInfo({
         </div>
       </div>
 
-      <h1 className="hidden lg:block text-4xl font-bold lg:mt-0 tracking-tight">{displayName}</h1>
+      <h1 className="hidden lg:block text-3xl xl:text-4xl font-bold lg:mt-0 tracking-tight break-words">{displayName}</h1>
 
       <div className="mt-6 space-y-3 text-sm">
         <h2 className="text-lg font-semibold sr-only lg:not-sr-only">

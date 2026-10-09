@@ -199,7 +199,7 @@ export function RestaurantDetails({
       </div>
       <div className="w-full px-0 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-0 lg:pt-6">
-          <div className={cn(leftColumnClass, "lg:w-[350px] xl:w-[400px] shrink-0")}>
+          <div className={cn(leftColumnClass, "lg:w-[280px] xl:w-[320px] shrink-0")}>
             <RestaurantInfo restaurant={restaurant} displayName={displayName} />
             <Separator className="my-3" />
             <MenuNav menuCategories={menuCategories} hasChef={false} />
@@ -257,7 +257,7 @@ export function RestaurantDetails({
                     <section id={getSectionId(category.title)} className="scroll-mt-28">
                       <section className="mb-6 overflow-hidden px-4 sm:px-0">
                         <h2 className="text-xl font-bold text-gray-800 mb-4 px-1 tracking-tight">{category.title}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4 gap-6">
                           {category.items.map(item => <MenuItem key={item.id} item={item} onClick={() => handleItemClick(item)} />)}
                         </div>
                       </section>

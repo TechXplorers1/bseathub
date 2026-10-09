@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { RestaurantCarousel } from '@/components/home/RestaurantCarousel';
 import { useRestaurants } from '@/context/RestaurantProvider';
 import { FilterCategories } from '@/components/home/FilterCategories';
@@ -17,7 +18,13 @@ export default function Home() {
   const { deliveryMode } = useDeliveryMode();
   const { selectedRadius, nearbyData, isFetchingNearby, hasLocation, locationLabel } = useDistanceFilter();
   const { user } = useUser();
-  const currentUserId = user?.uid;
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentUserId(localStorage.getItem('userId'));
+    }
+  }, []);
 
   // Filter out the current user's provider card from showing on their own homepage
   const filterSelf = <T extends { ownerId?: string; owner?: { id: string } }>(items: T[]): T[] => {

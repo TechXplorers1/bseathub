@@ -38,7 +38,10 @@ export default function ChefsPage() {
     );
   }
 
-  const filteredChefs = chefs.filter(chef => {
+  const filteredChefs = chefs.filter((chef: any) => {
+    const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (currentUserId && chef.ownerId === currentUserId) return false;
+
     if (filter === 'all') return true;
     if (!chef.preference) return false;
     if (filter === 'veg') return chef.preference === 'Veg';

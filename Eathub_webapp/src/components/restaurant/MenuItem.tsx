@@ -51,8 +51,8 @@ export function MenuItem({
           </div>
 
           {/* TEXT RIGHT */}
-          <div className="flex-1">
-            <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-start gap-2">
               <div className="flex-1 min-w-0">
                 {showProviderInfo && item.providerName && (
                   <div className="flex items-center gap-1.5 mb-1.5">
@@ -70,7 +70,7 @@ export function MenuItem({
                   {item.name}
                 </h3>
               </div>
-              <div className="text-right flex flex-col items-end">
+              <div className="text-right flex flex-col items-end flex-shrink-0 ml-1">
                 {!hidePrice && (
                   <span className="font-black text-xl tracking-tighter">${item.price}</span>
                 )}

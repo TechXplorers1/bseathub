@@ -24,7 +24,12 @@ export default function HomeFoodPage() {
           isOpen: item.isActive ?? true,
           type: 'home-food' as const
         }));
-        setHomeFoods(normalized);
+        const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+        let filteredNormalized = normalized;
+        if (currentUserId) {
+          filteredNormalized = normalized.filter((item: any) => item.ownerId !== currentUserId);
+        }
+        setHomeFoods(filteredNormalized);
       } catch (err: any) {
         setError(err.message);
       } finally {

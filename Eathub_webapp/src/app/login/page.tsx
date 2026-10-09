@@ -178,11 +178,22 @@ export default function LoginPage() {
         router.push('/');
         return;
       }
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: error.message || "Invalid email or password.",
-      });
+      if (error.message === "User not found") {
+        toast({
+          variant: "destructive",
+          title: "Account Not Found",
+          description: "This email is not registered. Please create an account first.",
+        });
+        setIsRegistering(true);
+        // Pre-fill the registration email with the one they tried to login with
+        setRegForm(prev => ({ ...prev, email: email }));
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message || "Invalid email or password.",
+        });
+      }
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,15 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import {
     Tabs,
     TabsList,
     TabsTrigger,
@@ -105,9 +114,16 @@ function BookingsTable({ bookings, onStatusUpdate }: { bookings: ChefBooking[], 
                             {booking.eventType || booking.serviceName || 'General Hire'}
                         </TableCell>
                         <TableCell>
-                            <Badge className="rounded-full px-4 font-black text-[10px] uppercase tracking-wider shadow-sm" variant={booking.status === 'Completed' ? 'default' : booking.status === 'Cancelled' ? 'destructive' : 'secondary'}>
-                                {booking.status}
-                            </Badge>
+                            <div className="flex flex-col gap-1 items-start">
+                                <Badge className="rounded-full px-4 font-black text-[10px] uppercase tracking-wider shadow-sm" variant={booking.status === 'Completed' ? 'default' : booking.status === 'Cancelled' ? 'destructive' : 'secondary'}>
+                                    {booking.status}
+                                </Badge>
+                                {booking.status === 'Cancelled' && booking.statusReason && (
+                                    <span className="text-[9px] font-bold text-destructive/80 italic max-w-[150px] truncate" title={booking.statusReason}>
+                                        {booking.statusReason}
+                                    </span>
+                                )}
+                            </div>
                         </TableCell>
                         <TableCell className="text-right">
                             {booking.isNegotiable ? (
@@ -151,6 +167,8 @@ export default function BookingsPage() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState<BookingFilterStatus>('All');
+    const [cancelDialog, setCancelDialog] = useState<{ isOpen: boolean; bookingId: string }>({ isOpen: false, bookingId: '' });
+    const [cancelReason, setCancelReason] = useState('');
     const { toast } = useToast();
 
     // Connect to Global Header Search
@@ -196,18 +214,37 @@ export default function BookingsPage() {
     }, []);
 
     const handleStatusUpdate = async (id: string, status: string) => {
-        let reason = '';
         if (status === 'Cancelled') {
-            reason = window.prompt('Please provide a reason for rejection/cancellation:') || '';
-            if (reason === null) return;
+            setCancelDialog({ isOpen: true, bookingId: id });
+            return;
         }
 
         try {
-            await updateBookingStatus(id, status, reason);
+            await updateBookingStatus(id, status, '');
             toast({ title: 'Status Updated', description: `Booking is now ${status}` });
-            setBookings(prev => prev.map(b => b.id === id ? { ...b, status: status as any, statusReason: reason } : b));
+            setBookings(prev => prev.map(b => b.id === id ? { ...b, status: status as any } : b));
         } catch (err) {
             toast({ variant: 'destructive', title: 'Update Failed', description: 'Could not update status' });
+        }
+    };
+
+    const confirmCancellation = async () => {
+        const id = cancelDialog.bookingId;
+        const reason = cancelReason.trim();
+
+        if (!reason) {
+            toast({ variant: 'destructive', title: 'Reason Required', description: 'Please provide a reason for cancellation.' });
+            return;
+        }
+
+        try {
+            await updateBookingStatus(id, 'Cancelled', reason);
+            toast({ title: 'Booking Cancelled', description: 'Cancellation reason stored successfully.' });
+            setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'Cancelled', statusReason: reason } : b));
+            setCancelDialog({ isOpen: false, bookingId: '' });
+            setCancelReason('');
+        } catch (err) {
+            toast({ variant: 'destructive', title: 'Cancellation Failed', description: 'Could not cancel booking.' });
         }
     };
 
@@ -285,6 +322,48 @@ export default function BookingsPage() {
                     <BookingsTable bookings={filteredBookings} onStatusUpdate={handleStatusUpdate} />
                 </CardContent>
             </Card>
+
+            <Dialog open={cancelDialog.isOpen} onOpenChange={(open) => {
+                if (!open) {
+                    setCancelDialog({ isOpen: false, bookingId: '' });
+                    setCancelReason('');
+                }
+            }}>
+                <DialogContent className="rounded-3xl border-0 shadow-2xl p-6 sm:p-8 max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black uppercase tracking-tight text-destructive">Cancel Booking</DialogTitle>
+                        <DialogDescription className="font-bold text-xs tracking-widest uppercase">
+                            Please provide a reason for cancelling this booking.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="py-4">
+                        <Textarea 
+                            placeholder="Enter cancellation reason..." 
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            className="min-h-[120px] rounded-2xl resize-none p-4"
+                        />
+                    </div>
+                    
+                    <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+                        <Button 
+                            variant="ghost" 
+                            onClick={() => { setCancelDialog({ isOpen: false, bookingId: '' }); setCancelReason(''); }}
+                            className="rounded-xl font-bold uppercase tracking-widest text-xs"
+                        >
+                            Back
+                        </Button>
+                        <Button 
+                            variant="destructive" 
+                            onClick={confirmCancellation}
+                            className="rounded-xl font-black uppercase tracking-widest text-xs shadow-md shadow-red-200"
+                        >
+                            Confirm Cancellation
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

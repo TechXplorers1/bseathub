@@ -24,12 +24,12 @@ export function getCuisinePlaceholder(cuisine: string = ''): PlaceholderImageIds
   if (c.includes('break')) return 'restaurant-14';
   if (c.includes('ramen')) return 'restaurant-15';
   if (c.includes('dess') || c.includes('sweet')) return 'restaurant-16';
-  
+
   return 'restaurant-1'; // Default
 }
 
 export function getDisplayImage(
-  idOrUrl: string | PlaceholderImageIds | undefined | null, 
+  idOrUrl: string | PlaceholderImageIds | undefined | null,
   fallbackId: PlaceholderImageIds = 'restaurant-1'
 ): string {
   if (!idOrUrl) {
@@ -45,17 +45,8 @@ export function getDisplayImage(
 
   // Assume it's a URL or Base64 string
   const urlStr = idOrUrl as string;
-  
-  // Block API images to decrease loading time and prevent timeouts/500 errors
-  if (urlStr.startsWith('http://localhost') || urlStr.startsWith('https://example.com')) {
-    const fallback = getImageById(fallbackId);
-    return fallback?.imageUrl || '';
-  }
 
-  if (urlStr.startsWith('data:image') || urlStr.startsWith('http') || urlStr.startsWith('/')) {
-    return urlStr;
-  }
-
+  // BLOCK ALL IMAGES AS REQUESTED (including Base64 and API images)
   const fallback = getImageById(fallbackId);
   return fallback?.imageUrl || '';
 }

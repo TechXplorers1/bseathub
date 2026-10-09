@@ -258,14 +258,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     } catch (error: any) {
       console.error('Checkout error:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Checkout Failed',
-        description: error.message || 'Something went wrong while placing your order.',
-      });
-
-      if (error.message === 'Failed to fetch profile' || error.status === 401) {
+      if (error.status === 401) {
+        toast({
+          variant: 'destructive',
+          title: 'Session Expired',
+          description: 'Your session has expired. Please log in again to continue checkout.',
+        });
+        // Clear stale data so the UI reflects the logged-out state
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('eathubLoggedIn');
         router.push('/login');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Checkout Failed',
+          description: error.message || 'Something went wrong while placing your order.',
+        });
       }
     } finally {
       setIsCheckingOut(false);

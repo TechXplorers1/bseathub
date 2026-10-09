@@ -85,7 +85,10 @@ export const login = async (credentials: any) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
     });
-    if (!res.ok) throw new Error("Invalid email or password");
+    if (!res.ok) {
+        const errorText = await res.text().catch(() => '');
+        throw new Error(errorText || "Invalid email or password");
+    }
     return res.json();
 };
 
@@ -289,7 +292,8 @@ export const fetchUserProfile = async () => {
         },
     });
     if (!res.ok) {
-        const error = new Error("Failed to fetch profile");
+        const errorText = await res.text().catch(() => '');
+        const error = new Error(errorText || "Failed to fetch profile");
         (error as any).status = res.status;
         throw error;
     }

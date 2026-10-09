@@ -77,6 +77,14 @@ public class OrderService {
                     "Invalid sourceType '" + request.getSourceType() + "'. Must be 'Restaurant' or 'HomeFood'");
         }
 
+        User owner = null;
+        if (order.getRestaurant() != null) owner = order.getRestaurant().getOwner();
+        else if (order.getHomeFoodProvider() != null) owner = order.getHomeFoodProvider().getOwner();
+
+        if (owner != null && owner.getId().equals(customer.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Providers cannot order their own items.");
+        }
+
         // ── Build Order Items ───────────────────────────────────────────────
         List<OrderItem> items = request.getItems().stream().map(itemReq -> OrderItem.builder()
                 .order(order)

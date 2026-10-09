@@ -19,12 +19,19 @@ public class UserService {
 
     public User getUserByToken(String token) {
         String jwt = token;
+        if (jwt == null || jwt.equals("Bearer null")) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Missing or invalid token");
+        }
         if (jwt.startsWith("Bearer ")) {
             jwt = jwt.substring(7);
         }
-        String email = jwtService.extractUsername(jwt);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found via token: " + email));
+        try {
+            String email = jwtService.extractUsername(jwt);
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "User not found via token"));
+        } catch (Exception e) {
+            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+        }
     }
 
     public UserProfileDTO getUserProfile(String token) {

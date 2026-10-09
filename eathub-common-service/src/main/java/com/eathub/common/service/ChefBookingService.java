@@ -36,6 +36,10 @@ public class ChefBookingService {
         Chef chef = chefRepository.findById(dto.getChefId())
                 .orElseThrow(() -> new RuntimeException("Chef not found"));
 
+        if (chef.getOwner() != null && chef.getOwner().getId().equals(customer.getId())) {
+            throw new RuntimeException("Providers cannot book their own services.");
+        }
+
         ChefService service = null;
         if (dto.getServiceId() != null) {
             service = chefServiceRepository.findById(dto.getServiceId())

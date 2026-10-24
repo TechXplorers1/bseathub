@@ -8,7 +8,7 @@ import { createOrder, fetchUserProfile, createRazorpayOrder, updateOrderPaymentS
 import { useRouter } from 'next/navigation';
 import { loadRazorpay } from '@/lib/razorpay';
 import { requestForToken, onMessageListener } from '@/lib/firebase';
-import { requestForToken, onMessageListener } from '@/lib/firebase';
+import { isItemInStock } from '@/lib/stock-utils';
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -71,6 +71,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cartItems, providerInfo]);
 
   const addToCart = (item: MenuItem, provider: { id: string; type: 'Restaurant' | 'HomeFood'; name: string }) => {
+    if (!isItemInStock(item)) {
+      toast({
+        title: 'Item Unavailable',
+        description: `${item.name} is currently out of stock.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // MULTI-VENDOR SUPPORT: We no longer block different restaurants.
     // We just ensure the item has the provider info attached.
     const itemWithProvider = {

@@ -20,19 +20,24 @@ interface LocationContextType {
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
 export function LocationProvider({ children }: { children: ReactNode }) {
-  const [location, setLocation] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('userLocation') || 'Detecting location...';
+  const [location, setLocation] = useState<string>('Detecting location...');
+  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+
+  // Load from localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('userLocation');
+    if (savedLocation) {
+      setLocation(savedLocation);
     }
-    return 'Detecting location...';
-  });
-  const [coordinates, setCoordinates] = useState<Coordinates | null>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('userCoords');
-      return saved ? JSON.parse(saved) : null;
+    const savedCoords = localStorage.getItem('userCoords');
+    if (savedCoords) {
+      try {
+        setCoordinates(JSON.parse(savedCoords));
+      } catch (e) {
+        console.warn('Failed to parse userCoords from localStorage');
+      }
     }
-    return null;
-  });
+  }, []);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -63,7 +68,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
             const state = addr?.state || '';
             const fullLoc = state ? `${city}, ${state}` : city;
             setLocation(fullLoc);
-            
+
             // Persist for fallback/Geocoding
             localStorage.setItem('userLocation', fullLoc);
             localStorage.setItem('userCity', city);

@@ -5,7 +5,7 @@ import type { Restaurant } from '@/lib/types';
 import { fetchHomeFoodBySlug } from '@/services/api';
 
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export const dynamic = 'force-dynamic';

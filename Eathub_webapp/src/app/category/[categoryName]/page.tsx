@@ -47,7 +47,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         let fetchedRestaurants = (data.restaurants || []).map((item: any) => ({ ...item, type: "RESTAURANT" as const }));
         let fetchedHomeFoods = (data.homeFoods || []).map((item: any) => ({ ...item, type: "HOME_FOOD" as const }));
         let fetchedChefs = (data.chefs || []).map((item: any) => ({ ...item, type: "CHEF" as const }));
-        let fetchedItems = data.items || [];
+        
+        const { isItemInStock } = await import('@/lib/stock-utils');
+        let fetchedItems = (data.items || []).filter((item: any) => isItemInStock(item));
 
         // FALLBACK: If backend finds nothing, perform a thorough local search
         if (allVendors.length > 0) {
@@ -71,7 +73,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                   item.name?.toLowerCase().includes(query) ||
                   item.description?.toLowerCase().includes(query);
 
-                if (itemMatch && !fetchedItems.find((fi: any) => fi.id === item.id)) {
+                if (itemMatch && isItemInStock(item) && !fetchedItems.find((fi: any) => fi.id === item.id)) {
                   extraItems.push({
                     ...item,
                     providerName: v.name,
@@ -85,7 +87,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             });
           });
 
-          fetchedItems = [...fetchedItems, ...extraItems];
+          fetchedItems = [...fetchedItems, ...extraItems].filter((item: any) => isItemInStock(item));
 
           allVendors.forEach(v => {
             if (extraVendors.has(v.id)) {

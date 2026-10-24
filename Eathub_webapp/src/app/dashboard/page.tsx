@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MoreHorizontal, Loader2, RefreshCw, UtensilsCrossed, CalendarDays } from "lucide-react"
+import { MoreHorizontal, Loader2, RefreshCw, UtensilsCrossed, CalendarDays, Star } from "lucide-react"
 import { OrderDetailsDialog } from '@/components/dashboard/OrderDetailsDialog';
 import { ReviewModal } from '@/components/dashboard/ReviewModal';
 import { ReviewDialog } from '@/components/dashboard/ReviewDialog';
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                     <main className="grid flex-1 items-start gap-4 md:gap-8 lg:grid-cols-3">
                         <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
                             {/* Stats Cards */}
-                            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
                                 <Card className="border-none shadow-lg bg-white/50 backdrop-blur-md">
                                     <CardHeader className="pb-2">
                                         <CardDescription className="font-bold uppercase text-[10px] tracking-widest text-muted-foreground">Total Orders</CardDescription>
@@ -206,6 +206,24 @@ export default function DashboardPage() {
                                     </CardHeader>
                                     <CardContent>
                                         <div className="text-xs text-indigo-500 font-bold">Culinary event history</div>
+                                    </CardContent>
+                                </Card>
+                                <Card 
+                                    className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 hover:shadow-xl transition-all cursor-pointer group"
+                                    onClick={() => router.push('/reviews')}
+                                >
+                                    <CardHeader className="pb-2">
+                                        <CardDescription className="font-bold uppercase text-[10px] tracking-widest text-amber-700 flex items-center justify-between">
+                                            <span>My Reviews</span>
+                                            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                                        </CardDescription>
+                                        <CardTitle className="text-xl font-black text-amber-900 group-hover:text-primary transition-colors flex items-center justify-between">
+                                            <span>Ratings & Feedback</span>
+                                            <span className="text-sm font-bold text-amber-700 group-hover:translate-x-1 transition-transform">→</span>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-xs text-amber-800 font-medium">Order items & timings log</div>
                                     </CardContent>
                                 </Card>
                             </div>

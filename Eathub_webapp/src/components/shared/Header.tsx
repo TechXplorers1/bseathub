@@ -18,6 +18,7 @@ import {
   Store,
   ChefHat,
   User,
+  Star,
   X,
   Menu
 } from 'lucide-react';
@@ -322,6 +323,7 @@ export function Header({ className, style }: HeaderProps) {
     if (!auth.role) return null;
     const role = auth.role.toUpperCase();
     const map: Record<string, { label: string; href: string }> = {
+      ADMIN: { label: 'Admin Dashboard', href: '/admin/dashboard' },
       USER: { label: 'User Dashboard', href: '/dashboard' },
       HOMEFOOD: { label: 'Homefood Dashboard', href: '/home-food-dashboard' },
       RESTAURANT: { label: 'Restaurant Dashboard', href: '/restaurant-dashboard' },
@@ -516,12 +518,20 @@ export function Header({ className, style }: HeaderProps) {
                       </Link>
                     </DropdownMenuItem>
                     {auth.role === 'USER' && (
-                      <DropdownMenuItem asChild>
-                        <Link href="/profile" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
-                          <User className="mr-3 h-4 w-4 text-blue-500" />
-                          Profile
-                        </Link>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href="/reviews" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
+                            <Star className="mr-3 h-4 w-4 text-amber-500 fill-amber-500" />
+                            My Reviews
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href="/profile" className="cursor-pointer w-full flex items-center py-2.5 px-3 text-sm rounded-lg hover:bg-muted font-bold">
+                            <User className="mr-3 h-4 w-4 text-blue-500" />
+                            Profile
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
                     )}
                   </>
                 )}

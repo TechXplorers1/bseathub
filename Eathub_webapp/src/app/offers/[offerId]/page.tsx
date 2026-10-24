@@ -45,8 +45,10 @@ export default function OffersPage({ params }: { params: Promise<{ offerId: stri
       setLoading(true);
       try {
         const { fetchItemsOnOffer } = await import('@/services/api');
+        const { isItemInStock } = await import('@/lib/stock-utils');
         const data = await fetchItemsOnOffer(targetOfferType);
-        setItemsPool(data || []);
+        const inStockData = (data || []).filter((item: any) => isItemInStock(item));
+        setItemsPool(inStockData);
       } catch (err) {
         console.error("Failed to load offers", err);
       } finally {

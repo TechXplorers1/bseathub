@@ -6,6 +6,7 @@ import { MenuItem } from '@/components/restaurant/MenuItem';
 import { MenuItemDialog } from '@/components/restaurant/MenuItemDialog';
 import { Separator } from '../ui/separator';
 import { useRestaurants } from '@/context/RestaurantProvider';
+import { isItemInStock } from '@/lib/stock-utils';
 
 type EnrichedMenuItem = BaseMenuItem & {
   restaurantName?: string;
@@ -21,13 +22,15 @@ export function MostOrdered() {
 
   const allEnrichedItems = vendors.flatMap((restaurant) =>
     (restaurant.menu || []).flatMap((category) =>
-      (category.items || []).map((item) => ({
-        ...item,
-        type: restaurant.type,
-        restaurantName: restaurant.name,
-        rating: typeof (item as any).rating === 'number' ? (item as any).rating : restaurant.rating,
-        recipe: (item as any).recipe ?? item.description,
-      }))
+      (category.items || [])
+        .filter((item) => isItemInStock(item))
+        .map((item) => ({
+          ...item,
+          type: restaurant.type,
+          restaurantName: restaurant.name,
+          rating: typeof (item as any).rating === 'number' ? (item as any).rating : restaurant.rating,
+          recipe: (item as any).recipe ?? item.description,
+        }))
     )
   );
 

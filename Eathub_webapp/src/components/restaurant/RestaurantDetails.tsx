@@ -6,6 +6,7 @@ import { MenuNav } from './MenuNav';
 import { MenuItem } from './MenuItem';
 import { MenuItemDialog } from './MenuItemDialog';
 import { fetchGroupedMenu } from '@/services/api';
+import { filterInStockCategories } from '@/lib/stock-utils';
 import { ChefGallery } from '../chef/ChefGallery';
 import { ChefCuisineSpecialties } from '../chef/ChefCuisineSpecialties';
 import { Separator } from '../ui/separator';
@@ -62,7 +63,7 @@ export function RestaurantDetails({
   const [selectedItem, setSelectedItem] = React.useState<MenuItemType | null>(null);
   const [categoryFilter, setCategoryFilter] = React.useState<CategoryFilterKey>('all');
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [menu, setMenu] = React.useState<MenuCategory[]>(restaurant.menu || []);
+  const [menu, setMenu] = React.useState<MenuCategory[]>(() => filterInStockCategories(restaurant.menu || []));
   const [loadingMenu, setLoadingMenu] = React.useState(false);
   const [hasFetchedMenu, setHasFetchedMenu] = React.useState(false);
 
@@ -81,8 +82,9 @@ export function RestaurantDetails({
           const providerType = (normalizedType === 'home-food' || normalizedType === 'homefood') ? 'home-food' : 'restaurant';
           const grouped = await fetchGroupedMenu(restaurant.id, providerType as any);
           if (grouped && Array.isArray(grouped)) {
-            setMenu(grouped);
-            const flattened = grouped.flatMap((cat: any) =>
+            const inStockGrouped = filterInStockCategories(grouped);
+            setMenu(inStockGrouped);
+            const flattened = inStockGrouped.flatMap((cat: any) =>
               cat.items.map((item: any) => ({
                 ...item,
                 vendorSlug: restaurant.slug,
@@ -123,7 +125,7 @@ export function RestaurantDetails({
 
   const handleItemClick = (item: MenuItemType) => setSelectedItem(item);
 
-  const nonEmptyMenu = React.useMemo(() => (menu ?? []).filter(c => c.items?.length > 0), [menu]);
+  const nonEmptyMenu = React.useMemo(() => filterInStockCategories(menu), [menu]);
 
   const availableFilterKeys = React.useMemo(() => {
     const keys: string[] = ['all'];

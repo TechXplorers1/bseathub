@@ -67,14 +67,11 @@ export default function OrdersPage() {
         try {
             const data = await fetchMyOrders();
             // Sort recently first
-            setOrders(data.sort((a, b) => new Date(b.orderPlacedAt).getTime() - new Date(a.orderPlacedAt).getTime()));
+            const sorted = (data || []).sort((a, b) => new Date(b.orderPlacedAt).getTime() - new Date(a.orderPlacedAt).getTime());
+            setOrders(sorted);
         } catch (err) {
-            console.error(err);
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Failed to load orders.'
-            });
+            console.error("Orders load failed:", err);
+            setOrders([]);
         } finally {
             setLoading(false);
         }

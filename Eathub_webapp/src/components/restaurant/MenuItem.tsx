@@ -8,6 +8,7 @@ import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import Link from 'next/link';
 import { FavoriteButton } from '../shared/FavoriteButton';
+import { isItemInStock } from '@/lib/stock-utils';
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -24,6 +25,11 @@ export function MenuItem({
   hideAddButton = false,
   hidePrice = false
 }: MenuItemProps) {
+  // Never show out-of-stock items to users
+  if (!isItemInStock(item)) {
+    return null;
+  }
+
   const displayImage = getDisplayImage(item.imageId, 'food-1');
 
   return (

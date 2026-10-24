@@ -15,6 +15,7 @@ import { MenuItem } from '../restaurant/MenuItem';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { MenuItemDialog } from '../restaurant/MenuItemDialog';
 import { useHeader } from '@/context/HeaderProvider';
+import { filterInStockCategories } from '@/lib/stock-utils';
 
 type ChefTab = 'book' | 'signature' | 'enquiry';
 
@@ -56,8 +57,9 @@ export function ModernChefPage({ restaurant, chefName }: ModernChefPageProps) {
         try {
           const grouped = await fetchGroupedChefServices(restaurant.id);
           if (grouped && Array.isArray(grouped)) {
-            setServices(grouped);
-            const flattened = grouped.flatMap(cat =>
+            const inStockGrouped = filterInStockCategories(grouped);
+            setServices(inStockGrouped);
+            const flattened = inStockGrouped.flatMap(cat =>
               cat.items.map((item: MenuItemType) => ({
                 ...item,
                 vendorSlug: restaurant.slug,

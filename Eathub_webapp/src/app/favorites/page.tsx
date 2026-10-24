@@ -12,6 +12,8 @@ import { MenuItemDialog } from '@/components/restaurant/MenuItemDialog';
 import type { MenuItem as MenuItemType } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
+import { isItemInStock } from '@/lib/stock-utils';
+
 export default function FavoritesPage() {
   const router = useRouter();
   const [activeType, setActiveType] = useState('RESTAURANT');
@@ -24,7 +26,11 @@ export default function FavoritesPage() {
     setLoading(true);
     try {
       const results = await getDetailedFavorites(type);
-      setData(results);
+      if (type === 'MENU_ITEM') {
+        setData((results || []).filter((item: any) => isItemInStock(item)));
+      } else {
+        setData(results || []);
+      }
     } catch (err) {
       toast({
         title: "Error",

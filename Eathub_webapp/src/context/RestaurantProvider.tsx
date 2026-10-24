@@ -9,6 +9,7 @@ import {
 } from 'react';
 import type { Restaurant } from '@/lib/types';
 import { getCuisinePlaceholder } from '@/lib/image-utils';
+import { filterInStockCategories } from '@/lib/stock-utils';
 
 const API_BASE = "http://localhost:8081/api/v1";
 
@@ -87,11 +88,11 @@ export function RestaurantProvider({
             reviews: item.reviewsCount ?? item.reviews ?? 0,
             services: item.services ?? ['delivery', 'pickup'],
             imageId: item.imageId || getCuisinePlaceholder(cuisine),
-            menu: item.menuCategories?.map((cat: any) => ({
+            menu: filterInStockCategories(item.menuCategories?.map((cat: any) => ({
               id: cat.id,
               title: cat.title,
               items: cat.items ?? []
-            })) ?? []
+            })) ?? [])
           };
         });
 
@@ -104,11 +105,11 @@ export function RestaurantProvider({
           reviews: item.reviews ?? 0,
           isOpen: item.isActive ?? true,
           imageId: item.imageId || getCuisinePlaceholder(item.foodType || "Home-made"),
-          menu: item.menuCategories?.map((cat: any) => ({
+          menu: filterInStockCategories(item.menuCategories?.map((cat: any) => ({
             id: cat.id,
             title: cat.title,
             items: cat.items ?? []
-          })) ?? []
+          })) ?? [])
         }));
 
       setAllItems([...mappedRestaurants, ...mappedHomeFoods]);
@@ -194,11 +195,11 @@ export function RestaurantProvider({
       reviews: item.reviewsCount ?? 0,
       services: item.services ?? ['delivery', 'pickup'],
       imageId: item.imageId || getCuisinePlaceholder(cuisine),
-      menu: item.menuCategories?.map((cat: any) => ({
+      menu: filterInStockCategories(item.menuCategories?.map((cat: any) => ({
         id: cat.id,
         title: cat.title,
         items: cat.items ?? []
-      })) ?? []
+      })) ?? [])
     };
 
     // Update local state if it's already in the list

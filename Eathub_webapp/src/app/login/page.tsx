@@ -164,7 +164,11 @@ export default function LoginPage() {
       });
 
       setOpen(false);
-      router.push('/');
+      if (response.role === 'ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/');
+      }
 
     } catch (error: any) {
       // If it's a QuotaExceededError from localStorage that leaked out

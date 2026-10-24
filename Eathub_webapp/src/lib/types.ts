@@ -59,6 +59,9 @@ export interface MenuItem {
   category?: string;
   type?: RestaurantType | 'chef-service';
   itemType?: 'Veg' | 'Non-Veg' | 'Vegan' | 'Other';
+  status?: string;
+  isAvailable?: boolean;
+  inStock?: boolean;
   isSignature?: boolean;
   isSpecial?: boolean;
   isNegotiable?: boolean;
@@ -186,6 +189,8 @@ export interface ReviewResponse {
   comment: string;
   createdAt: string;
   orderId?: string;
+  menuItemId?: string;
+  menuItemName?: string;
   reply?: string;
   repliedAt?: string;
 }

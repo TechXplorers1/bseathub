@@ -57,8 +57,17 @@ public class OrderController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<OrderResponse>> getOrdersByPartner(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(orderService.getOrdersByPartner(token));
+    public ResponseEntity<List<OrderResponse>> getOrdersByPartner(
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        if (token == null || token.isBlank() || "Bearer null".equalsIgnoreCase(token) || "null".equalsIgnoreCase(token)) {
+            return ResponseEntity.ok(java.util.Collections.emptyList());
+        }
+        try {
+            return ResponseEntity.ok(orderService.getOrdersByPartner(token));
+        } catch (Exception e) {
+            System.err.println("Failed to get orders by partner token: " + e.getMessage());
+            return ResponseEntity.ok(java.util.Collections.emptyList());
+        }
     }
 
     // ─── Provider Endpoints ─────────────────────────────────────────────────

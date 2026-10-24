@@ -59,6 +59,7 @@ public class DiscoveryController {
                     .collect(Collectors.toList());
 
             List<MenuItemDTO> items = rawItems.stream()
+                    .filter(item -> item.getStatus() == null || !"Out of Stock".equalsIgnoreCase(item.getStatus().trim()))
                     .map(item -> {
                         MenuItemDTO dto = MenuItemDTO.builder()
                                 .id(item.getId())

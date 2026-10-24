@@ -301,7 +301,10 @@ public class RestaurantService {
         return MenuCategoryDTO.builder()
                 .id(cat.getId())
                 .title(cat.getTitle())
-                .items(cat.getItems() != null ? cat.getItems().stream().map(this::mapToMenuItemDTO).collect(Collectors.toList()) : List.of())
+                .items(cat.getItems() != null ? cat.getItems().stream()
+                        .filter(i -> i.getStatus() == null || !"Out of Stock".equalsIgnoreCase(i.getStatus().trim()))
+                        .map(this::mapToMenuItemDTO)
+                        .collect(Collectors.toList()) : List.of())
                 .build();
     }
 

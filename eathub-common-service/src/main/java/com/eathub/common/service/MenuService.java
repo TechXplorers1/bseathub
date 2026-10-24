@@ -105,6 +105,7 @@ public class MenuService {
     public List<MenuItemDTO> getItemsOnOffer(String offerType) {
         return menuItemRepository.findAll().stream()
                 .filter(i -> i.getOffer() != null && i.getOffer().getIsActive())
+                .filter(i -> i.getStatus() == null || !"Out of Stock".equalsIgnoreCase(i.getStatus().trim()))
                 .filter(i -> offerType == null || offerType.isEmpty() || offerType.equals(i.getOffer().getType()))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -119,6 +120,7 @@ public class MenuService {
         }
 
         return items.stream()
+                .filter(item -> item.getStatus() == null || !"Out of Stock".equalsIgnoreCase(item.getStatus().trim()))
                 .collect(Collectors.groupingBy(
                         item -> item.getCategory() != null ? item.getCategory().getTitle() : "Uncategorized",
                         Collectors.mapping(this::mapToDTO, Collectors.toList())))

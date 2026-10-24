@@ -108,7 +108,7 @@ public class OrderService {
 
         // ── Send Notification to Provider ──────────────────────────────────
         try {
-            User owner = null;
+            owner = null;
             String brandName = "New Order";
             if ("Restaurant".equalsIgnoreCase(savedOrder.getSourceType()) && savedOrder.getRestaurant() != null) {
                 owner = savedOrder.getRestaurant().getOwner();
